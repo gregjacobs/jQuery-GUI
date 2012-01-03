@@ -1,0 +1,43 @@
+{
+	projectName: "Kevlar",
+	licenseText: "Kevlar JS Library\nCopyright(c) 2011 Gregory Jacobs.\nMIT Licensed. http://www.opensource.org/licenses/mit-license.php",
+	pkgs: [
+		{
+			name: "Kevlar JS",
+			filename: "kevlar.js",
+			includes: [
+				{ file: "js/Kevlar.js" },
+				{ file: "js/namespaces.js" },
+				
+				{ file: "js/util/Observable.js" },
+				
+				{ file: "js/data/proxy/AbstractProxy.js" },
+				
+				{ file: "js/ui/namespaces.js" },
+				{ file: "js/ui/ComponentManager.js" },
+				{ file: "js/ui/Component.js" },
+				{ file: "js/ui/Container.js" },
+				{ file: "js/ui/DataControl.js" },
+				{ file: "js/ui/AbstractOverlay.js" },
+				{ file: "js/ui/Button.js" },
+				{ file: "js/ui/formFields/AbstractField.js" },
+				{ file: "js/ui/formFields/WrappedInputField.js" },
+				{ file: "js/ui/formFields/TextField.js" },
+				{ file: "js/ui/layouts/AbstractLayout.js" },
+				{ file: "js/ui/layouts/CardsLayout.js" },
+				{ file: "js/ui/plugins/AbstractPlugin.js" },
+				{ file: "js/ui/toolButtons/ToolButton.js" },
+				
+				{ tree: "js/" }
+			]
+		},
+
+		{
+			name: "Kevlar CSS",
+			filename: "kevlar.css",
+			includes: [
+				{ tree: "css/" }
+			]
+		}
+	]
+}
