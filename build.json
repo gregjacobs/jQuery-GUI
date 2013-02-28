@@ -1,17 +1,15 @@
 {
-	projectName: "Kevlar",
-	licenseText: "Kevlar JS Library\nCopyright(c) 2011 Gregory Jacobs.\nMIT Licensed. http://www.opensource.org/licenses/mit-license.php",
+	projectName: "UI",
+	licenseText: "UI JS Library\nCopyright(c) 2013 Gregory Jacobs.\nMIT Licensed. http://www.opensource.org/licenses/mit-license.php",
 	pkgs: [
 		{
-			name: "Kevlar JS",
-			filename: "kevlar.js",
+			name: "UI JS",
+			filename: "ui.js",
 			includes: [
-				{ file: "js/Kevlar.js" },
+				{ file: "js/UI.js" },
 				{ file: "js/namespaces.js" },
 				
 				{ file: "js/util/Observable.js" },
-				
-				{ file: "js/data/proxy/AbstractProxy.js" },
 				
 				{ file: "js/ui/namespaces.js" },
 				{ file: "js/ui/ComponentManager.js" },
@@ -33,8 +31,8 @@
 		},
 
 		{
-			name: "Kevlar CSS",
-			filename: "kevlar.css",
+			name: "UI CSS",
+			filename: "ui.css",
 			includes: [
 				{ tree: "css/" }
 			]
