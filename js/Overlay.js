@@ -186,7 +186,7 @@ ui.Overlay = Class.extend( ui.AbstractOverlay, {
 		
 		// Determine if the Overlay has been "flipped" (by collision === 'flip', which is also the default). If so, we need to 
 		// move the arrow to the other side (if there is an arrow)
-		var arrow = Jux.clone( this.arrow );  // make a copy. don't actually want to overwrite the config if it is re-positioned again
+		var arrow = _.cloneDeep( this.arrow );  // make a copy. don't actually want to overwrite the config if it is re-positioned again
 		if( arrow && collisionType === 'flip' ) {
 			var arrowSide = arrow.side;
 			

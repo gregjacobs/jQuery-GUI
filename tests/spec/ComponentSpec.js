@@ -1566,8 +1566,8 @@ tests.unit.ui.add( new Ext.test.Suite( {
 				var myComponent = new ComponentSubClass();
 				
 				// Initial conditions
-				Y.Assert.isTrue( Jux.isJQuery( myComponent.$wrappedSet ), "$wrappedSet should initially be a jQuery wrapped set" );
-				Y.Assert.isTrue( Jux.isElement( myComponent.divElement ), "divElement should initially be an HTMLElement" );
+				Y.Assert.isTrue( myComponent.$wrappedSet instanceof jQuery, "$wrappedSet should initially be a jQuery wrapped set" );
+				Y.Assert.isTrue( _.isElement( myComponent.divElement ), "divElement should initially be an HTMLElement" );
 				
 				myComponent.destroy();
 				

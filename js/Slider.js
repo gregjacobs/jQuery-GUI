@@ -90,7 +90,7 @@ ui.Slider = Class.extend( ui.Component, {
 			// No handle positions, set to an array with one element: the configured (or default) minimum value
 			this.handlePositions = [ this.min ];
 			
-		} else if ( !Jux.isArray( this.handlePositions ) ) {
+		} else if ( !_.isArray( this.handlePositions ) ) {
 			// not an array, make it one
 			this.handlePositions = [ this.handlePositions ];
 		}
@@ -245,7 +245,7 @@ ui.Slider = Class.extend( ui.Component, {
 	 * @param {Number[]} An array of the handle positions. If only one handle, this should be a one element array.
 	 */
 	setHandlePositions : function( positions ) {
-		if( !Jux.isArray( positions ) ) {
+		if( !_.isArray( positions ) ) {
 			positions = [ positions ];
 		}
 		

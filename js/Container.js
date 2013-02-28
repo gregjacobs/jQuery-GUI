@@ -267,7 +267,7 @@ ui.Container = Class.extend( ui.Component, {
 	add : function( cmp ) {
 		var returnVal;
 
-		if( Jux.isArray( cmp ) ) {
+		if( _.isArray( cmp ) ) {
 			returnVal = [];
 			for( var i = 0, numItems = cmp.length; i < numItems; i++ ) {
 				returnVal.push( this.doInsert( cmp[ i ] ) );
@@ -434,7 +434,7 @@ ui.Container = Class.extend( ui.Component, {
 	remove : function( cmp, destroyRemoved ) {
 		var returnVal;
 
-		if( Jux.isArray( cmp ) ) {
+		if( _.isArray( cmp ) ) {
 			returnVal = [];
 			for( var i = 0, numItems = cmp.length; i < numItems; i++ ) {
 				var removedComponent = this.doRemove( cmp[ i ], destroyRemoved );

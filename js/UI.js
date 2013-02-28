@@ -54,25 +54,13 @@ define( [
 		 * This may be placed into CSS styles as such:
 		 * 
 		 *     var $div = jQuery( '<div />' );
-		 *     $div.css( 'background-image', 'url(' + Plus.getBlankImgUrl() + ')' );
+		 *     $div.css( 'background-image', 'url(' + UI.getBlankImgUrl() + ')' );
 		 * 
 		 * @method getBlankImgUrl
 		 * @return {String}
 		 */
 		getBlankImgUrl : function() {
 			return this.blankImgUrl;
-		},
-		
-		
-		/**
-		 * Returns true if the given `value` is a jQuery wrapped set object.
-		 * 
-		 * @method isJQuery
-		 * @param {Mixed} value The value to check.
-		 * @return {Boolean}
-		 */
-		isJQuery : function( value ) {
-			return value instanceof jQuery;
 		},
 		
 		
@@ -150,7 +138,7 @@ define( [
 		 * @param {Object} [scope=window] The scope to run the callback function in.
 		 */
 		loadImages : function( images, callback, scope ) {
-			if( !Jux.isArray( images ) ) {
+			if( !_.isArray( images ) ) {
 				return;
 			}
 			
@@ -186,10 +174,10 @@ define( [
 			this.loadImages( [ image ], callback, scope );
 		}
 		
-		
 	} );
 	
+	
 	// Return singleton instance
-	return new Plus();
+	return new UI();
 	
 } );

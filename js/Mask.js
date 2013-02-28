@@ -78,10 +78,10 @@ ui.Mask = Class.extend( Object, {
 	
 	
 	constructor : function( targetEl, config ) {
-		if( Jux.isElement( targetEl ) ) {
+		if( _.isElement( targetEl ) ) {
 			this.$targetEl = jQuery( targetEl );
 			
-		} else if( Jux.isJQuery( targetEl ) ) {
+		} else if( targetEl instanceof jQuery ) {
 			if( targetEl.length !== 1 ) {
 				throw new Error( "If the 'targetEl' argument to the ui.Mask constructor is a jQuery wrapped set, it must contain exactly one element." );
 			}

@@ -330,7 +330,7 @@ ui.Dialog = Class.extend( ui.Container, {
 		// The footer may have direct HTML content, or child ui.Components.
 		var footerIsHTMLContent = false,
 		    footer = this.footer;
-		if( Jux.isString( footer ) || Jux.isElement( footer ) || Jux.isJQuery( footer ) ) {
+		if( _.isString( footer ) || _.isElement( footer ) || footer instanceof jQuery ) {
 			footerIsHTMLContent = true;
 		}
 		this.footerContainer = new ui.Container( {
