@@ -1,11 +1,21 @@
+/*global define */
 define( [
-	'',
-	''
-], function() {
+	'jquery',
+	'lodash',
+	'Class',
+	'ui/UI',
+	'ui/util/Observable',
+	'ui/ComponentManager',
+	'ui/Css',
+	'ui/Mask',
+	'ui/anim/Animation',
+	'ui/plugin/Plugin'
+],
+function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animation, Plugin ) {
 
 	/**
 	 * @class ui.Component
-	 * @extends Jux.util.Observable
+	 * @extends ui.util.Observable
 	 * 
 	 * Generalized component that defines a displayable item that can be placed onto a page. Provides a base element (by default, a div),
 	 * and a framework for the instantiation, rendering, and (eventually) the destruction process, with events that can be listened to
@@ -64,8 +74,7 @@ define( [
 	 * @constructor
 	 * @param {Object} config The configuration options for this Component, specified in an object (hash).
 	 */
-	/*global Class, jQuery, Jux, ui */
-	ui.Component = Class.extend( Jux.util.Observable, { 
+	var Component = Class.extend( Observable, { 
 		
 		/**
 		 * @cfg {String} id 
@@ -186,9 +195,9 @@ define( [
 		
 		
 		/**
-		 * @cfg {ui.plugins.AbstractPlugin/ui.plugins.AbstractPlugin[]} plugins
-		 * A single plugin or array of plugins to attach to the Component. Plugins must extend the class {@link ui.plugins.AbstractPlugin}.
-		 * See {@link ui.plugins.AbstractPlugin} for details on creating plugins.
+		 * @cfg {ui.plugin.Plugin/ui.plugin.Plugin[]} plugins
+		 * A single plugin or array of plugins to attach to the Component. Plugins must extend the class {@link ui.plugin.Plugin}.
+		 * See {@link ui.plugin.Plugin} for details on creating plugins.
 		 * 
 		 * Note that Component will normalize this config into an array, converting a single plugin into a one-element array, or creating
 		 * an empty array if no plugins were provided.  This is done so that subclasses may add plugins by pushing them directly
@@ -197,7 +206,7 @@ define( [
 		
 		/**
 		 * @cfg {Boolean} dragAndDropSortable
-		 * This config only applies when the Component is added to a {@link ui.Container} that has the {@link ui.plugins.DragAndDropSort} plugin applied.
+		 * This config only applies when the Component is added to a {@link ui.Container} that has the {@link ui.plugin.DragAndDropSort} plugin applied.
 		 * 
 		 * Specifies if the Component should be draggable within the DragAndDropSort Container. Set to false to prevent the Component from being allowed to
 		 * be dragged and dropped.
@@ -294,7 +303,7 @@ define( [
 		
 		constructor : function( config ) {
 			// Apply the properties of the configuration object onto this object
-			Jux.apply( this, config );
+			_.assign( this, config );
 			
 			
 			// Call superclass (observable) constructor. Must be done after config has been applied.
@@ -359,7 +368,7 @@ define( [
 			// Normalize the 'plugins' config into an array before calling initComponent, so that subclasses may just push any
 			// plugins that they wish directly onto the array without extra processing.
 			this.plugins = this.plugins || [];
-			if( _.isPlainObject( this.plugins ) ) {
+			if( !_.isArray( this.plugins ) ) {
 				this.plugins = [ this.plugins ];
 			}
 	        
@@ -388,7 +397,7 @@ define( [
 		 * @protected
 		 * @method initComponent
 		 */
-		initComponent : Jux.emptyFn,
+		initComponent : UI.emptyFn,
 		
 		
 		/**
@@ -396,7 +405,7 @@ define( [
 		 * 
 		 * @private
 		 * @method initPlugins
-		 * @param {ui.plugins.AbstractPlugin/ui.plugins.AbstractPlugin[]} plugin A single plugin, or array of plugins to initialize.
+		 * @param {ui.plugin.Plugin/ui.plugin.Plugin[]} plugin A single plugin, or array of plugins to initialize.
 		 */
 		initPlugins : function( plugin ) {
 			if( _.isArray( plugin ) ) {
@@ -406,12 +415,12 @@ define( [
 				return;  // array has been processed, return
 			}
 			
-			if( !( plugin instanceof ui.plugins.AbstractPlugin ) ) {
-				throw new Error( "error: a plugin provided to this Component was not of type ui.plugins.AbstractPlugin" );
+			if( !( plugin instanceof Plugin ) ) {
+				throw new Error( "error: a plugin provided to this Component was not of type ui.plugin.Plugin" );
 			}
 			
 			// Initialize the plugin, passing a reference to this Component into it.
-			plugin.initPlugin( this );
+			plugin.init( this );
 		},
 		
 		
@@ -490,7 +499,7 @@ define( [
 				}
 				
 				// If the Component was configured with `dragAndDropSortable: false`, add the special HTML attribute which makes the Component's element
-				// be ignored by a ui.Container configured with the ui.plugins.DragAndDropSortable plugin.
+				// be ignored by a ui.Container configured with the ui.plugin.DragAndDropSortable plugin.
 				if( this.dragAndDropSortable === false ) {
 					additionalAttributes.push( 'data-dragAndDropSortable="false"' );
 				}
@@ -499,7 +508,7 @@ define( [
 				// Create a CSS string of any specified styles (the 'style' config)
 				var styles = "";
 				if( this.style ) {
-					styles = Jux.Css.hashToString( this.style );
+					styles = Css.hashToString( this.style );
 					delete this.style;  // no longer needed
 				}
 				
@@ -592,7 +601,7 @@ define( [
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component is being rendered into.
 		 * @param {Object} options The options provided to {@link #render}.
 		 */
-		onRender : Jux.emptyFn,
+		onRender : UI.emptyFn,
 		
 		
 		/**
@@ -605,7 +614,7 @@ define( [
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component has been rendered into.
 		 * @param {Object} options The options provided to {@link #render}.
 		 */
-		afterRender : Jux.emptyFn,
+		afterRender : UI.emptyFn,
 		
 		
 		/**
@@ -678,7 +687,7 @@ define( [
 		 * @template
 		 * @method onComponentLayout
 		 */
-		onComponentLayout : Jux.emptyFn,
+		onComponentLayout : UI.emptyFn,
 		
 		
 		/**
@@ -718,7 +727,7 @@ define( [
 				this.attr = this.attr || {};
 				
 				if( typeof name === 'object' ) {
-					Jux.apply( this.attr, name );  // apply each of the properties on the provided 'attrs' object onto the component's attributes
+					_.assign( this.attr, name );  // apply each of the properties on the provided 'attrs' object onto the component's attributes
 				} else {
 					this.attr[ name ] = value;
 				}
@@ -840,7 +849,7 @@ define( [
 				this.style = this.style || {};
 				
 				if( typeof name === 'object' ) {
-					Jux.apply( this.style, name );  // apply each of the properties on the provided 'styles' object onto the component's style
+					_.assign( this.style, name );  // apply each of the properties on the provided 'styles' object onto the component's style
 				} else {
 					this.style[ name ] = value;
 				}
@@ -1074,7 +1083,7 @@ define( [
 		 * @return {Number} The width of the padding for the given `sides`.
 		 */
 		getPadding : function( sides ) {
-			return Jux.Css.getPadding( this.$el, sides );
+			return Css.getPadding( this.$el, sides );
 		},	
 		
 		
@@ -1092,7 +1101,7 @@ define( [
 		 * @return {Number} The width of the margin for the given `sides`.
 		 */
 		getMargin : function( sides ) {
-			return Jux.Css.getMargin( this.$el, sides );
+			return Css.getMargin( this.$el, sides );
 		},
 		
 		
@@ -1110,7 +1119,7 @@ define( [
 		 * @return {Number} The width of the border for the given `sides`.
 		 */
 		getBorderWidth : function( sides ) {
-			return Jux.Css.getBorderWidth( this.$el, sides );
+			return Css.getBorderWidth( this.$el, sides );
 		},
 		
 		
@@ -1126,7 +1135,7 @@ define( [
 		 * @return {Number} The sum total of the width of the border, plus padding, plus margin, for the given `sides`.
 		 */
 		getFrameSize : function( sides ) {
-			return Jux.Css.getFrameSize( this.$el, sides );
+			return Css.getFrameSize( this.$el, sides );
 		},
 	
 		
@@ -1161,7 +1170,7 @@ define( [
 				if( typeof animConfig === 'object' ) {
 					animConfig.target = this;
 					
-					this.currentAnimation = new ui.anim.Animation( animConfig );    
+					this.currentAnimation = new Animation( animConfig );    
 					//this.currentAnimation.addListener( 'afteranimate', this.showComplete, this );  // adding a listener instead of providing in config, in case there is already a listener in the config
 					this.currentAnimation.start();
 				} else {
@@ -1209,7 +1218,7 @@ define( [
 				if( typeof animConfig === 'object' ) {
 					animConfig.target = this;
 					
-					this.currentAnimation = new ui.anim.Animation( animConfig );    
+					this.currentAnimation = new Animation( animConfig );    
 					//this.currentAnimation.addListener( 'afteranimate', this.hideComplete, this );  // adding a listener instead of providing in config, in case there is already a listener in the config
 					this.currentAnimation.start();
 				} else {
@@ -1232,7 +1241,7 @@ define( [
 		 * @protected
 		 * @method onHide
 		 */
-		onHide : Jux.emptyFn,
+		onHide : UI.emptyFn,
 		
 		
 		/**
@@ -1336,7 +1345,7 @@ define( [
 					// If there is not yet a mask instance for this Component, create one now.
 					// Otherwise, just update its config.
 					if( !this._mask ) {
-						this._mask = new ui.Mask( this.getMaskTarget(), maskConfig );
+						this._mask = new Mask( this.getMaskTarget(), maskConfig );
 					} else {
 						this._mask.updateConfig( maskConfig );
 					}
@@ -1451,7 +1460,7 @@ define( [
 		 * @return {ui.Container} The first Container for which the custom function returns true.
 		 */
 		findParentBy : function( fn ) {
-			for( var p = this.parentContainer; (p !== null) && !fn( p, this ); p = p.parentContainer ) { /* Empty */ }
+			for( var p = this.parentContainer; (p !== null) && !fn( p, this ); p = p.parentContainer );  // intentional semicolon, loop does the work
 			return p || null;
 		},
 		
@@ -1466,7 +1475,7 @@ define( [
 		 *   If no Container for the supplied {@link #id} is found, this method returns null.
 		 */
 		findParentById : function( id ) {
-			for( var p = this.parentContainer; p && p.id !== id; p = p.parentContainer ) { /* Empty */ }
+			for( var p = this.parentContainer; p && p.id !== id; p = p.parentContainer );  // intentional semicolon, loop does the work
 			return p || null;
 		},
 		
@@ -1482,7 +1491,7 @@ define( [
 		 */
 		findParentByType : function( type ) {
 			if( typeof type === 'string' ) {
-				type = ui.ComponentManager.getType( type );
+				type = ComponentManager.getType( type );
 				
 				// No type found for the given type name, return null immediately
 				if( !type ) {
@@ -1491,20 +1500,8 @@ define( [
 			}
 			
 			// Find the parent by type (js class / constructor function)
-			for( var p = this.parentContainer; p && !(p instanceof type); p = p.parentContainer ) { /* Empty */ }
+			for( var p = this.parentContainer; p && !(p instanceof type); p = p.parentContainer );  // intentional semicolon, loop does the work
 			return p || null;
-		},
-		
-		
-		/**
-		 * Override of Jux.util.Observable's {@link Jux.util.Observable#getBubbleTarget getBubbleTarget} method, which specifies
-		 * that the Component's {@link #parentContainer} is the bubble target for events.
-		 * 
-		 * @method getBubbleTarget
-		 * @return {Jux.util.Observable} The Component's parent {@link ui.Container} if it is part of a Container hierarchy, or null if it is not.
-		 */
-		getBubbleTarget : function() {
-			return this.parentContainer;
 		},
 		
 		
@@ -1527,7 +1524,7 @@ define( [
 					this.onDestroy();
 					
 					// Destroy the mask, if it is an instantiated ui.Mask object (it may not be if the mask was never used)
-					if( this._mask instanceof ui.Mask ) {
+					if( this._mask instanceof Mask ) {
 						this._mask.destroy();
 					}
 					
@@ -1564,13 +1561,13 @@ define( [
 		 * @protected
 		 * @method onDestroy
 		 */
-		onDestroy : Jux.emptyFn
+		onDestroy : UI.emptyFn
 	
 	} );
 	
 	
-	// Register the type so it can be created by the string 'Component' in the manifest
-	ui.ComponentManager.registerType( 'Component', ui.Component );
+	// Register the type so it can be created by the string 'component' in an anonymous config object
+	ComponentManager.registerType( 'component', Component );
 
 	return Component;
 	

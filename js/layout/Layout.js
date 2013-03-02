@@ -1,7 +1,7 @@
 /**
  * @abstract 
  * @class ui.layout.Layout
- * @extends Jux.util.Observable
+ * @extends ui.util.Observable
  * 
  * Base class Layout that defines the public interface of all Layout subclasses. Layouts are stateful strategy objects 
  * that are used by {@link ui.Container ui.Containers} to implement how their child items are displayed. Because of their 
@@ -46,7 +46,7 @@
  * @param {Object} config The configuration options for the Layout, specified in an object (hash).
  */
 /*global Class, Jux, ui */
-ui.layout.Layout = Class.extend( Jux.util.Observable, {
+ui.layout.Layout = Class.extend( ui.util.Observable, {
 	
 	abstractClass : true,
 	

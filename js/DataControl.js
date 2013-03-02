@@ -1,6 +1,6 @@
 /**
  * @class ui.DataControl
- * @extends Jux.util.Observable
+ * @extends ui.util.Observable
  * 
  * Generalized class that is intended to be used as a mixin class (pretty much just as an interface) with a {@link ui.Component},
  * that is to be part of the general data-collection routine defined by {@link ui.Container#getData} and {@link ui.Container#setData} methods.
@@ -13,7 +13,7 @@
  * @param {Object} config The configuration options for this Component, specified in an object (hash).
  */
 /*global Class, Jux, ui */
-ui.DataControl = Class.extend( Jux.util.Observable, {
+ui.DataControl = Class.extend( ui.util.Observable, {
 	
 	/**
 	 * @cfg {String} key

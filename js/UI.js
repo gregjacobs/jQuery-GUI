@@ -1,15 +1,17 @@
-define( [ 
-	'vendor/class/Class',
-	'vendor/jquery/jquery' 
-], function( Class, jQuery ) {
+/*global define */
+define( [
+	'Class',
+	'jquery',
+	'lodash'
+], function( Class, jQuery, _ ) {
 
 	/**
 	 * @class UI
 	 * @singleton
 	 * 
-	 * Main namespace and singleton class of a few utility functions for the UI library.
+	 * Main singleton class of a few utility functions for the UI library.
 	 */
-	var UI = Class( {
+	var UI = Class.extend( Object, {
 
 		/**
 		 * @property {Boolean} isIE (readonly)
@@ -33,7 +35,7 @@ define( [
 			var userAgent = window.navigator.userAgent.toLowerCase();
 			
 			this.isIE = /msie/.test( userAgent ) && !( /opera/.test( userAgent ) );
-		};
+		},
 
 		
 		// -----------------------------------
@@ -120,7 +122,7 @@ define( [
 		 */
 		getScrollbarHeight : function() {
 			return this.getScrollbarSizes().height;
-		}
+		},
 		
 		
 		// -----------------------------------

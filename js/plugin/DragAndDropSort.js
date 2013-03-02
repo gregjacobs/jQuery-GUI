@@ -1,6 +1,6 @@
 /**
- * @class ui.plugins.DragAndDropSort
- * @extends ui.plugins.AbstractPlugin
+ * @class ui.plugin.DragAndDropSort
+ * @extends ui.plugin.Plugin
  * 
  * Plugin that can be added to any {@link ui.Container} to make the Container's items drag and drop sortable. 
  * 
@@ -14,7 +14,7 @@
  * @param {Object} config The configuration options for the plugin, specified in an object (hash).
  */
 /*global Class, Jux, ui */
-ui.plugins.DragAndDropSort = Class.extend( ui.plugins.AbstractPlugin, {
+ui.plugin.DragAndDropSort = Class.extend( ui.plugin.Plugin, {
 	
 	/**
 	 * @cfg {String} itemsSelector
@@ -51,10 +51,10 @@ ui.plugins.DragAndDropSort = Class.extend( ui.plugins.AbstractPlugin, {
 	 * Initializes the DragAndDropSort plugin. This method is called by the Container that the plugin
 	 * is added to, and should not be called directly.
 	 * 
-	 * @method initPlugin
+	 * @method init
 	 * @param {ui.Container} container
 	 */
-	initPlugin : function( container ) {
+	init : function( container ) {
 		if( !( container instanceof ui.Container ) ) {
 			throw new Error( "error: DragAndDropSort plugin can only be added as a plugin to a ui.Container, or ui.Container subclass" );
 		} 

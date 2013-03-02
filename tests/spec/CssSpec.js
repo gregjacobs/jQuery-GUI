@@ -1,30 +1,33 @@
-/*global tests, Ext, Y, Jux */
-tests.unit.Jux.add( new Ext.test.Case( {
+/*global define, describe, it, expect */
+define( [
+	'ui/Css'
+], 
+function( Css ) {
 	
-	name: 'Css',
+	describe( 'ui.Css', function() {
 	
-	"hashToString() should return an empty string when providing an empty hash" : function() {
-		Y.Assert.areSame( "", Jux.Css.hashToString( {} ) );
-	},
-	
-
-	"hashToString() should convert a hash of property/value pairs to a CSS string" : function() {
-		var props = {
-			'color'     : 'red',
-			'font-size' : '12px'
-		};
+		it( "hashToString() should return an empty string when providing an empty hash", function() {
+			expect( Css.hashToString( {} ) ).toBe( "" );
+		} );
 		
-		Y.Assert.areSame( "color:red;font-size:12px;", Jux.Css.hashToString( props ) );
-	},
 	
-	
-	"hashToString() should convert camelCase style properties to their 'dash' form for the resulting string" : function() {
-		var props = {
-			'fontFamily' : 'Arial',
-			'fontSize'   : '12px'
-		};
+		it( "hashToString() should convert a hash of property/value pairs to a CSS string", function() {
+			var props = {
+				'color'     : 'red',
+				'font-size' : '12px'
+			};
+			
+			expect( Css.hashToString( props ) ).toBe( "color:red;font-size:12px;" );
+		} );
 		
-		Y.Assert.areSame( "font-family:Arial;font-size:12px;", Jux.Css.hashToString( props ) );
-	}
-    
-} ) );
+		
+		it( "hashToString() should convert camelCase style properties to their 'dash' form for the resulting string", function() {
+			var props = {
+				'fontFamily' : 'Arial',
+				'fontSize'   : '12px'
+			};
+			
+			expect( Css.hashToString( props ) ).toBe( "font-family:Arial;font-size:12px;" );
+		} );
+	} );
+} );
