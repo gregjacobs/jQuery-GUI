@@ -1,9 +1,12 @@
 /*global define */
 /*jslint forin: true */
-define( [
-	'lodash',
-	'Class'
-], function( _, Class ) {
+(function( root, factory ) {
+	if( typeof define === 'function' && define.amd ) {
+		define( [ 'lodash', 'Class' ], factory );  // AMD (such as RequireJS). Register as module.
+	} else {
+		root.Observable = factory( root._, root.Class );  // Browser global. root == window
+	}
+}( this, function( _, Class ) {
 	
 	var TOARRAY = _.toArray,
 		ISOBJECT = _.isObject,
@@ -172,7 +175,7 @@ define( [
 	
 		
 	/**
-	 * @class ui.util.Observable
+	 * @class Observable
 	 * 
 	 * Base class that provides a common interface for publishing events. Subclasses are expected to
 	 * to have a property "events" with all the events defined, and, optionally, a property "listeners"
@@ -180,7 +183,7 @@ define( [
 	 * 
 	 * For example:
 	 * 
-	 *     Employee = Kevlar.extend(Kevlar.util.Observable, {
+	 *     Employee = Class.extend(Observable, {
 	 *         constructor: function( config ) {
 	 *             this.name = config.name;
 	 *             this.addEvents( {
@@ -250,7 +253,7 @@ define( [
 				 * 
 				 * Ex:
 				 * 
-				 *     var myObservable = new Kevlar.util.Observable();
+				 *     var myObservable = new Observable();
 				 *     myObservable.on( 'all', function( eventName ) {
 				 *         console.log( "Event '" + eventName + "' was fired with args: ", Array.prototype.slice.call( arguments, 1 ) );
 				 *     } );
@@ -321,7 +324,7 @@ define( [
 		 * @param {Object} [options.scope] The scope (`this` reference) in which the handler function is executed. **If omitted, defaults to the object which fired the event.**
 		 * @param {Number} [options.delay] The number of milliseconds to delay the invocation of the handler after the event fires.
 		 * @param {Boolean} [options.single] True to add a handler to handle just the next firing of the event, and then remove itself.
-		 * @param {Number} [options.buffer] Causes the handler to be scheduled to run in an {@link UI.util.DelayedTask} delayed by the specified number of milliseconds. 
+		 * @param {Number} [options.buffer] Causes the handler to be scheduled to run in a delayed fashion by the specified number of milliseconds. 
 		 *   If the event fires again within that time, the original handler is *not* invoked, but the new handler is scheduled in its place.
 		 * 
 		 * 
@@ -562,4 +565,4 @@ define( [
 	
 	return Observable;
 	
-} );
+} ) );
