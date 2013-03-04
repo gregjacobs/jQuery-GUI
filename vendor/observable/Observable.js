@@ -1,9 +1,12 @@
 /*global define */
 /*jslint forin: true */
-define( [
-	'lodash',
-	'Class'
-], function( _, Class ) {
+(function( root, factory ) {
+	if( typeof define === 'function' && define.amd ) {
+		define( [ 'lodash', 'Class' ], factory );  // AMD (such as RequireJS). Register as module.
+	} else {
+		root.Observable = factory( root._, root.Class );  // Browser global. root == window
+	}
+}( this, function( _, Class ) {
 	
 	var TOARRAY = _.toArray,
 		ISOBJECT = _.isObject,
@@ -180,7 +183,7 @@ define( [
 	 * 
 	 * For example:
 	 * 
-	 *     Employee = Kevlar.extend(Kevlar.util.Observable, {
+	 *     Employee = Class.extend(Observable, {
 	 *         constructor: function( config ) {
 	 *             this.name = config.name;
 	 *             this.addEvents( {
@@ -250,7 +253,7 @@ define( [
 				 * 
 				 * Ex:
 				 * 
-				 *     var myObservable = new Kevlar.util.Observable();
+				 *     var myObservable = new Observable();
 				 *     myObservable.on( 'all', function( eventName ) {
 				 *         console.log( "Event '" + eventName + "' was fired with args: ", Array.prototype.slice.call( arguments, 1 ) );
 				 *     } );
@@ -562,4 +565,4 @@ define( [
 	
 	return Observable;
 	
-} );
+} ) );
