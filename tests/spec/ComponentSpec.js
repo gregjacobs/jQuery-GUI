@@ -9,7 +9,7 @@ define( [
 ],
 function( jQuery, _, Class, Plugin, Component, Container ) {
 	
-	describe( 'Component', function() {
+	describe( 'ui.Component', function() {
 		
 		describe( 'constructor', function() {
 			
