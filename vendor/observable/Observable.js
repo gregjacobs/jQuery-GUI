@@ -2,14 +2,45 @@
 /*jslint forin: true */
 define( [
 	'lodash',
-	'Class',
-	'ui/util/DelayedTask'
-], function( _, Class, DelayedTask ) {
+	'Class'
+], function( _, Class ) {
 	
 	var TOARRAY = _.toArray,
 		ISOBJECT = _.isObject,
 		TRUE = true,
 		FALSE = false;
+	
+	
+	// Utility class for buffered and delayed listeners
+	var DelayedTask = function(fn, scope, args){
+		var me = this,
+		    id,
+		    call = function(){
+		        clearInterval(id);
+		        id = null;
+		        fn.apply(scope, args || []);
+			};
+			
+		me.delay = function(delay, newFn, newScope, newArgs){
+			me.cancel();
+			fn = newFn || fn;
+			scope = newScope || scope;
+			args = newArgs || args;
+			id = setInterval(call, delay);
+		};
+		
+		me.cancel = function(){
+			if(id){
+				clearInterval(id);
+				id = null;
+			}
+		};
+		
+		me.isPending = function() {
+			return !!id;
+		};
+	};
+	
 	
 	
 	var Event = function(obj, name){

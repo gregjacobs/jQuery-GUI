@@ -3,7 +3,7 @@ define( [
 	'lodash',
 	'Class',
 	'ui/UI',
-	'ui/util/Observable'
+	'Observable'
 ], function( _, Class, UI, Observable ) {
 	
 	/**

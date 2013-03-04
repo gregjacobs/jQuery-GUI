@@ -2,7 +2,7 @@
 define( [ 
 	'lodash',
 	'Class',
-	'ui/util/Observable'
+	'Observable'
 ],
 function( _, Class, Observable ) {
 	

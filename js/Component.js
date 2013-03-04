@@ -4,7 +4,7 @@ define( [
 	'lodash',
 	'Class',
 	'ui/UI',
-	'ui/util/Observable',
+	'Observable',
 	'ui/ComponentManager',
 	'ui/Css',
 	'ui/Mask',

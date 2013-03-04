@@ -4,7 +4,7 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'ui/util/Observable',
+	'Observable',
 	'ui/Component'
 ], function( require, jQuery, _, Class, Observable, Component ) {
 	
