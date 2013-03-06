@@ -1,5 +1,15 @@
 <project name="UI">
 
-	
+	<target name="doc">
+		<exec executable="${basedir}/vendor/jsduck/jsduck-4.4.1.exe" failonerror="true">
+			<arg value="--output=docs" />
+			<arg value="--external=jQuery" />
+			<arg value="--title=UI.js API Docs" />
+			
+			<arg value="js/" />
+			<arg value="vendor/class/" />
+			<arg value="vendor/observable/" />
+		</exec>
+	</target>
 
 </project>

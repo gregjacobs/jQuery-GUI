@@ -1,1 +1,0 @@
-This is a json-driven UI framework that I developed for Jux (<a href="http://jux.com" target="_blank">http://jux.com</a>). More to come in the way of examples, screenshots, and code.

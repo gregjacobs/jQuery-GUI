@@ -1,3 +1,11 @@
+/*!
+ * UI.js Library
+ * Copyright(c) 2013 Gregory Jacobs.
+ * 
+ * MIT Licensed. http://www.opensource.org/licenses/mit-license.php
+ * https://github.com/gregjacobs/UI
+ */
+
 /*global define */
 define( [
 	'Class',

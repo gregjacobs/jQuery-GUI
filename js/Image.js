@@ -53,9 +53,10 @@ define( [
 		 * @private
 		 * @property {String} blankImg
 		 * 
-		 * A blank image which is used to swap into the underlying image (if not using {@link #fillmore})
-		 * before placing a new image src in. This is a webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f,
-		 * where the 'load' event wouldn't be fired again if setting to the same image src. Using this data uri bypasses a webkit log warning.
+		 * A blank image which is used to swap into the underlying image before placing a new image src in. This is a 
+		 * webkit hack from http://groups.google.com/group/jquery-dev/browse_thread/thread/eee6ab7b2da50e1f,
+		 * where the 'load' event wouldn't be fired again if setting to the same image src. Using this data uri bypasses 
+		 * a webkit log warning.
 		 */
 		blankImg : "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",
 	

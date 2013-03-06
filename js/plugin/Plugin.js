@@ -9,16 +9,13 @@ function( _, Class, Observable ) {
 	/**
 	 * @abstract
 	 * @class ui.plugin.Plugin
-	 * @extends ui.util.Observable
+	 * @extends Observable
 	 * 
 	 * Abstract base class for plugins.  All plugins that are created should extend from this class.  Concrete plugin implementations
 	 * must implement the method {@link #init}, which is called by a {@link ui.Component} when it initializes the plugin. See
 	 * {@link #init} for more details.<br><br>
 	 * 
 	 * See the ui.plugin package for examples on building plugins.
-	 * 
-	 * @constructor
-	 * @param {Object} config The configuration options for the plugin, specified in an object (hash).
 	 */
 	var Plugin = Class.extend( Observable, {
 		abstractClass : true,
@@ -26,6 +23,7 @@ function( _, Class, Observable ) {
 		
 		/**
 		 * @constructor
+	 * @param {Object} config The configuration options for the plugin, specified in an object (hash).
 		 */
 		constructor : function( config ) {
 			// Apply the properties of the configuration object onto this object

@@ -24,7 +24,7 @@ define( [
 			 * @private
 			 * @static
 			 * @property {Object} LAYOUTS
-			 * Hash object that stores "registered" layout types. The layouts are in the {@link ui.layout} package, and each
+			 * Hash object that stores "registered" layout types. The layouts are in the `ui.layout` package, and each
 			 * specifies a type name that is used to instantiate them.
 			 */
 			LAYOUTS : {},
@@ -89,19 +89,12 @@ define( [
 		 * {@link ui.Component#contentEl} configs, and will take precedence over them.
 		 */
 	
-		/**
-		 * @cfg {Object} data
-		 * The data to recursively set to each of the {@link ui.DataControl DataControls} (see {@link #items}) in this Container after
-		 * their instantiation.  This can be an object (hash) where the object's keys
-		 * are the DataControl keys, and the values are the data values themselves.
-		 */
-	
 	
 		/**
 		 * @private
 		 * @property {ui.Component[]} childComponents
 		 * 
-		 * An array of child components. Created from the "items" config, or call(s) to the {@link #add} method.
+		 * An array of child components. Created from the "items" config, or call(s) to the {@link #method-add} method.
 		 */
 		
 		/**
@@ -152,7 +145,7 @@ define( [
 				 * Fires when a Component has been reordered within the Container (i.e. its index has changed).
 				 * This is fired by the {@link #insert} method if it notices that the Component being "inserted" is
 				 * already in this Container, but at a different index. If the Component was previously in a different
-				 * Container, then the {@link #add} event is fired.
+				 * Container, then the {@link #event-add} event is fired.
 				 *
 				 * @event reorder
 				 * @param {ui.Container} container This Container.
@@ -185,7 +178,7 @@ define( [
 				
 				/**
 				 * Fires after the Container's {@link #doLayout} method has successfully executed.  
-				 * Note that this event will fire after the {@link #render} event fires for
+				 * Note that this event will fire after the {@link #event-render} event fires for
 				 * the initial rendering of the Container (as {@link #doLayout} is executed at that
 				 * point).
 				 *
@@ -306,7 +299,7 @@ define( [
 	
 	
 		/**
-		 * Private method that does the actual add or insert of the Component.  This is called by both {@link #add} and {@link #insert} methods, and exists
+		 * Private method that does the actual add or insert of the Component.  This is called by both {@link #method-add} and {@link #insert} methods, and exists
 		 * so that those methods can call {@link #doLayout} after their processing is complete.
 		 *
 		 * @private
@@ -477,7 +470,7 @@ define( [
 		/**
 		 * Removes a child {@link ui.Component Component(s)} from this Container.  If a Component is successfully removed, the 'remove' event will be fired.
 		 * Removed {@link ui.Component Components} will automatically have their destroy() method called if the {@link #destroyRemoved} config is true, or
-		 * if the `destroyRemoved` argument is explicitly set to true.  If the Component is not destroyed, its main {@link ui.Component.getEl element} is
+		 * if the `destroyRemoved` argument is explicitly set to true.  If the Component is not destroyed, its main {@link ui.Component#getEl element} is
 		 * detached from this Container.
 		 *
 		 * @private
@@ -662,8 +655,8 @@ define( [
 		 * If no {@link #layout} has been configured, the default {@link ui.layout.Auto} is used.
 		 *
 		 * Note that a layout can only be done if the Container is rendered and visible. This method will automatically
-		 * be run when the Container's {@link #render} method runs. If the Container isn' visible when this method is called,
-		 * the layout will be deferred until the {@link #show} method is called.
+		 * be run when the Container's {@link #method-render} method runs. If the Container isn' visible when this method is called,
+		 * the layout will be deferred until the {@link #method-show} method is called.
 		 *
 		 * @method doLayout
 		 */
@@ -695,7 +688,7 @@ define( [
 		
 		
 		/**
-		 * Hook method that is executed just before the {@link #layout layout's} {@link ui.layouts.Layout#doLayout doLayout}
+		 * Hook method that is executed just before the {@link #layout layout's} {@link ui.layout.Layout#doLayout doLayout}
 		 * method is executed to run the layout.
 		 * 
 		 * @protected
@@ -814,62 +807,6 @@ define( [
 	
 	
 		// ----------------------------------------
-	
-	
-		/**
-		 * Recursively sets the data for each child {@link ui.Component} which has the {@link ui.DataControl} mixin.  Searches and sets
-		 * data at all levels.  Accepts an object literal of keys and values. Ex: <pre><code>setData( { field1: "value1", field2: "value2" } );</code></pre><br><br>
-		 *
-		 * Note that this method will not "reach" into a given {@link ui.DataControl} and set data on the "inner" DataControls that the outer DataControl may be composed of.
-		 * {@link ui.DataControl DataControls} know how to set their own inner {@link ui.DataControl} components, and those will not be affected by this method.
-		 *
-		 * @method setData
-		 * @param {Object} data An object (hash) where the object's keys are the data keys, and the values are the data values themselves.
-		 */
-		setData : function( data ) {
-			var dataControls = this.getDataControls();
-			for( var i = 0, len = dataControls.length; i < len; i++ ) {
-				var dataControl = dataControls[ i ],
-				    key = dataControl.getKey();
-	
-				if( typeof data[ key ] !== 'undefined' ) {  // If the component's key is defined in the data to set
-					dataControl.setData( data[ key ] );
-				}
-			}
-		},
-	
-	
-		/**
-		 * Recursively collects the data from all child {@link ui.Component Components} which have the {@link ui.DataControl} mixin.
-		 * Searches all levels, and returns the data as an object (hash) keyed by the DataControl's {@link ui.DataControl#key keys},
-		 * and having their data (the return from the {@link ui.DataControl#getData} method) as the value. Be sure that each DataControl
-		 * has a unique key, or keys may be overwritten in the returned data.<br><br>
-		 *
-		 * Note that this method will not "reach" into a given {@link ui.DataControl} and get the data from any "inner" DataControls that the outer DataControl may be composed of.
-		 * {@link ui.DataControl DataControls} know how to get and return the data from their own inner {@link ui.DataControl} components, and therefore those will not be retrieved
-		 * directly by this method.
-		 *
-		 * @method getData
-		 * @return {Object} The collected data as a hash.
-		 */
-		getData : function() {
-			var data = {},
-			    dataControls = this.getDataControls();
-	
-			for( var i = 0, len = dataControls.length; i < len; i++ ) {
-				var dataControl = dataControls[ i ],
-				    key = dataControl.getKey();
-	
-				if( key ) {
-					data[ key ] = dataControl.getData();
-				}
-			}
-			return data;
-		},
-	
-	
-		// ----------------------------------------
-	
 	
 	
 		/**

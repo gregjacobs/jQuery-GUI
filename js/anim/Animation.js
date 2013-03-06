@@ -10,7 +10,7 @@ define( [
 	
 	/**
 	 * @class ui.anim.Animation
-	 * @extends ui.util.Observable
+	 * @extends Observable
 	 * 
 	 * A class that encapsulates a single animation of a given HTMLElement, jQuery wrapped set, or {@link ui.Component}.
 	 * 

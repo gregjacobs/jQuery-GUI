@@ -9,7 +9,7 @@ define( [
 	/**
 	 * @abstract 
 	 * @class ui.layout.Layout
-	 * @extends ui.util.Observable
+	 * @extends Observable
 	 * 
 	 * Base class Layout that defines the public interface of all Layout subclasses. Layouts are stateful strategy objects 
 	 * that are used by {@link ui.Container ui.Containers} to implement how their child items are displayed. Because of their 
@@ -26,25 +26,25 @@ define( [
 	 * They should first call the superclass `onLayout` method, and then implement the code to perform the desired layout.
 	 * Note the following items:
 	 * 
-	 * - {@link #onLayout} and {@link #afterLayout} will be executed each time the {@link #container container's} 
+	 * - {@link #onLayout} and {@link #afterLayout} will be executed each time the {@link #property-container container's} 
 	 *   {@link ui.Container#doLayout} method is executed. This means that {@link #onLayout} and {@link #afterLayout}
 	 *   may be called multiple times during the lifetime of the Layout, and this should be handled. Some layouts choose
 	 *   to have completely separate "first run" and "update layout" methods.
 	 * - Use the helper methods in this Layout class to {@link #renderComponent render} and {link #sizeComponent size}
-	 *   child components of the {@link #container}. They take into account details of the Layout system, and sizing details
+	 *   child components of the {@link #property-container}. They take into account details of the Layout system, and sizing details
 	 *   (such as accounting for child component padding/margin/border) that aren't handled elsewhere. See the 
 	 *   {@link #renderComponent} and {@link #sizeComponent} methods for details.
-	 * - Layouts should handle the case of the {@link #container} they are laying out having 0 child components, and it should
+	 * - Layouts should handle the case of the {@link #property-container} they are laying out having 0 child components, and it should
 	 *   also handle the cases where child components are added, removed, or reordered. However, try not execute the
-	 *   {@link #renderComponent} method (and thus the {@link ui.Component#render} method) when the component is already
+	 *   {@link #renderComponent} method (and thus the {@link ui.Component#method-render} method) when the component is already
 	 *   rendered and in the correct position. This adds DOM overhead, and can cause some weird behavior such as having
-	 *   {@link ui.formFields.TextField TextFields to lose focus if a layout runs that does this.
+	 *   {@link ui.form.Text Text Fields} to lose focus if a layout runs that does this.
 	 * - Browser window resize events should not be handled within the Layout. The top level {@link ui.Viewport} will
 	 *   call its {@link ui.Container#doLayout doLayout} method to fix the layout automatically, on resize.
 	 * 
 	 * Layouts are required to manage any HTML elements that they create, and should clean up after themselves
 	 * when they are done. This includes cleaning up old HTML elements when {@link #doLayout} (and therefore,
-	 * {@link #onLayout}) is run again, and when the Layout is {@link #destroy destroyed}. Subclasses should
+	 * {@link #onLayout}) is run again, and when the Layout is {@link #method-destroy destroyed}. Subclasses should
 	 * implement the {@link #onDestroy} method to implement their clean up as part of the destruction process.
 	 * Note that a layout may be destroyed by a {@link ui.Container} if another layout is set to it, and therefore
 	 * it cannot be relied on that the Container will clean up any stray elements that a Layout has created.
@@ -88,7 +88,7 @@ define( [
 		 * @protected
 		 * @property {Boolean} destroyed
 		 * 
-		 * Flag which is set to true once the layout has been {@link #destroy destroyed}.
+		 * Flag which is set to true once the layout has been {@link #method-destroy destroyed}.
 		 */
 		destroyed : false,
 		
@@ -123,9 +123,9 @@ define( [
 		/**
 		 * Hook method which should be extended to provide any of the Layout's initialization logic.
 		 * 
-		 * Note that the {@link #container} reference may or may not be available when this method is
+		 * Note that the {@link #property-container} reference may or may not be available when this method is
 		 * called, so you shouldn't rely on its existence in it. To set up any initialization for the
-		 * {@link #container}, extend {@link #onContainerSet} instead.
+		 * {@link #property-container}, extend {@link #onContainerSet} instead.
 		 * 
 		 * @protected
 		 * @template
@@ -158,8 +158,8 @@ define( [
 		
 		
 		/**
-		 * Hook method which is executed when the {@link #container} is set to the Layout.
-		 * This is executed upon initialization if the {@link #container} config was provided (but
+		 * Hook method which is executed when the {@link #property-container} is set to the Layout.
+		 * This is executed upon initialization if the {@link #cfg-container} config was provided (but
 		 * after {@link #initLayout} is executed), or when {@link #setContainer} is called.
 		 * 
 		 * Note that this method is guaranteed to run before {@link #doLayout} runs, and subclasses
@@ -272,33 +272,33 @@ define( [
 		 * the child component, deferring any layout of child {@link ui.Container containers} until after the layout process 
 		 * is complete.
 		 * 
-		 * This method lazily renders the provided `component`. A call to the component's {@link ui.Component#render render}
+		 * This method lazily renders the provided `component`. A call to the component's {@link ui.Component#method-render render}
 		 * method will only be made if:
 		 * 
-		 * 1) The `component` is not yet {@link ui.Component#render rendered}.
-		 * 2) The `component` is rendered, but not a child of the `$targetEl`. Calling {@link ui.Component#render render} here
+		 * 1) The `component` is not yet {@link ui.Component#method-render rendered}.
+		 * 2) The `component` is rendered, but not a child of the `$targetEl`. Calling {@link ui.Component#method-render render} here
 		 *    will move it.
 		 * 3) The `component` is not at the provided `position` in the $targetEl. Basically if the `position` option is provided, 
 		 *    an extra check will be made to determine if the component already exists at that position, and if so, no call to 
-		 *    {@link ui.Component#render render} will be made.
+		 *    {@link ui.Component#method-render render} will be made.
 		 * 
-		 * The main reason that this method checks to see if the {@link ui.Component#render} method needs to be called before
+		 * The main reason that this method checks to see if the {@link ui.Component#method-render} method needs to be called before
 		 * doing so is so that we do not end up moving components around the DOM when they don't need to be. Doing so will
 		 * make the browser do more work, and can also cause unwanted side effects. One of these side effects could be if the user 
-		 * is editing a {@link ui.formFields.TextAreaField TextAreaField}, and the field resizes, triggering a layout routine 
-		 * (see {@link ui.formFields.TextAreaField#autoGrow}). If a parent layout of the TextAreaField moves a component in the DOM, 
-		 * the TextAreaField will lose focus, and the user would have to click into it again to continue editing.
+		 * is editing a {@link ui.form.TextArea TextArea Field}, and the field resizes, triggering a layout routine 
+		 * (see {@link ui.form.TextArea#autoGrow}). If a parent layout of the TextArea moves a component in the DOM, 
+		 * the TextArea will lose focus, and the user would have to click into it again to continue editing.
 		 * 
 		 * @protected
 		 * @method renderComponent
 		 * @param {ui.Component} component The component to render.
 		 * @param {jQuery} $targetEl The target element to render the `component` into.
 		 * @param {Object} [options] Any additional options to provide to the `options` argument of the 
-		 *   `component`'s {@link ui.Component#render} method. 
+		 *   `component`'s {@link ui.Component#method-render} method. 
 		 * @param {Number/String/HTMLElement/jQuery} [options.position] This property is handled in particular 
 		 *   by this method (if provided), to determine if the `component` needs to be moved (by way
-		 *   of the {@link ui.Component#render render} method). If provided, an extra test will check if
-		 *   the component is already in the correct position, or else no call to {@link ui.Component#render}
+		 *   of the {@link ui.Component#method-render render} method). If provided, an extra test will check if
+		 *   the component is already in the correct position, or else no call to {@link ui.Component#method-render}
 		 *   will be made (as an optimization). This may be a numeric position index, a jQuery selector, an HTML 
 		 *   element, or a jQuery wrapped set itself.
 		 */

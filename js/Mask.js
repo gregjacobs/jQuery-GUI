@@ -10,12 +10,7 @@ function( jQuery, _, Class ) {
 	 * @class ui.Mask
 	 * 
 	 * Generalized class that can create a mask over any given element, and provides a simple interface
-	 * to show, hide, and add content to it. 
-	 * 
-	 * @constructor
-	 * @param {HTMLElement/jQuery} targetEl The element or jQuery wrapped set that the mask is to mask over. This
-	 *   may only be one element in the case of a jQuery wrapped set. 
-	 * @param {Object} config Any additional configuration options for the Mask, specified in an object (hash).
+	 * to show, hide, and add content to it.
 	 */
 	var Mask = Class.extend( Object, {
 		
@@ -41,7 +36,7 @@ function( jQuery, _, Class ) {
 		 * 
 		 * The URL of the spinner image to use when the {@link #spinner} config is true.
 		 */
-		//spinnerURL : Jux.Cdn.BASE_URI + "assets/spinner2e2d2d.gif",
+		//spinnerURL : "assets/spinner2e2d2d.gif",
 		
 		
 		/**
@@ -55,7 +50,7 @@ function( jQuery, _, Class ) {
 		 * @private
 		 * @property {Boolean} rendered
 		 * 
-		 * Will be true once the Mask's elements have been rendered ({@link initMaskElements} has been run). Initially false.
+		 * Will be true once the Mask's elements have been rendered ({@link #initMaskElements} has been run). Initially false.
 		 */
 		rendered : false,
 		
@@ -93,6 +88,9 @@ function( jQuery, _, Class ) {
 		
 		/**
 		 * @constructor
+		 * @param {HTMLElement/jQuery} targetEl The element or jQuery wrapped set that the mask is to mask over. This
+		 *   may only be one element in the case of a jQuery wrapped set. 
+		 * @param {Object} config Any additional configuration options for the Mask, specified in an object (hash).
 		 */
 		constructor : function( targetEl, config ) {
 			if( _.isElement( targetEl ) ) {
@@ -259,7 +257,7 @@ function( jQuery, _, Class ) {
 		
 		
 		/**
-		 * Repositions the {@link $contentEl} to be in the center of the {@link $targetEl}.
+		 * Repositions the {@link #$contentEl} to be in the center of the {@link #$targetEl}.
 		 * 
 		 * @private
 		 * @method repositionContentEl

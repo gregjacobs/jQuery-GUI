@@ -15,52 +15,14 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 
 	/**
 	 * @class ui.Component
-	 * @extends ui.util.Observable
+	 * @extends Observable
 	 * 
 	 * Generalized component that defines a displayable item that can be placed onto a page. Provides a base element (by default, a div),
 	 * and a framework for the instantiation, rendering, and (eventually) the destruction process, with events that can be listened to
 	 * each step of the way.
 	 * 
-	 * Components can be constructed via anonymous config objects, based on their `type` property. This is useful for defining components in a
-	 * manifest. This is the list of all pre-defined Component types that may be instantiated in this manner. Note that type names are case-insensitive.
-	 * 
-	 * <pre>
-	 * type                  Class
-	 * -------------         ------------------
-	 * component             {@link ui.Component}
-	 * container             {@link ui.Container}
-	 * button                {@link ui.Button}
-	 * buttonset             {@link ui.ButtonSet}
-	 * colorpicker           {@link ui.ColorPicker}
-	 * label                 {@link ui.Label}
-	 * fieldset              {@link ui.FieldSet}
-	 * slider                {@link ui.Slider}
-	 * image                 {@link ui.Image}
-	 * 
-	 * Containers
-	 * ---------------------------------------
-	 * section               {@link ui.containers.SectionContainer}
-	 * tabs                  {@link ui.containers.TabsContainer}
-	 * 
-	 * Form Field Components
-	 * ---------------------------------------
-	 * checkbox | boolean    {@link ui.formFields.CheckboxField}
-	 * date                  {@link ui.formFields.DateField}
-	 * dropdown              {@link ui.formFields.DropdownField}
-	 * hidden                {@link ui.formFields.HiddenField}
-	 * link | linktextfield  {@link ui.formFields.LinkTextField}
-	 * radio                 {@link ui.formFields.RadioField}
-	 * textarea              {@link ui.formFields.TextAreaField}
-	 * text | string         {@link ui.formFields.TextField}
-	 * 
-	 * Tool Buttons
-	 * ---------------------------------------
-	 * toolbutton            {@link ui.toolButtons.ToolButton}
-	 * closebutton           {@link ui.toolButtons.CloseButton}
-	 * editbutton            {@link ui.toolButtons.EditButton}
-	 * hidebutton            {@link ui.toolButtons.HideButton}
-	 * deletebutton          {@link ui.toolButtons.DeleteButton}
-	 * </pre>
+	 * Components can be constructed via anonymous config objects, based on their `type` property. This is useful for defining components in
+	 * an anonymous object, when added as items of a {@link ui.Container}.
 	 * 
 	 * Some other things to note about Component and its subclasses are:
 	 * 
@@ -69,10 +31,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 	 *   configuration options are also listed as public properties, they should not be used externally.
 	 * - Components directly support masking and un-masking their viewable area.  See the {@link #maskConfig} configuration option, and the {@link #mask} and
 	 *   {@link #unMask} methods.
-	 * - When a Component is {@link #destroy} destroyed, a number of automatic cleanup mechanisms are executed. See {@link #destroy} for details. 
-	 *   
-	 * @constructor
-	 * @param {Object} config The configuration options for this Component, specified in an object (hash).
+	 * - When a Component is {@link #method-destroy} destroyed, a number of automatic cleanup mechanisms are executed. See {@link #method-destroy} for details.
 	 */
 	var Component = Class.extend( Observable, { 
 		
@@ -86,7 +45,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		/**
 		 * @cfg {String} elId
 		 * The id that should be used for the Component's element. Defaults to a unique id.
-		 * If this config is not provided, the unique id is generated when the Component is {@link #render rendered}.
+		 * If this config is not provided, the unique id is generated when the Component is {@link #method-render rendered}.
 		 */
 		
 		/**
@@ -180,7 +139,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		
 		/**
 		 * @cfg {Object} maskConfig A configuration object for the default mask that will be shown when the {@link #mask} method is called (if {@link #mask mask's}
-		 * argument is omitted), or if the {@link #masked} configuration option is true (in which a mask will be shown over the Component, using this maskConfig, 
+		 * argument is omitted), or if the {@link #cfg-masked} configuration option is true (in which a mask will be shown over the Component, using this maskConfig, 
 		 * when it is first rendered).  This default maskConfig can be overrided when calling {@link #mask} by passing a configuration object for its argument.<br><br>
 		 * 
 		 * Masks are shown and hidden using the {@link #mask} and {@link #unMask} methods. If this configuration option is not provided, the configuration
@@ -204,14 +163,6 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * onto the plugins array in their implementation of {@link #initComponent}. 
 		 */
 		
-		/**
-		 * @cfg {Boolean} dragAndDropSortable
-		 * This config only applies when the Component is added to a {@link ui.Container} that has the {@link ui.plugin.DragAndDropSort} plugin applied.
-		 * 
-		 * Specifies if the Component should be draggable within the DragAndDropSort Container. Set to false to prevent the Component from being allowed to
-		 * be dragged and dropped.
-		 */
-		dragAndDropSortable : true,
 		
 		
 		/**
@@ -262,7 +213,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * 
 		 * Flag that is set to true if the {@link #mask} method is run, but the Component is currently hidden.
 		 * The Component must be in a visible state to show the mask, as the ui.Mask class makes a calculation of 
-		 * the height of the mask target element.  When the Component's {@link #show} method runs, this flag will be
+		 * the height of the mask target element.  When the Component's {@link #method-show} method runs, this flag will be
 		 * tested to see if it is true, and if so, will run the {@link #mask} method at that time.
 		 */
 		deferMaskShow : false,
@@ -289,18 +240,23 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * @protected
 		 * @property {Boolean} destroyed
 		 * 
-		 * Initially false, and will be set to true after the {@link #destroy} method executes.
+		 * Initially false, and will be set to true after the {@link #method-destroy} method executes.
 		 */
 		destroyed: false,
 		
 		/**
-		 * @private {jQuery} $el
+		 * @protected
+		 * @property {jQuery} $el
 		 * 
 		 * The main element that is created for the Component (determined by the {@link #elType} config). 
 		 * This will be available after the Component is rendered, and may be retrieved using {@link #getEl}
 		 */	
 		
 		
+		/**
+		 * @constructor
+		 * @param {Object} config The configuration options for this Component, specified in an object (hash).
+		 */
 		constructor : function( config ) {
 			// Apply the properties of the configuration object onto this object
 			_.assign( this, config );
@@ -313,7 +269,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 			// Add events that this class will fire
 			this.addEvents( 
 				/**
-				 * Fires when this component has been {@link #render rendered}.
+				 * Fires when this component has been {@link #method-render rendered}.
 				 * 
 				 * @event render
 				 * @param {ui.Component} component This component.
@@ -321,8 +277,8 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 				'render',
 				
 				/**
-				 * Fires when the component has been shown, using the {@link #show} method. Only fires
-				 * if the Component has been {@link #render rendered}.
+				 * Fires when the component has been shown, using the {@link #method-show} method. Only fires
+				 * if the Component has been {@link #method-render rendered}.
 				 * 
 				 * @event show
 				 * @param {ui.Component} component This component.
@@ -330,8 +286,8 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 				'show',
 				
 				/**
-				 * Fires when the component has been hidden, using the {@link #hide} method. Only fires
-				 * if the Component has been {@link #render rendered}.
+				 * Fires when the component has been hidden, using the {@link #method-hide} method. Only fires
+				 * if the Component has been {@link #method-render rendered}.
 				 * 
 				 * @event hide
 				 * @param {ui.Component} component This component.
@@ -427,8 +383,8 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		/**
 		 * Renders the component into a containing HTML element.  Starts by creating the base div element for this component, and then 
 		 * calls the hook method {@link #onRender} to allow subclasses to add their own functionality/elements into the rendering process.
-		 * When fully complete, the {@link #afterLayout} hook method is executed, the {@link #evt-render render event is fired}, and then
-		 * {@link #doLayout} is executed (if the `deferLayout` option is not provided as `true`).
+		 * When fully complete, the {@link #event-render render event is fired}, and then {@link #doLayout} is executed (if the `deferLayout` 
+		 * option is not provided as `true`).
 		 *
 		 * @method render
 		 * @param {HTMLElement/jQuery} containerEl The HTML element to render this component into.
@@ -599,7 +555,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * @protected
 		 * @method onRender
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component is being rendered into.
-		 * @param {Object} options The options provided to {@link #render}.
+		 * @param {Object} options The options provided to {@link #method-render}.
 		 */
 		onRender : UI.emptyFn,
 		
@@ -607,12 +563,12 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		/**
 		 * Hook method that runs when a Component has been completely rendered (i.e. the base element has been created,
 		 * the {@link #onRender} template method has run, the content/html has been appended, the sizing configs have been set,
-		 * and the element has had its initial {@link #hidden} state set).
+		 * and the element has had its initial {@link #cfg-hidden} state set).
 		 * 
 		 * @protected
 		 * @method afterRender
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component has been rendered into.
-		 * @param {Object} options The options provided to {@link #render}.
+		 * @param {Object} options The options provided to {@link #method-render}.
 		 */
 		afterRender : UI.emptyFn,
 		
@@ -643,16 +599,16 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		
 		/**
 		 * This method was initially intended to bring Component layouts into the mix (instead of only having {@link ui.Container Container}
-		 * layouts, which lay out {@link ui.Container#item child components}). A Component layout was going to size and position the HTML 
+		 * layouts, which lay out {@link ui.Container#items child components}). A Component layout was going to size and position the HTML 
 		 * elements that a particular Component had created in its {@link #onRender} method.
 		 * 
 		 * However, at the time of this writing, we never got around to implementing this feature, and {@link ui.Container} extends
-		 * this method for its {@link ui.Container#layout layout} of {@link ui.Container#item child components}. This method was added into 
+		 * this method for its {@link ui.Container#layout layout} of {@link ui.Container#items child components}. This method was added into 
 		 * the Component class (this class) later though, in an effort to allow Components to respond to being laid out by their {@link #parentContainer}.
 		 * When the Component's {@link #parentContainer} runs its {@link ui.Container#layout layout}, this method is executed from it. A 
 		 * Component author may implement an extension of the {@link #onComponentLayout} hook method to respond to the Component being laid 
 		 * out by its {@link #parentContainer}, such as to implement updating the size or positioning of its child elements upon being laid out.
-		 * Note that {@link #onComponentLayout} will eventually be called just from the Component's initial {@link #render rendering} 
+		 * Note that {@link #onComponentLayout} will eventually be called just from the Component's initial {@link #method-render rendering} 
 		 * process as well, if the Component is not being rendered by a {@link #parentContainer} layout (i.e. it is a standalone Component,
 		 * not part of a {@link ui.Container Container}/Component hierarchy).
 		 * 
@@ -902,8 +858,8 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		
 		/**
 		 * Returns the container element for this component, wrapped in a jQuery object.  This element will only
-		 * be available after the component has been rendered by {@link #render}.  The element that will be returned
-		 * will be the one created for the Component in the {@link #render} method, and its type is dependent on the
+		 * be available after the component has been rendered by {@link #method-render}.  The element that will be returned
+		 * will be the one created for the Component in the {@link #method-render} method, and its type is dependent on the
 		 * {@link #elType} config.
 		 * 
 		 * @method getEl
@@ -964,7 +920,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		/**
 		 * Returns the width of the Component. 
 		 * 
-		 * Note: this may only be called after the component has been {@link #render rendered}.
+		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 *
 		 * @method getWidth
 		 * @return {Number}
@@ -978,7 +934,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * Returns the inner width of the Component. The inner width of the Component is the Component's width, plus
 		 * its padding.
 		 * 
-		 * Note: this may only be called after the component has been {@link #render rendered}.
+		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 * 
 		 * @method getInnerWidth
 		 * @return {Number}
@@ -993,7 +949,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * its padding, plus its border width. Provide the optional argument `includeMargin` as true to include the margin
 		 * as well.
 		 * 
-		 * Note: this may only be called after the component has been {@link #render rendered}.
+		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 * 
 		 * @method getOuterWidth
 		 * @param {Boolean} [includeMargin=false]
@@ -1007,7 +963,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		/**
 		 * Returns the height of the Component. 
 		 * 
-		 * Note: this may only be called after the component has been {@link #render rendered}.
+		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 *
 		 * @method getHeight
 		 * @return {Number}
@@ -1021,7 +977,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * Returns the inner height of the Component. The inner height of the Component is the Component's height, plus
 		 * its padding.
 		 * 
-		 * Note: this may only be called after the component has been {@link #render rendered}.
+		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 * 
 		 * @method getInnerHeight
 		 * @return {Number}
@@ -1036,7 +992,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * its padding, plus its border width. Provide the optional argument `includeMargin` as true to include the margin
 		 * as well.
 		 * 
-		 * Note: this may only be called after the component has been {@link #render rendered}.
+		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 * 
 		 * @method getOuterHeight
 		 * @param {Boolean} [includeMargin=false]
@@ -1124,7 +1080,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		
 		
 		/**
-		 * Retrieves the "frame" size of the component's {@link #$elelement}, which is the sum of the width of the padding, margin, and border, 
+		 * Retrieves the "frame" size of the component's {@link #$el element}, which is the sum of the width of the padding, margin, and border, 
 		 * for the given `sides` of the `element`. `sides` can be either 't', 'r', 'b', or 'l' (for "top", "right", "bottom", or "left"), *or* 
 		 * it can be a combination of more than one to add the padding widths together. Ex: 'rl' would add the right and left padding/border/margin 
 		 * together and return that number.
@@ -1189,7 +1145,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		/**
 		 * Hook method for handling the component being shown. This will only be called when the 
 		 * Component is shown after it is rendered. Note that this method is called immediately after
-		 * any animation is started by providing the `animConfig` argument to {@link #show}.
+		 * any animation is started by providing the `animConfig` argument to {@link #method-show}.
 		 * 
 		 * @protected
 		 * @method onShow
@@ -1236,7 +1192,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		/**
 		 * Hook method for handling the component being hidden. This will only be called when the 
 		 * Component is hidden after it is rendered. Note that this method is called immediately after
-		 * any animation is started by providing the `animConfig` argument to {@link #hide}.
+		 * any animation is started by providing the `animConfig` argument to {@link #method-hide}.
 		 * 
 		 * @protected
 		 * @method onHide
@@ -1249,7 +1205,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * (after it has been rendered), and will return true if 1) the element itself is set as "display: none", 2) a parent 
 		 * element of the Component is set to "display: none", or 3) the element is not attached to the document.  To determine 
 		 * if the Component's element itself is set as hidden, regardless of the visibility of parent elements or being attached
-		 * to the document, check the {@link #hidden} property.
+		 * to the document, check the {@link #property-hidden} property.
 		 * 
 		 * @method isHidden
 		 * @return {Boolean}
@@ -1299,7 +1255,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * for performance reasons, to completely remove the element from the DOM when it is unnecessary for the 
 		 * Component to be in it.
 		 * 
-		 * The Component may be re-attached to the DOM by calling {@link #render} again on it (with the new container
+		 * The Component may be re-attached to the DOM by calling {@link #method-render} again on it (with the new container
 		 * element to append/insert it into). 
 		 * 
 		 * @method detach
@@ -1512,7 +1468,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * is rendered.<br><br>
 		 *
 		 * Fires the {@link #beforedestroy} event, which a handler can return false from to cancel the destruction process,
-		 * and the {@link #destroy} event.
+		 * and the {@link #event-destroy} event.
 		 * 
 		 * @method destroy
 		 */
