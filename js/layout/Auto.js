@@ -1,9 +1,10 @@
 /*global define */
 define( [
+	'require',
 	'Class',
-	'ui/Container',
-	'ui/layout/Layout'
-], function( Class, Container, Layout ) {
+	'ui/layout/Layout',
+	'ui/Container'
+], function( require, Class, Layout ) {
 	
 	/**
 	 * @class ui.layout.Auto
@@ -39,7 +40,9 @@ define( [
 	
 	
 	// Register the layout type with the ui.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'auto', AutoLayout );
+	require( [ 'ui/Container' ], function( Container ) {
+		Container.registerLayout( 'auto', AutoLayout );
+	} );
 
 	return AutoLayout;
 } );

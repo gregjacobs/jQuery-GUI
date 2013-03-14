@@ -6,8 +6,9 @@ define( [
 	'ui/UI',
 	'ui/ComponentManager',
 	'ui/Component',
-	'ui/layout/Layout'
-], function( require, _, Class, UI, ComponentManager, Component, Layout ) {
+	'ui/layout/Layout',   // circular dependency, used with require() call
+	'ui/layout/Auto'      // circular dependency, used with require() call
+], function( require, _, Class, UI, ComponentManager, Component ) {
 
 	/**
 	 * @class ui.Container
@@ -754,6 +755,8 @@ define( [
 		 * @param {String/Object/ui.layout.Layout} layout See the {@link #layout} config.
 		 */
 		setLayout : function( layout ) {
+			var Layout = require( 'ui/layout/Layout' );  // for dealing with circular dependency
+			
 			// Destroy the current layout if we have a new one, and detach all Components in the Container, as 
 			// a new layout is going to have to render them anyway.
 			if( this.layout instanceof Layout && this.layout !== layout ) {
@@ -923,6 +926,7 @@ define( [
 			this.removeAll();
 	
 			// Destroy the Container's layout, if it has one
+			var Layout = require( 'ui/layout/Layout' );
 			if( this.layout instanceof Layout ) {  // just in case it's still the string config
 				this.layout.destroy();
 			}
