@@ -1,9 +1,11 @@
 /*global define, describe, it, beforeEach, afterEach, expect */
+/*jshint sub: true */
 define( [
 	'Class',
 	'ui/ComponentManager',
-	'ui/Component'
-], function( Class, ComponentManager, Component ) {
+	'ui/Component',
+	'ui/Container'
+], function( Class, ComponentManager, Component, Container ) {
 	
 	describe( 'ui.ComponentManager', function() {
 		var componentClasses;   // for restoring the previous list of component classes that have been registered, after the tests
@@ -120,13 +122,12 @@ define( [
 				expect( cmp instanceof Component ).toBe( true );  // create() did not instantiate 'someClass' via config object.
 			} );
 			
-			/* NEED TO ADD THIS TEST BACK WHEN UI.CONTAINER IS CONVERTED TO USE REQUIREJS
 			it( "should create the type `ui.Container` when no 'type' config is specified in the anonymous config object", function() { 
-				ComponentManager.registerType( 'Container', Container );  // need to re-register the Container class for this test.
+				ComponentManager.registerType( 'container', Container );  // need to re-register the Container class for this test.
+				
 				var cmp = ComponentManager.create( {} );
 				expect( cmp instanceof Container ).toBe( true );  // create() did not instantiate a Container via config object with no type property.
 			} );
-			*/
 		
 			it( "should throw an error for an unknown type name", function() {
 				expect( function() {
