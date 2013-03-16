@@ -154,6 +154,35 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		
 		
 		/**
+		 * @cfg {String/String[]/Function} tpl
+		 * 
+		 * The lodash template to use as the HTML template of the Component. This can be a string, an array of strings, 
+		 * or a compiled lodash template function.
+		 * 
+		 * Used in conjunction with the {@link #tplData} config (which will be the data that is provided to the template
+		 * function), this template can be used as the component's markup. Its output is injected into the element specified by
+		 * the {@link #getContentTarget content target}, after the {@link #onRender} method has been executed. 
+		 * 
+		 * If this config is specified, it will override the {@link #html} and {@link #contentEl} configs. The markup that it 
+		 * outputs can be updated with new data by using the {@link #update} method, and providing an Object as its first argument.
+		 * 
+		 * For more information on lodash templates, see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
+		 */
+		
+		/**
+		 * @cfg {Object} tplData
+		 * 
+		 * The data to provide to the {@link #tpl} when initially rendering the Component. If this config is not
+		 * specified, but a {@link #tpl} config is, then the {@link #tpl} will simply be provided an empty object as its data.
+		 * 
+		 * Note that the template data can be provided after {@link #method-render} time to update the markup of the Component using 
+		 * the {@link #update} method. However, if initial data is available, it should be provided with this config so that the 
+		 * template is run with the correct initial data the first time, and doesn't need to be run again unless the data has 
+		 * changed.
+		 */
+		
+		
+		/**
 		 * @cfg {ui.plugin.Plugin/ui.plugin.Plugin[]} plugins
 		 * A single plugin or array of plugins to attach to the Component. Plugins must extend the class {@link ui.plugin.Plugin}.
 		 * See {@link ui.plugin.Plugin} for details on creating plugins.
@@ -233,6 +262,16 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * If the masking of the Component needs to be deferred (either because the Component is not yet rendered, or because
 		 * the Component is currently hidden), then the configuration options to show the mask with are stored in this property,
 		 * for when the mask does in fact get shown.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {Boolean} updateCalledWithContent
+		 * 
+		 * This special flag is for if a {@link #tpl} exists, but the {@link #update} method was called with direct HTML content
+		 * (instead of {@link #tplData}). This only matters while the Component is in its {@link #rendered unrendered} state. A 
+		 * value of `true` tells the {@link #method-render} method to skip rendering the {@link #tpl}, and instead use the direct 
+		 * {@link #html} content that was provided to the call to {@link #update}.
 		 */
 		
 		
@@ -424,6 +463,12 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 				}
 			}
 			
+			// Make sure the `tpl` has been created into an actual lodash template function, if it was provided as a string
+			if( this.tpl ) {
+				this.tpl = this.normalizeTpl( this.tpl );
+			}
+			
+			
 			if( this.rendered ) {
 				// Component is already rendered, just append it to the supplied container element
 				if( position ) {
@@ -452,12 +497,6 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 						}
 					}
 					delete this.attr;  // no longer needed
-				}
-				
-				// If the Component was configured with `dragAndDropSortable: false`, add the special HTML attribute which makes the Component's element
-				// be ignored by a ui.Container configured with the ui.plugin.DragAndDropSortable plugin.
-				if( this.dragAndDropSortable === false ) {
-					additionalAttributes.push( 'data-dragAndDropSortable="false"' );
 				}
 				
 				
@@ -492,17 +531,25 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 				
 				
 				
-				// Attach any specified HTML or content element to the Component's content target. The content target is by default,
-				// the Component's element, but may be overridden by subclasses that generate a more complex HTML structure.
-				var $contentTarget = this.getContentTarget(); 
-				if( this.html ) {
-					$contentTarget.append( this.html );
-					delete this.html;  // no longer needed
+				// Attach the output of the `tpl` config (if provided) or any specified HTML or content element to the Component's content 
+				// target. The content target is by default, the Component's element, but may be overridden by subclasses that generate a 
+				// more complex HTML structure.
+				var $contentTarget = this.getContentTarget();
+				if( this.tpl && !this.updateCalledWithContent ) {  // tpl config takes precedence over html/contentEl configs, *unless* update() has been called with HTML content
+					$contentTarget.append( this.tpl( this.tplData || {} ) );
+					delete this.tplData;  // no longer needed
+					
+				} else {
+					if( this.html ) {
+						$contentTarget.append( this.html );
+					}
+					if( this.contentEl ) {
+						$contentTarget.append( this.contentEl );
+					}
 				}
-				if( this.contentEl ) {
-					$contentTarget.append( this.contentEl );
-					delete this.contentEl;  // no longer needed
-				}
+				delete this.updateCalledWithContent;  // no longer needed
+				delete this.html;                     // no longer needed
+				delete this.contentEl;                // no longer needed
 				
 				// Apply any custom sizing
 				if( typeof this.height !== 'undefined' )    { this.$el.height( this.height ); }
@@ -534,6 +581,23 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 					this.doLayout();
 				}
 			}
+		},
+		
+		
+		/**
+		 * Utility method used to normalize a template string or string array into a lodash template function.
+		 * If a function is provided to this method, it will simply be returned.
+		 * 
+		 * @protected
+		 * @param {String/String[]/Function} template The template to normalize. A string or string array argument will be
+		 *   used to generate a lodash template. A function argument will simply be returned.
+		 * @return {Function} The lodash template function.
+		 */
+		normalizeTpl : function( template ) {
+			if( !_.isFunction( template ) ) {
+				template = _.template( [].concat( template ).join( "" ) );
+			}
+			return template;
 		},
 		
 		
@@ -574,22 +638,35 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		
 		
 		/**
-		 * Updates the HTML of the component directly. Will handle the unrendered an rendered states of the Component.
+		 * Updates the HTML of the component directly, or re-runs the {@link #tpl} to update the HTML if {@link #tplData template data}
+		 * (an Object) is provided. Will handle the unrendered and rendered states of the Component.
 		 *
-		 * @method update
-		 * @param {String/HTMLElement/jQuery} content The HTML content as a string, an HTML element, or a jQuery wrapped set of 
-		 *   elements to update the component with.
+		 * @param {String/HTMLElement/jQuery/Object} contentOrTplData The HTML content as a string, an HTML element, or a jQuery 
+		 *   wrapped set of elements to update the component's {@link #getContentTarget content target} with. If an Object is provided, 
+		 *   it is taken as the {@link #tplData data} that the {@link #tpl} should be executed with, allowing this method to update the 
+		 *   Component's markup via its {@link #tpl}.
 		 */
 		update : function( content ) {
+			var isTplData = _.isPlainObject( content );  // will be true if it is a plain JavaScript Object, meaning template data is being provided
+			
 			if( !this.rendered ) {
-				// Remove this config, just in case it was specified. Setting the 'html' config (next) has the same effect as 'contentEl'.
-				delete this.contentEl;
-				
-				// Set the 'html' config, for when the Component is rendered.
-				this.html = content;
-				
+				if( isTplData ) {
+					this.tplData = content;
+					
+				} else {  // Not a plain JavaScript Object, must be HTML content
+					// Remove this config, just in case it was specified. Setting the 'html' config (next) has the same effect as 'contentEl'.
+					delete this.contentEl;
+					
+					// Set the 'html' config, for when the Component is rendered.
+					this.html = content;
+					this.updateCalledWithContent = true;  // in case there is a `tpl` config, this flag tells render() to use the `html` config instead 
+                                                          // of `tpl` when it renders. We don't want to delete the `tpl` config, since it may be used with
+                                                          // data provided to this method at a later time.
+				}
 			} else {
-				this.getContentTarget().empty().append( content );
+				this.getContentTarget()
+					.empty()
+					.append( isTplData ? this.tpl( content ) : content );
 			}
 		},
 		

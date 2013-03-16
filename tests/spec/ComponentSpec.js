@@ -369,6 +369,206 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 				expect( $containerEl.children()[ 0 ] ).toBe( component1.getEl()[ 0 ] );  // component1's element should now be the first element in the $containerEl (again)
 				expect( $containerEl.children()[ 1 ] ).toBe( component2.getEl()[ 0 ] );  // component2's element should now be the second element in the $containerEl (again)	
 			} );
+			
+			
+			
+			describe( "content rendering (`tpl`, `html`, and `contentEl` configs)", function() {
+				
+				it( "should render a `tpl` into the component's element with an empty object for the data if no `tplData` config is provided", function() {
+					var component = new Component( {
+						tpl : "<span>Testing 123</span>"
+					} );
+					
+					component.render( 'body' );
+					expect( component.getEl().html() ).toMatch( "<span>Testing 123</span>" );
+					
+					component.destroy();  // clean up
+				} );
+				
+				
+				it( "should render a `tpl` into the component's element using any provided `tplData`", function() {
+					var component = new Component( {
+						tpl : "<span>Testing <%= num %></span>",
+						tplData : {
+							num: 123
+						}
+					} );
+					
+					component.render( 'body' );
+					expect( component.getEl().html() ).toMatch( "<span>Testing 123</span>" );
+					
+					component.destroy();  // clean up
+				} );
+				
+				
+				it( "should ignore the `html` and `contentEl` configs if the `tpl` config is present", function() {
+					var component = new Component( {
+						tpl : "<span>Testing 123</span>",
+						html : "YYY",
+						contentEl: jQuery( "<span>ZZZ</span>" )
+					} );
+					
+					component.render( 'body' );
+					var componentHtml = component.getEl().html();
+					
+					expect( componentHtml ).toMatch( "<span>Testing 123</span>" );
+					expect( componentHtml ).not.toMatch( "YYY" );
+					expect( componentHtml ).not.toMatch( "ZZZ" );
+					
+					component.destroy();  // clean up
+				} );
+				
+				
+				it( "should append the content of the `html` config (when no `tpl` is present)", function() {
+					var component = new Component( {
+						html : "YYY"
+					} );
+					
+					component.render( 'body' );
+					expect( component.getEl().html() ).toMatch( "YYY" );
+					
+					component.destroy();  // clean up
+				} );
+				
+				
+				it( "should append the content of the `contentEl` config (when no `tpl` is present)", function() {
+					var component = new Component( {
+						html : jQuery( "<span>ZZZ</span>" )
+					} );
+					
+					component.render( 'body' );
+					expect( component.getEl().html() ).toMatch( "<span>ZZZ</span>" );
+					
+					component.destroy();  // clean up
+				} );
+				
+			} );
+			
+		} );
+		
+		
+		/*
+		 * Test normalizeTpl()
+		 */
+		describe( "Test normalizeTpl()", function() {
+			
+			it( "should convert a string into a lodash template function", function() {
+				var component = new Component();
+				
+				var result = component.normalizeTpl( "Testing 123" );
+				expect( _.isFunction( result ) ).toBe( true );
+				expect( result.source ).toBeTruthy();  // should have this property
+				expect( result.source ).toMatch( /Testing 123/ );
+			} );
+			
+			it( "should convert a string array into a lodash template function", function() {
+				var component = new Component();
+				
+				var result = component.normalizeTpl( [ "Testing", " ", "123" ] );
+				expect( _.isFunction( result ) ).toBe( true );
+				expect( result.source ).toBeTruthy();  // should have this property
+				expect( result.source ).toMatch( /Testing 123/ );
+			} );
+			
+			it( "should simply return a provided template function", function() {
+				var component = new Component();
+				
+				var templateFn = _.template( "Testing 123" );
+				
+				var result = component.normalizeTpl( templateFn );
+				expect( result ).toBe( templateFn );
+			} );
+			
+		} );
+		
+		
+		
+		describe( "update()", function() {
+			var component;
+			
+			beforeEach( function() {
+				component = new Component( {
+					tpl  : "Hello, <%= thing %>",
+					tplData : { thing: "Town" },
+					
+					html : "html_config",
+					contentEl : jQuery( '<span>contentEl_config</span>' )
+				} );	
+			} );
+			
+			afterEach( function() {
+				component.destroy();
+			} );
+			
+			
+			it( "should set the component's `tplData` config if a plain JS object is provided as the argument, when unrendered", function() {
+				component.update( {
+					thing: "World"
+				} );
+				expect( component.tplData ).toEqual( { thing: "World" } );
+				
+				component.render( 'body' );  // render after
+				
+				var componentHtml = component.getEl().html();
+				expect( componentHtml ).toMatch( "Hello, World" );
+				expect( componentHtml ).not.toMatch( "html_config" );
+				expect( componentHtml ).not.toMatch( "contentEl_config" );
+			} );
+			
+			
+			it( "should run the component's `tpl` if a plain JS object is provided as the argument, when rendered", function() {
+				component.render( 'body' );  // render first
+				component.update( {
+					thing: "World"
+				} );
+				
+				var componentHtml = component.getEl().html();
+				expect( componentHtml ).toMatch( "Hello, World" );
+				expect( componentHtml ).not.toMatch( "html_config" );
+				expect( componentHtml ).not.toMatch( "contentEl_config" );
+			} );
+			
+			
+			it( "should update the component's `html` config (and delete the `contentEl` config) when an HTML string is provided, when unrendered", function() {
+				component.update( "newHtmlConfig" );
+				expect( component.html ).toEqual( "newHtmlConfig" );
+				expect( component.contentEl ).toBeUndefined();
+				
+				component.render( 'body' );  // render after
+				
+				var componentHtml = component.getEl().html();
+				expect( componentHtml ).toMatch( "newHtmlConfig" );
+				expect( componentHtml ).not.toMatch( "Hello, Town" );
+				expect( componentHtml ).not.toMatch( "html_config" );       // the old `html` config
+				expect( componentHtml ).not.toMatch( "contentEl_config" );  // the old `contentEl` config
+			} );
+			
+			
+			it( "should update the component's inner HTML when an HTML string is provided, when rendered", function() {
+				component.render( 'body' );  // render first
+				component.update( "newHtmlConfig" );
+				
+				var componentHtml = component.getEl().html();
+				expect( componentHtml ).toMatch( "newHtmlConfig" );
+				expect( componentHtml ).not.toMatch( "Hello, Town" );
+				expect( componentHtml ).not.toMatch( "html_config" );       // the old `html` config
+				expect( componentHtml ).not.toMatch( "contentEl_config" );  // the old `contentEl` config
+			} );
+			
+			
+			it( "should cause the component to be rendered with the provided HTML content, but not delete the `tpl` config so that it may be used at a later time", function() {
+				// Update with direct HTML content while the Component is in its unrendered state
+				component.update( "newHtmlConfig" );
+				
+				component.render( 'body' );  // now render
+				expect( component.getEl().html() ).toMatch( "newHtmlConfig" );  // the direct HTML content was used to render the Component instead of the `tpl` (correct)
+				
+				// Now leverage the `tpl` again
+				component.update( { thing: "World" } );
+				expect( component.getEl().html() ).toMatch( "Hello, World" );
+				expect( component.getEl().html() ).not.toMatch( "newHtmlConfig" );   // the old content provided to the previous update() method call
+			} );
+			
 		} );
 		
 		
