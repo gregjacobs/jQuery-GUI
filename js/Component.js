@@ -9,9 +9,10 @@ define( [
 	'ui/Css',
 	'ui/Mask',
 	'ui/anim/Animation',
-	'ui/plugin/Plugin'
+	'ui/plugin/Plugin',
+	'ui/util/LoDashTpl'
 ],
-function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animation, Plugin ) {
+function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animation, Plugin, LoDashTpl ) {
 
 	/**
 	 * @class ui.Component
@@ -154,10 +155,11 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		
 		
 		/**
-		 * @cfg {String/String[]/Function} tpl
+		 * @cfg {String/String[]/Function/ui.util.LoDashTpl} tpl
 		 * 
-		 * The lodash template to use as the HTML template of the Component. This can be a string, an array of strings, 
-		 * or a compiled lodash template function.
+		 * The Lo-Dash template to use as the HTML template of the Component. This can be a string, an array of strings, 
+		 * a compiled Lo-Dash template function, or a {@link ui.util.LoDashTpl} instance. When the Component is rendered,
+		 * it will be turned into a {@link ui.util.LoDashTpl LoDashTpl} instance.
 		 * 
 		 * Used in conjunction with the {@link #tplData} config (which will be the data that is provided to the template
 		 * function), this template can be used as the component's markup. Its output is injected into the element specified by
@@ -166,7 +168,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * If this config is specified, it will override the {@link #html} and {@link #contentEl} configs. The markup that it 
 		 * outputs can be updated with new data by using the {@link #update} method, and providing an Object as its first argument.
 		 * 
-		 * For more information on lodash templates, see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
+		 * For more information on Lo-Dash templates, see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
 		 */
 		
 		/**
@@ -463,9 +465,9 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 				}
 			}
 			
-			// Make sure the `tpl` has been created into an actual lodash template function, if it was provided as a string
+			// Make sure the `tpl` has been created into a LoDashTpl instance
 			if( this.tpl ) {
-				this.tpl = this.normalizeTpl( this.tpl );
+				this.tpl = new LoDashTpl( this.tpl );
 			}
 			
 			
@@ -536,7 +538,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 				// more complex HTML structure.
 				var $contentTarget = this.getContentTarget();
 				if( this.tpl && !this.updateCalledWithContent ) {  // tpl config takes precedence over html/contentEl configs, *unless* update() has been called with HTML content
-					$contentTarget.append( this.tpl( this.tplData || {} ) );
+					$contentTarget.append( this.tpl.apply( this.tplData ) );
 					delete this.tplData;  // no longer needed
 					
 				} else {
@@ -581,23 +583,6 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 					this.doLayout();
 				}
 			}
-		},
-		
-		
-		/**
-		 * Utility method used to normalize a template string or string array into a lodash template function.
-		 * If a function is provided to this method, it will simply be returned.
-		 * 
-		 * @protected
-		 * @param {String/String[]/Function} template The template to normalize. A string or string array argument will be
-		 *   used to generate a lodash template. A function argument will simply be returned.
-		 * @return {Function} The lodash template function.
-		 */
-		normalizeTpl : function( template ) {
-			if( !_.isFunction( template ) ) {
-				template = _.template( [].concat( template ).join( "" ) );
-			}
-			return template;
 		},
 		
 		
@@ -666,7 +651,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 			} else {
 				this.getContentTarget()
 					.empty()
-					.append( isTplData ? this.tpl( content ) : content );
+					.append( isTplData ? this.tpl.apply( content ) : content );
 			}
 		},
 		

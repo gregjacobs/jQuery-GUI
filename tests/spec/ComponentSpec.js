@@ -444,43 +444,7 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 				
 			} );
 			
-		} );
-		
-		
-		/*
-		 * Test normalizeTpl()
-		 */
-		describe( "Test normalizeTpl()", function() {
-			
-			it( "should convert a string into a lodash template function", function() {
-				var component = new Component();
-				
-				var result = component.normalizeTpl( "Testing 123" );
-				expect( _.isFunction( result ) ).toBe( true );
-				expect( result.source ).toBeTruthy();  // should have this property
-				expect( result.source ).toMatch( /Testing 123/ );
-			} );
-			
-			it( "should convert a string array into a lodash template function", function() {
-				var component = new Component();
-				
-				var result = component.normalizeTpl( [ "Testing", " ", "123" ] );
-				expect( _.isFunction( result ) ).toBe( true );
-				expect( result.source ).toBeTruthy();  // should have this property
-				expect( result.source ).toMatch( /Testing 123/ );
-			} );
-			
-			it( "should simply return a provided template function", function() {
-				var component = new Component();
-				
-				var templateFn = _.template( "Testing 123" );
-				
-				var result = component.normalizeTpl( templateFn );
-				expect( result ).toBe( templateFn );
-			} );
-			
-		} );
-		
+		} );		
 		
 		
 		describe( "update()", function() {
