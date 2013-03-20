@@ -1263,52 +1263,105 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		
 		
 		/**
-		 * Tests to see if the Component is hidden. Note that this method tests for the Component's element visibility
-		 * (after it has been rendered), and will return true if 1) the element itself is set as "display: none", 2) a parent 
-		 * element of the Component is set to "display: none", or 3) the element is not attached to the document.  To determine 
-		 * if the Component's element itself is set as hidden, regardless of the visibility of parent elements or being attached
-		 * to the document, check the {@link #property-hidden} property.
+		 * Determines if the Component is hidden.
 		 * 
-		 * @method isHidden
-		 * @return {Boolean}
+		 * If the `checkDom` flag is not passed or is `false`, then this method simply returns the value of the {@link #hidden}
+		 * flag. If the `checkDom` flag is passed as true, this method tests for the Component's element visibility, and will 
+		 * return true if 1) the element itself is set as "display: none", 2) a parent element of the Component is set to 
+		 * `display: none;`, or 3) the element is not attached to the document.
+		 * 
+		 * @param {Boolean} [checkDom=false] `true` to also interrogate the DOM to see if the Component is hidden to the user
+		 *   (i.e. the element is not attached to the DOM, or its CSS `display` property is set to 'none'). If this argument is 
+		 *   provided as `true`, and the component is not yet {@link method-render rendered}, then this method will always return 
+		 *   `true` (as an unrendered component can't be visible, and therefore must be hidden).
+		 * @return {Boolean} `true` if the Component is hidden, `false` otherwise.
 		 */
-		isHidden : function() {
-			if( !this.rendered ) {
-				return this.hidden;  // not yet rendered, return the current state of the 'hidden' config
+		isHidden : function( checkDom ) {
+			if( this.hidden ) {  // quick test: if the component's flag says it's hidden, immediately return true
+				return true;
 				
 			} else {
-				// NOTE: Cannot simply use the jQuery :hidden selector. jQuery determines if an element is hidden by if it
-				// has any computed height or width > 0. The Component's element can be shown, but if it's not taking up 
-				// any space because it has no content, it would still be considered hidden by jQuery. We instead want to see
-				// if the Component, or any of its ancestor elements are hidden via "display: none", to determine if it's hidden.
-				// The Component must also be attached to the document to be considered "shown".
-				//return this.$el.is( ':hidden' );  -- intentionally left here as a reminder not to use
-				
-				// Find out if the component itself, or any of its ancestor elements has "display: none".
-				if( this.$el.css( 'display' ) === 'none' ) {    // slight optimization by testing the Component's element itself first, before grabbing parent elements to test
-					return true;
+				// `hidden` flag is false, check other conditions
+				if( !this.rendered ) {
+					return ( checkDom ) ? true : false;  // `hidden` flag is false, and if checkDom flag is passed as true, we want to return true (as the Component must be hidden if it is not yet rendered into the DOM)
 					
 				} else {
-					var $parents = this.$el.parents(),
-					    numParents = $parents.length;
-					
-					
-					// If the element is not attached to the document (it has no parents, or the top level ancestor is not the <html> tag), then it must be hidden
-					if( numParents === 0 || $parents[ numParents - 1 ].tagName.toLowerCase() !== 'html' ) {
-						return true;
-					}
-	
-					// Element is attached to the DOM, check all parents for one that is not displayed
-					for( var i = 0, len = $parents.length; i < len; i++ ) {
-						if( jQuery( $parents[ i ] ).css( 'display' ) === 'none' ) {
-							return true;
-						}
+					return ( checkDom ) ? !this.isDomVisible() : false;  // not checking the DOM, return the state of the flag (which must be false at this point)
+				}
+			}
+		},
+		
+		
+		/**
+		 * Tests to see if the Component is visible.
+		 * 
+		 * If the `domVisible` flag is not passed or is `false`, then this method simply returns the opposite state of the internal
+		 * {@link #hidden} flag. If the `domVisible` flag is passed as true, this method tests for the Component's element visibility, 
+		 * and will return false if 1) the element itself is set as "display: none", 2) a parent element of the Component is set to 
+		 * `display: none;`, or 3) the element is not attached to the document.
+		 * 
+		 * @param {Boolean} [domVisible=true] `true` to also interrogate the DOM to see if the Component is visible to the user
+		 *   (i.e. the element is attached to the DOM, and its CSS `display` property is something other than 'none'). If this argument 
+		 *   is provided as `true`, and the component is not yet {@link method-render rendered}, then this method will always return 
+		 *   `false` (as an unrendered component can't be visible).
+		 * @return {Boolean} `true` if the Component is visible, `false` otherwise.
+		 */
+		isVisible : function( checkDom ) {
+			return !this.isHidden( checkDom );
+		},
+		
+		
+		/**
+		 * Utility method which determines if the Component's {@link #$el element} is visible in the DOM. Runs an 
+		 * algorithm to check:
+		 * 
+		 * 1. If the {@link #$el element} is attached to the DOM.
+		 * 2. If the {@link #$el element} itself is not `display: none;`
+		 * 3. If any of the {@link #$el element's} parent elements are `display: none;`
+		 * 
+		 * For most cases, one would want to use {@link #isVisible} instead.
+		 * 
+		 * @protected
+		 * @return {Boolean} `true` if the Component's {@link #$el element} is visible in the DOM, false otherwise.
+		 *   If the component is not rendered, returns false immediately.
+		 */
+		isDomVisible : function() {
+			if( !this.isRendered() )
+				return false;  // can't be DOM visible if it's not rendered
+			
+			
+			var $el = this.$el;
+			
+			// NOTE: Cannot simply use the jQuery :hidden selector. jQuery determines if an element is hidden by if it
+			// has any computed height or width > 0. The Component's element can be shown, but if it's not taking up 
+			// any space because it has no content, it would still be considered hidden by jQuery. We instead want to see
+			// if the Component, or any of its ancestor elements are hidden via "display: none", to determine if it's hidden.
+			// The Component must also be attached to the document to be considered "shown".
+			//return $el.is( ':hidden' );  -- intentionally left here as a reminder not to use
+			
+			// Find out if the component itself, or any of its ancestor elements has "display: none".
+			if( $el.css( 'display' ) === 'none' ) {    // slight optimization by testing the Component's element itself first, before grabbing parent elements to test
+				return false;
+				
+			} else {
+				var $parents = $el.parents(),
+				    numParents = $parents.length;
+				
+				// If the element is not attached to the document (it has no parents, or the top level ancestor is not the <html> tag), then it must be hidden
+				if( numParents === 0 || $parents[ numParents - 1 ].tagName.toLowerCase() !== 'html' ) {
+					return false;
+				}
+
+				// Element is attached to the DOM, check all parents for one that is not displayed
+				for( var i = 0, len = $parents.length; i < len; i++ ) {
+					if( $parents.eq( i ).css( 'display' ) === 'none' ) {
+						return false;
 					}
 				}
-				
-				// Passed checks, element must not be hidden
-				return false;
 			}
+			
+			// Passed checks, element must not be hidden (i.e. must be visible)
+			return true;
 		},
 		
 		
@@ -1344,7 +1397,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 			maskConfig = maskConfig || this.maskConfig;  // use the provided argument if it exists, or the defaults provided by the config option otherwise
 			
 			// Set the flag for the isMasked method. Also, if the Component is not rendered, this is updated so that the mask will show on render time.
-			this.masked = true;   
+			this.masked = true;
 			
 			if( !this.rendered ) {
 				this.deferredMaskConfig = maskConfig;  // set the maskConfig to use when the Component is rendered

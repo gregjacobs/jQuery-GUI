@@ -225,7 +225,7 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 			
 			
 		describe( 'isHidden()', function() {
-			it( "isHidden()", function() {
+			it( "should return the state of the `hidden` flag for an unrendered component", function() {
 				// Test on an unrendered component
 				var component = new Component();
 				expect( component.isHidden() ).toBe( false );  // initial condition failed. isHidden() should have returned false (for unrendered component)
@@ -233,9 +233,10 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 				expect( component.isHidden() ).toBe( true );  // after running hide(), isHidden() should have returned true (on an unrendered component)
 				component.show();
 				expect( component.isHidden() ).toBe( false );  // after running hide(), isHidden() should have returned false (on an unrendered component)
-				
-				// Test on a rendered component
-				component = new Component( { renderTo: document.body } );
+			} );
+			
+			it( "should return its `hidden` flag state (which in this case, should relate to its DOM visible state) for a rendered component", function() {
+				var component = new Component( { renderTo: document.body } );
 				expect( component.isHidden() ).toBe( false );  // initial condition failed. isHidden() should have returned false (for rendered component)
 				expect( component.getEl().is( ':visible' ) ).toBe( true );  // confirm initial condition on rendered component, that the element itself is visible (not hidden)
 				component.hide();
@@ -245,15 +246,55 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 				expect( component.isHidden() ).toBe( false );  // after running show(), isHidden() should have returned false (on a rendered component)
 				expect( component.getEl().is( ':visible' ) ).toBe( true );  // confirm that the element itself is now visible on rendered component
 				component.destroy();  // clean up DOM
-				
-				// Test on a rendered component that has been placed into an element that does not exist in the DOM
+			} );
+			
+			it( "should return false for a rendered component that has been placed into an element that does not exist in the DOM, but with not passing the `checkDom` argument to the method", function() {
 				var myDiv = jQuery( '<div />' );
-				component = new Component( { renderTo: myDiv } );
-				expect( component.isHidden() ).toBe( true );  // isHidden() should return true for a Component that is shown, but is rendered as a child of an element that is not attached to the DOM
+				var component = new Component( { renderTo: myDiv } );
+				expect( component.isHidden( /* checkDom */ false ) ).toBe( false );  // isHidden() should only have reported on the state of the `hidden` flag in this case, not reporting on the DOM state
 				component.destroy();
 				myDiv.remove();
 			} );
+			
+			it( "should return true for a rendered component that has been placed into an element that does not exist in the DOM", function() {
+				var myDiv = jQuery( '<div />' );
+				var component = new Component( { renderTo: myDiv } );
+				expect( component.isHidden( /* checkDom */ true ) ).toBe( true );  // isHidden() should return true for a Component that is shown, but is rendered as a child of an element that is not attached to the DOM
+				
+				component.destroy();
+				myDiv.remove();
+			} );
+			
+			it( "should return true for a rendered component that is `display: none`", function() {
+				var myDiv = jQuery( '<div />' ).appendTo( 'body' );
+				var component = new Component( { renderTo: myDiv } );
+				
+				component.getEl().hide();  // set to display:none
+				expect( component.isHidden( /* checkDom */ true ) ).toBe( true );
+				
+				component.destroy();
+				myDiv.remove();
+			} );
+			
+			it( "should return true for a rendered component that is not `display: none`, but one of its parent elements is", function() {
+				var myDiv = jQuery( '<div />' ).appendTo( 'body' );
+				var component = new Component( { renderTo: myDiv } );
+				
+				myDiv.hide();  // set parent element to display:none
+				expect( component.isHidden( /* checkDom */ true ) ).toBe( true );
+				
+				component.destroy();
+				myDiv.remove();
+			} );
+			
 		} );
+		
+		
+		xdescribe( 'isDomVisible()', function() {
+			
+		} );
+		
+		
 		
 		
 		// -----------------------------------------------

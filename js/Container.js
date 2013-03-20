@@ -638,7 +638,7 @@ define( [
 			var childComponents = this.childComponents;
 			for( var i = 0, len = childComponents.length; i < len; i++ ) {
 				var childComponent = childComponents[ i ];
-				if( !childComponent.hidden ) {   // check hidden flag, which stores the state that the Component is supposed to be in (not necessarily in depending on the DOM, which isHidden() relies on)
+				if( !childComponent.isHidden() ) {  // note: we don't need to query the DOM for this check, so no 'checkDom' argument to isHidden()
 					childComponents[ i ].onShow();
 				}
 			}
@@ -726,7 +726,7 @@ define( [
 		 * @return {Boolean}
 		 */
 		canLayout : function() {
-			return this.isRendered() && !this.isHidden();  // not hidden, we can run the layout
+			return this.isRendered() && !this.isHidden( /* checkDom */ true );  // not hidden, we can run the layout
 		},
 	
 	
