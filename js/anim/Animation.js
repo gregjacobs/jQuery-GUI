@@ -78,15 +78,15 @@ define( [
 		
 		/**
 		 * @private
-		 * @property $target
-		 * @type jQuery
+		 * @property {jQuery} $target
+		 * 
 		 * The jQuery wrapped set for the {@link #target}.
 		 */
 		
 		/**
 		 * @private
-		 * @property running
-		 * @type Boolean
+		 * @property {Boolean} running
+		 * 
 		 * Flag to determine if the animation is currently running. Because this class's {@link #target} can be multiple elements, and
 		 * because jQuery's animate() function calls its complete() callback once per each element, we need this flag to be able to set
 		 * it back to false when the first complete() call is made. We don't want to run the {@link #end} method once for each element,
@@ -103,6 +103,10 @@ define( [
 		complete : false,
 		
 		
+		/**
+		 * @constructor
+		 * @param {Object} config The configuration options for this instance.
+		 */
 		constructor : function( config ) {
 			_.assign( this, config );
 			
@@ -171,13 +175,13 @@ define( [
 					}
 					
 					// Run the effect
-					this.$target.effect( effectType, effectOptions, this.duration, this.onLastFrame.createDelegate( this ) );
+					this.$target.effect( effectType, effectOptions, this.duration, _.bind( this.onLastFrame, this ) );
 					
 				} else {
 					this.$target.animate( this.to, {
 						duration : this.duration,
 						easing   : this.easing,
-						complete : this.onLastFrame.createDelegate( this )  // run the 'end' method in the scope of this class, not the DOM element that has completed its animation
+						complete : _.bind( this.onLastFrame, this )  // run the 'end' method in the scope of this class, not the DOM element that has completed its animation
 					} );
 				}
 			}
