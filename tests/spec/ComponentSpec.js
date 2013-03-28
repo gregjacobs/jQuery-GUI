@@ -1776,7 +1776,7 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 					initComponent : function() {
 						// NOTE: These two elements are intentionally not appended to the Component's element, so that the automatic recursive
 						// removal of $el does not effect them. It is possible that Components add elements in other places in the DOM, such as
-						// with the overlay dropdown menu in ui.formFields.DropdownField.
+						// with the overlay dropdown menu in ui.form.field.Dropdown.
 						this.$wrappedSet = jQuery( '<div id="ui-component-test-destruction-1" />' )
 							.appendTo( document.body );
 						

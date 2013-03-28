@@ -10,9 +10,6 @@ define( [
 	 * @extends ui.Component
 	 * 
 	 * Creates a label (piece of text) in a UI hierarchy. This class is used for the legacy type "Introduction" as well.
-	 * 
-	 * @constructor
-	 * @param {Object} config The configuration options for this Component, specified in an object (hash).
 	 */
 	var Label = Class.extend( Component, {
 	

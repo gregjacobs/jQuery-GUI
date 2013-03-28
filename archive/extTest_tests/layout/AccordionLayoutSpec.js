@@ -15,7 +15,7 @@ ui.layout.AccordionLayoutTest = Class.extend( ui.layout.LayoutTest, {
 	 * This method must be overridden in each TestCase subclass.
 	 * 
 	 * @method createLayout
-	 * @return {ui.layout.FitLayout}
+	 * @return {ui.layout.Fit}
 	 */
 	createLayout : function() {
 		return new ui.layout.AccordionLayout();

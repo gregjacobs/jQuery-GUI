@@ -48,10 +48,6 @@ define( [
 	 * implement the {@link #onDestroy} method to implement their clean up as part of the destruction process.
 	 * Note that a layout may be destroyed by a {@link ui.Container} if another layout is set to it, and therefore
 	 * it cannot be relied on that the Container will clean up any stray elements that a Layout has created.
-	 *
-	 * 
-	 * @constructor
-	 * @param {Object} config The configuration options for the Layout, specified in an object (hash).
 	 */
 	var Layout = Class.extend( Observable, {
 		abstractClass : true,
@@ -93,6 +89,10 @@ define( [
 		destroyed : false,
 		
 		
+		/**
+		 * @constructor
+		 * @param {Object} [config] Any of the configuration options of this class, specified in an Object (map).
+		 */
 		constructor : function( config ) {
 			this.addEvents(
 				/**

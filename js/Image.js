@@ -1,18 +1,16 @@
 /*global define */
 define( [
+	'lodash',
 	'Class',
 	'ui/ComponentManager',
 	'ui/Component'
-], function( Class, ComponentManager, Component ) {
+], function( _, Class, ComponentManager, Component ) {
 	
 	/**
 	 * @class ui.Image
 	 * @extends ui.Component
 	 *
 	 * A simple component which is an image.
-	 *
-	 * @constructor
-	 * @param {Object} config The configuration options for this Component, specified in an object (hash).
 	 */
 	var Image = Class.extend( Component, {
 		
@@ -121,8 +119,8 @@ define( [
 				
 				// Now bind the load and error events for when we set the new src
 				this.$el.bind( {
-					'load.uiImage'  : this.onImageLoad.createDelegate( this ),
-					'error.uiImage' : this.onImageError.createDelegate( this )
+					'load.uiImage'  : _.bind( this.onImageLoad, this ),
+					'error.uiImage' : _.bind( this.onImageError, this )
 				} );
 				this.$el.attr( 'src', this.src );
 			}

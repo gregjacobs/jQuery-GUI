@@ -5,7 +5,7 @@ Jux.namespace(
 	'ui.bits',
 	'ui.layout',
 	'ui.containers',
-	'ui.formFields',
+	'ui.form',
 	'ui.toolButtons',
 	'ui.plugin',
 	'ui.utils'

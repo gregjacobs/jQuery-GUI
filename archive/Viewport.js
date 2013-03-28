@@ -10,7 +10,7 @@
  * 
  * Note that a Viewport should not containe another Viewport though. A set of parent/child relationships should end at the
  * top with a Viewport, and all children should simply be {@link ui.Container Containers}. If they need to be sized to 100% height/width,
- * their parent {@link ui.Container Container} should be configured with a {@link ui.layout.FitLayout FitLayout}.
+ * their parent {@link ui.Container Container} should be configured with a {@link ui.layout.Fit FitLayout}.
  *
  * @constructor
  * @param {Object} config The configuration options for this Component, specified in an object (hash).

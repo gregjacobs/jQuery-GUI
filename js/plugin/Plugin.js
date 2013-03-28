@@ -23,7 +23,7 @@ function( _, Class, Observable ) {
 		
 		/**
 		 * @constructor
-	 * @param {Object} config The configuration options for the plugin, specified in an object (hash).
+		 * @param {Object} config The configuration options for the plugin, specified in an object (hash).
 		 */
 		constructor : function( config ) {
 			// Apply the properties of the configuration object onto this object

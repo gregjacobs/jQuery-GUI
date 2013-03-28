@@ -7,6 +7,19 @@ define( [
 	'ui/layout/Layout'
 ], function( jQuery, Class, Component, Container, Layout ) {
 	
+	/**
+	 * @class spec.layout.LayoutFixture
+	 * @extends Object
+	 * 
+	 * Fixture class for the base class {@link ui.layout.Layout} tests.
+	 * 
+	 * This class creates the fixture for the tests upon construction. It is usually created as part
+	 * of a `beforeEach()` method. All parts of the fixture which are needed for tests are available via 
+	 * accessor methods (ex: {@link #getLayout}, {@link #getTargetEl}, etc).
+	 * 
+	 * Upon completion of a test, the fixture should be {@link #destroy destroyed}, usually from an `afterEach()` 
+	 * method.
+	 */
 	var LayoutFixture = Class.extend( Object, {
 	
 		/**
@@ -21,7 +34,7 @@ define( [
 		 * @protected
 		 * @property {ui.Container} container
 		 * 
-		 * A mock Container instance.
+		 * A mock {@link ui.Container} instance.
 		 */
 		
 		/**
@@ -125,7 +138,6 @@ define( [
 		 * Retrieves the Fixture's {@link #container}, which is the Container that the {@link #layout}
 		 * is attached to.
 		 * 
-		 * @method getContainer
 		 * @return {ui.Container}
 		 */
 		getContainer : function() {
@@ -137,7 +149,6 @@ define( [
 		 * Retrieves the Fixture's {@link #layout} (which is created by {@link #createLayout}).
 		 * This layout is attached to the fixture's {@link #container}.
 		 * 
-		 * @method getLayout
 		 * @return {ui.layout.Layout}
 		 */
 		getLayout : function() {
@@ -146,10 +157,9 @@ define( [
 		
 		
 		/**
-		 * Retrieves the {@link #layout layout's} target element. This is the element where child components'
-		 * elements are placed into.
+		 * Retrieves the {@link #layout layout's} {@link #$targetEl target element}. This is the element where 
+		 * child components' elements are placed into.
 		 * 
-		 * @method getTargetEl
 		 * @return {jQuery}
 		 */
 		getTargetEl : function() {
@@ -158,9 +168,29 @@ define( [
 		
 		
 		/**
-		 * Destroys the LayoutFixture
+		 * Retrieves the {@link #layout layout's} {@link #$targetEl target element's} width. This is how wide
+		 * the target element is configured to be (in pixels).
 		 * 
-		 * @method destroy
+		 * @return {Number} The target element's width.
+		 */
+		getTargetElWidth : function() {
+			return this.targetWidth;
+		},
+		
+		
+		/**
+		 * Retrieves the {@link #layout layout's} {@link #$targetEl target element's} height. This is how wide
+		 * the target element is configured to be (in pixels).
+		 * 
+		 * @return {Number} The target element's height.
+		 */
+		getTargetElHeight : function() {
+			return this.targetHeight;
+		},
+		
+		
+		/**
+		 * Destroys the LayoutFixture
 		 */
 		destroy : function() {
 			this.layout.destroy();

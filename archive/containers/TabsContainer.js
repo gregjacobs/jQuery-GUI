@@ -2,7 +2,7 @@
  * @class ui.containers.TabsContainer
  * @extends ui.Container
  *  
- * Convenience Container class that is pre-configured to use a {@link ui.layout.TabsLayout}.  
+ * Convenience Container class that is pre-configured to use a {@link ui.layout.Tab}.  
  * This Container provides easy configuration, and delegation methods to easily use the internal TabsLayout.
  *
  * @constructor
@@ -13,13 +13,13 @@ ui.containers.TabsContainer = Class.extend( ui.Container, {
 	
 	/**
 	 * @cfg {Number/ui.Component} activeTab
-	 * The tab number, or ui.Component instance to set as the initially active tab. See {@link ui.layout.TabsLayout} for details.
+	 * The tab number, or ui.Component instance to set as the initially active tab. See {@link ui.layout.Tab} for details.
 	 */
 	
 	/**
 	 * @hide
 	 * @cfg {String/Object/ui.layout.Layout} layout
-	 * A {@link ui.layout.TabsLayout} is automatically configured for this subclass.
+	 * A {@link ui.layout.Tab} is automatically configured for this subclass.
 	 */
 	
 	
@@ -36,7 +36,7 @@ ui.containers.TabsContainer = Class.extend( ui.Container, {
 		);
 		
 		// Create the TabsLayout for the Container
-		this.layout = new ui.layout.TabsLayout( {
+		this.layout = new ui.layout.Tab( {
 			activeTab : this.activeTab,
 			
 			listeners : {
@@ -88,7 +88,7 @@ ui.containers.TabsContainer = Class.extend( ui.Container, {
 	 *
 	 * @protected
 	 * @method onTabChange
-	 * @param {ui.layout.TabsLayout} tabsLayout The TabsLayout instance.
+	 * @param {ui.layout.Tab} tabsLayout The TabsLayout instance.
 	 * @param {ui.Component} tab The new tab that was selected (i.e. changed to).
 	 * @param {ui.Component} oldTab The old tab that was de-selected (i.e. changed from).
 	 */

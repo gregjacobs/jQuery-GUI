@@ -246,13 +246,14 @@ function( jQuery, _, Class ) {
 			// The interval is for when elements on the page may resize themselves, we need to adjust the content element's position. The interval
 			// will be cleared once the mask is hidden.
 			this.repositionContentEl();
+			var me = this;  // for closure
 			var repositionIntervalId = setInterval( function() {
-				if( this.isShown() ) {
-					this.repositionContentEl();
+				if( me.isShown() ) {
+					me.repositionContentEl();
 				} else {
 					clearInterval( repositionIntervalId );  // When no longer shown, clear the interval
 				}
-			}.createDelegate( this ), 100 );
+			}, 100 );
 		},
 		
 		

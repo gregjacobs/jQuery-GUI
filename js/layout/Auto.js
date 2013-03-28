@@ -1,10 +1,9 @@
 /*global define */
 define( [
 	'require',
-	'Class',
 	'ui/layout/Layout',
 	'ui/Container'
-], function( require, Class, Layout ) {
+], function( require, Layout ) {
 	
 	/**
 	 * @class ui.layout.Auto
@@ -16,7 +15,7 @@ define( [
 	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'auto' (or
 	 * by not giving a {@link ui.Container Container} any {@link ui.Container#layout layout} config).
 	 */
-	var AutoLayout = Class.extend( Layout, {
+	var AutoLayout = Layout.extend( {
 		
 		/**
 		 * Layout implementation for AutoLayout, which simply renders each child component directly into the 

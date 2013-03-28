@@ -1,11 +1,11 @@
 /**
- * @class ui.layout.CardsLayout.SlideTransition
- * @extends ui.layout.CardsLayout.AbstractTransition
+ * @class ui.layout.Card.SlideTransition
+ * @extends ui.layout.Card.AbstractTransition
  * 
- * {@link ui.layout.CardsLayout} transition strategy for switching cards by sliding the currently active item out, while sliding the newly active item in.
+ * {@link ui.layout.Card} transition strategy for switching cards by sliding the currently active item out, while sliding the newly active item in.
  */
 /*global Class, window, jQuery, Jux, ui */
-ui.layout.CardsLayout.SlideTransition = Class.extend( ui.layout.CardsLayout.AbstractTransition, {
+ui.layout.Card.SlideTransition = Class.extend( ui.layout.Card.AbstractTransition, {
 	
 	/**
 	 * @private
@@ -38,7 +38,7 @@ ui.layout.CardsLayout.SlideTransition = Class.extend( ui.layout.CardsLayout.Abst
 	 * Sets the active item that should be transitioned to.
 	 * 
 	 * @method setActiveItem
-	 * @param {ui.layout.CardsLayout} cardsLayout The CardsLayout instance that is using this transition strategy.
+	 * @param {ui.layout.Card} cardsLayout The CardsLayout instance that is using this transition strategy.
 	 * @param {ui.Component} currentItem The currently active item. This may be null if the CardsLayout does not currently have an active item.
 	 * @param {ui.Component} newItem The item to activate. This may be null if there is no new item to activate (for just hiding the currentItem).
 	 * @param {Object} [options] An object which may contain the following properties:

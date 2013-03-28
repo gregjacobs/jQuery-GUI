@@ -913,7 +913,7 @@ define( [
 			it( "setLayout() should accept a layout's string name", function() {
 				var container = new Container();
 				container.setLayout( '__setLayoutTest_testLayout' );
-				expect( container.getLayout() instanceof TestLayout ).toBe( true );  // Setting a layout with the string 'columns' should have created a ui.layout.ColumnsLayout
+				expect( container.getLayout() instanceof TestLayout ).toBe( true );  // Setting a layout with the string 'columns' should have created a ui.layout.Column
 				expect( container.getLayout().getContainer() ).toEqual( container );  // The layout's Container reference was not set to the Container when instantiated by its string type
 			} );
 			
@@ -941,7 +941,7 @@ define( [
 				var container = new Container();
 				container.setLayout( { type : '__setLayoutTest_testLayout' } );
 				
-				expect( container.getLayout() instanceof TestLayout ).toBe( true );  // Setting a layout with an object with type 'Columns' should have created a ui.layout.ColumnsLayout
+				expect( container.getLayout() instanceof TestLayout ).toBe( true );  // Setting a layout with an object with type 'Columns' should have created a ui.layout.Column
 				expect( container.getLayout().getContainer() ).toEqual( container );  // The layout's Container reference was not set to the Container when instantiated by an object with a 'type' property
 			} );
 			
@@ -950,7 +950,7 @@ define( [
 				var container = new Container();
 				container.setLayout( { type : '__setLayoutTest_testLayout', customProp: 1 } );   // test with a custom property, to make sure it gets applied
 				
-				expect( container.getLayout() instanceof TestLayout ).toBe( true );  // Setting a layout with an object with type 'Columns' should have created a ui.layout.ColumnsLayout (with a custom property)
+				expect( container.getLayout() instanceof TestLayout ).toBe( true );  // Setting a layout with an object with type 'Columns' should have created a ui.layout.Column (with a custom property)
 				expect( 1 ).toBe( container.getLayout().customProp );  // setLayout() didn't seem to create the Layout with the config object (customProp wasn't applied)
 				expect( container.getLayout().getContainer() ).toEqual( container );  // The layout's Container reference was not set to the Container when instantiated by an object with a 'type' property, and with a custom property
 			} );

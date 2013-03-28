@@ -13,9 +13,6 @@ define( [
 	 * @extends Observable
 	 * 
 	 * A class that encapsulates a single animation of a given HTMLElement, jQuery wrapped set, or {@link ui.Component}.
-	 * 
-	 * @constructor
-	 * @param {Object} config The configuration options for this Component, specified in an object (hash).
 	 */
 	var Animation = Class.extend( Observable, {
 		
