@@ -1,4 +1,4 @@
-/*global define, describe, it, expect */
+/*global define, describe, beforeEach, it, expect */
 define( [
 	'jquery',
 	'ui/anim/Animation'
@@ -6,33 +6,52 @@ define( [
 	
 	describe( 'ui.anim.Animation', function() {
 		
-		it( "should require the 'target' config, and either the 'to' or 'effect' configs", function() {
-			var $targetEl = jQuery( '<div />' );
+		describe( 'start()', function() {
+			var $targetEl;
 			
-			// Should not error
-			var anim = new Animation( {
-				target : $targetEl,
-				to : { someProp: 1 }
+			beforeEach( function() {
+				$targetEl = jQuery( '<div />' );
 			} );
 			
-			// Should not error
-			var anim2 = new Animation( {
-				target : $targetEl,
-				effect : "testEffect"
+			it( "should throw an error if the `target` config is missing", function() {
+				expect( function() {
+					var anim = new Animation( {
+						// NOTE: no 'target' config
+					} );
+					anim.start();
+				} ).toThrow( "ui.anim.Animation.start(): Error. No `target` config provided" );
 			} );
 			
-			expect( function() {
-				var anim3 = new Animation( {
-					// NOTE: no 'target' config
-				} );
-			} ).toThrow( "ui.anim.Animation: Error. No 'target' config provided" );
 			
-			expect( function() {
-				var anim4 = new Animation( {
-					target : $targetEl
-					// NOTE: no 'to' or 'effect' configs
+			it( "should throw an error if both the `to` and `effect` configs are missing", function() {
+				expect( function() {
+					var anim = new Animation( {
+						target : $targetEl
+						// NOTE: no 'to' and 'effect' config
+					} );
+					anim.start();
+				} ).toThrow( "ui.anim.Animation.start(): Error. No `to` or `effect` config provided" );
+			} );
+			
+			
+			it( "should not error if a `target` config, and a `to` config is provided", function() {
+				var anim = new Animation( {
+					target : $targetEl,
+					to : { someProp: 1 }
 				} );
-			} ).toThrow( "ui.anim.Animation: Error. No 'to' or 'effect' config provided" );
+				anim.start();
+			} );
+			
+			
+			// NOTE: commented test because we're not including jQuery UI effects library
+			/*it( "should not error if a `target` config, and an `effect` config is provided", function() {
+				var anim = new Animation( {
+					target : $targetEl,
+					effect : "testEffect"
+				} );
+				anim.start();
+			} );*/			
+			
 		} );
 		
 	} );
