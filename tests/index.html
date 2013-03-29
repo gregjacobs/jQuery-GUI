@@ -18,16 +18,21 @@
   		
   		paths : {
   			// General dependencies
-  			'jquery'     : 'vendor/jquery/jquery',
-  			'lodash'     : 'vendor/lodash/lodash',
-  			'Class'      : 'vendor/class/Class',
-  			'Observable' : 'vendor/observable/Observable',
+  			'jquery'             : 'vendor/jquery/jquery',
+  			'jquery-ui.position' : 'vendor/jquery-ui.position/jquery-ui.position',
+  			'lodash'             : 'vendor/lodash/lodash',
+  			'Class'              : 'vendor/class/Class',
+  			'Observable'         : 'vendor/observable/Observable',
   			
   			// UI Library
   			'ui' : 'js',
   			
   			// Specs
   			'spec' : 'tests/spec'
+  		},
+  		
+  		shim : {
+  			'jquery-ui.position' : [ 'jquery' ]   // jQuery UI's 'position' plugin
   		}
   	} );
   	
