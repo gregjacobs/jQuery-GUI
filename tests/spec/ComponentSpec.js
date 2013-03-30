@@ -1,13 +1,15 @@
-/*global define, describe, xdescribe, it, xit, expect, beforeEach, afterEach */
+/*global define, describe, xdescribe, beforeEach, afterEach, it, xit, expect, runs, waitsFor, JsMockito */
+/*jshint sub:true */
 define( [
 	'jquery',
 	'lodash',
 	'Class',
+	'ui/anim/Animation',
 	'ui/plugin/Plugin',
-	'ui/Component'//,
-	//'ui/Container'
+	'ui/Component',
+	'ui/Container'
 ],
-function( jQuery, _, Class, Plugin, Component, Container ) {
+function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 	
 	describe( 'ui.Component', function() {
 		
@@ -138,53 +140,74 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 			} );
 		} );
 			
-			
 		
-		describe( 'hide()', function() {
-			var component;
-			
-			beforeEach( function() {
-				component = new Component();
-			} );
-			
-			afterEach( function() {
-				component.destroy();  // clean up
-			} );
-			
-			
-			it( "should set the state correctly on an unrendered component", function() {
-				expect( component.isHidden() ).toBe( false );  // initial condition failed. isHidden() should have returned false
-				component.hide();
-				expect( component.isHidden() ).toBe( true );  // after running hide(), isHidden() should have returned true (on an unrendered component)
-			} );
-			
-			
-			it( "should render a component as hidden, if hide() was called on the component in its unrendered state", function() {
-				component.hide();
-				
-				// now render
-				component.render( document.body );
-				expect( component.isHidden() ).toBe( true );  // after rendering the component, hidden with hide() when it was unrendered, it should have been rendered hidden
-				expect( component.getEl().is( ':visible' ) ).toBe( false );  // after rendering the component, hidden with hide() when it was unrendered, confirm that the element itself is hidden (not visible)
-			} );
-			
-			
-			it( "should hide a rendered component", function() {
-				component.render( document.body );
-				
-				expect( component.isHidden() ).toBe( false );  // initial condition failed. isHidden() should have returned false for rendered component
-				component.hide();
-				expect( component.isHidden() ).toBe( true );  // after running hide(), isHidden() should have returned true (on rendered component)
-				expect( component.getEl().is( ':visible' ) ).toBe( false );  // after running hide() when it was rendered, confirm that the element itself is hidden (not visible)
-			} );
-		} );
-			
-			
 		describe( 'show()', function() {
-			var component;
+			var component,
+			    callCounts = {},
+			    callArgs = {},
+			    onBeforeShow_elVisibleState,
+			    onBeforeShow_showingState,
+			    onShow_elVisibleState,
+			    showbegin_elVisibleState,
+			    onAfterShow_showingState,
+			    executionOrder = [];
+			
+			// A Component subclass with overridden hook methods for the tests
+			var TestComponent = Component.extend( {
+				onBeforeShow : function( arg ) {
+					executionOrder.push( 'onBeforeShow' );
+					
+					callCounts[ 'onBeforeShow' ]++;
+					callArgs[ 'onBeforeShow' ] = arg;
+					onBeforeShow_elVisibleState = this.getEl().is( ':visible' );
+					onBeforeShow_showingState = this.showing;
+				},
+				onShow : function( arg ) { 
+					executionOrder.push( 'onShow' );
+					
+					callCounts[ 'onShow' ]++;
+					callArgs[ 'onShow' ] = arg;
+					onShow_elVisibleState = this.getEl().is( ':visible' );
+				},
+				onAfterShow : function( arg ) {
+					executionOrder.push( 'onAfterShow' );
+					
+					callCounts[ 'onAfterShow' ]++;
+					callArgs[ 'onAfterShow' ] = arg;
+					onAfterShow_showingState = this.showing;
+				}
+			} );
+			
 			
 			beforeEach( function() {
-				component = new Component();
+				component = new TestComponent();
+				
+				callCounts = {   // call counts for both hook methods and events
+					onBeforeShow : 0,
+					onShow       : 0,
+					onAfterShow  : 0,
+					beforeshow   : 0,
+					showbegin    : 0,
+					show         : 0,
+					aftershow    : 0
+				};
+				callArgs = {
+					onBeforeShow : undefined,
+					onShow       : undefined,
+					onAfterShow  : undefined
+				};
+			    onBeforeShow_elVisibleState = undefined;
+			    onBeforeShow_showingState = undefined;
+			    onShow_elVisibleState = undefined;
+			    showbegin_elVisibleState = undefined;
+			    executionOrder = [];
+			    
+			    component.on( {
+					'beforeshow' : function( cmp ) { executionOrder.push( 'beforeshow' ); callCounts[ 'beforeshow' ]++; },
+					'showbegin'  : function( cmp ) { executionOrder.push( 'showbegin' );  callCounts[ 'showbegin' ]++; showbegin_elVisibleState = cmp.getEl().is( ':visible' ); },
+					'show'       : function( cmp ) { executionOrder.push( 'show' );       callCounts[ 'show' ]++;       },
+					'aftershow'  : function( cmp ) { executionOrder.push( 'aftershow' );  callCounts[ 'aftershow' ]++;  }
+			    } );
 			} );
 			
 			afterEach( function() {
@@ -221,8 +244,461 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 				expect( component.isHidden() ).toBe( false );  // after running show(), isHidden() should have returned false (on rendered component)
 				expect( component.getEl().is( ':visible' ) ).toBe( true );  // after running show() when it was rendered, confirm that the element itself is visible (not hidden)
 			} );
+			
+			
+			it( "should only show a component that is not already shown", function() {
+				component.render( document.body );
+				
+				expect( component.isVisible() ).toBe( true );  // initial condition
+				expect( callCounts[ 'onBeforeShow' ] ).toBe( 0 );     // initial condition
+				
+				component.show();
+				expect( callCounts[ 'onBeforeShow' ] ).toBe( 0 );  // shouldn't have been called
+				expect( callCounts[ 'onShow' ] ).toBe( 0 );        // shouldn't have been called
+				expect( callCounts[ 'onAfterShow' ] ).toBe( 0 );   // shouldn't have been called
+			} );
+			
+			
+			it( "should be prevented from showing if a 'beforeshow' event handler returns false", function() {
+				component.render( document.body );
+				
+				component.hide();  // do an initial hide
+				expect( component.isVisible() ).toBe( false );  // initial condition
+				
+				component.on( 'beforeshow', function() { return false; } );
+				component.show();
+				expect( callCounts[ 'onBeforeShow' ] ).toBe( 0 );  // shouldn't have been called
+				expect( callCounts[ 'onShow' ] ).toBe( 0 );        // shouldn't have been called
+				expect( callCounts[ 'onAfterShow' ] ).toBe( 0 );   // shouldn't have been called
+			} );
+			
+			
+			it( "should end a current 'hiding' animation, if there is one, when showing", function() {
+				component.render( document.body );
+				
+				component.hide();  // do an initial hide
+				expect( component.isVisible() ).toBe( false );  // initial condition
+				
+				var anim = JsMockito.mock( Animation );
+				
+				// Set state
+				component.hiding = true;
+				component.currentAnimation = anim;
+				
+				// Test
+				component.show();
+				JsMockito.verify( anim ).end();  // verify that the 'end' method was called
+			} );
+			
+			
+			it( "should call onBeforeShow(), before the element is visible, and with the `showing` flag == true", function() {
+				component.render( document.body );
+				
+				component.hide();  // do an initial hide
+				expect( component.isVisible() ).toBe( false );          // initial condition
+				expect( callCounts[ 'onBeforeShow' ] ).toBe( 0 );       // initial condition
+				expect( onBeforeShow_elVisibleState ).toBeUndefined();  // initial condition
+				expect( onBeforeShow_showingState ).toBeUndefined();    // initial condition
+				
+				var opts = {};
+				component.show( opts );
+				expect( callCounts[ 'onBeforeShow' ] ).toBe( 1 );
+				expect( callArgs[ 'onBeforeShow' ] ).toBe( opts );    // check that the original `options` object was provided to the hook method
+				expect( onBeforeShow_elVisibleState ).toBe( false );  // still not visible yet
+				expect( onBeforeShow_showingState ).toBe( true );
+			} );
+			
+			
+			it( "should call onShow(), after the element is visible", function() {
+				component.render( document.body );
+				
+				component.hide();  // do an initial hide
+				expect( component.isVisible() ).toBe( false );    // initial condition
+				expect( callCounts[ 'onShow' ] ).toBe( 0 );       // initial condition
+				expect( onShow_elVisibleState ).toBeUndefined();  // initial condition
+				
+				var opts = {};
+				component.show( opts );
+				expect( callCounts[ 'onShow' ] ).toBe( 1 );
+				expect( callArgs[ 'onShow' ] ).toBe( opts );   // check that the original `options` object was provided to the hook method
+				expect( onShow_elVisibleState ).toBe( true );  // visible now
+			} );
+			
+			
+			it( "should fire the 'showbegin' and 'show' events after the element is visible, but before any animation is complete (i.e. before onAfterShow() executes)", function() {
+				component.render( document.body );
+				
+				component.hide();  // do an initial hide
+				expect( component.isVisible() ).toBe( false );  // initial condition
+				expect( executionOrder ).toEqual( [] );         // initial condition
+				expect( showbegin_elVisibleState ).toBeUndefined();  // initial condition
+				
+				component.show();
+				expect( executionOrder ).toEqual( [ 'beforeshow', 'onBeforeShow', 'onShow', 'showbegin', 'show', 'onAfterShow', 'aftershow' ] );
+				expect( showbegin_elVisibleState ).toBe( true );
+			} );
+			
+			
+			it( "should call onAfterShow() and fire the 'aftershow' event immediately when there is no animation", function() {
+				component.render( document.body );
+				
+				component.hide();  // do an initial hide
+				expect( component.isVisible() ).toBe( false );  // initial condition
+				expect( executionOrder ).toEqual( [] );         // initial condition
+				
+				var opts = {};
+				component.show( opts );
+				expect( callCounts[ 'onAfterShow' ] ).toBe( 1 );   // called synchronously in show()
+				expect( callCounts[ 'aftershow' ] ).toBe( 1 );     // called synchronously in show()
+				expect( callArgs[ 'onAfterShow' ] ).toBe( opts );  // make sure method was provided the original `options` object
+				expect( onAfterShow_showingState ).toBe( false );  // should no longer "be in the process of showing"
+				
+				// Just double checking the execution order
+				expect( executionOrder ).toEqual( [ 'beforeshow', 'onBeforeShow', 'onShow', 'showbegin', 'show', 'onAfterShow', 'aftershow' ] );
+			} );
+			
+			
+			it( "should call onAfterShow() and fire the 'aftershow' event only after a specified animation is complete", function() {
+				component.render( document.body );
+				
+				component.hide();  // do an initial hide
+				expect( component.isVisible() ).toBe( false );  // initial condition
+				expect( executionOrder ).toEqual( [] );         // initial condition
+				
+				// options to provide to show() method
+				var opts = {
+					anim: {
+						from     : { opacity: 0 },
+						to       : { opacity: 1 },
+						duration : 10
+					}
+				};
+				
+				runs( function() {
+					component.show( opts );
+					expect( callCounts[ 'onBeforeShow' ] ).toBe( 1 );  // called synchronously in show()
+					expect( callCounts[ 'beforeshow' ] ).toBe( 1 );    // called synchronously in show()
+					expect( callCounts[ 'onShow' ] ).toBe( 1 );        // called synchronously in show()
+					expect( callCounts[ 'show' ] ).toBe( 1 );          // called synchronously in show()
+					expect( callCounts[ 'onAfterShow' ] ).toBe( 0 );   // *not* called synchronously in show()
+					expect( callCounts[ 'aftershow' ] ).toBe( 0 );     // *not* called synchronously in show()
+					expect( component.showing ).toBe( true );          // should "be in the process of showing"
+				} );
+				
+				waitsFor( function() {
+					return callCounts[ 'onAfterShow' ] === 1;   // wait until it has been executed
+				}, "onAfterShow() should be executed", 100 );
+				
+				runs( function() {
+					expect( callCounts[ 'onBeforeShow' ] ).toBe( 1 );  // final state after animation completes
+					expect( callCounts[ 'beforeshow' ] ).toBe( 1 );    // final state after animation completes
+					expect( callCounts[ 'onShow' ] ).toBe( 1 );        // final state after animation completes
+					expect( callCounts[ 'show' ] ).toBe( 1 );          // final state after animation completes
+					expect( callCounts[ 'onAfterShow' ] ).toBe( 1 );   // final state after animation completes
+					expect( callCounts[ 'aftershow' ] ).toBe( 1 );     // final state after animation completes
+					expect( callArgs[ 'onAfterShow' ] ).toBe( opts );  // make sure method was provided the original `options` object
+					expect( onAfterShow_showingState ).toBe( false );  // should no longer "be in the process of showing" in the onAfterShowMethod
+					expect( component.getEl().is( ':visible' ) ).toBe( true );  // final state after show
+					
+					// Double checking execution order
+					expect( executionOrder ).toEqual( [ 'beforeshow', 'onBeforeShow', 'onShow', 'showbegin', 'show', 'onAfterShow', 'aftershow' ] );
+				} );
+			} );
+			
+			
+			it( "should return a reference to itself, for chaining, when showing", function() {
+				component.hide();  // do an initial hide
+				
+				expect( component.isVisible() ).toBe( false );  // checking initial state prior to show() call
+				expect( component.show() ).toBe( component );
+			} );
+			
+			it( "should return a reference to itself, for chaining, when not showing (because it is already shown)", function() {
+				component.show();  // do an initial show
+				
+				expect( component.isVisible() ).toBe( true );  // checking initial state prior to hide() call
+				expect( component.show() ).toBe( component );
+			} );
 		} );
 			
+			
+		
+		describe( 'hide()', function() {
+			var component,
+			    callCounts = {},
+			    callArgs = {},
+			    onBeforeHide_elVisibleState,
+			    onBeforeHide_hidingState,
+			    onHide_elVisibleState,
+			    onHide_hidingState,
+			    onAfterHide_elVisibleState,
+			    onAfterHide_hidingState,
+			    hidebegin_elVisibleState,
+			    executionOrder = [];
+			
+			// A Component subclass with overridden hook methods for the tests
+			var TestComponent = Component.extend( {
+				onBeforeHide : function( arg ) {
+					executionOrder.push( 'onBeforeHide' );
+					
+					callCounts[ 'onBeforeHide' ]++;
+					callArgs[ 'onBeforeHide' ] = arg;
+					onBeforeHide_elVisibleState = this.getEl().is( ':visible' );
+					onBeforeHide_hidingState = this.hiding;
+				},
+				onHide : function( arg ) { 
+					executionOrder.push( 'onHide' );
+					
+					callCounts[ 'onHide' ]++;
+					callArgs[ 'onHide' ] = arg;
+					onHide_elVisibleState = this.getEl().is( ':visible' );
+					onHide_hidingState = this.hiding;
+				},
+				onAfterHide : function( arg ) {
+					executionOrder.push( 'onAfterHide' );
+					
+					callCounts[ 'onAfterHide' ]++;
+					callArgs[ 'onAfterHide' ] = arg;
+					onAfterHide_elVisibleState = this.getEl().is( ':visible' );
+					onAfterHide_hidingState = this.hiding;
+				}
+			} );
+			
+			
+			beforeEach( function() {
+				component = new TestComponent();
+				
+				callCounts = {   // call counts for both hook methods and events
+					onBeforeHide : 0,
+					onHide       : 0,
+					onAfterHide  : 0,
+					beforehide   : 0,
+					hidebegin    : 0,
+					hide         : 0,
+					afterhide    : 0
+				};
+				callArgs = {
+					onBeforeHide : undefined,
+					onHide       : undefined,
+					onAfterHide  : undefined
+				};
+			    onBeforeHide_elVisibleState = undefined;
+			    onBeforeHide_hidingState = undefined;
+			    onHide_elVisibleState = undefined;
+			    onHide_hidingState = undefined;
+			    hidebegin_elVisibleState = undefined;
+			    onAfterHide_hidingState = undefined;
+			    executionOrder = [];
+			    
+			    component.on( {
+					'beforehide' : function( cmp ) { executionOrder.push( 'beforehide' ); callCounts[ 'beforehide' ]++; },
+					'hidebegin'  : function( cmp ) { executionOrder.push( 'hidebegin' );  callCounts[ 'hidebegin' ]++; hidebegin_elVisibleState = cmp.getEl().is( ':visible' ); },
+					'hide'       : function( cmp ) { executionOrder.push( 'hide' );       callCounts[ 'hide' ]++;       },
+					'afterhide'  : function( cmp ) { executionOrder.push( 'afterhide' );  callCounts[ 'afterhide' ]++;  }
+			    } );
+			} );
+			
+			afterEach( function() {
+				component.destroy();  // clean up
+			} );
+			
+			
+			it( "should set the state correctly on an unrendered component", function() {
+				expect( component.isHidden() ).toBe( false );  // initial condition failed. isHidden() should have returned false
+				component.hide();
+				expect( component.isHidden() ).toBe( true );  // after running hide(), isHidden() should have returned true (on an unrendered component)
+			} );
+			
+			
+			it( "should render a component as hidden, if hide() was called on the component in its unrendered state", function() {
+				component.hide();
+				
+				// now render
+				component.render( document.body );
+				expect( component.isHidden() ).toBe( true );  // after rendering the component, hidden with hide() when it was unrendered, it should have been rendered hidden
+				expect( component.getEl().is( ':visible' ) ).toBe( false );  // after rendering the component, hidden with hide() when it was unrendered, confirm that the element itself is hidden (not visible)
+			} );
+			
+			
+			it( "should hide a rendered component", function() {
+				component.render( document.body );
+				
+				expect( component.isHidden() ).toBe( false );  // initial condition failed. isHidden() should have returned false for rendered component
+				component.hide();
+				expect( component.isHidden() ).toBe( true );  // after running hide(), isHidden() should have returned true (on rendered component)
+				expect( component.getEl().is( ':visible' ) ).toBe( false );  // after running hide() when it was rendered, confirm that the element itself is hidden (not visible)
+			} );
+			
+			
+			it( "should only hide a component that is not already hidden", function() {
+				component.render( document.body );
+				
+				// Do an initial hide
+				component.hide();
+				expect( component.isVisible() ).toBe( false );     // initial condition
+				expect( callCounts[ 'onBeforeHide' ] ).toBe( 1 );  // initial condition
+				expect( callCounts[ 'onHide' ] ).toBe( 1 );        // initial condition
+				expect( callCounts[ 'onAfterHide' ] ).toBe( 1 );   // initial condition
+				
+				// Test attempting to call it again
+				component.hide();
+				expect( callCounts[ 'onBeforeHide' ] ).toBe( 1 );  // shouldn't have been called again
+				expect( callCounts[ 'onHide' ] ).toBe( 1 );        // shouldn't have been called again
+				expect( callCounts[ 'onAfterHide' ] ).toBe( 1 );   // shouldn't have been called again
+			} );
+			
+			
+			it( "should be prevented from hiding if a 'beforehide' event handler returns false", function() {
+				component.render( document.body );
+				expect( component.isVisible() ).toBe( true );  // initial condition
+				
+				component.on( 'beforehide', function() { return false; } );
+				component.hide();
+				expect( callCounts[ 'onBeforeHide' ] ).toBe( 0 );  // shouldn't have been called
+				expect( callCounts[ 'onHide' ] ).toBe( 0 );        // shouldn't have been called
+				expect( callCounts[ 'onAfterHide' ] ).toBe( 0 );   // shouldn't have been called
+			} );
+			
+			
+			it( "should end a current 'showing' animation, if there is one, when hiding", function() {
+				component.render( document.body );
+				expect( component.isVisible() ).toBe( true );  // initial condition
+				
+				var anim = JsMockito.mock( Animation );
+				
+				// Set state
+				component.showing = true;
+				component.currentAnimation = anim;
+				
+				// Test
+				component.hide();
+				JsMockito.verify( anim ).end();  // verify that the 'end' method was called
+			} );
+			
+			
+			it( "should call onBeforeHide(), with element still visible, and with the `hiding` flag == true", function() {
+				component.render( document.body );
+				
+				expect( component.isVisible() ).toBe( true );          // initial condition
+				expect( callCounts[ 'onBeforeHide' ] ).toBe( 0 );      // initial condition
+				expect( onBeforeHide_elVisibleState ).toBeUndefined(); // initial condition
+				expect( onBeforeHide_hidingState ).toBeUndefined();    // initial condition
+				
+				var opts = {};
+				component.hide( opts );
+				expect( callCounts[ 'onBeforeHide' ] ).toBe( 1 );
+				expect( callArgs[ 'onBeforeHide' ] ).toBe( opts );   // check that the original `options` object was provided to the hook method
+				expect( onBeforeHide_elVisibleState ).toBe( true );  // still visible at this point
+				expect( onBeforeHide_hidingState ).toBe( true );     // "in the process of hiding"
+			} );
+			
+			
+			it( "should fire the 'hidebegin' event after the onBeforeHide() hook, but before onHide() and onAfterHide(), when the element is still visible", function() {
+				component.render( document.body );
+				
+				expect( component.isVisible() ).toBe( true );        // initial condition
+				expect( executionOrder ).toEqual( [] );              // initial condition
+				expect( hidebegin_elVisibleState ).toBeUndefined();  // initial condition
+				
+				component.hide();
+				expect( executionOrder ).toEqual( [ 'beforehide', 'onBeforeHide', 'hidebegin', 'onHide', 'hide', 'onAfterHide', 'afterhide' ] );
+				expect( hidebegin_elVisibleState ).toBe( true );
+			} );
+			
+			
+			it( "should call onHide() and onAfterHide() methods, and fire the 'hide' and 'afterhide' events immediately when there is no animation", function() {
+				component.render( document.body );
+				
+				expect( component.isVisible() ).toBe( true );  // initial condition
+				expect( executionOrder ).toEqual( [] );        // initial condition
+				
+				var opts = {};
+				component.hide( opts );
+				expect( component.hiding ).toBe( false );            // should not longer "be in the process of hiding"
+				expect( callCounts[ 'onHide' ] ).toBe( 1 );          // called synchronously as part of hide()
+				expect( callCounts[ 'hide' ] ).toBe( 1 );            // called synchronously as part of hide()
+				expect( callCounts[ 'onAfterHide' ] ).toBe( 1 );     // called synchronously as part of hide()
+				expect( callCounts[ 'afterhide' ] ).toBe( 1 );       // called synchronously as part of hide()
+				expect( callArgs[ 'onHide' ] ).toBe( opts );         // make sure method was provided the original `options` object
+				expect( callArgs[ 'onAfterHide' ] ).toBe( opts );    // make sure method was provided the original `options` object
+				expect( onHide_elVisibleState ).toBe( false );       // should have been hidden at this point
+				expect( onAfterHide_elVisibleState ).toBe( false );  // should have been hidden at this point
+				expect( onHide_hidingState ).toBe( false );          // no longer "in the process of hiding"
+				expect( onAfterHide_hidingState ).toBe( false );     // no longer "in the process of hiding"
+				
+				// Just double checking the execution order
+				expect( executionOrder ).toEqual( [ 'beforehide', 'onBeforeHide', 'hidebegin', 'onHide', 'hide', 'onAfterHide', 'afterhide' ] );
+			} );
+			
+			
+			it( "should call onHide() and onAfterHide(), and fire the 'hide' and 'afterhide' events only after a specified animation is complete", function() {
+				component.render( document.body );
+				
+				expect( component.isVisible() ).toBe( true );  // initial condition
+				expect( executionOrder ).toEqual( [] );         // initial condition
+				
+				// options to provide to hide() method
+				var opts = {
+					anim: {
+						from     : { opacity: 1 },
+						to       : { opacity: 0 },
+						duration : 10
+					}
+				};
+				
+				runs( function() {
+					component.hide( opts );
+					expect( component.hiding ).toBe( true );          // should "be in the process of hiding"
+					expect( callCounts[ 'onBeforeHide' ] ).toBe( 1 ); // called synchronously in hide()
+					expect( callCounts[ 'beforehide' ] ).toBe( 1 );   // called synchronously in hide()
+					expect( callCounts[ 'onHide' ] ).toBe( 0 );       // *not* called synchronously in hide()
+					expect( callCounts[ 'hide' ] ).toBe( 0 );         // *not* called synchronously in hide()
+					expect( callCounts[ 'onAfterHide' ] ).toBe( 0 );  // *not* called synchronously in hide()
+					expect( callCounts[ 'afterhide' ] ).toBe( 0 );    // *not* called synchronously in hide()
+				} );
+				
+				waitsFor( function() {
+					return callCounts[ 'onAfterHide' ] === 1;   // wait until it has been executed
+				}, "onAfterHide() should be executed", 100 );
+				
+				runs( function() {
+					expect( component.hiding ).toBe( false );            // should not longer "be in the process of hiding"
+					expect( callCounts[ 'onBeforeHide' ] ).toBe( 1 );    // final state after animation completes
+					expect( callCounts[ 'beforehide' ] ).toBe( 1 );      // final state after animation completes
+					expect( callCounts[ 'onHide' ] ).toBe( 1 );          // final state after animation completes
+					expect( callCounts[ 'hide' ] ).toBe( 1 );            // final state after animation completes
+					expect( callCounts[ 'onAfterHide' ] ).toBe( 1 );     // final state after animation completes
+					expect( callCounts[ 'afterhide' ] ).toBe( 1 );       // final state after animation completes
+					expect( callArgs[ 'onHide' ] ).toBe( opts );         // make sure method was provided the original `options` object
+					expect( callArgs[ 'onAfterHide' ] ).toBe( opts );    // make sure method was provided the original `options` object
+					expect( onHide_elVisibleState ).toBe( false );       // should have been hidden at this point
+					expect( onAfterHide_elVisibleState ).toBe( false );  // should have been hidden at this point
+					expect( onHide_hidingState ).toBe( false );          // no longer "in the process of hiding" at this point
+					expect( onAfterHide_hidingState ).toBe( false );     // no longer "in the process of hiding" at this point
+					expect( component.getEl().is( ':visible' ) ).toBe( false );  // should be hidden as an end state
+					
+					// Double checking execution order
+					expect( executionOrder ).toEqual( [ 'beforehide', 'onBeforeHide', 'hidebegin', 'onHide', 'hide', 'onAfterHide', 'afterhide' ] );
+				} );
+			} );
+			
+			
+			it( "should return a reference to itself, for chaining, when hiding", function() {
+				component.show();  // do an initial show
+				
+				expect( component.isVisible() ).toBe( true );  // checking initial state prior to hide() call
+				expect( component.hide() ).toBe( component );
+			} );
+			
+			it( "should return a reference to itself, for chaining, when not hiding (because it is already hidden)", function() {
+				component.hide();  // do an initial hide
+				
+				expect( component.isVisible() ).toBe( false );  // checking initial state prior to hide() call
+				expect( component.hide() ).toBe( component );
+			} );
+		} );
+		
+		
 			
 		describe( 'isHidden()', function() {
 			it( "should return the state of the `hidden` flag for an unrendered component", function() {
@@ -1312,7 +1788,7 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 		
 		// -------------------------
 			
-		xdescribe( "bubble()", function() {
+		describe( "bubble()", function() {
 			it( "bubble", function() {
 				// Test that the ID's can be compiled from a component's parents
 				var component = new Component( {
@@ -1389,10 +1865,10 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 					id: 'parent',
 					
 					items: [
-						{ type : 'Text', key : 'myKey1' },
-						{ type : 'Text', key : 'myKey2' },
-						{ type : 'Text', key : 'myKey3' },
-						{ type : 'Text', key : 'myKey4' }
+						{ type : 'component', id : 'myKey1' },
+						{ type : 'component', id : 'myKey2' },
+						{ type : 'component', id : 'myKey3' },
+						{ type : 'component', id : 'myKey4' }
 					]
 				} );
 				
@@ -1403,7 +1879,7 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 					}
 				};
 				for( var i = 1; i <= 4; i++ ) {
-					child = container.findByKey( 'myKey' + i );
+					child = container.findById( 'myKey' + i );
 					parentContainer = child.findParentBy( findFn );
 					expect( parentContainer ).toBe( container );  // child " + i + " could not retrieve its parent from first level children.
 				}
@@ -1420,23 +1896,23 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 						{ 
 							type  : 'Container', 
 							items : [
-								{ type : 'Text', key : 'myKey1' }
+								{ type : 'component', id : 'myKey1' }
 							]
 						},
 						
-						{ type : 'Text', key : 'myKey2' },
+						{ type : 'component', id : 'myKey2' },
 						
 						{
 							type  : 'Container',
 							items : [
-								{ type : 'Text', key : 'myKey3' },
-								{ type : 'Text', key : 'myKey4' },
+								{ type : 'component', id : 'myKey3' },
+								{ type : 'component', id : 'myKey4' },
 								{
 									type  : 'Container',
 									items : [
-										{ type : 'Text', key : 'myKey5' },
-										{ type : 'Text', key : 'myKey6' },
-										{ type : 'Text', key : 'myKey7' }
+										{ type : 'component', id : 'myKey5' },
+										{ type : 'component', id : 'myKey6' },
+										{ type : 'component', id : 'myKey7' }
 									]
 								}
 							]
@@ -1451,7 +1927,7 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 					}
 				};
 				for( i = 1; i <= 7; i++ ) {
-					child = container.findByKey( 'myKey' + i );
+					child = container.findById( 'myKey' + i );
 					parentContainer = child.findParentBy( findFn2 );
 					expect( parentContainer ).toBe( container );  // child " + i + " could not retrieve its parent from deep children.
 				}
@@ -1466,25 +1942,25 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 						{ 
 							type  : 'Container', 
 							items : [
-								{ type : 'Text', key : 'myKey1' }
+								{ type : 'component', id : 'myKey1' }
 							]
 						},
 						
-						{ type : 'Text', key : 'myKey2' },
+						{ type : 'component', id : 'myKey2' },
 						
 						{
 							type  : 'Container',
 							id    : 'localParent',
 							
 							items : [
-								{ type : 'Text', key : 'myKey3' },
-								{ type : 'Text', key : 'myKey4' },
+								{ type : 'component', id : 'myKey3' },
+								{ type : 'component', id : 'myKey4' },
 								{
 									type  : 'Container',
 									items : [
-										{ type : 'Text', key : 'myKey5' },
-										{ type : 'Text', key : 'myKey6' },
-										{ type : 'Text', key : 'myKey7' }
+										{ type : 'component', id : 'myKey5' },
+										{ type : 'component', id : 'myKey6' },
+										{ type : 'component', id : 'myKey7' }
 									]
 								}
 							]
@@ -1493,7 +1969,7 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 				} );
 				
 				var parent = container.findById( 'localParent' );
-				child = container.findByKey( 'myKey7' );
+				child = container.findById( 'myKey7' );
 				parentContainer = child.findParentBy( function( cmp ) {
 					if( cmp.getId() === 'localParent' ) {
 						return true;
@@ -1520,27 +1996,27 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 							id    : 'parentTabs',
 							
 							items : [
-								{ type : 'Text', id: "testChild1" },
-								{ type : 'Text', id: "testChild2" }
+								{ type : 'component', id: "testChild1" },
+								{ type : 'component', id: "testChild2" }
 							]
 						},
 						
-						{ type : 'Text', key : 'myKey1' },
+						{ type : 'component', id : 'myKey1' },
 						
 						{
 							type  : 'Container',
 							id    : 'parentContainer',
 							
 							items : [
-								{ type : 'Text', key : 'myKey2' },
-								{ type : 'Text', key : 'myKey3' },
+								{ type : 'component', id : 'myKey2' },
+								{ type : 'component', id : 'myKey3' },
 								{
 									type  : 'Container',
 									id    : 'parentContainer2',
 									items : [
-										{ type : 'Text', key : 'myKey4' },
-										{ type : 'Text', key : 'myKey5' },
-										{ type : 'Text', key : 'myKey6' }
+										{ type : 'component', id : 'myKey4' },
+										{ type : 'component', id : 'myKey5' },
+										{ type : 'component', id : 'myKey6' }
 									]
 								}
 							]
@@ -1549,7 +2025,7 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 				} );
 				
 				// Test checking against the actual constructor function
-				var myKey1 = container.findByKey( 'myKey1' );
+				var myKey1 = container.findById( 'myKey1' );
 				expect( myKey1.findParentByType( Container ) ).toBe( container );  // Outer container not found from myKey1
 				
 				var parentTabs = container.findById( 'parentTabs' );
@@ -1559,16 +2035,16 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 				//expect( testChild2.findParentByType( ui.containers.TabsContainer ) ).toBe( parentTabs );  // Parent TabsContainer not found from testChild2
 				
 				var parentContainer = container.findById( 'parentContainer' );
-				var myKey2 = container.findByKey( 'myKey2' );
+				var myKey2 = container.findById( 'myKey2' );
 				expect( myKey2.findParentByType( Container ) ).toBe( parentContainer );  // parentContainer not found from myKey2
 				
 				var parentContainer2 = container.findById( 'parentContainer2' );
-				var myKey5 = container.findByKey( 'myKey5' );
+				var myKey5 = container.findById( 'myKey5' );
 				expect( myKey5.findParentByType( Container ) ).toBe( parentContainer2 );  // parentContainer2 not found from myKey5
 				
 				
 				// Test checking against the type name
-				myKey1 = container.findByKey( 'myKey1' );
+				myKey1 = container.findById( 'myKey1' );
 				expect( myKey1.findParentByType( 'Container' ) ).toBe( container );  // Outer container not found from myKey1 by type name
 				
 				parentTabs = container.findById( 'parentTabs' );
@@ -1578,11 +2054,11 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 				expect( testChild2.findParentByType( 'Tabs' ) ).toBe( parentTabs );  // Parent TabsContainer not found from testChild2 by type name
 				
 				parentContainer = container.findById( 'parentContainer' );
-				myKey2 = container.findByKey( 'myKey2' );
+				myKey2 = container.findById( 'myKey2' );
 				expect( myKey2.findParentByType( 'Container' ) ).toBe( parentContainer );  // parentContainer not found from myKey2 by type name
 				
 				parentContainer2 = container.findById( 'parentContainer2' );
-				myKey5 = container.findByKey( 'myKey5' );
+				myKey5 = container.findById( 'myKey5' );
 				expect( myKey5.findParentByType( 'Container' ) ).toBe( parentContainer2 );  // parentContainer2 not found from myKey5 by type name
 			} );
 			
@@ -1592,6 +2068,11 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 			 * Test findParentById()
 			 */
 			it( "findParentById", function() {
+				var cmps = [];
+				for( var i = 0; i < 7; i++ ) {
+					cmps.push( new Component() );
+				}
+				
 				var container = new Container( {
 					id: 'top',
 					
@@ -1601,27 +2082,27 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 							id    : 'first',
 							
 							items : [
-								{ type : 'Text', key : 'myKey1' }
+								cmps[ 0 ]
 							]
 						},
 						
-						{ type : 'Text', key : 'myKey2' },
+						cmps[ 1 ],
 						
 						{
 							type  : 'Container',
 							id    : 'second',
 							
 							items : [
-								{ type : 'Text', key : 'myKey3' },
-								{ type : 'Text', key : 'myKey4' },
+								cmps[ 2 ],
+								cmps[ 3 ],
 								{
 									type  : 'Container',
 									id    : 'second_nested',
 									
 									items : [
-										{ type : 'Text', key : 'myKey5' },
-										{ type : 'Text', key : 'myKey6' },
-										{ type : 'Text', key : 'myKey7' }
+										cmps[ 4 ],
+										cmps[ 5 ],
+										cmps[ 6 ]
 									]
 								}
 							]
@@ -1631,26 +2112,20 @@ function( jQuery, _, Class, Plugin, Component, Container ) {
 				
 				
 				// Tests just getting parents
-				var myKey1 = container.findByKey( 'myKey1' );
-				expect( myKey1.getKey() ).toBe( 'myKey1' );  // Error with precondition of retrieving the correct Component (myKey1) with findByKey()
-				expect( myKey1.findParentById( 'non-existent-container-id' ) ).toBe( null );  // Null not returned when finding a parent called non-existent-container-id from myKey1.
-				expect( myKey1.findParentById( 'top' ) ).toBe( container );  // Top level Container not found from myKey1
-				expect( myKey1.findParentById( 'first' ) ).toBe( container.findById( 'first' ) );  // Container 'first' not found from myKey1
-				expect( myKey1.findParentById( 'second' ) ).toBe( null );  // Container 'second' was somehow found from myKey1, even though it is not a parent of myKey1.
+				expect( cmps[ 0 ].findParentById( 'non-existent-container-id' ) ).toBe( null );  // Null not returned when finding a parent called non-existent-container-id from cmps[ 0 ].
+				expect( cmps[ 0 ].findParentById( 'top' ) ).toBe( container );  // Top level Container not found from cmps[ 0 ]
+				expect( cmps[ 0 ].findParentById( 'first' ) ).toBe( container.findById( 'first' ) );  // Container 'first' not found from cmps[ 0 ]
+				expect( cmps[ 0 ].findParentById( 'second' ) ).toBe( null );  // Container 'second' was somehow found from myKey1, even though it is not a parent of cmps[ 0 ].
 				
-				var myKey2 = container.findByKey( 'myKey2' );
-				expect( myKey2.getKey() ).toBe( 'myKey2' );  // Error with precondition of retrieving the correct Component (myKey2) with findByKey()
-				expect( myKey2.findParentById( 'top' ) ).toBe( container );  // Top level Container not found from myKey2
-				expect( myKey2.findParentById( 'first' ) ).toBe( null );  // Container 'first' was somehow found from myKey2, even though it is not a parent of myKey2.
+				expect( cmps[ 1 ].findParentById( 'top' ) ).toBe( container );  // Top level Container not found from cmps[ 1 ]
+				expect( cmps[ 1 ].findParentById( 'first' ) ).toBe( null );  // Container 'first' was somehow found from cmps[ 1 ], even though it is not a parent of cmps[ 1 ].
 				
-				var myKey7 = container.findByKey( 'myKey7' );
-				expect( myKey7.getKey() ).toBe( 'myKey7' );  // Error with precondition of retrieving the correct Component (myKey7) with findByKey()
-				expect( myKey7.findParentById( 'non-existent-container-id' ) ).toBe( null );  // Null not returned when finding a parent called non-existent-container-id from myKey7.
-				expect( myKey7.findParentById( 'top' ) ).toBe( container );  // Top level Container not found from myKey7
-				expect( myKey7.findParentById( 'first' ) ).toBe( null );  // Container 'first' was somehow found from myKey7, even though it is not a parent of myKey7.
-				expect( myKey7.findParentById( 'top' ) ).toBe( container );  // Top level Container not found from myKey1
-				expect( myKey7.findParentById( 'second' ) ).toBe( myKey7.findParentById( 'second' ) );  // Container 'second' not found from myKey7
-				expect( myKey7.findParentById( 'second_nested' ) ).toBe( myKey7.findParentById( 'second_nested' ) );  // Container 'second_nested' not found from myKey7
+				expect( cmps[ 6 ].findParentById( 'non-existent-container-id' ) ).toBe( null );  // Null not returned when finding a parent called non-existent-container-id from cmps[ 6 ].
+				expect( cmps[ 6 ].findParentById( 'top' ) ).toBe( container );  // Top level Container not found from cmps[ 6 ]
+				expect( cmps[ 6 ].findParentById( 'first' ) ).toBe( null );  // Container 'first' was somehow found from cmps[ 6 ], even though it is not a parent of cmps[ 6 ].
+				expect( cmps[ 6 ].findParentById( 'top' ) ).toBe( container );  // Top level Container not found from cmps[ 6 ]
+				expect( cmps[ 6 ].findParentById( 'second' ) ).toBe( cmps[ 6 ].findParentById( 'second' ) );  // Container 'second' not found from cmps[ 6 ]
+				expect( cmps[ 6 ].findParentById( 'second_nested' ) ).toBe( cmps[ 6 ].findParentById( 'second_nested' ) );  // Container 'second_nested' not found from cmps[ 6 ]
 			} );
 		} );   // eo "General Tests" test case
 		

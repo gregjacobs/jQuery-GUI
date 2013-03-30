@@ -221,15 +221,50 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 */
 		rendered: false,
 		
+		
+		
+		
 		/**
 		 * @private
 		 * @property {Boolean} hidden
 		 * 
-		 * Property that stores the 'hidden' state of the Component. Note that the component may be 
-		 * considered "hidden" by its element's visibility (i.e. it will be considered hidden if its parent
-		 * element is hidden), in which case the {@link #isHidden} method will return true. But this property
-		 * stores the state of if the Component is supposed to be still hidden when its parent element is shown.
+		 * Property that stores the 'hidden' state of the Component. This property is set to true immediately
+		 * when the Component is hidden (even if a hide animation is to take place), and set to false immediately
+		 * when the Component is shown (even if a show animation is to take place). This behavior is for the fact
+		 * that even if the Component is in the process of showing, it is already shown in some manner.
+		 * 
+		 * Note that the Component may still be considered "hidden" by its element's visibility, and this case
+		 * may be tested for with the `checkDom` parameter that {@link #isHidden} provides.
 		 */
+	
+		/**
+		 * @private
+		 * @property {Boolean} showing
+		 * 
+		 * Flag that is set to true while the Component is showing (i.e. a show animation is running). It is set to false
+		 * when the Component has fully shown (its animation has completed).
+		 */
+		showing : false,
+	
+		/**
+		 * @private
+		 * @property {Boolean} hiding
+		 * 
+		 * Flag that is set to true when the Component is hiding (i.e. a hide animation is running). It is set to false
+		 * when the Component has fully hidden (its animation has completed).
+		 */
+		hiding : false,
+	
+		/**
+		 * @private
+		 * @property {ui.anim.Animation} currentAnimation
+		 * 
+		 * The currently running {@link method-show}/{@link #method-hide} animation, if any. Will be null if the Component
+		 * is not currently in the process of showing or hiding. This is only relevant when {@link #method-show} or
+		 * {@link #method-hide} is called with the `anim` option.
+		 */
+		currentAnimation : null,
+		
 		
 		/**
 		 * @protected
@@ -310,45 +345,133 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 			// Add events that this class will fire
 			this.addEvents( 
 				/**
-				 * Fires when this component has been {@link #method-render rendered}.
+				 * Fires when this Component has been {@link #method-render rendered}.
 				 * 
 				 * @event render
-				 * @param {ui.Component} component This component.
+				 * @param {ui.Component} component This Component instance.
 				 */
 				'render',
 				
 				/**
-				 * Fires when the component has been shown, using the {@link #method-show} method. Only fires
-				 * if the Component has been {@link #method-render rendered}.
+				 * Fires before the Component is shown. Handlers of this event may cancel the showing of the Component by 
+				 * returning false.
+				 * 
+				 * Only fires if the Component has been {@link #method-render rendered}.
+				 *
+				 * @event beforeshow
+				 * @param {ui.Component} component This Component instance.
+				 * @preventable
+				 */
+				'beforeshow',
+				
+				/**
+				 * Fires when the Component has been shown, using the {@link #method-show} method. If an `anim` option
+				 * was passed to the {@link #method-show} method, this event fires immediately, just after the beginning of the
+				 * animation. To find out when the animation is complete, listen to the {@link #aftershow} event.
+				 *
+				 * Note that this event fires as soon as the Component is starting to show because handlers most likely expect to do 
+				 * something with the Component immediately. So for handlers of Components that first don't show with any `anim`, and 
+				 * then are given one at a later time, they will still work as expected (as opposed to the behavior of if this event 
+				 * fired at the end of the animation).
+				 * 
+				 * Only fires if the Component has been {@link #method-render rendered}.
 				 * 
 				 * @event show
-				 * @param {ui.Component} component This component.
+				 * @param {ui.Component} component This Component instance.
 				 */
 				'show',
+	
+				/**
+				 * An alias of the {@link #event-show} event, which can make handler-adding code more consistent and clear
+				 * when running animations. Also, having a 'begin' event for 'show' also maintains consistency with {@link #hidebegin}.
+				 * 
+				 * Only fires if the Component has been {@link #method-render rendered}.
+				 *
+				 * @event showbegin
+				 * @param {ui.Component} component This Component instance.
+				 */
+				'showbegin',
+	
+				/**
+				 * Fires when the Component has fully shown, after any animation has finished. Note that this
+				 * event will fire regardless of if an `anim` option was provided to the {@link #method-show} method or not.
+				 * 
+				 * Only fires if the Component has been {@link #method-render rendered}.
+				 *
+				 * @event aftershow
+				 * @param {ui.Component} component This Component instance.
+				 */
+				'aftershow',
 				
 				/**
-				 * Fires when the component has been hidden, using the {@link #method-hide} method. Only fires
-				 * if the Component has been {@link #method-render rendered}.
+				 * Fires before the Component is hidden. Handlers of this event may cancel the hiding of the Component by 
+				 * returning false.
+				 * 
+				 * Only fires if the Component has been {@link #method-render rendered}.
+				 *
+				 * @event beforehide
+				 * @param {ui.Component} component This Component instance.
+				 * @preventable
+				 */
+				'beforehide',
+	
+				/**
+				 * Fires when the Component has been hidden, using the {@link #method-hide} method. If an `anim` option was passed
+				 * to the {@link #method-hide} method, this event fires *after* the animation has finished hiding the Component. 
+				 * To find out when a hide animation has started, listen to the {@link #hidebegin} event.
+				 * 
+				 * Note that this event fires only after the Component has fully hidden because handlers most likely expect to do something
+				 * after the Component is hidden from the DOM. So for handlers of Components that first don't hide with any `anim`, and
+				 * then are given one at a later time, they will still work as expected (as opposed to the behavior of if this event fired 
+				 * at the start of the animation).
+				 * 
+				 * Only fires if the Component has been {@link #method-render rendered}.
 				 * 
 				 * @event hide
-				 * @param {ui.Component} component This component.
+				 * @param {ui.Component} component This Component instance.
 				 */
 				'hide',
+	
+				/**
+				 * Fires when the Component is beginning to hide. This event is useful if an `anim` option is specified to the
+				 * {@link #method-hide} method, as it fires just before the animation starts. The {@link #hide} 
+				 * (and {@link #afterhide}) event will fire when the animation is complete, and the Component has been completely 
+				 * hidden. Note that this event will  fire regardless of if an `anim` option is provided to the {@link #method-hide} 
+				 * method or not.
+				 * 
+				 * Only fires if the Component has been {@link #method-render rendered}.
+				 *
+				 * @event hidebegin
+				 * @param {ui.Component} component This Component instance.
+				 */
+				'hidebegin',
+	
+				/**
+				 * An alias of the {@link #hide} event, which can make handler-adding code more consistent and clear.
+				 * Having a 'complete' event for 'hide' also maintains consistency with {@link #aftershow}.
+				 * 
+				 * Only fires if the Component has been {@link #method-render rendered}.
+				 *
+				 * @event afterhide
+				 * @param {ui.Component} component This Component instance.
+				 */
+				'afterhide',
 				
 				/**
-				 * Fires just before this component is destroyed. A handler of this event may return false to cancel 
+				 * Fires just before this Component is destroyed. A handler of this event may return false to cancel 
 				 * the destruction process for the Component.
 				 * 
 				 * @event beforedestroy
-				 * @param {ui.Component} component This component. 
+				 * @param {ui.Component} component This Component instance. 
+				 * @preventable
 				 */
 				'beforedestroy',
 				
 				/**
-				 * Fires when this component has been destroyed.
+				 * Fires when this Component has been destroyed.
 				 * 
 				 * @event destroy
-				 * @param {ui.Component} component This component.
+				 * @param {ui.Component} component This Component instance.
 				 */
 				'destroy'
 			);
@@ -1176,32 +1299,95 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * Shows the Component. 
 		 *
 		 * @method show
-		 * @param {Object} [animConfig] A {@link ui.anim.Animation} config object (minus the {@link ui.anim.Animation#target target) property) 
-		 *   for animating the showing of the Component. Note that this will only be run if the Component is currently {@link #rendered}.
-		 * @return {ui.Component} This Component, to allow method chaining.
+		 * @param {Object} [options] An object which may contain the following options:
+		 * @param {Object} [options.anim] An {@link ui.anim.Animation Animation} config object (minus the 
+		 *   {@link ui.anim.Animation#target target) property) for animating the showing of the Component. 
+		 *   Note that this will only be run if the Component is currently {@link #rendered}.
+		 * @chainable
 		 */
-		show : function( animConfig ) {
-			this.hidden = false;  // set flag regardless of if the Component is rendered or not. If not yet rendered, this flag will be tested for in the render() method.
+		show : function( options ) {
+			// If the Component is currently visible, or a 'beforeshow' handler returned false, simply return out.
+			if( !this.hidden || this.fireEvent( 'beforeshow', this ) === false )
+				return this;
+			
+			// set flag regardless of if the Component is rendered or not. If not yet rendered, this flag will be tested 
+			// for in the render() method to determine if the Component should be rendered hidden or not.
+			this.hidden = false;
 			
 			if( this.rendered ) {
-				// If a show animation was specified, run that now. Otherwise, simply show the element
-				if( typeof animConfig === 'object' ) {
-					animConfig.target = this;
-					
-					this.currentAnimation = new Animation( animConfig );    
-					//this.currentAnimation.addListener( 'afteranimate', this.showComplete, this );  // adding a listener instead of providing in config, in case there is already a listener in the config
-					this.currentAnimation.start();
-				} else {
-					this.$el.show();
+				options = options || {};
+				
+				// If the Component is currently in the process of being animated to its hidden state when the call to this method 
+				// is made, finish it up so we can open it again.
+				if( this.hiding ) {
+					this.currentAnimation.end();  // ends the "hiding" animation, and runs onHideComplete()
 				}
 				
-				// Call template method, and fire the event
-				this.onShow();
+				this.showing = true;  // will only be true while any show animation is running
+				this.onBeforeShow( options );  // call hook method
+				
+				// make sure the element is displayed. This is done even for animations, which will always need
+				// to display the element in some way first before animating size, opacity, etc
+				this.$el.show();
+				
+				// Call template method, and fire the events. These are done before the animation is complete. See the 'show' and 
+				// 'aftershow' event descriptions for details on why this is done now, instead of when the animation (if any) 
+				// is complete.
+				this.onShow( options );
+				this.fireEvent( 'showbegin', this );
 				this.fireEvent( 'show', this );
+				
+				// If a mask show request has been made while the Component was hidden, show the mask now, with the configuration requested when the call to mask() was made (if any).
+				if( this.deferMaskShow ) {
+					this.mask( this.deferredMaskConfig );
+				}
+				
+				// If a show animation was specified, run that now. Otherwise, simply show the element
+				var animConfig = options.anim;  // Note: setting this after the onBeforeShow() hook method has executed, to give it a chance to modify the `anim` option
+				if( animConfig ) {
+					animConfig = _.assign( {}, animConfig, { target: this } );  // the `animConfig` provides defaults. We specify the target explicitly.
+					
+					var anim = this.currentAnimation = new Animation( animConfig );
+					anim.on( 'complete', _.partial( this.onShowComplete, options ), this );  // adding a listener instead of providing in config, in case there is already a listener in the config
+					anim.start();
+				} else {
+					this.onShowComplete( options );
+				}
 			}
 			
 			return this;
 		},
+	
+	
+		/**
+		 * Private method that handles when the Component has been fully shown. This may be delayed from the call to {@link #method-show} 
+		 * if an animation was run, or may be called immediately (synchronously) if not. Sets private properties to the state they 
+		 * should be in when the Component has been fully shown, calls the {@link #onAfterShow} hook method, and fires the 
+		 * {@link #aftershow} event.
+		 *
+		 * @private
+		 * @template
+		 * @method onShowComplete
+		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
+		 */
+		onShowComplete : function( options ) {
+			this.showing = false;
+			this.currentAnimation = null;  // remove the reference to the "showing" animation
+			
+			this.onAfterShow( options );
+			this.fireEvent( 'aftershow', this );
+		},
+		
+		
+		/**
+		 * Hook method that is run before the Component has been shown (before an animation has started, if any).
+		 *
+		 * @protected
+		 * @template
+		 * @method onBeforeShow
+		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
+		 */
+		onBeforeShow : UI.emptyFn,
 		
 		
 		/**
@@ -1210,56 +1396,133 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * any animation is started by providing the `animConfig` argument to {@link #method-show}.
 		 * 
 		 * @protected
+		 * @template
 		 * @method onShow
+		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onShow : function() {
-			// If a mask show request has been made while the Component was hidden, show the mask now, with the configuration requested when the call to mask() was made (if any).
-			if( this.deferMaskShow ) {
-				this.mask( this.deferredMaskConfig );
-			}
-		},
+		onShow : UI.emptyFn,
+		
+		
+		/**
+		 * Hook method that is run when the Component has been fully shown. This may be delayed from the call to {@link #method-show} 
+		 * if an animation was run, or may be called immediately (synchronously) if not. 
+		 *
+		 * @protected
+		 * @template
+		 * @method onAfterShow
+		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
+		 */
+		onAfterShow : UI.emptyFn,
+		
 		
 		
 		/**
 		 * Hides the Component.
 		 *
 		 * @method hide
-		 * @param {Object} [animConfig] A {@link ui.anim.Animation} config object (minus the {@link ui.anim.Animation#target target) property) 
-		 *   for animating the hiding of the Component. Note that this will only be run if the Component is currently {@link #rendered}.
-		 * @return {ui.Component} This Component, to allow method chaining.
+		 * @param {Object} [options] An object which may contain the following options:
+		 * @param {Object} [options.anim] An {@link ui.anim.Animation Animation} config object (minus the 
+		 *   {@link ui.anim.Animation#target target) property) for animating the showing of the Component. 
+		 *   Note that this will only be run if the Component is currently {@link #rendered}.
+		 * @chainable
 		 */
-		hide : function( animConfig ) {
-			this.hidden = true;  // set flag regardless of if the Component is rendered or not. If not yet rendered, this flag will be tested for in the render() method, and the Component will be hidden.
+		hide : function( options ) {
+			// If the Component is currently hidden, or a 'beforehide' handler returned false, simply return out.
+			if( this.hidden || this.fireEvent( 'beforehide', this ) === false )
+				return this;
+			
+			// set flag regardless of if the Component is rendered or not. If not yet rendered, this flag will be tested 
+			// for in the render() method to determine if the Component should be rendered hidden or not.
+			this.hidden = true;
 			
 			if( this.rendered ) {
-				// If a show animation was specified, run that now. Otherwise, simply show the element
-				if( typeof animConfig === 'object' ) {
-					animConfig.target = this;
-					
-					this.currentAnimation = new Animation( animConfig );    
-					//this.currentAnimation.addListener( 'afteranimate', this.hideComplete, this );  // adding a listener instead of providing in config, in case there is already a listener in the config
-					this.currentAnimation.start();
-				} else {
-					this.$el.hide();
+				options = options || {};
+				
+				// If the Component is currently in the process of being animated to its shown (visible) state when the call to this 
+				// method is made, finish it up so we can open it again.
+				if( this.showing ) {
+					this.currentAnimation.end();  // ends the "showing" animation, and runs onShowComplete()
 				}
 				
-				this.onHide();
-				this.fireEvent( 'hide', this );
+				this.hiding = true;  // will only be true while any hide animation is running
+				this.onBeforeHide( options );  // call hook method
+				
+				this.fireEvent( 'hidebegin', this );
+				
+				// If a show animation was specified, run that now. Otherwise, simply show the element
+				var animConfig = options.anim;  // Note: setting this after the onBeforeShow() hook method has executed, to give it a chance to modify the `anim` option
+				if( animConfig ) {
+					animConfig = _.assign( {}, animConfig, { target: this } );  // the `animConfig` provides defaults. We specify the target explicitly.
+					
+					var anim = this.currentAnimation = new Animation( animConfig );    
+					anim.on( 'complete', _.partial( this.onHideComplete, options ), this );  // adding a listener instead of providing in config, in case there is already a listener in the config
+					anim.start();
+				} else {
+					this.onHideComplete( options );
+				}				
 			}
 			
 			return this;
 		},
+	
+	
+		/**
+		 * Private method that is run when the Component has fully hidden. This may be delayed from the call to {@link #method-hide} if a
+		 * animation is run, or may be called immediately if not. Hides the Component (if it is not already hidden), runs the 
+		 * {@link #onHide} hook method, and fires the {@link #event-hide} event.
+		 *
+		 * @private
+		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
+		 */
+		onHideComplete : function( options ) {
+			this.hiding = false;
+			this.currentAnimation = null;  // remove the reference to the "hiding" animation
+			
+			this.$el.hide();   // make sure the element is hidden at this point
+			
+			// Run hook methods, and fire the 'hide' events
+			this.onHide( options );
+			this.fireEvent( 'hide', this );
+			this.onAfterHide( options );          // maintains consistency with having an `onAfterShow()` method
+			this.fireEvent( 'afterhide', this );  // maintains consistency with having an `aftershow` event
+		},
 		
 		
 		/**
-		 * Hook method for handling the component being hidden. This will only be called when the 
-		 * Component is hidden after it is rendered. Note that this method is called immediately after
-		 * any animation is started by providing the `animConfig` argument to {@link #method-hide}.
+		 * Hook method that is run just before the Component it to be hidden (before an animation has started, if any).
+		 *
+		 * @protected
+		 * @template
+		 * @method onBeforeHide
+		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
+		 */
+		onBeforeHide : UI.emptyFn,
+		
+		
+		/**
+		 * Hook method that is run when the Component has fully hidden. This will only be called when the Component is hidden after it 
+		 * is rendered. This may be delayed from the call to {@link #method-hide} if a animation is run, or may be called immediately 
+		 * if not.
 		 * 
 		 * @protected
+		 * @template
 		 * @method onHide
+		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
 		onHide : UI.emptyFn,
+	
+	
+		/**
+		 * Hook method that is run when the Component has fully hidden. This will only be called when the Component is hidden after it 
+		 * is rendered. This may be delayed from the call to {@link #method-hide} if a animation is run, or may be called immediately 
+		 * if not.
+		 *
+		 * @protected
+		 * @template
+		 * @method onAfterHide
+		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
+		 */
+		onAfterHide : UI.emptyFn,
 		
 		
 		/**
@@ -1576,6 +1839,9 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		},
 		
 		
+		// -------------------------------------
+		
+		
 		/**
 		 * Destroys the Component. Frees (i.e. deletes) all references that the Component held to HTMLElements or jQuery wrapped sets
 		 * (so as to prevent memory leaks) and removes them from the DOM, removes the Component's {@link #mask} if it has one, purges 
@@ -1593,6 +1859,11 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 					// Run template method for subclasses first, to allow them to handle their processing
 					// before the Component's element is removed
 					this.onDestroy();
+					
+					// If the Component is currently animating, end it
+					if( this.currentAnimation ) {
+						this.currentAnimation.end();
+					}
 					
 					// Destroy the mask, if it is an instantiated ui.Mask object (it may not be if the mask was never used)
 					if( this._mask instanceof Mask ) {
