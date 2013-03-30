@@ -3,7 +3,7 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'ui/Css',
+	'ui/util/Css',
 	'ui/ComponentManager',
 	'ui/form/field/WrappedInput',
 	'ui/util/OptionsStore'

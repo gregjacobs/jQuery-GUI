@@ -3,7 +3,7 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'ui/Html',
+	'ui/util/Html',
 	'ui/ComponentManager',
 	'ui/form/field/WrappedInput',
 	'ui/form/field/Text.EmptyTextBehavior',

@@ -6,7 +6,7 @@ define( [
 	'ui/UI',
 	'Observable',
 	'ui/ComponentManager',
-	'ui/Css',
+	'ui/util/Css',
 	'ui/Mask',
 	'ui/anim/Animation',
 	'ui/plugin/Plugin',
@@ -1301,7 +1301,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		 * @method show
 		 * @param {Object} [options] An object which may contain the following options:
 		 * @param {Object} [options.anim] An {@link ui.anim.Animation Animation} config object (minus the 
-		 *   {@link ui.anim.Animation#target target) property) for animating the showing of the Component. 
+		 *   {@link ui.anim.Animation#target target} property) for animating the showing of the Component. 
 		 *   Note that this will only be run if the Component is currently {@link #rendered}.
 		 * @chainable
 		 */

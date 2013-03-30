@@ -1,10 +1,10 @@
 /*global define, describe, it, expect */
 define( [
-	'ui/Css'
+	'ui/util/Css'
 ], 
 function( Css ) {
 	
-	describe( 'ui.Css', function() {
+	describe( 'ui.util.Css', function() {
 	
 		it( "hashToString() should return an empty string when providing an empty hash", function() {
 			expect( Css.hashToString( {} ) ).toBe( "" );

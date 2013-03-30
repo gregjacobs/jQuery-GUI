@@ -1,7 +1,7 @@
 /*global define */
 define( [
 	'lodash',
-	'ui/Css',
+	'ui/util/Css',
 	'ui/Component',
 	'ui/Container',
 	'ui/layout/Layout'

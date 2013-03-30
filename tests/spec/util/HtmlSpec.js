@@ -1,9 +1,9 @@
 /*global define, describe, beforeEach, afterEach, it, expect */
 define( [
-	'ui/Html'
+	'ui/util/Html'
 ], function( Html ) {
 
-	describe( "ui.Html", function() {
+	describe( "ui.util.Html", function() {
 		
 		describe( "Test decode()", function() {
 			
