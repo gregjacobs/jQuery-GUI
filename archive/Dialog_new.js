@@ -468,55 +468,6 @@ ui.Dialog = Class.extend( ui.AbstractOverlay, {
 	},
 	
 	
-	
-	/**
-	 * Gets the position of the Dialog. This can only be retrieved if the dialog is currently open. If the dialog is not open,
-	 * all values will return 0.
-	 * 
-	 * @method getPosition
-	 * @return {Object} An object with the following properties:
-	 * <div class="mdetail-params">
-	 *   <ul>
-	 *     <li><b>x</b> : Int<div class="sub-desc">The position of the left side of the dialog, relative to the left side of the screen. Same as `left`.</div>
-	 *     <li><b>y</b> : Int<div class="sub-desc">The position of the top of the dialog, relative to the top of the screen. Same as `top`.</div>
-	 *     <li><b>left</b> : Int<div class="sub-desc">The position of the left side of the dialog, relative to the left side of the screen. Same as `x`.</div>
-	 *     <li><b>top</b> : Int<div class="sub-desc">The position of the left side of the dialog, relative to the left side of the screen. Same as `y`.</div>
-	 *     <li><b>right</b> : Int<div class="sub-desc">The position of the right side of the dialog, relative to the right side of the screen.</div>
-	 *     <li><b>bottom</b> : Int<div class="sub-desc">The position of the bottom of the dialog, relative to the bottom of the screen.</div>
-	 *   </ul>
-	 * </div>
-	 */
-	getPosition : function() {
-		if( !this.isOpen() ) {
-			return {
-				x      : 0,
-				y      : 0,
-				left   : 0,
-				top    : 0,
-				right  : 0,
-				bottom : 0
-			};
-			
-		} else {
-			var $window  = jQuery( window ),
-			    position = this.$dialog.dialog( 'widget' ).position(),
-			    left     = position.left,
-			    top      = position.top,
-			    right    = $window.width() - ( position.left + this.getWidth() ),
-			    bottom   = $window.height() - ( position.top + this.getHeight() );
-			
-			return {
-				x      : left,
-				y      : top,
-				left   : left,
-				top    : top,
-				right  : right,
-				bottom : bottom
-			};
-		}
-	},
-	
-	
 	/**
 	 * Sizes the {@link #$contentEl} of the dialog (the container that holds the dialog's content) to constrain its
 	 * size to the {@link #maxHeight} and {@link #maxWidth} configs, OR the browser's viewport size; whichever is smaller.

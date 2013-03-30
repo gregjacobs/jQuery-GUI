@@ -1,0 +1,20 @@
+/* Generalized Mask Component (ui.Mask) 
+--------------------------------------------*/
+.ui-mask { position: absolute; top: 0; left: 0; z-index: 100; background-color: #000; -moz-opacity: .40; opacity: .40; filter: alpha(opacity=40); width: 100%; height: 100%; zoom: 1; }
+
+.ui-mask-content { position: absolute; top: 0; left: 0; z-index: 101; zoom: 1; font-size: 14px; }
+.ui-mask-contentBox { background-color: #BBBBBB; padding: 8px; border: 1px solid black; }
+
+.ui-mask-content-spinner { display: none; padding: 5px;}
+.ui-mask-spinnerEnabled .ui-mask-content-spinner { display: inline-block; }
+.ui-mask-spinnerEnabled.ui-mask-contentBox .ui-mask-content-spinner {  }
+	
+.ui-mask-msg { display: inline-block; }
+
+/* For elements that are masked, they should have their overflow hidden to remove scroll bars */
+/* Note: the uses of !important are necessary to override more specific css classes! */
+.ui-masked { 
+	overflow: hidden !important;  
+}
+/* For elements that are masked, they need a positioning context if they don't have one */
+.ui-masked-relative { position: relative !important; } 

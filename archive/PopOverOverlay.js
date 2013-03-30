@@ -1,3 +1,13 @@
+
+
+
+
+// *** NOTE: Anything with an extra level of indent was moved out of the AbstractOverlay code and into this class,
+//           as it did not seem to belong in abstract overlay. This code is untested in this class.
+
+
+
+
 /**
  * @class ui.Overlay
  * @extends ui.AbstractOverlay
@@ -40,6 +50,34 @@ ui.Overlay = Class.extend( ui.AbstractOverlay, {
 	 */
 	
 	
+	// NOTE: The following were copied from abstract Overlay, since they seemed to fit in this class better
+	
+		/**
+		 * @cfg {Boolean} closeOnMouseOut
+		 * True to have the Overlay close after the mouse has left the Overlay. Waits for the {@link #closeOnMouseOutDelay}
+		 * before actually closing the Overlay.
+		 */
+		closeOnMouseOut : false,
+		
+		/**
+		 * @cfg {Number} closeOnMouseOutDelay
+		 * If the {@link #closeOnMouseOut} config is true, this number is the delay (in milliseconds) that the Overlay waits 
+		 * before running the {@link #method-close close} method. The timeout starts when the mouse leaves the overlay, but is
+		 * reset if the mouse comes back over the overlay.
+		 */
+		closeOnMouseOutDelay : 2000,
+	
+		/**
+		 * @private
+		 * @property {Jux.util.DelayedTask} mouseOutHideTask
+		 * 
+		 * A DelayedTask instance used to keep track of how long the mouse has not been over the Overlay, for use when the
+		 * {@link #closeOnMouseOut} config is true. The delay is dictated by the {@link #closeOnMouseOutDelay} config.
+		 * 
+		 * Note that this will only be created if the {@link #closeOnMouseOut} config is true.
+		 */
+	
+	
 	
 	// protected
 	initComponent : function() {
@@ -49,7 +87,25 @@ ui.Overlay = Class.extend( ui.AbstractOverlay, {
 		
 		// Overlay should be instantiated hidden (ui.Component config)
 		this.hidden = true;
+	
+			// Create the task that will hide the Overlay if the closeOnMouseOut config is true
+			if( this.closeOnMouseOut ) {
+				this.mouseOutHideTask = new Jux.util.DelayedTask();
+			}
 		
+			
+	
+				/**
+				 * Fires just before the Overlay would be closed due to the Overlay "losing focus" (i.e.
+				 * a click was made in the document outside of the overlay. This fires before the {@link #beforeclose}
+				 * event, and handlers of this event may cancel the closing of the Overlay by returning false.
+				 *
+				 * @event beforeblurclose
+				 * @param {ui.AbstractOverlay} overlay This Overlay instance.
+				 * @param {jQuery.Event} evt The click event on the document, outside of the Overlay's elements.
+				 */
+				'beforeblurclose',
+			
 		// Run setArrow() to normalize any arrow value
 		if( this.value ) {
 			this.setArrow( this.arrow );
@@ -73,6 +129,15 @@ ui.Overlay = Class.extend( ui.AbstractOverlay, {
 		if( this.arrow ) {
 			this.renderArrow( this.arrow );
 		}
+		
+			// If the closeOnMouseOut config is true, set up mouseenter and mouseleave events to delay the close
+			// of the overlay
+			if( this.closeOnMouseOut ) {
+				this.$el.on( {
+					'mouseenter mousemove' : jQuery.proxy( this.onMouseEnter, this ),
+					'mouseleave' : jQuery.proxy( this.onMouseLeave, this )
+				} );
+			}
 	},
 	
 	
@@ -246,11 +311,45 @@ ui.Overlay = Class.extend( ui.AbstractOverlay, {
 	 * @method onBeforeClose
 	 */
 	onBeforeClose : function() {
+		
+	
+				// Cancel any pending closeOnMouseOut task
+				if( this.closeOnMouseOut ) {
+					this.mouseOutHideTask.cancel();
+				}
+		
 		// Remove the document body handler, which closes the overlay when clicking off of it
 		jQuery( document.body )
 			.unbind( 'mousedown', this.docBodyClickHandler )
 			.unbind( 'touchend', this.docBodyClickHandler );
 		this.docBodyClickHandler = null;
-	}
+	},
+	
+	
+		// -----------------------------------------
+		
+	
+		/**
+		 * Handles the mouse entering the Overlay. This method is to support the {@link #closeOnMouseOut} config,
+		 * and is only called if {@link #closeOnMouseOut} is true.
+		 * 
+		 * @private
+		 * @method onMouseEnter
+		 */
+		onMouseEnter : function() {
+			this.mouseOutHideTask.cancel();
+		},
+	
+	
+		/**
+		 * Handles the mouse leaving the Overlay. This method is to support the {@link #closeOnMouseOut} config,
+		 * and is only called if {@link #closeOnMouseOut} is true.
+		 * 
+		 * @private
+		 * @method onMouseLeave
+		 */
+		onMouseLeave : function() {
+			this.mouseOutHideTask.delay( this.closeOnMouseOutDelay, this.close, this );
+		},
 	
 } );
