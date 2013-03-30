@@ -1,38 +1,43 @@
 /*global define */
 define( [
-	'Class',
 	'ui/ComponentManager',
 	'ui/Component'
-], function( Class, ComponentManager, Component ) {
+], function( ComponentManager, Component ) {
 	
 	/**
 	 * @class ui.Label
 	 * @extends ui.Component
 	 * 
-	 * Creates a label (piece of text) in a UI hierarchy. This class is used for the legacy type "Introduction" as well.
+	 * Creates a label (piece of text).
 	 */
-	var Label = Class.extend( Component, {
+	var Label = Component.extend( {
 	
 		/**
 		 * @cfg {String/HTMLElement/jQuery} text
-		 * The label's text. Accepts HTML, DOM nodes, and jQuery wrapper objects as well.
+		 * 
+		 * The label's text. Accepts HTML, DOM nodes, and jQuery wrapped sets as well.
 		 */
 		text : "",
 		
 	
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		initComponent : function() {
-			this.cls += ' ui-label';
+			this.addCls( 'ui-Label' );
 			
 			this._super( arguments );
 		},
 	
 	
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		onRender : function() {
 			this._super( arguments );
 			
 			this.$el.append( this.text || "" );
+			delete this.text;  // no longer needed
 		},
 		
 		
@@ -46,7 +51,7 @@ define( [
 			if( !this.rendered ) {
 				this.text = text;  // set the config. will be used when rendered
 			} else {
-				this.$el.empty().append( text );
+				this.$el.html( text );
 			}
 		},
 		
@@ -59,17 +64,18 @@ define( [
 		 */
 		getText : function() {
 			if( !this.rendered ) {
-				return this.text || "";  // return the current value of the config
+				return this.text || "";
 			} else {
-				return this.$el.html();
+				return this.getEl().html();  // in case DOM nodes were provided as the `text`, return the html
 			}
 		}
 	
 	} );
 	
 	
-	// Register the type so it can be created by the string 'Label' in the manifest
+	// Register the class so it can be created by the type string 'label'
 	ComponentManager.registerType( 'label', Label );
 	
 	return Label;
+	
 } );
