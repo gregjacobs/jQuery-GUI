@@ -52,7 +52,7 @@ ui.containers.SectionContainer = Class.extend( ui.Container, {
 		if( !title ) {
 			titleStyle.display = 'none';
 		}
-		var $titleDiv = jQuery( '<div class="dialog-section-title" style="' + Jux.Css.hashToString( titleStyle ) + '">' + this.title + '</div>' ).prependTo( $innerEl );
+		var $titleDiv = jQuery( '<div class="dialog-section-title" style="' + Jux.Css.mapToString( titleStyle ) + '">' + this.title + '</div>' ).prependTo( $innerEl );
 		
 		// Create the element for the section's content
 		this.$contentEl = jQuery( '<div class="dialog-section-content" />' ).appendTo( $innerEl );
