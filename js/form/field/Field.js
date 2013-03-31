@@ -114,11 +114,11 @@ define( [
 			/**
 			 * @private
 			 * @static
-			 * @property {String} renderTpl
+			 * @property {String} fieldRenderTpl
 			 * 
 			 * The template to use to render the Field's elements.
 			 */
-			renderTpl : [
+			fieldRenderTpl : [
 				'<div class="dialog-formField-labelWrap" style="<%= labelWrapStyles %>">',
 					'<label for="<%= inputName %>" class="dialog-formField-label"><%= label %></label>',
 				'</div>',
@@ -203,7 +203,7 @@ define( [
 			this._super( arguments );
 			
 			var $el = this.$el,
-			    renderTpl = Field.renderTpl,  // static property
+			    fieldRenderTpl = Field.fieldRenderTpl,  // static property
 			    labelWrapStyles = "",
 			    inputContainerWrapStyles = "",
 			    helpStyles = "";
@@ -221,7 +221,7 @@ define( [
 			}
 			
 			// Single DOM append of the render template
-			var renderHTML = _.template( renderTpl, {
+			var renderHTML = _.template( fieldRenderTpl, {
 				inputName : this.inputName || this.inputId,
 				
 				label : this.label || "",

@@ -31,18 +31,17 @@ function( jQuery, UI ) {
 		
 		// ------------------------------------
 		
-			
+		
 		/**
 		 * Given a hash of CSS property/value pairs, will return a string that can be placed directly
 		 * into the "style" attribute of an element. camelCased CSS property names will be converted to 
 		 * dashes. Ex: "fontSize" will be converted to "font-size".
 		 * 
-		 * @method hashToString
 		 * @param {Object} cssProperties An object (hash) of CSS property/value pairs. Ex: { color: 'red', fontSize: '10px;' }
 		 * @return {String} The CSS string that can be used directly in an element's "style" attribute, or when using it
 		 *   to update an existing element's styles, can be used directly on the .style.cssText property.
 		 */
-		hashToString : function( cssProperties ) {
+		mapToString : function( cssProperties ) {
 			var replaceRegex = /([A-Z])/g,
 			    cssString = "",
 			    normalizedProp;
@@ -60,7 +59,6 @@ function( jQuery, UI ) {
 		/**
 		 * Updates the given &lt;style&gt; element(s) with new CSS text. Handles the special case for IE.
 		 * 
-		 * @method updateStyleEl
 		 * @param {String/HTMLElement/jQuery} styleEl A selector, reference to an HTMLElement, or jQuery wrapped
 		 *   set of &lt;style&gt; elements to update.
 		 * @param {String} cssText The new CSS text to update the style element(s) with.
@@ -75,6 +73,22 @@ function( jQuery, UI ) {
 			} else {
 				$styleEl.text( cssText );
 			}
+		},
+		
+		
+		/**
+		 * Normalizes a CSS "size" property value. When provided a number, or a string that converts to a number, this method adds 
+		 * the 'px' suffix. When provided any other string, it returns the string unchanged (for example, when providing a percentage 
+		 * size, such as "50%").
+		 * 
+		 * @param {Number/String} sizeVal The size value. If the size is a number, it will have 'px' appended to it.
+		 * @return {String} The normalized CSS size value. 
+		 */
+		normalizeSizeValue : function( sizeVal ) {
+			if( !isNaN( +sizeVal ) ) {
+				sizeVal += 'px';
+			}
+			return sizeVal;
 		},
 		
 		

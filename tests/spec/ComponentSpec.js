@@ -824,11 +824,59 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				expect( $el.css( "font-family" ) ).toBe( 'Arial' );  // font-family 'Arial' should have been applied to the element
 				expect( $el.css( "font-size" ) ).toBe( '12px' );  // font-size '12px' should have been applied to the element
 				
-				component.destroy();
+				component.destroy();  // clean up
 			} );
 			
 			
-			// -------------------
+			it( "should apply the sizing configs (width/height, minWidth/minHeight, maxWidth/maxHeight) to the element, when specified as numbers", function() {
+				var component = new Component( {
+					renderTo : 'body',   // to cause it to render
+					
+					minWidth  : 100,
+					minHeight : 110,
+					width     : 200,
+					height    : 210,
+					maxWidth  : 300,
+					maxHeight : 310
+				} );
+				
+				var $el = component.getEl();
+				expect( $el.css( 'minWidth' ) ).toBe( '100px' );
+				expect( $el.css( 'minHeight' ) ).toBe( '110px' );
+				expect( $el.css( 'width' ) ).toBe( '200px' );
+				expect( $el.css( 'height' ) ).toBe( '210px' );
+				expect( $el.css( 'maxWidth' ) ).toBe( '300px' );
+				expect( $el.css( 'maxHeight' ) ).toBe( '310px' );
+				
+				component.destroy();  // clean up
+			} );
+			
+			
+			it( "should apply the sizing configs (width/height, minWidth/minHeight, maxWidth/maxHeight) to the element, when specified as css strings", function() {
+				var component = new Component( {
+					renderTo : 'body',   // to cause it to render
+					
+					minWidth  : '10%',
+					minHeight : '11%',
+					width     : '20%',
+					height    : '21%',
+					maxWidth  : '30%',
+					maxHeight : '31%'
+				} );
+				
+				var el = component.getEl().get( 0 );
+				expect( el.style.minWidth ).toBe( '10%' );
+				expect( el.style.minHeight ).toBe( '11%' );
+				expect( el.style.width ).toBe( '20%' );
+				expect( el.style.height ).toBe( '21%' );
+				expect( el.style.maxWidth ).toBe( '30%' );
+				expect( el.style.maxHeight ).toBe( '31%' );
+				
+				component.destroy();  // clean up
+			} );
+			
+			
+			// -----------------------------------
 			
 			
 			it( "rendering an element with a numeric position should put that component's element at that position", function() {
@@ -887,6 +935,42 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				expect( $containerEl.children()[ 1 ] ).toBe( component2.getEl()[ 0 ] );  // component2's element should now be the second element in the $containerEl (again)	
 			} );
 			
+			
+			describe( "internal structure rendering (`renderTpl` and `renderTplData` configs)", function() {
+				
+				it( "the `renderTpl` config should populate the internal structure of the Component, and do so before onRender() is executed", function() {
+					var innerHtmlOnRender = "";
+					var TestComponent = Component.extend( {
+						renderTpl : "Testing <%= number %>",
+						renderTplData : { number : 123 },
+						
+						onRender : function() {  // override onRender to check
+							this._super( arguments );
+							
+							innerHtmlOnRender = this.$el.html();
+						}
+					} );
+					
+					var component = new TestComponent( { renderTo: 'body' } );
+					expect( innerHtmlOnRender ).toBe( "Testing 123" );
+					
+					component.destroy();  // clean up
+				} );
+				
+				
+				it( "the `renderTpl` should automatically be provided the following vars from the Component: `elId`", function() {
+					var TestComponent = Component.extend( {
+						elId : "123",
+						renderTpl : "Testing <%= elId %>"
+					} );
+					
+					var component = new TestComponent( { renderTo: 'body' } );
+					expect( component.getEl().html() ).toBe( "Testing 123" );
+					
+					component.destroy();  // clean up
+				} );
+				
+			} );
 			
 			
 			describe( "content rendering (`tpl`, `html`, and `contentEl` configs)", function() {

@@ -179,7 +179,7 @@ define( [
 				// For the initially selected option
 				optionText    : ( option ) ? option.text : "",
 				optionClass   : ( option && option.cls ) ? option.cls : "",
-				optionStyles  : ( option && option.style ) ? Css.hashToString( option.style ) : ""
+				optionStyles  : ( option && option.style ) ? Css.mapToString( option.style ) : ""
 			} );
 			$inputContainerEl.append( dropdownMarkup );
 			
@@ -452,7 +452,7 @@ define( [
 					
 					optionsMarkup += _.template( optionsMenuRenderTpl, {
 						anchorClass : ( option.cls || "" ) + ( ( option.value === currentFieldValue ) ? ' selected' : '' ),
-						anchorStyle : ( option.style ) ? Css.hashToString( option.style ) : '', 
+						anchorStyle : ( option.style ) ? Css.mapToString( option.style ) : '', 
 						text : option.text  
 					} );
 				}
@@ -549,7 +549,7 @@ define( [
 				
 				if( this.rendered ) {
 					// Create a new element for the $selectText's html, which will be styled based on the option's cls and/or style properties.
-					var $div = jQuery( '<div class="' + option.cls + '" style="' + ( option.style ? Css.hashToString( option.style ) : '' ) + '">' + option.text + '</div>' );					
+					var $div = jQuery( '<div class="' + option.cls + '" style="' + ( option.style ? Css.mapToString( option.style ) : '' ) + '">' + option.text + '</div>' );					
 					// Set the $selectText's html
 					this.$selectText.empty().append( $div );
 					
