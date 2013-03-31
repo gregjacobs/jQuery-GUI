@@ -54,9 +54,9 @@ define( [
 		 * the {@link ui.anim.Animation#target} parameter however, as it will be set to this Overlay.
 		 * 
 		 * This config is to provide a default animation that the Overlay always shows with. If the animation is to be
-		 * different for different calls to {@link #method-show}, one may supply the animation as the `anim` option
-		 * to the {@link #method-show} method. Note that an `anim` option provided to {@link #method-show} always overrides 
-		 * this config.
+		 * different for different calls to {@link #method-show}, one may supply the animation config in the `anim` option
+		 * to the {@link #method-show} method. Note that an `anim` option provided to the {@link #method-show} method 
+		 * always overrides this config for that call.
 		 */
 	
 		/**
@@ -66,9 +66,9 @@ define( [
 		 * the {@link ui.anim.Animation#target} parameter however, as it will be set to this Overlay.
 		 * 
 		 * This config is to provide a adefault animation that the Overlay always hides with. If the animation is to be
-		 * different for different calls to {@link #method-hide}, one may supply the animation as the `anim` option
-		 * to the {@link #method-hide} method. Note that an `anim` option provided to {@link #method-hide} always overrides 
-		 * this config.
+		 * different for different calls to {@link #method-hide}, one may supply the animation config in the `anim` option
+		 * to the {@link #method-hide} method. Note that an `anim` option provided to the {@link #method-hide} method 
+		 * always overrides this config for that call
 		 * 
 		 * This config is especially useful with the {@link #hideOnEscape} config, as the call to the {@link method-hide} method
 		 * is made behind the scenes in this case.
