@@ -8,10 +8,6 @@
 	
 	<style>
 		body { margin: 0; }
-		
-		.myOverlay {
-			border: 1px solid black;
-		}
 	</style>
 
 	<script type="text/javascript" src="../vendor/require/require.js"></script>
@@ -74,14 +70,14 @@
 					tooltip : "O hai hover!"
 				} );
 				
-				/*
+				
 				var overlay = new Overlay( {
 					html : "HI!",
 					x : 'center',
 					y: 'center',
 					width : 300,
 					height : 200,
-					cls : "myOverlay",
+					title: "Test Title",
 					
 					items : [
 						{
@@ -90,7 +86,7 @@
 						}
 					]
 				} );
-				overlay.show();*/
+				overlay.show();
 			} );
 		} );
 	</script>

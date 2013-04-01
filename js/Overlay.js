@@ -6,19 +6,19 @@ define( [
 	'ui/UI',
 	'ui/anim/Animation',
 	'ui/Component',
-	'ui/Container',
+	'ui/panel/Panel',
 	'jquery-ui.position'  // jQuery UI's `position` plugin
-], function( jQuery, _, Class, UI, Animation, Component, Container ) {
+], function( jQuery, _, Class, UI, Animation, Component, Panel ) {
 	
 	/**
 	 * @class ui.Overlay
-	 * @extends ui.Container
+	 * @extends ui.panel.Panel
 	 *
 	 * Base class for UI elements that "float" on top of the document (most notably: {@link ui.window.Window}).
 	 * This can be positioned by {@link #x} and {@link #y} values, or positioned relative to other elements using the 
 	 * {@link #anchor} config.
 	 */
-	var Overlay = Class.extend( Container, {
+	var Overlay = Panel.extend( {
 	
 		/**
 		 * @cfg {Boolean} autoDestroy
