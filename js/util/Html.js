@@ -1,5 +1,7 @@
 /*global define */
-define( function() {
+define( [
+	'lodash'
+], function( _ ) {
 	
 	/**
 	 * @class ui.Html
@@ -55,6 +57,24 @@ define( function() {
 		 */
 		nl2br : function( text ) {
 			return text.replace( /\n/g, "<br />" );
+		},
+		
+		
+		/**
+		 * Given an Object (map) of attribute name/value pairs, will return a string that can be placed directly
+		 * into an HTML tag to add attributes to that element.
+		 * 
+		 * @param {Object} attrMap An Object (map) of attribute name/value pairs. Ex: { id: 'myEl', title: "My Tooltip" }
+		 * @return {String} The string that can be used directly in an element tag to add the attributes. Ex:
+		 *   `id="myEl" title="My Tooltip"`
+		 */
+		attrMapToString : function( attrMap ) {
+			var attr = [];
+			
+			_.forOwn( attrMap, function( attrValue, attrName ) {
+				attr.push( attrName + '="' + attrValue + '"' );
+			} );
+			return attr.join( " " );
 		}
 		
 	};
