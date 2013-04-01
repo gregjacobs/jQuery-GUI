@@ -1,0 +1,26 @@
+.ui-Button {
+	display: inline-block;
+	position: relative;
+	padding: 0;
+	line-height: normal;
+	margin-right: .1em;
+	cursor: pointer;
+	vertical-align: middle;
+	text-align: center;
+	overflow: visible; /* removes extra width in IE */
+}
+
+/* button text element */
+.ui-Button-text {
+	display: block;
+	line-height: normal;
+}
+
+
+/* workarounds */
+/* reset extra padding in Firefox, see h5bp.com/l */
+input.ui-Button::-moz-focus-inner,
+button.ui-Button::-moz-focus-inner {
+	border: 0;
+	padding: 0;
+}

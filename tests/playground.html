@@ -3,6 +3,17 @@
 <head>
 <title>UI Playground</title>
 
+	<link rel="stylesheet" href="../css/base/base.css" />
+	<link rel="stylesheet" href="../css/theme/basic/basic.css" />
+	
+	<style>
+		body { margin: 0; }
+		
+		.myOverlay {
+			border: 1px solid black;
+		}
+	</style>
+
 	<script type="text/javascript" src="../vendor/require/require.js"></script>
 	<script type="text/javascript">
 		require.config( {
@@ -11,7 +22,7 @@
 			paths : {
 				// General dependencies
 				'jquery'             : 'vendor/jquery/jquery',
-  				'jquery-ui.position' : 'vendor/jquery-ui.position/jquery-ui.position',
+				'jquery-ui.position' : 'vendor/jquery-ui.position/jquery-ui.position',
 				'lodash'             : 'vendor/lodash/lodash',
 				'Class'              : 'vendor/class/Class',
 				'Observable'         : 'vendor/observable/Observable',
@@ -19,18 +30,62 @@
 				// UI Library
 				'ui' : 'js'
 			},
-  		
-	  		shim : {
-	  			'jquery-ui.position' : [ 'jquery' ]   // jQuery UI's 'position' plugin
-	  		}
+			
+			shim : {
+				'jquery-ui.position' : [ 'jquery' ]   // jQuery UI's 'position' plugin
+			}
 		} );
 		
 		
 		require( [
-			'jquery'
-		], function( $ ) {
+			'jquery',
+			'ui/panel/Panel',
+			'ui/Overlay',
+			'ui/Button',
+			'ui/form/field/Text'
+		], function( $, Panel, Overlay, Button ) {
 			$( document ).ready( function() {
 				$( 'body' ).html( "Hello, Playground!" );
+				
+				var panel = new Panel( {
+					renderTo : 'body',
+					
+					style : { margin: '10px' },
+					title: "Hello!",
+					html: "Ohai!<br>This is some HTML content"
+				} );
+				
+				var panel = new Panel( {
+					renderTo : 'body',
+					
+					style : { margin: '10px' },
+					html: "Ohai!<br>This is some HTML content"
+				} );
+				
+				var button = new Button( {
+					renderTo : 'body',
+					
+					text : "HI!",
+					tooltip : "O hai hover!"
+				} );
+				
+				/*
+				var overlay = new Overlay( {
+					html : "HI!",
+					x : 'center',
+					y: 'center',
+					width : 300,
+					height : 200,
+					cls : "myOverlay",
+					
+					items : [
+						{
+							type: 'textfield',
+							value: "OHAI"
+						}
+					]
+				} );
+				overlay.show();*/
 			} );
 		} );
 	</script>
