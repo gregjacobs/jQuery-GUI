@@ -50,9 +50,9 @@ define( [
 		/**
 		 * @cfg {String} defaultType
 		 * The default Component 'type' to instantiate when child {@link #items} are specified as anonymous config objects
-		 * without a `type` property of their own. See {@link ui.Component} for a list of types. 
+		 * without a `type` property of their own. 
 		 */
-		defaultType : 'Container',
+		defaultType : 'container',
 		
 		/**
 		 * @cfg {Function} acceptType

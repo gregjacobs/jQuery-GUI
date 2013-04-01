@@ -2,4 +2,9 @@
 @import '_Button.css';
 @import '_Overlay.css';
 @import '_Mask.css';
+@import 'panel/_Panel.css';
 @import 'panel/_ToolButton.css';
+
+
+/* General Styles */
+.ui-clear { clear: both; }

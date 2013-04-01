@@ -1,0 +1,9 @@
+.ui-Panel {}
+
+.ui-Panel-header {}
+.ui-Panel-header-innerCt {}
+.ui-Panel-header-title {}
+
+.ui-Panel-header-toolButtons { float: right; }
+
+.ui-Panel-body {}
