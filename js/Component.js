@@ -7,12 +7,13 @@ define( [
 	'Observable',
 	'ui/ComponentManager',
 	'ui/util/Css',
+	'ui/util/Html',
 	'ui/Mask',
 	'ui/anim/Animation',
 	'ui/plugin/Plugin',
 	'ui/util/LoDashTpl'
 ],
-function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animation, Plugin, LoDashTpl ) {
+function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, Animation, Plugin, LoDashTpl ) {
 
 	/**
 	 * @class ui.Component
@@ -667,20 +668,14 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 				// First, generate an element ID for the component's element, if one has not been provided as a config
 				this.elId = this.elId || 'ui-cmp-' + _.uniqueId();
 				
-				// Handle any additional attributes (the 'attr' config) that were specified to add
-				var additionalAttributes = [], 
-				    attr = this.attr;
-				if( attr ) {
-					_.forOwn( attr, function( attrValue, attrName ) {
-						additionalAttributes.push( attrName + '="' + attrValue + '"' );
-					} );
-					delete this.attr;  // no longer needed
-				}
-				
+				// Handle any additional attributes (the `attr` config) that were specified to add (or any attributes
+				// added by subclass implementations of getRenderAttributes())
+				var attr = Html.attrMapToString( this.getRenderAttributes() );
+				delete this.attr;  // config no longer needed
 				
 				// Create a CSS string of any specified styles (the `style` config + sizing configs such as width/height)
 				var style = Css.mapToString( this.getRenderStyle() );  // convert the Object (map) returned by getRenderStyle() into a CSS string
-				delete this.style;  // no longer needed
+				delete this.style;  // config no longer needed
 				
 				// If there is a `renderTpl`, execute it now
 				var renderTplMarkup = "";
@@ -694,7 +689,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 				// With a `renderTpl`, it will create the div with its `renderTpl` result as its inner HTML. Ex:
 				// <div id="someId"><div id="bodyEl" /></div>
 				var elMarkup = [
-					'<', this.elType, ' id="', this.elId, '" class="', this.cls, '" style="', style, '" ', additionalAttributes.join( " " ) + '>',
+					'<', this.elType, ' id="', this.elId, '" class="', this.cls, '" style="', style, '" ', attr, '>',
 						renderTplMarkup,
 					'</', this.elType, '>'
 				].join( "" );
@@ -770,11 +765,25 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Mask, Animati
 		
 		
 		/**
-		 * Retrieves the style properties that are used to render the Component's {@link #$el element} with. This method is called
-		 * from {@link #render} when initially rendering the component.
+		 * Retrieves the additional attributes that are used to render the Component's {@link #$el element} with.
+		 * This method is called from {@link #render} when initially rendering the component.
 		 * 
 		 * @protected
-		 * @return {Object} An Object (map) of the style properties which should be applied to the Component's main {@link #$el element}.
+		 * @return {Object} An Object (map) of the additional attributes which should be applied to the Component's
+		 *   main {@link #$el element}.
+		 */
+		getRenderAttributes : function() {
+			return this.attr || {};
+		},
+		
+		
+		/**
+		 * Retrieves the style properties that are used to render the Component's {@link #$el element} with. This method 
+		 * is called from {@link #render} when initially rendering the component.
+		 * 
+		 * @protected
+		 * @return {Object} An Object (map) of the style properties which should be applied to the Component's main 
+		 *   {@link #$el element}.
 		 */
 		getRenderStyle : function() {
 			var style = this.style || {};
