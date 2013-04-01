@@ -200,6 +200,12 @@ define( [
 		onRender : function() {
 			this._super( arguments );
 			
+			// Create the content div container, which will hold the overlay's HTML or child components.
+			// This is a separate container so that the "arrow" can be appended inside the same overlay
+			// container (in ui.Overlay), and is also for an extra layer of styling.
+			//this.$contentContainer = jQuery( '<div class="ui-overlay-content" />' ).appendTo( this.$el );
+			
+			
 			// If the closeOnEscape config is true, set up a keydown event for it to close the overlay.
 			if( this.closeOnEscape ) {
 				var me = this;  // for closure
@@ -219,6 +225,18 @@ define( [
 			this.windowResizeHandler = _.debounce( _.bind( this.onWindowResize, this ), 150 );
 			jQuery( window ).on( 'resize', this.windowResizeHandler );
 		},
+	
+	
+		/**
+		 * Retrieves the element that should be the target for the Component's content (html) or child components.  For this subclass,
+		 * this is the {@link #$contentContainer}.
+		 *
+		 * @method getContentTarget
+		 * @return {jQuery} The element (jQuery wrapped set) where HTML content or child components should be placed.
+		 */
+		//getContentTarget : function() {
+			//return this.$contentContainer;
+		//},
 	
 	
 		// -----------------------------------------
@@ -457,8 +475,87 @@ define( [
 					of: of,
 					collision: collision
 				} );
+	
+				// Check if there was a collision with the window
+				// Not sure if we need this now, as jQuery UI's Position utility may take care of collisions + offsets 
+				// correctly now.
+				//this.checkCollision();
 			}
 		},
+	
+	
+		/**
+		 * @hide
+		 * 
+		 * Checks if the Overlay has collided with the window in some way. If so, calls the {@link #onCollision} method
+		 * with information about the collision.
+		 *
+		 * @protected
+		 */
+		/* TODO: Not sure if we need this now with the latest jQuery UI Position utility...
+		checkCollision : function() {
+			var anchor = this.anchor;
+			if( anchor ) {
+				var collision = anchor.collision || 'flip';   // "flip" is the default for jQuery UI's position utility, so if it has not been specified, that is what was used
+				if( collision.indexOf( 'flip' ) > -1 ) {
+					var cssClass = this.$el.attr( 'class' );
+	
+					if( /(^| )ui-flipped-(top|bottom|left|right)( |$)/.test( cssClass ) ) {
+						this.onCollision( 'flip', {
+							top    : /(^| )ui-flipped-bottom( |$)/.test( cssClass ),  // these are opposites,
+							bottom : /(^| )ui-flipped-top( |$)/.test( cssClass ),     // as the position it was flipped
+							left   : /(^| )ui-flipped-right( |$)/.test( cssClass ),   // to is the opposite position
+							right  : /(^| )ui-flipped-left( |$)/.test( cssClass )     // it collided with the window
+						} );
+					}
+				}
+			}
+		},*/
+	
+		
+		/**
+		 * @hide
+		 * 
+		 * Hook method that is executed after the Overlay has been positioned using the {@link #anchor} config, but
+		 * has collided with the window boundaries in some direction. This implementation reverses any {@link #anchor}
+		 * `offset` when flipped.
+		 *
+		 * @protected
+		 * @param {String} collisionType The value of the `collision` option of the {@link #anchor} config.
+		 * @param {Object} collisionDirections An object (hash) of where the Overlay collided with the window. Has properties:
+		 * @param {Boolean} collisionDirections.top True if the Overlay collided with the top of the window, false otherwise.
+		 * @param {Boolean} collisionDirections.bottom True if the Overlay collided with the bottom of the window, false otherwise.
+		 * @param {Boolean} collisionDirections.left True if the Overlay collided with the left side of the window, false otherwise.
+		 * @param {Boolean} collisionDirections.right True if the Overlay collided with the right side of the window, false otherwise.
+		 */
+		/* Not sure we need all of this code... jQuery UI's Position utility might take care of it after all
+		onCollision : function( collisionType, collisionDirections ) {
+			var anchor = this.anchor;
+			if( collisionType === 'flip' && anchor && anchor.offset ) {
+				// Reverse the offsets of the anchor in the appropriate direction, if it had offsets
+				var offsets = anchor.offset.split( ' ' ),   // will make an array of 'left' and 'top' offsets (unless there is only one value, which will be normalized next)
+				    newXOffset = 0, newYOffset = 0;
+	
+				// Normalize the 'offsets' if only one value was provided
+				if( offsets.length === 1 ) {
+					offsets[ 1 ] = offsets[ 0 ];
+				}
+	
+				if( collisionDirections.left || collisionDirections.right ) {
+					newXOffset = ( -1 * +offsets[ 0 ] );  // apply the offset on the opposite side of where it was going originally (before the collision)
+				}
+				if( collisionDirections.top || collisionDirections.bottom ) {
+					newYOffset = ( -1 * +offsets[ 1 ] );  // apply the offset on the opposite side of where it was going originally (before the collision)
+				}
+	
+				if( newXOffset !== 0 || newYOffset !== 0 ) {
+					this.$el.css( {
+						left : ( parseInt( this.$el.css( 'left' ), 10 ) + newXOffset ) + 'px',
+						top  : ( parseInt( this.$el.css( 'top' ), 10 ) + newYOffset ) + 'px'
+					} );
+				}
+			}
+		},*/
 	
 	
 		/**
