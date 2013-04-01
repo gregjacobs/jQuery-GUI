@@ -1,0 +1,10 @@
+.ui-ToolButton {}
+
+.ui-ToolButton .ui-Button-icon {
+	top: -1px;
+	left: -2px;
+}
+
+.ui-ToolButton-icon {
+	background-image: url( '../../../../images/icons/ui-icons_222222_256x240.png' )
+}

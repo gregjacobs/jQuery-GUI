@@ -1,0 +1,9 @@
+.ui-ToolButton {
+	width: 16px;
+	height: 16px;
+}
+
+.ui-ToolButton .ui-Button-text {
+	padding: 0;
+	line-height: 0;
+}

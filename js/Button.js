@@ -16,6 +16,19 @@ define( [
 	var Button = Component.extend( {
 		
 		/**
+		 * @cfg {String} iconCls
+		 * 
+		 * A CSS class to use for the icon.
+		 */
+		
+		/**
+		 * @cfg {String} iconAlign
+		 * 
+		 * Which side to put the icon on. Accepts 'left' or 'right'.
+		 */
+		iconAlign : 'left',
+		
+		/**
 		 * @cfg {String} text
 		 *  
 		 * The text for the button.
@@ -60,9 +73,9 @@ define( [
 		 * @inheritdoc
 		 */
 		renderTpl : new LoDashTpl( [
-			'<span id="<%= elId %>-text" class="ui-Button-text" title="<%= tooltip %>">',
-				'<%= text %>',
-			'</span>'
+			'<span class="ui-Button-icon ui-Button-icon-left <%= leftIconElCls %>"></span>',
+			'<span id="<%= elId %>-text" class="ui-Button-text <%= textElCls %>" title="<%= tooltip %>"><%= text %></span>',
+			'<span class="ui-Button-icon ui-Button-icon-right <%= rightIconElCls %>"></span>'
 		] ),
 		
 		
@@ -103,15 +116,51 @@ define( [
 		
 		
 		/**
+		 * Override of superclass method used to add the {@link #tooltip} config as the "title" attribute.
+		 * 
+		 * @protected
+		 * @return {Object}
+		 */
+		getRenderAttributes : function() {
+			var attributes = this._super( arguments );
+			
+			if( this.tooltip ) {
+				attributes.title = this.tooltip;
+			}
+			return attributes;
+		},
+		
+		
+		/**
 		 * Override of superclass method used to build the {@link #renderTplData} object.
 		 * 
 		 * @protected
 		 * @return {Object}
 		 */
 		getRenderTplData : function() {
+			var leftIconElCls = "",
+			    rightIconElCls = "",
+			    textElCls = "",
+			    iconCls = this.iconCls,
+			    hiddenCls = 'ui-Button-hiddenEl';
+			
+			if( !iconCls ) {
+				leftIconElCls = rightIconElCls = hiddenCls;
+			} else if( this.iconAlign === 'left' ) {
+				leftIconElCls = iconCls;
+				rightIconElCls = hiddenCls;
+			} else {
+				leftIconElCls = hiddenCls;
+				rightIconElCls = iconCls;
+			}
+			
 			return _.defaults( this._super( arguments ), {
 				text     : this.text,
-				tooltip  : this.tooltip
+				tooltip  : this.tooltip,
+				
+				leftIconElCls  : leftIconElCls,
+				rightIconElCls : rightIconElCls,
+				textElCls      : textElCls
 			} );
 		},
 		
@@ -133,6 +182,8 @@ define( [
 			this.$el.on( {
 				'mouseenter' : _.bind( this.onMouseEnter, this ),
 				'mouseleave' : _.bind( this.onMouseLeave, this ),
+				'mousedown'  : _.bind( this.onMouseDown, this ),
+				'mouseup'    : _.bind( this.onMouseUp, this ),
 				'click'      : _.bind( this.onClick, this )
 			} );
 		},
@@ -191,7 +242,7 @@ define( [
 		
 		
 		/**
-		 * Handles a click to the button.
+		 * Handles a click to the Button.
 		 * 
 		 * @protected
 		 * @param {jQuery.Event} evt
@@ -206,22 +257,50 @@ define( [
 		
 		
 		/**
-		 * Method that is run when mouse hovers over the button.
+		 * Method that is run when mouse hovers over the Button.
 		 * 
 		 * @protected
+		 * @param {jQuery.Event} evt
 		 */
 		onMouseEnter : function() {
+			this.addCls( 'ui-Button-hover' );
+			
 			this.fireEvent( 'mouseenter', this );
 		},
 		
 		
 		/**
-		 * Method that is run when mouse un-hovers the button.
+		 * Method that is run when mouse un-hovers the Button.
 		 * 
 		 * @protected
+		 * @param {jQuery.Event} evt
 		 */
 		onMouseLeave : function() {
+			this.removeCls( 'ui-Button-hover' );
+			
 			this.fireEvent( 'mouseleave', this );
+		},
+		
+		
+		/**
+		 * Method that is run when mouse is pressed down on the Button.
+		 * 
+		 * @protected
+		 * @param {jQuery.Event} evt
+		 */
+		onMouseDown : function() {
+			this.addCls( 'ui-Button-active' );
+		},
+		
+		
+		/**
+		 * Method that is run when mouse is release on the Button.
+		 * 
+		 * @protected
+		 * @param {jQuery.Event} evt
+		 */
+		onMouseUp : function() {
+			this.removeCls( 'ui-Button-active' );
 		}
 		
 	} );

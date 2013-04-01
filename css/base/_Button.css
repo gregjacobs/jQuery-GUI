@@ -8,11 +8,20 @@
 	vertical-align: middle;
 	text-align: center;
 	overflow: visible; /* removes extra width in IE */
+	border: none;
 }
+
+/* General Button Styles */
+.ui-Button-hiddenEl { display: none !important; }
+
+/* Icons */
+.ui-Button-icon { display: inline-block; }
+.ui-Button-icon-left {}
+.ui-Button-icon-right {}
 
 /* button text element */
 .ui-Button-text {
-	display: block;
+	display: inline-block;
 	line-height: normal;
 }
 
