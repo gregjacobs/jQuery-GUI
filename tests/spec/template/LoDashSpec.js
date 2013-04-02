@@ -1,10 +1,10 @@
 /*global define, describe, beforeEach, afterEach, it, expect */
 define( [
 	'lodash',
-	'ui/util/LoDashTpl'
+	'ui/template/LoDash'
 ], function( _, LoDashTpl ) {
 	
-	describe( 'ui.util.LoDashTpl', function() {
+	describe( 'ui.template.LoDash', function() {
 		
 		describe( "constructor", function() {
 			

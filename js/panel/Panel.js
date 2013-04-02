@@ -4,7 +4,7 @@ define( [
 	'ui/ComponentManager',
 	'ui/Container',
 	'ui/Label',
-	'ui/util/LoDashTpl',
+	'ui/template/LoDash',
 	'ui/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
 ], function( jQuery, ComponentManager, Container, Label, LoDashTpl ) {
 

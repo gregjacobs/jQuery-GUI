@@ -4,7 +4,7 @@ define( [
 	'lodash',
 	'ui/Component',
 	'ui/ComponentManager',
-	'ui/util/LoDashTpl'
+	'ui/template/LoDash'
 ], function( jQuery, _, Component, ComponentManager, LoDashTpl ) {
 
 	/**

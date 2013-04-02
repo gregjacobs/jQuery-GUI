@@ -1,19 +1,21 @@
 /*global define */
 define( [
 	'lodash',
-	'Class'
-], function( _, Class ) {
+	'ui/template/Template'
+], function( _, Template ) {
 	
 	/**
-	 * @class LoDashTpl
-	 * @extends Object
+	 * @class ui.template.LoDash
+	 * @extends ui.template.Template
 	 * 
 	 * A wrapper class for Lo-Dash templates which helps with a few normalization procedures, and
 	 * allows for lazy compilation of a template from its string source.
 	 * 
+	 * This is the default template used by the framework.
+	 * 
 	 * For more information on Lo-Dash templates, see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
 	 */
-	var LoDashTpl = Class.extend( Object, {		
+	var LoDashTpl = Template.extend( {
 		
 		/**
 		 * @cfg {Boolean} compiled
@@ -53,16 +55,18 @@ define( [
 		
 		/**
 		 * @constructor
-		 * @param {String/String[]/Function/LoDashTpl} tpl A string or an array of strings which will be concatenated 
-		 *   together to generate the Lo-Dash template, a compiled Lo-Dash template function, or a LoDashTpl instance
-		 *   which will simply be returned from this constructor.
+		 * @param {String/String[]/Function/ui.templateTemplate} tpl A string or an array of strings which will be concatenated 
+		 *   together to generate the Lo-Dash template, a compiled Lo-Dash template function, or a {@link ui.template.Template} 
+		 *   instance which will simply be returned from this constructor.
 		 * @param {Object} options Any options to provide to the Lo-Dash template generator function. This argument
 		 *   is only valid when the first argument to this constructor is a string or array of strings. See 
 		 *   [http://lodash.com/docs#template](http://lodash.com/docs#template) for the options that are accepted.
 		 *   This parameter also accepts the configuration options of this class.
 		 */
 		constructor : function( tpl, options ) {
-			if( tpl instanceof LoDashTpl ) {
+			this._super( arguments );
+			
+			if( tpl instanceof Template ) {
 				return tpl;
 			} else {
 				options = options || {};

@@ -941,8 +941,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				it( "the `renderTpl` config should populate the internal structure of the Component, and do so before onRender() is executed", function() {
 					var innerHtmlOnRender = "";
 					var TestComponent = Component.extend( {
-						renderTpl : "Testing <%= number %>",
-						renderTplData : { number : 123 },
+						renderTpl : "Testing 123",
 						
 						onRender : function() {  // override onRender to check
 							this._super( arguments );
@@ -958,13 +957,57 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				} );
 				
 				
-				it( "the `renderTpl` should automatically be provided the following vars from the Component: `elId`", function() {
+				it( "the `renderTpl` should automatically be provided the following vars from the Component: `baseCls`, `elId`", function() {
 					var TestComponent = Component.extend( {
+						baseCls : 'testCls',
 						elId : "123",
-						renderTpl : "Testing <%= elId %>"
+						renderTpl : "Testing <%= elId %>, with baseCls: <%= baseCls %>"
 					} );
 					
 					var component = new TestComponent( { renderTo: 'body' } );
+					expect( component.getEl().html() ).toBe( "Testing 123, with baseCls: testCls" );
+					
+					component.destroy();  // clean up
+				} );
+				
+				
+				it( "the `renderTpl` should take a string form, and convert it to a LoDash template instance", function() {
+					var component = new Component( {
+						renderTo: 'body',
+						
+						renderTpl : "Testing <%= number %>",
+						renderTplData : { number: 123 }
+					} );
+					
+					expect( component.getEl().html() ).toBe( "Testing 123" );
+					
+					component.destroy();  // clean up
+				} );
+				
+				
+				it( "the `renderTpl` should take an array-of-strings form, and convert it to a LoDash template instance", function() {
+					var component = new Component( {
+						renderTo: 'body',
+						
+						renderTpl : [ "Testing", " ", "<%= number %>" ],
+						renderTplData : { number: 123 }
+					} );
+					
+					expect( component.getEl().html() ).toBe( "Testing 123" );
+					
+					component.destroy();  // clean up
+				} );
+				
+				
+				it( "the `renderTpl` should take compiled lodash template function form, and convert it to a LoDash template instance", function() {
+					var renderTplFn = _.template( "Testing <%= number %>" );
+					var component = new Component( {
+						renderTo: 'body',
+						
+						renderTpl : renderTplFn,
+						renderTplData : { number: 123 }
+					} );
+					
 					expect( component.getEl().html() ).toBe( "Testing 123" );
 					
 					component.destroy();  // clean up
@@ -1254,7 +1297,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 		describe( "Test addCls()", function() {
 			
 			
-			it( "addCls() should add a CSS class when unrendered", function() {
+			it( "should add a CSS class when unrendered", function() {
 				var cmp = new Component();
 				cmp.addCls( 'testCls' );
 				
@@ -1266,7 +1309,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "addCls() should add a CSS class when unrendered, and when it has an initial css class", function() {
+			it( "should add a CSS class when unrendered, and when it has an initial css class", function() {
 				var cmp = new Component( { cls: 'initialCls' } );
 				cmp.addCls( 'testCls' );
 				
@@ -1279,7 +1322,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "addCls() should add multiple, space-delimited CSS classes when unrendered", function() {
+			it( "should add multiple, space-delimited CSS classes when unrendered", function() {
 				var cmp = new Component( { cls: 'initialCls' } );
 				cmp.addCls( 'testCls1 testCls2' );
 				
@@ -1293,7 +1336,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "addCls() should not add a duplicate CSS class when unrendered", function() {
+			it( "should not add a duplicate CSS class when unrendered", function() {
 				var cmp = new Component( { cls: 'initialCls' } );
 				cmp.addCls( 'initialCls' );
 				
@@ -1308,7 +1351,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "addCls() should not add duplicate CSS classes when unrendered", function() {
+			it( "should not add duplicate CSS classes when unrendered", function() {
 				var cmp = new Component( { cls: 'initialCls' } );
 				cmp.addCls( 'testCls1 testCls1 initialCls' );
 				
@@ -1325,7 +1368,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			
 			
 			
-			it( "addCls() should add a CSS class when rendered", function() {
+			it( "should add a CSS class when rendered", function() {
 				var cmp = new Component( { renderTo: document.body } );
 				cmp.addCls( 'testCls' );
 				
@@ -1336,7 +1379,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "addCls() should add multiple, space-delimited CSS classes when rendered", function() {
+			it( "should add multiple, space-delimited CSS classes when rendered", function() {
 				var cmp = new Component( { renderTo: document.body } );
 				cmp.addCls( 'testCls1 testCls2' );
 				
@@ -1348,30 +1391,32 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "addCls() should not add a duplicate CSS class when rendered", function() {
+			it( "should not add a duplicate CSS class when rendered", function() {
 				var cmp = new Component( { renderTo: document.body, cls: 'initialCls' } );
 				cmp.addCls( 'initialCls' );
 				
 				// Need to pull off the className for the element to fully check this
-				expect( cmp.getEl()[ 0 ].className ).toBe( 'initialCls' );  // 
+				var re = /initialCls/g;
+				expect( cmp.getEl()[ 0 ].className.match( re ).length ).toBe( 1 );
 				
-				// Now check if the class is on it
-				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( true );  // 
+				// Now double check that the class is on it correctly
+				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
 			
 			
-			it( "addCls() should not add duplicate CSS classes when rendered", function() {
+			it( "should not add duplicate CSS classes when rendered", function() {
 				var cmp = new Component( { renderTo: document.body, cls: 'initialCls' } );
 				cmp.addCls( 'initialCls testCls testCls' );
 				
 				// Need to pull off the className for the element to fully check this
-				expect( cmp.getEl()[ 0 ].className ).toBe( 'initialCls testCls' );  // 
+				var re = /initialCls/g;
+				expect( cmp.getEl()[ 0 ].className.match( re ).length ).toBe( 1 );
 				
 				// Now check if the classes are on it
-				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( true );  // 
-				expect( cmp.getEl().hasClass( 'testCls' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( true );
+				expect( cmp.getEl().hasClass( 'testCls' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
