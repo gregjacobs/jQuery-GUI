@@ -1,5 +1,6 @@
 .project
 .settings
 .externalToolBuilders
+.sass-cache
 web.config
 /docs
