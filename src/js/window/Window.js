@@ -16,7 +16,19 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'ui-Window'
+		baseCls : 'ui-Window',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		x : 'center',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		y : 'center'
 		
 	} );
 	
