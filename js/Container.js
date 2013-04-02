@@ -45,8 +45,6 @@ define( [
 			
 		},
 	
-	
-	
 		/**
 		 * @cfg {String} defaultType
 		 * The default Component 'type' to instantiate when child {@link #items} are specified as anonymous config objects
@@ -89,6 +87,12 @@ define( [
 		 * Note that specifying child items is mutually exclusive with setting the {@link ui.Component#html} and
 		 * {@link ui.Component#contentEl} configs, and will take precedence over them.
 		 */
+	
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		baseCls : 'ui-Container',
 	
 	
 		/**

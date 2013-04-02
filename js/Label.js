@@ -19,16 +19,12 @@ define( [
 		 */
 		text : "",
 		
-	
 		/**
+		 * @cfg
 		 * @inheritdoc
 		 */
-		initComponent : function() {
-			this.addCls( 'ui-Label' );
-			
-			this._super( arguments );
-		},
-	
+		baseCls : 'ui-Label',
+		
 	
 		/**
 		 * @inheritdoc

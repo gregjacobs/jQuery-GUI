@@ -38,8 +38,9 @@
 			'ui/panel/Panel',
 			'ui/Overlay',
 			'ui/Button',
+			'ui/window/Window',
 			'ui/form/field/Text'
-		], function( $, Panel, Overlay, Button ) {
+		], function( $, Panel, Overlay, Button, Window, TextField ) {
 			$( document ).ready( function() {
 				$( 'body' ).html( "Hello, Playground!" );
 				
@@ -71,7 +72,7 @@
 				} );
 				
 				
-				var overlay = new Overlay( {
+				/*var overlay = new Overlay( {
 					html : "HI!",
 					x : 'center',
 					y: 'center',
@@ -86,7 +87,24 @@
 						}
 					]
 				} );
-				overlay.show();
+				overlay.show();*/
+				
+				var window = new Window( {
+					html : "HI!",
+					x : 10,
+					y: 10,
+					width : 300,
+					height : 200,
+					title: "Test Title 2",
+					
+					items : [
+						{
+							type: 'textfield',
+							value: "OHAI"
+						}
+					]
+				} );
+				window.show();
 			} );
 		} );
 	</script>

@@ -27,9 +27,15 @@ define( [
 		 */
 		elType : 'img',
 		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		baseCls : 'ui-Image',
+		
 		
 		/**
-		 * @private
+		 * @protected
 		 * @property {Boolean} loaded
 		 * 
 		 * Flag to store the state of if the image is loaded or not. If a new image is requested
@@ -38,7 +44,7 @@ define( [
 		loaded : false,
 		
 		/**
-		 * @private
+		 * @protected
 		 * @property {Boolean} errored
 		 * 
 		 * Flag to store the state of if it has been attempted to load the image, but it has failed to load. If a new
@@ -48,7 +54,7 @@ define( [
 		
 		
 		/**
-		 * @private
+		 * @protected
 		 * @property {String} blankImg
 		 * 
 		 * A blank image which is used to swap into the underlying image before placing a new image src in. This is a 
@@ -80,8 +86,6 @@ define( [
 				 */
 				'error'
 			);
-			
-			this.cls += ' ui-image';
 			
 			this._super( arguments );
 		},

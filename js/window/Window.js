@@ -12,6 +12,12 @@ define( [
 	 */
 	var Window = Overlay.extend( {
 		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		baseCls : 'ui-Window'
+		
 	} );
 	
 	

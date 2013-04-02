@@ -72,10 +72,16 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
+		baseCls : 'ui-Button',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
 		renderTpl : new LoDashTpl( [
-			'<span class="ui-Button-icon ui-Button-icon-left <%= leftIconElCls %>"></span>',
-			'<span id="<%= elId %>-text" class="ui-Button-text <%= textElCls %>" title="<%= tooltip %>"><%= text %></span>',
-			'<span class="ui-Button-icon ui-Button-icon-right <%= rightIconElCls %>"></span>'
+			'<span class="<%= baseCls %>-icon <%= baseCls %>-icon-left <%= leftIconElCls %>"></span>',
+			'<span id="<%= elId %>-text" class="<%= baseCls %>-text <%= textElCls %>" title="<%= tooltip %>"><%= text %></span>',
+			'<span class="<%= baseCls %>-icon <%= baseCls %>-icon-right <%= rightIconElCls %>"></span>'
 		] ),
 		
 		
@@ -83,8 +89,6 @@ define( [
 		 * @inheritdoc
 		 */
 		initComponent : function() {
-			this.addCls( 'ui-Button' );
-			
 			this.addEvents(
 				/**
 				 * Fires when the button has been clicked.
@@ -142,7 +146,7 @@ define( [
 			    rightIconElCls = "",
 			    textElCls = "",
 			    iconCls = this.iconCls,
-			    hiddenCls = 'ui-Button-hiddenEl';
+			    hiddenCls = this.baseCls + '-hiddenEl';
 			
 			if( !iconCls ) {
 				leftIconElCls = rightIconElCls = hiddenCls;
@@ -263,7 +267,7 @@ define( [
 		 * @param {jQuery.Event} evt
 		 */
 		onMouseEnter : function() {
-			this.addCls( 'ui-Button-hover' );
+			this.addCls( this.baseCls + '-hover' );
 			
 			this.fireEvent( 'mouseenter', this );
 		},
@@ -276,7 +280,7 @@ define( [
 		 * @param {jQuery.Event} evt
 		 */
 		onMouseLeave : function() {
-			this.removeCls( 'ui-Button-hover' );
+			this.removeCls( this.baseCls + '-hover' );
 			
 			this.fireEvent( 'mouseleave', this );
 		},
@@ -289,7 +293,7 @@ define( [
 		 * @param {jQuery.Event} evt
 		 */
 		onMouseDown : function() {
-			this.addCls( 'ui-Button-active' );
+			this.addCls( this.baseCls + '-active' );
 		},
 		
 		
@@ -300,7 +304,7 @@ define( [
 		 * @param {jQuery.Event} evt
 		 */
 		onMouseUp : function() {
-			this.removeCls( 'ui-Button-active' );
+			this.removeCls( this.baseCls + '-active' );
 		}
 		
 	} );

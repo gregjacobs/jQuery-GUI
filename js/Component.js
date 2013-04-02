@@ -38,20 +38,22 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 	var Component = Class.extend( Observable, { 
 		
 		/**
-		 * @cfg {String} id 
-		 * The id that identifies this Component, in a given hierarchy of {@link ui.Container Containers}/Components. 
-		 * Defaults to a unique id, and may be retrieved by {@link #getId}. This component is retrievable from a 
-		 * {@link ui.Container} via {@link ui.Container#findById}.
+		 * @cfg {String} id
+		 *  
+		 * The id that identifies this Component instance. Defaults to a unique id, and may be retrieved by {@link #getId}. 
+		 * This component is retrievable from a {@link ui.Container} via {@link ui.Container#findById}.
 		 */
 		 
 		/**
 		 * @cfg {String} elId
+		 * 
 		 * The id that should be used for the Component's element. Defaults to a unique id.
 		 * If this config is not provided, the unique id is generated when the Component is {@link #method-render rendered}.
 		 */
 		
 		/**
 		 * @cfg {String} elType
+		 * 
 		 * The element type that should be created as the Component's HTML element. For example, the string
 		 * 'div' will create a &lt;div&gt; element for the Component. Any HTML element type can be used,
 		 * and subclasses may override the default for a different implementation.
@@ -59,23 +61,37 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		elType : 'div',
 		 
 		/**
-		 * @cfg {jQuery/HTMLElement} renderTo The HTML element to render this component to. If specified, 
-		 * the component will be rendered immediately upon creation.
+		 * @cfg {jQuery/HTMLElement} renderTo 
+		 * 
+		 * The HTML element to render this component to. If specified, the component will be rendered immediately 
+		 * upon creation.
 		 */
 		
 		/**
-		 * @cfg {Boolean} hidden True to initially render the Component hidden.
+		 * @cfg {Boolean} hidden
+		 * 
+		 * True to initially render the Component hidden.
 		 */
 		hidden : false,
 		
 		/**
-		 * @cfg {Object} attr
-		 * Any additional html attributes to apply to the outer div element. Should be an object where the keys are the attribute names, and the values are the 
-		 * attribute values. Attribute values should be strings.
+		 * @protected
+		 * @cfg {String} baseCls
+		 * 
+		 * The base CSS class to apply to the Component. This is meant for subclasses to specify, to change the CSS class that
+		 * is applied to the Component's {@link #$el element}. 
+		 * 
+		 * The value of this config, by convention, is also used to prefix descendent elements of a Component subclass. For 
+		 * example, {@link ui.panel.Panel Panel} sets this config to 'ui-Panel', and its header and body elements are prefixed with 
+		 * this to become 'ui-Panel-header' and 'ui-Panel-body', respectively. However when a {@link ui.window.Window Window} is 
+		 * created (which is a subclass of {@link ui.panel.Panel Panel}, the value is 'ui-Window', and the header and body become 
+		 * 'ui-Window-header' and 'ui-Window-body' instead.
 		 */
+		baseCls : 'ui-Component',
 		
 		/**
 		 * @cfg {String} cls
+		 * 
 		 * Any additional CSS class(es) to add to this component's element. If multiple, they should be separated by a space. 
 		 * Useful for styling Components and their inner elements (if any) based on regular CSS rules.
 		 * (Note that this is named 'cls' instead of 'class', as 'class' is a JavaScript reserved word.)
@@ -84,8 +100,16 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		/**
 		 * @cfg {Object} style
+		 * 
 		 * Any additional CSS style(s) to apply to the outer div element. Should be an object where the keys are the css property names, and the 
 		 * values are the CSS values.
+		 */
+		
+		/**
+		 * @cfg {Object} attr
+		 * 
+		 * Any additional html attributes to apply to the outer div element. Should be an object where the keys are the attribute names, and the values are the 
+		 * attribute values. Attribute values should be strings.
 		 */
 		
 		
@@ -146,6 +170,10 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * {@link #getRenderTplData} method), including:
 		 * 
 		 * - **elId**: The value of the {@link #elId} config, or its auto-generated value.
+		 * - **baseCls**: The {@link #baseCls} config, which is the base CSS class to prefix descendent elements' CSS
+		 *   classes with. Ex: a {@link #baseCls} of 'ui-Panel' is used to prefix a {@link ui.panel.Panel Panel's} body
+		 *   element to become 'ui-Panel-body', but when a {@link ui.window.Window Window} is created, the value is
+		 *   'ui-Window', and the body becomes 'ui-Window-body' instead. 
 		 */
 		
 		
@@ -247,6 +275,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		/**
 		 * @cfg {ui.plugin.Plugin/ui.plugin.Plugin[]} plugins
+		 * 
 		 * A single plugin or array of plugins to attach to the Component. Plugins must extend the class {@link ui.plugin.Plugin}.
 		 * See {@link ui.plugin.Plugin} for details on creating plugins.
 		 * 
@@ -689,7 +718,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				// With a `renderTpl`, it will create the div with its `renderTpl` result as its inner HTML. Ex:
 				// <div id="someId"><div id="bodyEl" /></div>
 				var elMarkup = [
-					'<', this.elType, ' id="', this.elId, '" class="', this.cls, '" style="', style, '" ', attr, '>',
+					'<', this.elType, ' id="', this.elId, '" class="', this.baseCls, ' ', this.cls, '" style="', style, '" ', attr, '>',
 						renderTplMarkup,
 					'</', this.elType, '>'
 				].join( "" );
@@ -821,7 +850,8 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 */
 		getRenderTplData : function() {
 			return _.assign( {}, {
-				elId : this.elId
+				elId    : this.elId,
+				baseCls : this.baseCls
 			}, this.renderTplData || {} );
 		},
 		

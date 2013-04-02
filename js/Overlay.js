@@ -147,6 +147,12 @@ define( [
 		 * viewable area of the browser's viewport (at least as much as possible).
 		 */
 		constrainToViewport : true,
+	
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		baseCls : 'ui-Overlay',
 		
 		/**
 		 * @hide
@@ -181,8 +187,8 @@ define( [
 			// Call superclass initComponent
 			this._super( arguments );
 			
-			this.addCls( 'ui-Overlay' );
-			this.hidden = true;   // Overlays are always hidden to start, as they rely on the show() logic to be properly shown w/ a position and size
+			// Overlays are always hidden to start, as they rely on the show() logic to be properly shown w/ a position and size
+			this.hidden = true;
 	
 			// If the autoShow config has been set to true, show the overlay immediately
 			if( this.autoShow ) {

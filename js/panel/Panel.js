@@ -34,9 +34,15 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
+		baseCls : 'ui-Panel',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
 		renderTpl : new LoDashTpl( [
-			'<div id="<%= elId %>-header" class="ui-Panel-header"><div class="ui-clear" /></div>',
-			'<div id="<%= elId %>-body" class="ui-Panel-body"></div>'
+			'<div id="<%= elId %>-header" class="<%= baseCls %>-header"><div class="ui-clear" /></div>',
+			'<div id="<%= elId %>-body" class="<%= baseCls %>-body"></div>'
 		] ),
 		
 		
@@ -68,9 +74,7 @@ define( [
 		/**
 		 * @inheritdoc
 		 */
-		initComponent : function() {
-			this.addCls( 'ui-Panel' );
-			
+		initComponent : function() {			
 			if( this.title || this.toolButtons ) {
 				this.header = this.createHeader();
 			}
@@ -120,7 +124,7 @@ define( [
 			this.toolButtonsCt = this.createToolButtonsCt();
 			
 			return new Container( {
-				cls   : 'ui-Panel-header-innerCt',
+				cls   : this.baseCls + '-header-innerCt',
 				items : this.buildHeaderItems( this.titleCmp, this.toolButtonsCt )
 			} );
 		},
@@ -135,7 +139,7 @@ define( [
 		 */
 		createTitleCmp : function() {
 			return new Label( {
-				cls  : 'ui-Panel-header-title',
+				cls  : this.baseCls + '-header-title',
 				text : this.title
 			} );
 		},
@@ -149,7 +153,7 @@ define( [
 		 */
 		createToolButtonsCt : function() {
 			return new Container( {
-				cls         : 'ui-Panel-header-toolButtons',
+				cls         : this.baseCls + '-header-toolButtons',
 				defaultType : 'toolbutton',
 				items       : this.toolButtons
 			} );
