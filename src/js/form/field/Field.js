@@ -46,18 +46,18 @@ define( [
 		label : "",
 		
 		/**
-		 * @cfg {String} labelPosition
+		 * @cfg {String} labelAlign
 		 * 
 		 * A string that specifies where the field's label should be placed. Valid values are:
 		 * "left" and "top". Defaults to 'left'.
 		 */
-		labelPosition : 'left',
+		labelAlign : 'left',
 		
 		/**
 		 * @cfg {String} labelWidth
 		 * 
 		 * A string specifying the percentage (with the trailing '%' sign) of how wide the label should be in relation to the rest
-		 * of the field.  This is only valid if the {@link #labelPosition} config is set to 'left'. Defaults to "19%".<br><br>
+		 * of the field.  This is only valid if the {@link #labelAlign} config is set to 'left'. Defaults to "19%".<br><br>
 		 * 
 		 * Note that this must currently be a percentage because of limitations with div elements.  A future implementation
 		 * may incorporate calculations to allow this config to be a number (specifying the number of pixels).
@@ -168,15 +168,15 @@ define( [
 			}
 			
 			
-			// Fix labelPosition to be lowercase, juse in case
-			this.labelPosition = this.labelPosition.toLowerCase();
+			// Fix labelAlign to be lowercase, juse in case
+			this.labelAlign = this.labelAlign.toLowerCase();
 			
 			
 			// Apply other appropriate CSS classes to the outer element
 			if( this.label === "" ) {
 				this.cls += ' dialog-formField-noLabel';
 			} else {
-				this.cls += ' dialog-formField-' + this.labelPosition + 'Label';  // will add the 'dialog-formField-leftLabel' or 'dialog-formField-topLabel' css classes
+				this.cls += ' dialog-formField-' + this.labelAlign + 'Label';  // will add the 'dialog-formField-leftLabel' or 'dialog-formField-topLabel' css classes
 			}
 			
 			
@@ -208,8 +208,8 @@ define( [
 			    inputContainerWrapStyles = "",
 			    helpStyles = "";
 			
-			// Size the label and input container elements (based on the labelWidth config) if the labelPosition is 'left', and there is an actual label.
-			if( this.label !== "" && this.labelPosition === 'left' ) {
+			// Size the label and input container elements (based on the labelWidth config) if the labelAlign is 'left', and there is an actual label.
+			if( this.label !== "" && this.labelAlign === 'left' ) {
 				// Make the percentage label width into a number (i.e. change "15%" to 15)
 				var labelWidth = parseInt( this.labelWidth, 10 );
 				

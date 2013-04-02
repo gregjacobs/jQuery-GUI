@@ -22,7 +22,7 @@ define( [
 		 * 
 		 * For DateField, this accepts the special string "now", which can be used to set the field's emptyText to the current date.<br><br>
 		 * 
-		 * Note that this is not compatible with the {@link #labelPosition} config set to "infield". See the description of {@link #labelPosition}.
+		 * Note that this is not compatible with the {@link #labelAlign} config set to "infield". See the description of {@link #labelAlign}.
 		 */
 		
 		/**

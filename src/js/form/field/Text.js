@@ -25,12 +25,12 @@ define( [
 		selectOnFocus : false,
 		
 		/**
-		 * @cfg {String} labelPosition
+		 * @cfg {String} labelAlign
 		 * A string that specifies where the field's label should be placed. Valid values are: "left", "top", 
 		 * and "infield". The "infield" label position places the label inside the text field itself, which 
 		 * is then hidden when the user starts typing into the field. Defaults to 'left'.<br><br>
 		 * 
-		 * Note that a labelPosition set to "infield" is not compatible with the {@link #emptyText} 
+		 * Note that a labelAlign set to "infield" is not compatible with the {@link #emptyText} 
 		 * config. The provided {@link #emptyText} will not be used in this case. 
 		 */
 		
@@ -40,7 +40,7 @@ define( [
 		 * will be removed, allowing the user to type their value. If provided, and no {@link #value} is provided,
 		 * the {@link #value} will be set to this.
 		 * 
-		 * Note that this is not compatible with the {@link #labelPosition} config set to "infield". See the description of {@link #labelPosition}.
+		 * Note that this is not compatible with the {@link #labelAlign} config set to "infield". See the description of {@link #labelAlign}.
 		 */
 		
 		/**
@@ -50,7 +50,7 @@ define( [
 		 * empty string).  If this is false, the {@link #emptyText} will not be re-applied to the field when it loses 
 		 * focus. Defaults to true.
 		 * 
-		 * Note: This only applies when the {@link #labelPosition} config is not "infield". Infield labels cannot have
+		 * Note: This only applies when the {@link #labelAlign} config is not "infield". Infield labels cannot have
 		 * an {@link #emptyText} value.
 		 */
 		restoreEmptyText : true,
@@ -74,7 +74,7 @@ define( [
 		 * 
 		 * The {@link ui.form.field.Text.Behavior} object that governs the TextField's behavior.
 		 * This currently applies to either the TextField having a {@link ui.form.field.Field#default default} value, 
-		 * or the TextField having an "infield" {@link #labelPosition}.
+		 * or the TextField having an "infield" {@link #labelAlign}.
 		 */
 		
 		
@@ -111,7 +111,7 @@ define( [
 			// Set the TextField's behavior "state", based on if it is set to have an "infield" label or not.
 			// "infield" labels are incompatible with having a regular default value (i.e. the default showing on top
 			// of the "infield" label does not look right), and thus are mutually exclusive behaviors.
-			if( this.labelPosition === 'infield' ) {
+			if( this.labelAlign === 'infield' ) {
 				this.behaviorState = new InfieldLabelBehavior();
 			} else {
 				this.behaviorState = new EmptyTextBehavior();

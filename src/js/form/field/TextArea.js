@@ -80,7 +80,7 @@ define( [
 				var inputElHeight = this.height;
 				
 				// Leave room for a "top" label
-				if( this.labelPosition === 'top' ) {
+				if( this.labelAlign === 'top' ) {
 					inputElHeight -= this.$labelEl.outerHeight( /* includeMargin */ true );
 				}
 				

@@ -22,7 +22,7 @@ define( [
 		 * affects all form field components uniformly).  Defaults to an empty string.<br><br>
 		 * 
 		 * Note that if the checkbox should be aligned with other form fields that have "left side" labels (see 
-		 * {@link ui.form.field.Field#labelPosition}, then set its {@link ui.form.field.Field#label label} config to
+		 * {@link ui.form.field.Field#labelAlign}, then set its {@link ui.form.field.Field#label label} config to
 		 * a non-breaking space (&amp;nbsp;).
 		 */
 		checkboxLabel : "",
