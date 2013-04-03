@@ -82,7 +82,6 @@ define( [
 				field.render( 'body' );
 				
 				expect( field.$labelEl.length ).toBe( 1 );
-				expect( field.$inputContainerWrapEl.length ).toBe( 1 );
 				expect( field.$inputContainerEl.length ).toBe( 1 );
 				expect( field.$extraMsgEl.length ).toBe( 1 );
 				

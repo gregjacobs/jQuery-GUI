@@ -1002,43 +1002,34 @@ button.ui-Button::-moz-focus-inner {
 
 /* line 1, ../../../src/sass/base/form/field/_Field.scss */
 .ui-form-Field {
+  margin: 0;
+  padding: 0;
+  table-layout: fixed;
+  border-collapse: collapse;
   /* A "reset" for text and select elements */
 }
-/* line 11, ../../../src/sass/base/form/field/_Field.scss */
+/* line 7, ../../../src/sass/base/form/field/_Field.scss */
+.ui-form-Field tbody, .ui-form-Field tr, .ui-form-Field th, .ui-form-Field td {
+  margin: 0;
+  padding: 0;
+}
+/* line 17, ../../../src/sass/base/form/field/_Field.scss */
 .ui-form-Field input.ui-form-Field-Text,
 .ui-form-Field select,
 .ui-form-Field textarea {
   background: none transparent;
   border: none;
   width: 100%;
+  margin: 0;
   padding: 0;
   /* Override some user agent style sheets, like Chrome which puts on 1px and can cause scroll bars to appear */
 }
-/* line 20, ../../../src/sass/base/form/field/_Field.scss */
+/* line 27, ../../../src/sass/base/form/field/_Field.scss */
 .ui-form-Field input.ui-form-Field-Text:focus,
 .ui-form-Field select:focus,
 .ui-form-Field textarea:focus {
   outline: 0;
   /* Override some user agent style sheets, like Chrome which has a 5px outline */
-}
-
-/* 
- * Wrapper element used so that the label itself can have padding, without messing up the sizing of the 
- * label/fieldContainer when sized by percentages
- */
-/* line 31, ../../../src/sass/base/form/field/_Field.scss */
-.ui-form-Field-leftLabel .ui-form-Field-labelWrap {
-  display: inline-block;
-}
-
-/* line 35, ../../../src/sass/base/form/field/_Field.scss */
-.ui-form-Field-noLabel .ui-form-Field-label {
-  display: none;
-}
-
-/* line 40, ../../../src/sass/base/form/field/_Field.scss */
-.ui-form-Field-leftLabel .ui-form-Field-inputContainerWrap {
-  display: inline-block;
 }
 
 /* This is for the custom implementation of dropdowns, which don't use the html <select> element 

@@ -4,8 +4,9 @@ define( [
 	'lodash',
 	'Class',
 	'ui/Component',
+	'ui/template/Template',
 	'ui/template/LoDash'
-], function( jQuery, _, Class, Component, LoDashTpl ) {
+], function( jQuery, _, Class, Component, Template, LoDashTpl ) {
 	
 	/**
 	 * @abstract
@@ -57,13 +58,10 @@ define( [
 		/**
 		 * @cfg {String} labelWidth
 		 * 
-		 * A string specifying the percentage (with the trailing '%' sign) of how wide the label should be in relation to the rest
-		 * of the field.  This is only valid if the {@link #labelAlign} config is set to 'left'. Defaults to "19%".
-		 * 
-		 * Note that this must currently be a percentage because of limitations with div elements.  A future implementation
-		 * may incorporate calculations to allow this config to be a number (specifying the number of pixels).
+		 * A string specifying how wide the label should be. This is only valid if the {@link #labelAlign} config is set 
+		 * to 'left'.
 		 */
-		labelWidth : '19%',
+		labelWidth : '75',
 		
 		/**
 		 * @cfg {String} extraMsg 
@@ -120,15 +118,57 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		renderTpl : new LoDashTpl( [
-			'<div class="<%= baseCls %>-labelWrap" style="<%= labelWrapStyles %>">',
-				'<label id="<%= elId %>-label" for="<%= inputId %>" class="<%= baseCls %>-label"><%= label %></label>',
-			'</div>',
-			'<div id="<%= elId %>-inputContainerWrap" class="<%= baseCls %>-inputContainerWrap" style="<%= inputContainerWrapStyles %>">',
-				'<div id="<%= elId %>-inputContainer" class="<%= baseCls %>-inputContainer" style="position: relative;" />',
-			'</div>',
-			'<div id="<%= elId %>-extraMsg" class="<%= baseCls %>-extraMsg" style="<%= extraMsgStyles %>"><%= extraMsg %></div>'
+		elType : 'table',
+		
+		
+		/**
+		 * @cfg {String/String[]/Function/ui.template.Template} labelTpl
+		 * 
+		 * The template to use as the HTML template for the Field's label.
+		 * 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link ui.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link ui.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link ui.template.Template} 
+		 * subclass to this config. 
+		 * 
+		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template) 
+		 */
+		labelRenderTpl : new LoDashTpl( [
+			'<label id="<%= elId %>-label" for="<%= inputId %>" class="<%= baseCls %>-label"><%= label %></label>'
 		] ),
+		
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		renderTpl : new LoDashTpl( [
+			'<% if( labelAlign === "top" ) { %>',
+				'<tr>',
+					'<td id="<%= elId %>-topLabelCell" class="<%= baseCls %>-topLabelCell" colspan="2">',
+						'<%= labelMarkup %>',
+					'</td>',
+				'</tr>',
+			'<% } %>',
+			'<tr>',
+				'<td id="<%= elId %>-leftLabelCell" class="<%= baseCls %>-leftLabelCell" width="<%= leftLabelWidth %>">',
+					'<% if( labelAlign === "left" ) { %>',
+						'<%= labelMarkup %>',
+					'<% } %>',
+				'</td>',
+				'<td id="<%= elId %>-inputCell" class="<%= baseCls %>-inputCell">',
+					'<div id="<%= elId %>-inputContainer" class="<%= baseCls %>-inputContainer" style="position: relative;"></div>',
+				'</td>',
+			'</tr>',
+			'<tr>',
+				'<td></td>',
+				'<td class="<%= baseCls %>-extraMsgCell">',
+					'<div id="<%= elId %>-extraMsg" class="<%= baseCls %>-extraMsg"><%= extraMsg %></div>',
+				'</td>',
+			'</tr>'
+		] ),
+		
+		
 		
 		
 		// protected
@@ -183,35 +223,36 @@ define( [
 		 * @inheritdoc
 		 */
 		getRenderTplData : function() {
-			var labelWrapStyles = "",
-			    inputContainerWrapStyles = "",
-			    extraMsgStyles = "";
-			
-			// Size the label and input container elements (based on the labelWidth config) if the labelAlign is 'left', and there is an actual label.
-			if( this.label !== "" && this.labelAlign === 'left' ) {
-				// Make the percentage label width into a number (i.e. change "15%" to 15)
-				var labelWidth = parseInt( this.labelWidth, 10 );
-				
-				labelWrapStyles += 'width: ' + labelWidth + '%;';
-				inputContainerWrapStyles += 'width: ' + ( 100 - labelWidth ) + '%;';  // the remaining width: 100% - minus the label width
-				
-				// Set the extraMsg element to line up with the field's input container
-				extraMsgStyles += 'padding-left: ' + labelWidth + '%;';
-			}
-			
+			var labelAlign = this.labelAlign,
+			    labelRenderTpl = ( labelRenderTpl instanceof Template ) ? this.labelRenderTpl : new LoDashTpl( this.labelRenderTpl ),
+			    labelMarkup = labelRenderTpl.apply( this.getLabelRenderTplData() );
 			
 			// Add properties to the object provided by the superclass, and return
 			return _.assign( this._super( arguments ), {
 				inputId   : this.inputId,
 				inputName : this.inputName,
 				
-				label    : this.label    || "",
-				extraMsg : this.extraMsg || "",
-				
-				labelWrapStyles          : labelWrapStyles,
-				inputContainerWrapStyles : inputContainerWrapStyles,
-				extraMsgStyles           : extraMsgStyles
+				labelAlign     : labelAlign,
+				leftLabelWidth : ( this.label && labelAlign === 'left' ) ? this.labelWidth : 0,
+				labelMarkup    : labelMarkup,
+				extraMsg       : this.extraMsg || ""
 			} );
+		},
+		
+		
+		/**
+		 * Retrieves the data to provide to the {@link #labelRenderTpl}.
+		 * 
+		 * @protected
+		 * @return {Object}
+		 */
+		getLabelRenderTplData : function() {
+			return {
+				elId    : this.elId,
+				baseCls : this.baseCls,
+				inputId : this.inputId,
+				label   : this.label || ""
+			};
 		},
 		
 		
@@ -223,8 +264,7 @@ define( [
 			
 			// Retrieve references from generated HTML/DOM append
 			var elId = this.elId;
-			this.$labelEl = jQuery( '#' + elId + '-label' );
-			this.$inputContainerWrapEl = jQuery( '#' + elId + '-inputContainerWrap' );
+			this.$labelEl = jQuery( '#' + elId + '-label' );   // from the labelTpl
 			this.$inputContainerEl = jQuery( '#' + elId + '-inputContainer' );
 			this.$extraMsgEl = jQuery( '#' + elId + '-extraMsg' );
 		},

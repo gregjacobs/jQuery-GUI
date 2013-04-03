@@ -1,8 +1,14 @@
 .ui-form-Field {
-	&.ui-form-Field-focused {}
+	margin: 0;
+	padding: 0;
+	
+	table-layout: fixed;
+	border-collapse: collapse;
+	tbody, tr, th, td { margin: 0; padding: 0; }
+	
 	&.ui-form-Field-leftLabel {}
 	&.ui-form-Field-topLabel {}
-	&.ui-form-Field-noLabel {}
+	&.ui-form-Field-focused {}
 	
 	
 	/* A "reset" for text and select elements */
@@ -12,6 +18,7 @@
 		background: none transparent;
 		border: none;
 		width: 100%;
+		margin: 0;
 		padding: 0;   /* Override some user agent style sheets, like Chrome which puts on 1px and can cause scroll bars to appear */
 	}
 
@@ -22,23 +29,12 @@
 	}
 }
 
+.ui-form-Field-leftLabelCell {}
+.ui-form-Field-topLabelCell {}
+.ui-form-Field-label {}
 
-/* 
- * Wrapper element used so that the label itself can have padding, without messing up the sizing of the 
- * label/fieldContainer when sized by percentages
- */
-.ui-form-Field-labelWrap {
-	.ui-form-Field-leftLabel & { display: inline-block; }   // "left" side labels need to be inline-block
-} 
-
-.ui-form-Field-label {
-	.ui-form-Field-noLabel & { display: none; }  // Hide the label element entirely if there is no label to show 
-}
-
-
-.ui-form-Field-inputContainerWrap {
-	.ui-form-Field-leftLabel & { display: inline-block; }
-}
+.ui-form-Field-inputCell {}
 .ui-form-Field-inputContainer {}
 
+.ui-form-Field-extraMsgCell {}
 .ui-form-Field-extraMsg {}
