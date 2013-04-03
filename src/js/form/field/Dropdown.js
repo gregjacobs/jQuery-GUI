@@ -50,6 +50,13 @@ define( [
 		menuCollisionStrategy : 'flip',
 		
 		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'ui-form-DropdownField',
+		
+		
+		/**
 		 * @private
 		 * @property {ui.util.OptionsStore} optionsStore
 		 * 
@@ -78,11 +85,11 @@ define( [
 			 */
 			dropdownRenderTpl : new LoDashTpl( [
 				'<input type="hidden" id="<%= inputId %>" name="<%= inputName %>" value="<%= initialValue %>" />',  // populated upon selection for standard form submission
-				'<div id="<%= elId %>-dropdownContainer" class="<%= baseCls %>-Dropdown-container">',
-					'<div id="<%= elId %>-selectText" class="<%= baseCls %>-Dropdown-selectText">',
+				'<div id="<%= elId %>-dropdownContainer" class="<%= componentCls %>-dropdownContainer">',
+					'<div id="<%= elId %>-selectText" class="<%= componentCls %>-selectText">',
 						'<div class="<%= optionClass %>" style="<%= optionStyles %>"><%= optionText %></div>',
 					'</div>',
-					'<div id="<%= elId %>-openButton" class="<%= baseCls %>-Dropdown-openButton" />',
+					'<div id="<%= elId %>-openButton" class="<%= componentCls %>-openButton" />',
 				'</div>'
 			] ),
 			
@@ -95,7 +102,7 @@ define( [
 			 * The template to use to render the dropdown's options menu elements.
 			 */
 			optionsMenuRenderTpl : new LoDashTpl( [
-				'<li data-elem="ui-form-Field-Dropdown-menu-item" class="<%= baseCls %>-Dropdown-menu-item <%= menuItemCls %>" style="<%= menuItemStyle %>">',
+				'<li data-elem="ui-form-DropdownField-menu-item" class="<%= componentCls %>-menu-item <%= menuItemCls %>" style="<%= menuItemStyle %>">',
 					'<%= text %>',
 				'</li>'
 			] )
@@ -183,7 +190,7 @@ define( [
 			    option = this.optionsStore.getByValue( fieldValue );
 			
 			var dropdownMarkup = dropdownRenderTpl.apply( {
-				baseCls       : this.baseCls,
+				componentCls  : this.componentCls,
 				
 				elId          : elId,
 				inputId       : inputId,
@@ -210,7 +217,7 @@ define( [
 			
 			
 			// Create the dropdown menu, which is a <ul> element that holds the dropdown list. This is appended to the document body.
-			this.$optionsMenu = jQuery( '<ul class="' + this.baseCls + '-Dropdown-menu ' + this.menuCls + '" />' ).hide().appendTo( 'body' );
+			this.$optionsMenu = jQuery( '<ul class="' + this.componentCls + '-menu ' + this.menuCls + '" />' ).hide().appendTo( 'body' );
 			
 			// TODO: Add IE iframe shim
 			/*if ($.browser.msie && jQuery.browser.version < 7) {
@@ -294,7 +301,7 @@ define( [
 			
 			// Scroll to the currently selected option
 			var $optionsMenu = this.$optionsMenu,
-			    itemOffsetTop = jQuery( 'li.' + this.baseCls + '-Dropdown-menu-item-selected', $optionsMenu ).offset().top,
+			    itemOffsetTop = jQuery( 'li.' + this.componentCls + '-menu-item-selected', $optionsMenu ).offset().top,
 			    offset = itemOffsetTop - $optionsMenu.offset().top;
 			$optionsMenu.animate( { scrollTop: offset } );
 		},
@@ -457,12 +464,12 @@ define( [
 					
 					var menuItemCls = ( option.cls || "" );
 					if( option.value === currentFieldValue ) {
-						menuItemCls += ' ' + this.baseCls + '-Dropdown-menu-item-selected';
+						menuItemCls += ' ' + this.componentCls + '-menu-item-selected';
 					}
 					
 					optionsMarkup.push(
 						optionsMenuRenderTpl.apply( {
-							baseCls     : this.baseCls,
+							componentCls  : this.componentCls,
 							
 							menuItemCls   : menuItemCls,
 							menuItemStyle : ( option.style ) ? Css.mapToString( option.style ) : '', 
@@ -475,7 +482,7 @@ define( [
 				
 				// Now that the markup is appended and DOM nodes have been created, assign the values to the menu item
 				// elements using .data() (so that values of any datatype may be assigned)
-				var $itemEls = $optionsMenu.find( '[data-elem="ui-form-Field-Dropdown-menu-item"]' );
+				var $itemEls = $optionsMenu.find( '[data-elem="ui-form-DropdownField-menu-item"]' );
 				for( i = 0; i < numOptions; i++ ) {
 					// Add the "value" as data (instead of an attribute), so that any datatype can be stored for the value
 					$itemEls.eq( i ).data( 'value', options[ i ].value );
@@ -564,11 +571,11 @@ define( [
 					
 					// Update the options menu
 					var $optionsMenu = this.$optionsMenu,
-					    selectedCls = this.baseCls + '-Dropdown-menu-item-selected';
+					    selectedCls = this.componentCls + '-menu-item-selected';
 					$optionsMenu.find( 'li.' + selectedCls ).removeClass( selectedCls );  // De-select any currently selected item in the dropdown menu
 					
 					// Select the item with the given value
-					var $itemEls = $optionsMenu.find( 'li[data-elem="ui-form-Field-Dropdown-menu-item"]' );
+					var $itemEls = $optionsMenu.find( 'li[data-elem="ui-form-DropdownField-menu-item"]' );
 					for( var i = 0, len = $itemEls.length; i < len; i++ ) {
 						var $item = $itemEls.eq( i );
 						if( $item.data( 'value' ) === value ) {

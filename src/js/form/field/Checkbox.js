@@ -33,6 +33,12 @@ define( [
 		 * The initial value for the field, if any. Any truthy value will initialize the checkbox as checked.
 		 */
 		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'ui-form-CheckboxField',
+		
 		
 		/**
 		 * @inheritdoc
@@ -41,11 +47,11 @@ define( [
 			this._super( arguments );
 			
 			// Create the input element, and append it to the $inputContainerEl
-			this.$inputEl = jQuery( '<input type="checkbox" class="' + this.baseCls + '-Checkbox" id="' + this.inputId + '" name="' + this.inputName + '"' + ( this.value ? ' checked' : '' ) + ' />' )
+			this.$inputEl = jQuery( '<input type="checkbox" class="' + this.componentCls + '-input" id="' + this.inputId + '" name="' + this.inputName + '"' + ( this.value ? ' checked' : '' ) + ' />' )
 				.appendTo( this.$inputContainerEl );
 			
 			// Create the checkbox label element, which comes up on the right side of the checkbox.
-			this.$checkboxLabelEl = jQuery( '<label for="' + this.inputId + '" class="' + this.baseCls + '-Checkbox-label" />&nbsp;' + ( this.checkboxLabel || "" ) )
+			this.$checkboxLabelEl = jQuery( '<label for="' + this.inputId + '" class="' + this.componentCls + '-label" />&nbsp;' + ( this.checkboxLabel || "" ) )
 				.appendTo( this.$inputContainerEl );
 			
 			// Add event handlers to the input element

@@ -26,6 +26,12 @@ define( [
 		 */
 		autoGrow : false,
 		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'ui-form-TextAreaField',
+		
 		
 		/**
 		 * @protected
@@ -33,7 +39,6 @@ define( [
 		 * 
 		 * The &lt;input&gt; element; the textarea field.
 		 */
-		
 		
 		/**
 		 * @private
@@ -69,7 +74,9 @@ define( [
 		
 		
 		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		onRender : function() {
 			this._super( arguments );
 			
@@ -169,7 +176,7 @@ define( [
 		 * @return {jQuery}
 		 */
 		createInputEl : function() {
-			return jQuery( '<textarea id="' + this.inputId + '" name="' + this.inputName + '">' + ( this.value || "" ) + '</textarea>' );  
+			return jQuery( '<textarea id="' + this.inputId + '" name="' + this.inputName + '" class="' + this.componentCls + '-input">' + ( this.value || "" ) + '</textarea>' );  
 		},
 		
 		

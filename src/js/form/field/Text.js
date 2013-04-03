@@ -59,6 +59,12 @@ define( [
 		 * The initial value for the field, if any.
 		 */
 		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'ui-form-TextField',
+		
 		
 		/**
 		 * @protected
@@ -83,24 +89,27 @@ define( [
 			
 			this.addEvents(
 				/**
-				 * @event keydown
 				 * Fires when a key is pressed down in the field.
+				 * 
+				 * @event keydown
 				 * @param {ui.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keydown',
 				
 				/**
-				 * @event keyup
 				 * Fires when a key is pressed and let up in the field.
+				 * 
+				 * @event keyup
 				 * @param {ui.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keyup',
 				
 				/**
-				 * @event keypress
 				 * Fires when a key is pressed in the field.
+				 * 
+				 * @event keypress
 				 * @param {ui.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
@@ -162,7 +171,7 @@ define( [
 		 */
 		createInputEl : function() {
 			var value = Html.encode( this.value || "" );
-			return jQuery( '<input type="text" class="' + this.baseCls + '-Text" id="' + this.inputId + '" name="' + this.inputName + '" value="' + value + '" />' );  
+			return jQuery( '<input type="text" class="' + this.componentCls + '-input" id="' + this.inputId + '" name="' + this.inputName + '" value="' + value + '" />' );  
 		},
 		
 		

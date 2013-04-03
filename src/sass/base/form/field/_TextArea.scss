@@ -1,0 +1,5 @@
+.ui-form-TextAreaField {}
+
+.ui-form-TextAreaField-input {
+	@extend .ui-form-TextField-input;
+}

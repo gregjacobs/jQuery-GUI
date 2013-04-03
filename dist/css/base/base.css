@@ -1006,38 +1006,19 @@ button.ui-Button::-moz-focus-inner {
   padding: 0;
   width: 100%;
   border-collapse: collapse;
-  /* A "reset" for text and select elements */
 }
 /* line 7, ../../../src/sass/base/form/field/_Field.scss */
 .ui-form-Field tbody, .ui-form-Field tr, .ui-form-Field th, .ui-form-Field td {
   margin: 0;
   padding: 0;
 }
-/* line 17, ../../../src/sass/base/form/field/_Field.scss */
-.ui-form-Field input.ui-form-Field-Text,
-.ui-form-Field select,
-.ui-form-Field textarea {
-  background: none transparent;
-  border: none;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  /* Override some user agent style sheets, like Chrome which puts on 1px and can cause scroll bars to appear */
-}
-/* line 27, ../../../src/sass/base/form/field/_Field.scss */
-.ui-form-Field input.ui-form-Field-Text:focus,
-.ui-form-Field select:focus,
-.ui-form-Field textarea:focus {
-  outline: 0;
-  /* Override some user agent style sheets, like Chrome which has a 5px outline */
-}
 
-/* line 32, ../../../src/sass/base/form/field/_Field.scss */
+/* line 14, ../../../src/sass/base/form/field/_Field.scss */
 .ui-form-Field-leftLabelCell {
   vertical-align: top;
 }
 
-/* line 36, ../../../src/sass/base/form/field/_Field.scss */
+/* line 18, ../../../src/sass/base/form/field/_Field.scss */
 .ui-form-Field-inputCell {
   vertical-align: top;
 }
@@ -1045,7 +1026,7 @@ button.ui-Button::-moz-focus-inner {
 /* This is for the custom implementation of dropdowns, which don't use the html <select> element 
 ============================================================================================== */
 /* line 3, ../../../src/sass/base/form/field/_Dropdown.scss */
-.ui-form-Field-Dropdown {
+.ui-form-DropdownField {
   position: relative;
   left: 0px;
   top: 0px;
@@ -1053,7 +1034,7 @@ button.ui-Button::-moz-focus-inner {
 
 /* For IE, need an iframe to cover certain elements */
 /* line 10, ../../../src/sass/base/form/field/_Dropdown.scss */
-iframe.ui-form-Field-Dropdown-shim {
+iframe.ui-form-DropdownField-shim {
   position: absolute;
   z-index: 1;
   width: 100%;
@@ -1062,16 +1043,16 @@ iframe.ui-form-Field-Dropdown-shim {
 }
 
 /* The box that shows the selected option's text */
-/* line 13, ../../../src/sass/base/form/field/_Dropdown.scss */
-.ui-form-Field-Dropdown-selectText {
+/* line 15, ../../../src/sass/base/form/field/_Dropdown.scss */
+.ui-form-DropdownField-selectText {
   overflow-x: hidden;
   white-space: nowrap;
   background: none transparent;
   cursor: pointer;
 }
 
-/* line 20, ../../../src/sass/base/form/field/_Dropdown.scss */
-.ui-form-Field-Dropdown-openButton {
+/* line 22, ../../../src/sass/base/form/field/_Dropdown.scss */
+.ui-form-DropdownField-openButton {
   position: absolute;
   top: 0;
   right: 0;
@@ -1079,8 +1060,8 @@ iframe.ui-form-Field-Dropdown-shim {
   cursor: pointer;
 }
 
-/* line 30, ../../../src/sass/base/form/field/_Dropdown.scss */
-.ui-form-Field-Dropdown-menu {
+/* line 32, ../../../src/sass/base/form/field/_Dropdown.scss */
+.ui-form-DropdownField-menu {
   position: absolute;
   list-style: none;
   display: none;
@@ -1090,9 +1071,25 @@ iframe.ui-form-Field-Dropdown-shim {
   z-index: 5000;
 }
 
-/* line 40, ../../../src/sass/base/form/field/_Dropdown.scss */
-.ui-form-Field-Dropdown-menu-item {
+/* line 42, ../../../src/sass/base/form/field/_Dropdown.scss */
+.ui-form-DropdownField-menu-item {
   cursor: pointer;
+}
+
+/* line 3, ../../../src/sass/base/form/field/_Text.scss */
+.ui-form-TextField-input, .ui-form-TextAreaField-input {
+  background: none transparent;
+  border: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  /* Override some user agent style sheets, like Chrome which puts on 1px and can cause scroll bars to appear */
+}
+
+/* line 11, ../../../src/sass/base/form/field/_Text.scss */
+.ui-form-TextField-input:focus, .ui-form-TextAreaField-input:focus {
+  outline: 0;
+  /* Override some user agent style sheets, like Chrome which has a 5px outline */
 }
 
 /* line 7, ../../../src/sass/base/panel/_Panel.scss */
@@ -1113,7 +1110,7 @@ iframe.ui-form-Field-Dropdown-shim {
 }
 
 /* General Styles */
-/* line 13, ../../../src/sass/base/base.scss */
+/* line 17, ../../../src/sass/base/base.scss */
 .ui-clear {
   clear: both;
 }

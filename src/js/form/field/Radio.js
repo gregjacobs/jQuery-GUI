@@ -51,16 +51,22 @@ define( [
 		 * {@link ui.form.field.Field#inputId} config.
 		 */
 		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'ui-form-RadioField',
+		
 		
 		/**
-		 * @private
+		 * @protected
 		 * @property {String} radioTpl
 		 * 
 		 * The HTML template to use to create the radio elements.
 		 */
 		radioTpl : new LoDashTpl( [
-			'<input type="radio" id="<%= name %>-<%= num %>" name="<%= name %>" class="<%= baseCls %>-Radio" value="<%= inputValue %>" <% if( checked ) { %>checked<% } %>>',
-			'<label for="<%= name %>-<%= num %>" ><%= text %></label>'
+			'<input type="radio" id="<%= name %>-<%= num %>" name="<%= name %>" class="<%= componentCls %>-input" value="<%= inputValue %>" <% if( checked ) { %>checked<% } %>>',
+			'<label for="<%= name %>-<%= num %>" class="<%= componentCls %>-label"><%= text %></label>'
 		] ),
 		
 		
@@ -116,7 +122,6 @@ define( [
 			
 			var options = this.optionsStore.getOptions(),
 			    radioTpl = this.radioTpl,
-			    baseCls = this.baseCls,
 				inputName = this.inputName,
 				$inputContainerEl = this.$inputContainerEl,
 				stacked = this.stacked,
@@ -129,13 +134,13 @@ define( [
 				// Append the radio
 				markup.push( 
 					radioTpl.apply( {
-						baseCls    : baseCls,
+						componentCls : this.componentCls,
 						
-						name       : inputName,
-						num        : i,
-						inputValue : option.value,
-						text       : option.text,
-						checked    : ( fieldValue === option.value )
+						name         : inputName,
+						num          : i,
+						inputValue   : option.value,
+						text         : option.text,
+						checked      : ( fieldValue === option.value )
 					} )
 				);
 				if( stacked ) {

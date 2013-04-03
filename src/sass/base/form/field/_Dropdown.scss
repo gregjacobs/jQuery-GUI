@@ -1,23 +1,25 @@
 /* This is for the custom implementation of dropdowns, which don't use the html <select> element 
 ============================================================================================== */
-.ui-form-Field-Dropdown {
+.ui-form-DropdownField {
 	position: relative;
 	left: 0px; 
 	top: 0px;
 }
-	
+
 /* For IE, need an iframe to cover certain elements */
-iframe.ui-form-Field-Dropdown-shim { position: absolute; z-index: 1; width: 100%; left: 0px; top: 0px; }
-	
+iframe.ui-form-DropdownField-shim { position: absolute; z-index: 1; width: 100%; left: 0px; top: 0px; }
+
+.ui-form-DropdownField-dropdownContainer {}
+
 /* The box that shows the selected option's text */
-.ui-form-Field-Dropdown-selectText {
+.ui-form-DropdownField-selectText {
 	overflow-x: hidden;
 	white-space: nowrap;
 	background: none transparent;
 	cursor: pointer;
 }
 
-.ui-form-Field-Dropdown-openButton {
+.ui-form-DropdownField-openButton {
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -27,7 +29,7 @@ iframe.ui-form-Field-Dropdown-shim { position: absolute; z-index: 1; width: 100%
 
 
 // The dropdown menu itself. This is appended to the document body
-.ui-form-Field-Dropdown-menu {
+.ui-form-DropdownField-menu {
 	position: absolute;
 	list-style: none;
 	display: none;
@@ -37,7 +39,7 @@ iframe.ui-form-Field-Dropdown-shim { position: absolute; z-index: 1; width: 100%
 	z-index: 5000;
 }
 
-.ui-form-Field-Dropdown-menu-item {
+.ui-form-DropdownField-menu-item {
 	cursor: pointer;
 }
-.ui-form-Field-Dropdown-menu-item-selected {}
+.ui-form-DropdownField-menu-item-selected {}
