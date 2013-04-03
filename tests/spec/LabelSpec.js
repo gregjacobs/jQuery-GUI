@@ -4,10 +4,18 @@ define( [
 ],
 function( Label ) {
 	
-	describe( "ui.Label", function() {
+	describe( 'ui.Label', function() {
 		
-		it( "should be able to be instantiated (sanity test for now)", function() {
-			var label = new Label();
+		describe( "sanity", function() {
+			
+			it( "should be able to be instantiated, rendered, and destroyed", function() {
+				var label = new Label();
+				
+				label.render( 'body' );
+				
+				label.destroy();
+			} );
+			
 		} );
 		
 	} );

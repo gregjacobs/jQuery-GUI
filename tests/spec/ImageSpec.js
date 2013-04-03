@@ -2,12 +2,20 @@
 define( [
 	'ui/Image'
 ],
-function( Label ) {
+function( Image ) {
 	
-	describe( "ui.Image", function() {
+	describe( 'ui.Image', function() {
 		
-		it( "should be able to be instantiated (sanity test for now)", function() {
-			var image = new Image();
+		describe( "sanity", function() {
+			
+			it( "should be able to be instantiated, rendered, and destroyed", function() {
+				var image = new Image();
+				
+				image.render( 'body' );
+				
+				image.destroy();
+			} );
+			
 		} );
 		
 	} );
