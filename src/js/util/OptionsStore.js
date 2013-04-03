@@ -6,7 +6,7 @@ define( [
 ], function( jQuery, _, Class ) {
 	
 	/**
-	 * @class ui.utils.OptionsStore
+	 * @class ui.util.OptionsStore
 	 * @extends Object
 	 * 
 	 * Helper utility class used for making the management of 'options' data easy, for any classes that use this format of data.

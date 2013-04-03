@@ -51,7 +51,7 @@ ui.ButtonSet = Class.extend( ui.Component, {
 	 * @private
 	 * @property optionsStore
 	 * The OptionsStore instance used for managing the ButtonSet's options.
-	 * @type ui.utils.OptionsStore
+	 * @type ui.util.OptionsStore
 	 */
 
 	// protected
@@ -67,7 +67,7 @@ ui.ButtonSet = Class.extend( ui.Component, {
 		);
 		
 		// Create the OptionsStore for managing the 'options'
-		this.optionsStore = new ui.utils.OptionsStore( this.options );
+		this.optionsStore = new ui.util.OptionsStore( this.options );
 		
 		// Make sure that options were provided
 		if( this.optionsStore.getOptions().length === 0 ) {

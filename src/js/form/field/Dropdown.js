@@ -19,7 +19,8 @@ define( [
 		
 		/**
 		 * @cfg {Array/Function} options
-		 * The options for the dropdown. See the description of the {@link ui.utils.OptionsStore#setOptions} method for accepted formats.
+		 * 
+		 * The options for the dropdown. See the description of the {@link ui.util.OptionsStore#setOptions} method for accepted formats.
 		 * 
 		 * Note that along with 'text' and 'value' properties, options can have the extra properties of 'cls' and 'style', which can specify the
 		 * css class name(s) to style the dropdown option with, or a hash of styles to style the dropdown option with, repectively. Ex:
@@ -33,6 +34,7 @@ define( [
 		
 		/**
 		 * @cfg {String} menuCls
+		 * 
 		 * Any additional css class(es) to add to the dropdown menu itself. The dropdown menu is appended to the document body, and therefore can not be
 		 * styled by regular descendant css rules. Use this config to add one or more custom css classes (separated by spaces) for the styling of the dropdown menu. 
 		 */
@@ -40,6 +42,7 @@ define( [
 		
 		/**
 		 * @cfg {String} menuCollisionStrategy
+		 * 
 		 * The strategy to use to re-position the dropdown menu when it collides with the edge of the screen.  Can be one of the following values:
 		 * 'flip', 'fit', or 'none'.  See the 'collision' option of jQuery UI's position utility for details. http://jqueryui.com/demos/position/  
 		 * Defaults to 'flip'.
@@ -48,16 +51,16 @@ define( [
 		
 		/**
 		 * @private
-		 * @property optionsStore
+		 * @property {ui.util.OptionsStore} optionsStore
+		 * 
 		 * The OptionsStore instance used for managing the DropdownField's options.
-		 * @type ui.utils.OptionsStore
 		 */
 		
 		/**
 		 * @private
-		 * @property optionsMenuOpen
+		 * @property {Boolean} optionsMenuOpen
+		 * 
 		 * Flag that stores whether or not the options menu is open or closed.
-		 * @type Boolean
 		 */
 		optionsMenuOpen : false,
 	

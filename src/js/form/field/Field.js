@@ -10,8 +10,8 @@ define( [
 	 * @class ui.form.field.Field
 	 * @extends ui.Component
 	 * 
-	 * Abstract base class for form fields, which lays out a label, a container for form field(s), and a container
-	 * for help text, while also providing the base functionality and other common field related tasks.
+	 * Abstract base class for form fields, which lays out a label and a container for form field(s), while also 
+	 * providing the base functionality and other common field related tasks.
 	 * 
 	 * Each concrete subclass must implement the {@link #setValue} and {@link #getValue} methods.
 	 */
@@ -21,14 +21,14 @@ define( [
 		/**
 		 * @cfg {String} inputId
 		 * 
-		 * The id that should be used for the Component's input element. The label element (if {@link #label} is specified) will be created 
-		 * with a `for` attribute with this id.  Defaults to a uniquely generated id.
+		 * The id that should be used for the Component's input element. The label element (if {@link #label} is specified) 
+		 * will be created with a `for` attribute with this id. Defaults to a uniquely generated id.
 		 */
 		
 		/**
 		 * @cfg {String} inputName
 		 * 
-		 * The name to give the input. This will be set as the input's "name" attribute.  This is really only useful if
+		 * The name to give the input. This will be set as the input's "name" attribute. This is really only useful if
 		 * the form that the component exists in is going to be submitted by a standard form submission (as opposed to just
 		 * having its values retrieved, which are handled elsewhere). Defaults to the value of the 
 		 * {@link #inputId} config.
@@ -57,7 +57,7 @@ define( [
 		 * @cfg {String} labelWidth
 		 * 
 		 * A string specifying the percentage (with the trailing '%' sign) of how wide the label should be in relation to the rest
-		 * of the field.  This is only valid if the {@link #labelAlign} config is set to 'left'. Defaults to "19%".<br><br>
+		 * of the field.  This is only valid if the {@link #labelAlign} config is set to 'left'. Defaults to "19%".
 		 * 
 		 * Note that this must currently be a percentage because of limitations with div elements.  A future implementation
 		 * may incorporate calculations to allow this config to be a number (specifying the number of pixels).

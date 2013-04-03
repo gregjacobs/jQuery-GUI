@@ -17,6 +17,7 @@ define( [
 		
 		/**
 		 * @cfg {String} checkboxLabel
+		 * 
 		 * The label for the checkbox itself, which will be placed to the right of the checkbox. This config is to differentiate from
 		 * the {@link ui.form.field.Field#label label} provided by {@link ui.form.field.Field Field} (the one which
 		 * affects all form field components uniformly).  Defaults to an empty string.<br><br>
@@ -29,6 +30,7 @@ define( [
 		
 		/**
 		 * @cfg {String/Function} value
+		 * 
 		 * The initial value for the field, if any. Any truthy value will initialize the checkbox as checked.
 		 */
 		

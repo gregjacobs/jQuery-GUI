@@ -1,12 +1,12 @@
 /*global Ext, Y, tests, Class, Jux, ui */
-ui.utils.OptionsStoreTest = Class.extend( Ext.test.Case, {
+ui.util.OptionsStoreTest = Class.extend( Ext.test.Case, {
 	
 	setUp : function() {
 		// Quick reference to Jux.areEqual() method from Jux library
 		this.equals = Jux.areEqual;
 		
-		// Make a subclass of ui.utils.OptionsStore to extend setOptions()
-		this.TestOptionsStore = Jux.extend( ui.utils.OptionsStore, {
+		// Make a subclass of ui.util.OptionsStore to extend setOptions()
+		this.TestOptionsStore = Jux.extend( ui.util.OptionsStore, {
 			setOptionsCalled : false,
 			setOptionsCalledWithValue: null,
 			 
@@ -15,7 +15,7 @@ ui.utils.OptionsStoreTest = Class.extend( Ext.test.Case, {
 				this.setOptionsCalled = true; // set flag for test
 				this.setOptionsCalledWithValue = options;
 				
-				return ui.utils.OptionsStore.prototype.setOptions.apply( this, arguments );
+				return ui.util.OptionsStore.prototype.setOptions.apply( this, arguments );
 			}
 		} );
 	}
@@ -32,7 +32,7 @@ tests.unit.ui.utils.add( new Ext.test.Suite( {
 		/*
 		 * Test constructor
 		 */
-		new ui.utils.OptionsStoreTest( {
+		new ui.util.OptionsStoreTest( {
 			name : "Test constructor",
 	
 	
@@ -61,13 +61,13 @@ tests.unit.ui.utils.add( new Ext.test.Suite( {
 		/*
 		 * Test setOptions()
 		 */
-		new ui.utils.OptionsStoreTest( {
+		new ui.util.OptionsStoreTest( {
 			name : "Test setOptions()",
 			
 			
 			"Providing the OptionsStore an array of strings should normalize to an array of text/value objects with matching text and value properties" : function() {
 				var options = [ "text1", "text2" ];
-				var optionsStore = new ui.utils.OptionsStore();
+				var optionsStore = new ui.util.OptionsStore();
 				
 				optionsStore.setOptions( options );
 				
@@ -78,7 +78,7 @@ tests.unit.ui.utils.add( new Ext.test.Suite( {
 			
 			"Providing the OptionsStore an array of text/value objects should be stored exactly as such" : function() {
 				var options = [ { text: "text1", value: "text1" }, { text: "text2", value: "text2" } ];
-				var optionsStore = new ui.utils.OptionsStore();
+				var optionsStore = new ui.util.OptionsStore();
 				
 				optionsStore.setOptions( options );
 				
@@ -88,7 +88,7 @@ tests.unit.ui.utils.add( new Ext.test.Suite( {
 			
 			"Providing the OptionsStore a mix of an array of strings and text/value objects should be normalized to text/value objects" : function() {
 				var options = [ "text1", { text: "text2", value: "text2" }, "text3" ];
-				var optionsStore = new ui.utils.OptionsStore();
+				var optionsStore = new ui.util.OptionsStore();
 				
 				optionsStore.setOptions( options );
 				
@@ -99,7 +99,7 @@ tests.unit.ui.utils.add( new Ext.test.Suite( {
 			
 			"Providing the OptionsStore an array of text/value objects along with some extra properties should keep the extra properties" : function() {
 				var options = [ { text: "text1", value: "text1", extraProp: "prop" }, { text: "text2", value: "text2", extraProp1: "prop1", extraProp2: "prop2" } ];
-				var optionsStore = new ui.utils.OptionsStore();
+				var optionsStore = new ui.util.OptionsStore();
 				
 				optionsStore.setOptions( options );
 				
@@ -111,13 +111,13 @@ tests.unit.ui.utils.add( new Ext.test.Suite( {
 		/*
 		 * Test getAtIndex()
 		 */
-		new ui.utils.OptionsStoreTest( {
+		new ui.util.OptionsStoreTest( {
 			name : "Test getAtIndex()",
 			
 	
 			"getAtIndex() should return a valid options object for in-range values" : function() {
 				var options = [ { text: "text1", value: "text1" }, { text: "text2", value: "text2" } ];
-				var optionsStore = new ui.utils.OptionsStore( options );
+				var optionsStore = new ui.util.OptionsStore( options );
 				
 				Y.Assert.isTrue( this.equals( { text: "text1", value: "text1" }, optionsStore.getAtIndex( 0 ) ), "The options object returned from index 0 is not correct" );
 				Y.Assert.isTrue( this.equals( { text: "text2", value: "text2" }, optionsStore.getAtIndex( 1 ) ), "The options object returned from index 1 is not correct" );
@@ -126,7 +126,7 @@ tests.unit.ui.utils.add( new Ext.test.Suite( {
 			
 			"getAtIndex() should return null for out-of-range values" : function() {
 				var options = [ { text: "text1", value: "text1" }, { text: "text2", value: "text2" } ];
-				var optionsStore = new ui.utils.OptionsStore( options );
+				var optionsStore = new ui.util.OptionsStore( options );
 				
 				Y.Assert.isNull( optionsStore.getAtIndex( -1 ), "getAtIndex() should have returned null for a negative index" );
 				Y.Assert.isNull( optionsStore.getAtIndex( 2 ), "getAtIndex() should have returned null for an index too high" );
@@ -138,13 +138,13 @@ tests.unit.ui.utils.add( new Ext.test.Suite( {
 		/*
 		 * Test getByValue()
 		 */
-		new ui.utils.OptionsStoreTest( {
+		new ui.util.OptionsStoreTest( {
 			name : "Test getByValue()",
 			
 	
 			"getByValue() should return a valid options object for values that exist" : function() {
 				var options = [ { text: "text1", value: "value1" }, { text: "text2", value: "value2" } ];
-				var optionsStore = new ui.utils.OptionsStore( options );
+				var optionsStore = new ui.util.OptionsStore( options );
 				
 				Y.Assert.isTrue( this.equals( { text: "text1", value: "value1" }, optionsStore.getByValue( "value1" ) ), "The options object returned by value 'value1' is not correct" );
 				Y.Assert.isTrue( this.equals( { text: "text2", value: "value2" }, optionsStore.getByValue( "value2" ) ), "The options object returned by value 'value2' is not correct" );
@@ -153,7 +153,7 @@ tests.unit.ui.utils.add( new Ext.test.Suite( {
 			
 			"getByValue() should return null when searching for a value that doesn't exist in the options" : function() {
 				var options = [ { text: "text1", value: "value1" }, { text: "text2", value: "value2" } ];
-				var optionsStore = new ui.utils.OptionsStore( options );
+				var optionsStore = new ui.util.OptionsStore( options );
 				
 				Y.Assert.isNull( optionsStore.getByValue( "non-existent" ), "getByValue() should have returned null for a non-existent value" );
 			}
@@ -164,13 +164,13 @@ tests.unit.ui.utils.add( new Ext.test.Suite( {
 		/*
 		 * Test getByText()
 		 */
-		new ui.utils.OptionsStoreTest( {
+		new ui.util.OptionsStoreTest( {
 			name : "Test getByText()",
 			
 			
 			"getByText() should return a valid options object for a text that exists in the options" : function() {
 				var options = [ { text: "text1", value: "value1" }, { text: "text2", value: "value2" } ];
-				var optionsStore = new ui.utils.OptionsStore( options );
+				var optionsStore = new ui.util.OptionsStore( options );
 				
 				Y.Assert.isTrue( this.equals( { text: "text1", value: "value1" }, optionsStore.getByText( "text1" ) ), "The options object returned by text 'Text1' is not correct" );
 				Y.Assert.isTrue( this.equals( { text: "text2", value: "value2" }, optionsStore.getByText( "text2" ) ), "The options object returned by text 'Text2' is not correct" );
@@ -179,7 +179,7 @@ tests.unit.ui.utils.add( new Ext.test.Suite( {
 			
 			"getByText() should return null when searching for a text that doesn't exist in the options" : function() {
 				var options = [ { text: "text1", value: "value1" }, { text: "text2", value: "value2" } ];
-				var optionsStore = new ui.utils.OptionsStore( options );
+				var optionsStore = new ui.util.OptionsStore( options );
 				
 				Y.Assert.isNull( optionsStore.getByText( "non-existent" ), "getByText() should have returned null for a non-existent text option" );
 			}
