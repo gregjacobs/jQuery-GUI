@@ -42,6 +42,8 @@ define( [
 				expect( field.hasCls( field.baseCls + '-noLabel' ) ).toBe( true );
 				expect( field.hasCls( field.baseCls + '-leftLabel' ) ).toBe( false );  // make sure it doesn't have this CSS class
 				expect( field.hasCls( field.baseCls + '-topLabel' ) ).toBe( false );   // make sure it doesn't have this CSS class
+				
+				field.destroy();  // clean up
 			} );
 			
 			
@@ -55,6 +57,8 @@ define( [
 				expect( field.hasCls( field.baseCls + '-noLabel' ) ).toBe( false );   // make sure it doesn't have the "noLabel" CSS class
 				expect( field.hasCls( field.baseCls + '-leftLabel' ) ).toBe( true );
 				expect( field.hasCls( field.baseCls + '-topLabel' ) ).toBe( false );  // make sure it doesn't have this CSS class
+				
+				field.destroy();  // clean up
 			} );
 			
 			
@@ -68,6 +72,8 @@ define( [
 				expect( field.hasCls( field.baseCls + '-noLabel' ) ).toBe( false );   // make sure it doesn't have the "noLabel" CSS class
 				expect( field.hasCls( field.baseCls + '-leftLabel' ) ).toBe( false );  // make sure it doesn't have this CSS class
 				expect( field.hasCls( field.baseCls + '-topLabel' ) ).toBe( true );
+				
+				field.destroy();  // clean up
 			} );
 			
 			
@@ -93,6 +99,8 @@ define( [
 				var field = new ConcreteField( { renderTo: 'body' } );
 				
 				expect( field.focus() ).toBe( field );
+				
+				field.destroy();  // clean up
 			} );
 			
 		} );
@@ -105,6 +113,8 @@ define( [
 				var field = new ConcreteField( { renderTo: 'body' } );
 				
 				expect( field.blur() ).toBe( field );
+				
+				field.destroy();  // clean up
 			} );
 			
 		} );

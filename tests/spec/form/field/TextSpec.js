@@ -278,6 +278,8 @@ define( [
 				var textField = new TextField( { renderTo: 'body' } );
 				
 				expect( textField.focus() ).toBe( textField );
+					
+				textField.destroy();  // clean up
 			} );
 			
 		} );
@@ -290,6 +292,8 @@ define( [
 				var textField = new TextField( { renderTo: 'body' } );
 				
 				expect( textField.blur() ).toBe( textField );
+					
+				textField.destroy();  // clean up
 			} );
 			
 		} );
