@@ -91,6 +91,21 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		baseCls : 'ui-Component',
 		
 		/**
+		 * @protected
+		 * @cfg {String} componentCls
+		 * 
+		 * Any additional CSS class(es) to apply to the Component's root {@link #$el element}, to distinguish it for styling.
+		 * This is used for subclasses whose parent defines a {@link #baseCls}, but then have to add additional styling
+		 * themselves. 
+		 * 
+		 * For example, the base form {@link ui.form.field.Field Field} class adds the {@link #baseCls} 'ui-form-Field', and
+		 * the {@link ui.form.field.Text Text} field subclass wants to keep that class, and also add 'ui-form-TextField'
+		 * to allow for any different styling of that particular subclass component. The result is two css classes:
+		 * 'ui-form-Field' and 'ui-form-TextField'. In the case of {@link ui.form.field.TextArea TextArea} (a subclass
+		 * of the Text field}, its componentCls is 'ui-form-TextAreaField', which overrides Text field's componentCls.
+		 */
+		
+		/**
 		 * @cfg {String} cls
 		 * 
 		 * Any additional CSS class(es) to add to this component's element. If multiple, they should be separated by a space. 
@@ -186,6 +201,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 *   classes with. Ex: a {@link #baseCls} of 'ui-Panel' is used to prefix a {@link ui.panel.Panel Panel's} body
 		 *   element to become 'ui-Panel-body', but when a {@link ui.window.Window Window} is created, the value is
 		 *   'ui-Window', and the body becomes 'ui-Window-body' instead. 
+		 * - **componentCls**: The {@link #componentCls} config.
 		 */
 		
 		
@@ -735,8 +751,9 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				// Create the main (outermost) element for the Component. By default, creates a div element, such as: <div id="someId"></div>
 				// With a `renderTpl`, it will create the div with its `renderTpl` result as its inner HTML. Ex:
 				// <div id="someId"><div id="bodyEl" /></div>
+				var cls = _.compact( [ this.baseCls, this.componentCls, this.cls ] ).join( " " );  // _.compact() removes falsy values. In this case, undefined values.
 				var elMarkup = [
-					'<', this.elType, ' id="', this.elId, '" class="', this.baseCls, ' ', this.cls, '" style="', style, '" ', attr, '>',
+					'<', this.elType, ' id="', this.elId, '" class="', cls, '" style="', style, '" ', attr, '>',
 						renderTplMarkup,
 					'</', this.elType, '>'
 				].join( "" );
@@ -868,8 +885,9 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 */
 		getRenderTplData : function() {
 			return _.assign( {}, {
-				elId    : this.elId,
-				baseCls : this.baseCls
+				elId         : this.elId,
+				baseCls      : this.baseCls,
+				componentCls : this.componentCls
 			}, this.renderTplData || {} );
 		},
 		
