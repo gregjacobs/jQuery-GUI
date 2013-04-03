@@ -1,9 +1,10 @@
 /*global define */
 define( [
+	'jquery',
 	'ui/Component',
 	'ui/Container',
 	'ui/layout/Layout'
-], function( Component, Container, Layout ) {
+], function( jQuery, Component, Container, Layout ) {
 
 	/**
 	 * @class ui.layout.HBox
@@ -16,13 +17,6 @@ define( [
 	 * the component's width instead.
 	 */
 	var HBoxLayout = Layout.extend( {
-		
-		
-		
-		// NOTE: This layout may not work correctly yet (totally untested). Try it out and fix if need be though ;-)
-		
-		
-		
 		
 		/**
 		 * @cfg {Number} flex
@@ -63,13 +57,19 @@ define( [
 		 *     ]
 		 */
 		
+		/**
+		 * @protected
+		 * @property {jQuery} $clearEl
+		 * 
+		 * The element used to clear the floats created by the layout routine.
+		 */
+		
 		
 		/**
 		 * Hook method for subclasses to override to implement their layout strategy. Implements the HBoxLayout algorithm.
 		 * 
 		 * @protected
 		 * @template
-		 * @method onLayout
 		 * @param {ui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
@@ -77,6 +77,7 @@ define( [
 			this._super( arguments );
 			
 			
+			//debugger;
 			var flexedComponents = [],
 			    totalFlex = 0,
 			    totalUnflexedWidth = 0,
@@ -86,6 +87,7 @@ define( [
 			// While we're at it, we'll add up the total flex that components which *do* have a flex value have.
 			for( i = 0; i < numChildComponents; i++ ) {
 				childComponent = childComponents[ i ];
+				childComponent.setStyle( 'float', 'left' );  // need to float left so the elements don't take up full width
 				
 				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
 				this.renderComponent( childComponent, $targetEl, { position: i } );
@@ -102,29 +104,46 @@ define( [
 			}
 			
 			// Now go through and size the other child components based on their flex values and the remaining space.
-			// For this implementation, 
 			if( totalFlex > 0 ) {
 				var targetWidth = $targetEl.width(),
 				    targetHeight = $targetEl.height(),
-				    remainingTargetWidthPercent = ( targetWidth - totalUnflexedWidth ) / 100,
-				    trimmedPercentagePoints = 0;  // Stores the decimal values resulting in the division of the remainingTargetWidthPercent divided by the flex value. 
-				                                  // The percentage points that are trimmed off of each of the child components is added to the last item to fill the extra space.
+				    remainingTargetWidth = targetWidth - totalUnflexedWidth,
+				    trimmedPixels = 0;  // Stores the decimal values resulting in the division of the remainingTargetWidth divided by the flex value. 
+				                        // The pixels that are trimmed off of each of the child components is added to the last item to fill the extra space.
 				
 				for( i = 0, len = flexedComponents.length; i < len; i++ ) {
 					childComponent = flexedComponents[ i ];
 					
 					// Now size the flexed component based on the flex value
-					var newChildWidth = ( childComponent.flex / totalFlex ) * remainingTargetWidthPercent;
-					trimmedPercentagePoints += newChildWidth % 1;   // take the decimal value from the child width. Ex: 3.25 % 1 == 0.25  (We'll use this later).
-					newChildWidth = Math.floor( newChildWidth );    // and do the actual trimming off of the decimal for the new child width
+					var newChildWidth = ( childComponent.flex / totalFlex ) * remainingTargetWidth;
+					trimmedPixels += newChildWidth % 1;            // take the decimal value from the child height. Ex: 3.25 % 1 == 0.25  (We'll use this later).
+					newChildWidth = Math.floor( newChildWidth );  // and do the actual trimming off of the decimal for the new child height
 					
-					// If sizing the last component, add in (the smallest whole number of) the decimal value percentage points that were trimmed from previous components
+					// If sizing the last component, add in (the smallest whole number of) the decimal value pixels that were trimmed from previous components
 					if( i === len - 1 ) {
-						newChildWidth += Math.floor( trimmedPercentagePoints );
+						newChildWidth += Math.floor( trimmedPixels );
 					}
-					this.sizeComponent( childComponent, newChildWidth + '%', targetHeight );
+					
+					this.sizeComponent( childComponent, newChildWidth, undefined );
 				}
 			}
+			
+			if( !this.$clearEl ) {
+				this.$clearEl = jQuery( '<div style="clear: both;" />' );
+			}
+			$targetEl.append( this.$clearEl );
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onDestroy : function() {
+			if( this.$clearEl ) {
+				this.$clearEl.remove();
+			}
+			
+			this._super( arguments );
 		}
 		
 	} );

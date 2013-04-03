@@ -137,7 +137,6 @@ define( [
 		/**
 		 * Sets the {@link ui.Container} instance that this Layout belongs to.
 		 * 
-		 * @method setContainer
 		 * @param {ui.Container} container
 		 */
 		setContainer : function( container ) {
@@ -149,7 +148,6 @@ define( [
 		/**
 		 * Gets the {@link ui.Container} instance that this Layout belongs to.
 		 * 
-		 * @method getContainer
 		 * @return {ui.Container} The container
 		 */
 		getContainer : function() {
@@ -176,8 +174,6 @@ define( [
 		/**
 		 * Performs the layout strategy. Calls the {@link #onLayout} hook method for subclasses to perform the 
 		 * necessary layout processing.
-		 * 
-		 * @method doLayout
 		 */
 		doLayout : function() {
 			// Simply return out if the layout has already been destroyed
@@ -256,7 +252,6 @@ define( [
 		 * ({@link #doLayout}/{@link #onLayout}). This is so that we know that we don't have to lay out components
 		 * that have already been manually laid out.
 		 * 
-		 * @method markLayoutComplete
 		 * @param {ui.Component} component The Component that a layout was performed on.
 		 */
 		markLayoutComplete : function( component ) {
@@ -290,7 +285,6 @@ define( [
 		 * the TextArea will lose focus, and the user would have to click into it again to continue editing.
 		 * 
 		 * @protected
-		 * @method renderComponent
 		 * @param {ui.Component} component The component to render.
 		 * @param {jQuery} $targetEl The target element to render the `component` into.
 		 * @param {Object} [options] Any additional options to provide to the `options` argument of the 
@@ -331,7 +325,6 @@ define( [
 		 * it can access the margin/padding/border widths on the `component`.
 		 * 
 		 * @protected
-		 * @method sizeComponent
 		 * @param {ui.Component} component The {@link ui.Component component} to size.
 		 * @param {Number} targetWidth The width the component should be sized to. If the width should not be changed, this argument
 		 *   may be passed as `undefined`.
@@ -361,8 +354,6 @@ define( [
 		/**
 		 * Destroys the layout by cleaning up its event listeners. Subclasses should extend the onDestroy method to implement 
 		 * any destruction process they specifically need.
-		 * 
-		 * @method destroy
 		 */
 		destroy : function() {
 			if( !this.destroyed ) {

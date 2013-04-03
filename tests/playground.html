@@ -39,55 +39,14 @@
 			'ui/Overlay',
 			'ui/Button',
 			'ui/window/Window',
-			'ui/form/field/Text'
-		], function( $, Panel, Overlay, Button, Window, TextField ) {
+			
+			// Dependencies used by type name
+			'ui/form/field/Text',
+			'ui/layout/HBox',
+			'ui/layout/VBox'
+		], function( $, Panel, Overlay, Button, Window ) {
 			$( document ).ready( function() {
 				$( 'body' ).html( "Hello, Playground!" );
-				
-				var panel = new Panel( {
-					renderTo : 'body',
-					
-					style : { margin: '10px' },
-					title: "Hello!",
-					html: "Ohai!<br>This is some HTML content"
-				} );
-				
-				var panel = new Panel( {
-					renderTo : 'body',
-					
-					style : { margin: '10px' },
-					html: "Ohai!<br>This is some HTML content",
-					
-					toolButtons : [ {
-						ttype : 'close',
-						text : 'x'
-					} ]
-				} );
-				
-				var button = new Button( {
-					renderTo : 'body',
-					
-					text : "HI!",
-					tooltip : "O hai hover!"
-				} );
-				
-				
-				/*var overlay = new Overlay( {
-					html : "HI!",
-					x : 'center',
-					y: 'center',
-					width : 300,
-					height : 200,
-					title: "Test Title",
-					
-					items : [
-						{
-							type: 'textfield',
-							value: "OHAI"
-						}
-					]
-				} );
-				overlay.show();*/
 				
 				var window = new Window( {
 					html : "HI!",
@@ -97,8 +56,35 @@
 					
 					items : [
 						{
-							type: 'textfield',
-							value: "OHAI"
+							type : 'container',
+							layout : 'hbox',
+							items : [
+								{
+									flex : 1,
+									type: 'textfield',
+									value: "OHAI",
+									style: { border: '1px solid red' }
+								},
+								{
+									type: 'component',
+									html : "Test"
+								}
+							]
+						},{
+							type : 'container',
+							layout : 'hbox',
+							items : [
+								{
+									flex : 1,
+									type: 'component',
+									html : "Test"
+								},{
+									flex : 2,
+									type: 'textfield',
+									value: "OHAI",
+									style: { border: '1px solid red' }
+								},
+							]
 						}
 					]
 				} );

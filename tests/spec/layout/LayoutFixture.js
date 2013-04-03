@@ -1,11 +1,12 @@
 /*global define, JsMockito */
 define( [
 	'jquery',
+	'lodash',
 	'Class',
 	'ui/Component',
 	'ui/Container',
 	'ui/layout/Layout'
-], function( jQuery, Class, Component, Container, Layout ) {
+], function( jQuery, _, Class, Component, Container, Layout ) {
 	
 	/**
 	 * @class spec.layout.LayoutFixture
@@ -21,7 +22,22 @@ define( [
 	 * method.
 	 */
 	var LayoutFixture = Class.extend( Object, {
+		
+		/**
+		 * @cfg {Number} targetWidth
+		 * 
+		 * The {@link #$targetEl target element's} reported width.
+		 */
+		targetWidth : 100,
+		
+		/**
+		 * @cfg {Number} targetHeight
+		 * 
+		 * The {@link #$targetEl target element's} reported height.
+		 */
+		targetHeight : 200,
 	
+		
 		/**
 		 * @protected
 		 * @property {jQuery} $targetEl
@@ -45,27 +61,13 @@ define( [
 		 * mock {@link #container}.
 		 */
 		
-		/**
-		 * @protected
-		 * @property {Number} targetWidth
-		 * 
-		 * The {@link #$targetEl target element's} reported width.
-		 */
-		targetWidth : 100,
-		
-		/**
-		 * @protected
-		 * @property {Number} targetHeight
-		 * 
-		 * The {@link #$targetEl target element's} reported height.
-		 */
-		targetHeight : 200,
-		
 		
 		/**
 		 * @constructor
 		 */
-		constructor : function() {
+		constructor : function( cfg ) {
+			_.assign( this, cfg );
+			
 			// A mock Content target element
 			this.$targetEl = jQuery( '<div style="width: ' + this.targetWidth + 'px; height: ' + this.targetHeight + 'px;" />' );
 			
