@@ -7,7 +7,23 @@ define( [
 	
 	describe( 'ui.form.field.TextArea', function() {
 		
-		describe( "Test destroy()", function() {
+		describe( "rendering", function() {
+			
+			it( "should work correctly with a height configured on the component", function() {
+				var textAreaField = new TextAreaField( {
+					renderTo : 'body',
+					height   : 150
+				} );
+				
+				// test should simply not error (for now)
+				
+				textAreaField.destroy();
+			} );
+			
+		} );
+		
+		
+		describe( 'destroy()', function() {
 			
 			it( "destroy() should remove the $autoGrowTwinDiv element", function() {
 				var textAreaField = new TextAreaField( {

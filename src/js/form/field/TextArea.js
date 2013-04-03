@@ -2,9 +2,10 @@
 define( [
 	'jquery',
 	'lodash',
+	'ui/util/Css',
 	'ui/ComponentManager',
 	'ui/form/field/Text'
-], function( jQuery, _, ComponentManager, TextField ) {
+], function( jQuery, _, Css, ComponentManager, TextField ) {
 	
 	/**
 	 * @class ui.form.field.TextArea
@@ -83,10 +84,9 @@ define( [
 					inputElHeight -= this.$labelEl.outerHeight( /* includeMargin */ true );
 				}
 				
-				// Minus off the top/bottom margin/padding of the $inputContainerWrapEl, the $inputContainerEl, and the $inputEl itself
-				inputElHeight -= this.getTopBottomMarginPaddingHeight( this.$inputContainerWrapEl );
-				inputElHeight -= this.getTopBottomMarginPaddingHeight( this.$inputContainerEl );
-				inputElHeight -= this.getTopBottomMarginPaddingHeight( this.$inputEl );
+				// Minus off the top/bottom margin/padding of the $inputContainerEl and the $inputEl itself
+				inputElHeight -= Css.getMargin( this.$inputContainerEl, 'tb' ) + Css.getPadding( this.$inputContainerEl, 'tb' );
+				inputElHeight -= Css.getMargin( this.$inputEl, 'tb' ) + Css.getPadding( this.$inputEl, 'tb' );
 				
 				// And finally, minus off the height of the "extraMsg" element (if there is actually 'extraMsg' text)
 				if( this.extraMsg ) {
@@ -170,26 +170,6 @@ define( [
 		 */
 		createInputEl : function() {
 			return jQuery( '<textarea id="' + this.inputId + '" name="' + this.inputName + '">' + ( this.value || "" ) + '</textarea>' );  
-		},
-		
-		
-		// ----------------------------------------
-		
-		// Utility Methods
-		
-		/**
-		 * Utility method used to support a {@link #height} being passed for the Component. Returns the total 
-		 * number of pixels taken up by the top and bottom margin + the top and bottom padding of a given element.
-		 * 
-		 * @private
-		 * @param {jQuery} $targetEl The element to get the top/bottom margin/padding.
-		 * @return {Number} The number of pixels taken up by the top/bottom margin/padding.
-		 */
-		getTopBottomMarginPaddingHeight : function( $targetEl ) {
-			return parseInt( $targetEl.css( 'margin-top' ), 10 ) + 
-			       parseInt( $targetEl.css( 'padding-top' ), 10 ) + 
-			       parseInt( $targetEl.css( 'padding-bottom' ), 10 ) + 
-			       parseInt( $targetEl.css( 'margin-bottom' ), 10 );
 		},
 		
 		

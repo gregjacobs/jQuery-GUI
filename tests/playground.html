@@ -42,6 +42,7 @@
 			
 			// Dependencies used by type name
 			'ui/form/field/Text',
+			'ui/form/field/TextArea',
 			'ui/layout/HBox',
 			'ui/layout/VBox'
 		], function( $, Panel, Overlay, Button, Window ) {
@@ -51,7 +52,6 @@
 				var window = new Window( {
 					html : "HI!",
 					width : 300,
-					height : 200,
 					title: "Test Title 2",
 					
 					items : [
@@ -87,8 +87,14 @@
 									type: 'textfield',
 									value: "OHAI",
 									style: { border: '1px solid red' }
-								},
+								}
 							]
+						},
+						{
+							type : 'textareafield',
+							label: "HI!",
+							labelAlign: 'left',
+							height : 200
 						}
 					]
 				} );

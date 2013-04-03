@@ -1004,7 +1004,7 @@ button.ui-Button::-moz-focus-inner {
 .ui-form-Field {
   margin: 0;
   padding: 0;
-  table-layout: fixed;
+  width: 100%;
   border-collapse: collapse;
   /* A "reset" for text and select elements */
 }
@@ -1030,6 +1030,16 @@ button.ui-Button::-moz-focus-inner {
 .ui-form-Field textarea:focus {
   outline: 0;
   /* Override some user agent style sheets, like Chrome which has a 5px outline */
+}
+
+/* line 32, ../../../src/sass/base/form/field/_Field.scss */
+.ui-form-Field-leftLabelCell {
+  vertical-align: top;
+}
+
+/* line 36, ../../../src/sass/base/form/field/_Field.scss */
+.ui-form-Field-inputCell {
+  vertical-align: top;
 }
 
 /* This is for the custom implementation of dropdowns, which don't use the html <select> element 

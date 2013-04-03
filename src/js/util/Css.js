@@ -101,7 +101,6 @@ function( jQuery, _, UI ) {
 		 * 'l' (for "top", "right", "bottom", or "left"), *or* it can be a combination of more than one to add the padding widths
 		 * together. Ex: 'rl' would add the right and left padding together and return that number.
 		 * 
-		 * @method getPadding
 		 * @param {String/HTMLElement/jQuery} element The element to calculate padding for. Can be a selector string, actual HTML element, 
 		 *   or jQuery wrapped set. In the case of a jQuery wrapped set, only the first element will be considered for the calculation. 
 		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
@@ -118,7 +117,6 @@ function( jQuery, _, UI ) {
 		 * 'l' (for "top", "right", "bottom", or "left"), *or* it can be a combination of more than one to add the margin widths
 		 * together. Ex: 'rl' would add the right and left margin together and return that number.
 		 * 
-		 * @method getMargin
 		 * @param {String/HTMLElement/jQuery} element The element to calculate margin for. Can be a selector string, actual HTML element, 
 		 *   or jQuery wrapped set. In the case of a jQuery wrapped set, only the first element will be considered for the calculation. 
 		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
@@ -135,7 +133,6 @@ function( jQuery, _, UI ) {
 		 * 'l' (for "top", "right", "bottom", or "left"), *or* it can be a combination of more than one to add the border widths
 		 * together. Ex: 'rl' would add the right and left border together and return that number.
 		 * 
-		 * @method getBorderWidth
 		 * @param {String/HTMLElement/jQuery} element The element to calculate border for. Can be a selector string, actual HTML element, 
 		 *   or jQuery wrapped set. In the case of a jQuery wrapped set, only the first element will be considered for the calculation. 
 		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
@@ -153,7 +150,6 @@ function( jQuery, _, UI ) {
 		 * can be either 't', 'r', 'b', or 'l' (for "top", "right", "bottom", or "left"), *or* it can be a combination of more than one to add the 
 		 * padding/border/margin widths together. Ex: 'rl' would add the right and left padding together and return that number.
 		 * 
-		 * @method getFrameSize
 		 * @param {String/HTMLElement/jQuery} element The element to calculate border for. Can be a selector string, actual HTML element, 
 		 *   or jQuery wrapped set. In the case of a jQuery wrapped set, only the first element will be considered for the calculation. 
 		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
@@ -169,7 +165,6 @@ function( jQuery, _, UI ) {
 		 * Private helper method to sum up the `sides` for a given `element` and `propertyName`.
 		 * 
 		 * @private
-		 * @method sumSides
 		 * @param {String/HTMLElement/jQuery} element The element to read the CSS properties from (a combination of `propertyName`, and the sides. 
 		 *   ex: 'padding-left')
 		 * @param {String} propertyName The property name to read sides from. Ex: 'padding', 'margin', or 'border-width'. This will be combined with
