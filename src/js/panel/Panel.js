@@ -1,12 +1,14 @@
 /*global define */
 define( [
 	'jquery',
+	'lodash',
+	'ui/util/Css',
 	'ui/ComponentManager',
 	'ui/Container',
 	'ui/Label',
 	'ui/template/LoDash',
 	'ui/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
-], function( jQuery, ComponentManager, Container, Label, LoDashTpl ) {
+], function( jQuery, _, Css, ComponentManager, Container, Label, LoDashTpl ) {
 
 	/**
 	 * @class ui.panel.Panel
@@ -16,6 +18,18 @@ define( [
 	 * {@link #toolButtons}.
 	 */
 	var Panel = Container.extend( {
+		
+		/**
+		 * @cfg {Object} bodyStyle
+		 * 
+		 * Any additional CSS style(s) to apply to the Panel's {@link #$bodyEl body} element. Should be an object where the 
+		 * keys are the CSS property names, and the values are the CSS values. Ex:
+		 * 
+		 *     bodyStyle : {
+		 *         'padding'    : '5px',
+		 *         'border-top' : '1px solid #000'
+		 *     }
+		 */
 		
 		/**
 		 * @cfg {String} title
@@ -42,7 +56,7 @@ define( [
 		 */
 		renderTpl : new LoDashTpl( [
 			'<div id="<%= elId %>-header" class="<%= baseCls %>-header"><div class="ui-clear" /></div>',
-			'<div id="<%= elId %>-body" class="<%= baseCls %>-body"></div>'
+			'<div id="<%= elId %>-body" class="<%= baseCls %>-body" <% if( bodyStyle ) { %>style="<%= bodyStyle %>"<% } %>></div>'
 		] ),
 		
 		
@@ -96,6 +110,18 @@ define( [
 			if( this.header ) {
 				this.header.render( this.$headerEl, /* prepend */ 0 );
 			}
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		getRenderTplData : function() {
+			var bodyStyle = Css.mapToString( this.bodyStyle || {} );
+			
+			return _.assign( this._super( arguments ), {
+				bodyStyle : bodyStyle
+			} );
 		},
 		
 		
