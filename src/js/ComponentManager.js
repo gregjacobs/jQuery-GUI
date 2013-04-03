@@ -24,7 +24,7 @@ define( [
 	   
 		/**
 		 * Registers a given class with a `type` name. This is used to map the type names specified in Bit manifests
-		 * to the class that should be instantiated.  Note that type names are case-insensitive.<br><br>
+		 * to the class that should be instantiated.  Note that type names are case-insensitive.
 		 * 
 		 * This method will throw an error if a type name is already registered, to assist in making sure that we don't get
 		 * unexpected behavior from a type name being overwritten.

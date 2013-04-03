@@ -201,7 +201,7 @@ function( jQuery, _, Class ) {
 		
 		
 		/**
-		 * Shows the mask over the target element.<br><br>
+		 * Shows the mask over the target element.
 		 * 
 		 * Note that if the mask is already shown, and its height needs to be recalculated because the underlying element's 
 		 * size has changed, this method may be called again to redraw the mask.

@@ -13,7 +13,7 @@ function( _, Class, Observable ) {
 	 * 
 	 * Abstract base class for plugins.  All plugins that are created should extend from this class.  Concrete plugin implementations
 	 * must implement the method {@link #init}, which is called by a {@link ui.Component} when it initializes the plugin. See
-	 * {@link #init} for more details.<br><br>
+	 * {@link #init} for more details.
 	 * 
 	 * See the ui.plugin package for examples on building plugins.
 	 */

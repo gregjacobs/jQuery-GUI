@@ -102,8 +102,14 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		/**
 		 * @cfg {Object} style
 		 * 
-		 * Any additional CSS style(s) to apply to the outer div element. Should be an object where the keys are the css property names, and the 
-		 * values are the CSS values.
+		 * Any additional CSS style(s) to apply to the outer div element. Should be an object where the keys are the CSS 
+		 * property names, and the values are the CSS values. Ex:
+		 * 
+		 *     style : {
+		 *         'text-decoration' : 'underline',
+		 *         'padding-top'     : '20px',
+		 *         'margin'          : '5px'
+		 *     }
 		 */
 		
 		/**
@@ -269,7 +275,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		/**
 		 * @cfg {Object} maskConfig A configuration object for the default mask that will be shown when the {@link #mask} method is called (if {@link #mask mask's}
 		 * argument is omitted), or if the {@link #cfg-masked} configuration option is true (in which a mask will be shown over the Component, using this maskConfig, 
-		 * when it is first rendered).  This default maskConfig can be overrided when calling {@link #mask} by passing a configuration object for its argument.<br><br>
+		 * when it is first rendered).  This default maskConfig can be overrided when calling {@link #mask} by passing a configuration object for its argument.
 		 * 
 		 * Masks are shown and hidden using the {@link #mask} and {@link #unMask} methods. If this configuration option is not provided, the configuration
 		 * options default to the default values of the configuration options for {@link ui.Mask}.
@@ -2007,7 +2013,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * Destroys the Component. Frees (i.e. deletes) all references that the Component held to HTMLElements or jQuery wrapped sets
 		 * (so as to prevent memory leaks) and removes them from the DOM, removes the Component's {@link #mask} if it has one, purges 
 		 * all event {@link #listeners} from the object, and removes the Component's element ({@link #$el}) from the DOM, if the Component 
-		 * is rendered.<br><br>
+		 * is rendered.
 		 *
 		 * Fires the {@link #beforedestroy} event, which a handler can return false from to cancel the destruction process,
 		 * and the {@link #event-destroy} event.
