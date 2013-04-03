@@ -2,20 +2,20 @@
 define( [
 	'jquery',
 	'lodash',
-	'Class',
 	'ui/util/Css',
 	'ui/ComponentManager',
-	'ui/form/field/WrappedInput',
+	'ui/form/field/Field',
+	'ui/template/LoDash',
 	'ui/util/OptionsStore'
-], function( jQuery, _, Class, Css, ComponentManager, WrappedInputField, OptionsStore ) {
+], function( jQuery, _, Css, ComponentManager, Field, LoDashTpl, OptionsStore ) {
 	
 	/**
 	 * @class ui.form.field.Dropdown
-	 * @extends ui.form.field.WrappedInput
+	 * @extends ui.form.field.Field
 	 * 
 	 * Dropdown list where only one item may be selected.
 	 */
-	var DropdownField = Class.extend( WrappedInputField, {
+	var DropdownField = Field.extend( {
 		
 		/**
 		 * @cfg {Array/Function} options
@@ -67,6 +67,7 @@ define( [
 	
 		
 		statics : {
+			
 			/**
 			 * @private
 			 * @static
@@ -75,15 +76,15 @@ define( [
 			 * The template to use to render the dropdown's elements. Note: The hidden input is to allow this field to be submitted
 			 * as a regular form field.
 			 */
-			dropdownRenderTpl : [
-				'<input type="hidden" name="<%= inputName %>" value="<%= initialValue %>" />',
-				'<div class="ui-dropdownField">',
-					'<div class="ui-dropdownField-selectText">',
+			dropdownRenderTpl : new LoDashTpl( [
+				'<input type="hidden" id="<%= inputId %>" name="<%= inputName %>" value="<%= initialValue %>" />',  // populated upon selection for standard form submission
+				'<div id="<%= elId %>-dropdownContainer" class="<%= baseCls %>-Dropdown-container">',
+					'<div id="<%= elId %>-selectText" class="<%= baseCls %>-Dropdown-selectText">',
 						'<div class="<%= optionClass %>" style="<%= optionStyles %>"><%= optionText %></div>',
 					'</div>',
-					'<div class="ui-dropdownField-openButton" />',
+					'<div id="<%= elId %>-openButton" class="<%= baseCls %>-Dropdown-openButton" />',
 				'</div>'
-			].join( " " ),
+			] ),
 			
 			
 			/**
@@ -93,16 +94,19 @@ define( [
 			 * 
 			 * The template to use to render the dropdown's options menu elements.
 			 */
-			optionsMenuRenderTpl : [
-				'<li>',
-					'<a href="#" class="<%= anchorClass %>" style="<%= anchorStyle %>"><%= text %></a>',
+			optionsMenuRenderTpl : new LoDashTpl( [
+				'<li data-elem="ui-form-Field-Dropdown-menu-item" class="<%= baseCls %>-Dropdown-menu-item <%= menuItemCls %>" style="<%= menuItemStyle %>">',
+					'<%= text %>',
 				'</li>'
-			].join( " " )
+			] )
+			
 		},
 		
 	
 		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		initComponent : function() {
 			this._super( arguments );
 			
@@ -124,7 +128,6 @@ define( [
 		 * processing that they may need to add.
 		 * 
 		 * @protected
-		 * @method initValue
 		 */
 		initValue : function() {
 			var optionsStore = this.optionsStore,
@@ -148,7 +151,9 @@ define( [
 		},
 		
 		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		onRender : function( container ) {
 			// Call superclass onRender() first, to render this Component's element
 			this._super( arguments );
@@ -170,12 +175,18 @@ define( [
 			*/
 			
 			
-			var $inputContainerEl = this.$inputContainerEl,
+			var elId = this.elId,
+			    inputId = this.inputId,
+			    $inputContainerEl = this.$inputContainerEl,
 			    dropdownRenderTpl = DropdownField.dropdownRenderTpl,
 			    fieldValue = this.getValue(),
 			    option = this.optionsStore.getByValue( fieldValue );
 			
-			var dropdownMarkup = _.template( dropdownRenderTpl, {
+			var dropdownMarkup = dropdownRenderTpl.apply( {
+				baseCls       : this.baseCls,
+				
+				elId          : elId,
+				inputId       : inputId,
 				inputName     : this.inputName,
 				initialValue  : fieldValue,
 				
@@ -187,10 +198,10 @@ define( [
 			$inputContainerEl.append( dropdownMarkup );
 			
 			// Assign references to created elements
-			this.$inputEl = $inputContainerEl.find( 'input[name="' + this.inputName + '"]' );
-			this.$dropdownContainer = $inputContainerEl.find( 'div.ui-dropdownField' );
-			this.$selectText = this.$dropdownContainer.find( 'div.ui-dropdownField-selectText' );
-			this.$openButton = this.$dropdownContainer.find( 'div.ui-dropdownField-openButton' );
+			this.$inputEl = jQuery( '#' + inputId );
+			this.$dropdownContainer = jQuery( '#' + elId + '-dropdownContainer' );
+			this.$selectText = jQuery( '#' + elId + '-selectText' );
+			this.$openButton = jQuery( '#' + elId + '-openButton' );
 			
 			// Apply a click handler to the dropdown's "select text" and open button, for showing the dropdownMenu
 			var onDropdownClickDelegate = _.bind( this.onDropdownClick, this );
@@ -199,7 +210,7 @@ define( [
 			
 			
 			// Create the dropdown menu, which is a <ul> element that holds the dropdown list. This is appended to the document body.
-			this.$optionsMenu = jQuery( '<ul class="ui-dropdownField-menu ' + this.menuCls + '" />' ).hide().appendTo( document.body );
+			this.$optionsMenu = jQuery( '<ul class="' + this.baseCls + '-Dropdown-menu ' + this.menuCls + '" />' ).hide().appendTo( 'body' );
 			
 			// TODO: Add IE iframe shim
 			/*if ($.browser.msie && jQuery.browser.version < 7) {
@@ -245,7 +256,6 @@ define( [
 		 * from the dropdown itself or its menu, which will close the dropdown's menu if that is the case.
 		 * 
 		 * @private
-		 * @method onDocumentClick
 		 * @param {jQuery.Event} evt
 		 */
 		onDocumentClick : function( evt ) {
@@ -274,7 +284,6 @@ define( [
 		 * Method that is run when the dropdown itself, or the "open" button, is clicked. This opens the dropdown's options menu.
 		 * 
 		 * @private
-		 * @method onDropdownClick
 		 * @param {jQuery.Event} evt
 		 */
 		onDropdownClick : function( evt ) {
@@ -285,8 +294,9 @@ define( [
 			
 			// Scroll to the currently selected option
 			var $optionsMenu = this.$optionsMenu,
-			    offSet = jQuery( 'a.selected', $optionsMenu ).offset().top - $optionsMenu.offset().top;
-			$optionsMenu.animate( { scrollTop: offSet } );
+			    itemOffsetTop = jQuery( 'li.' + this.baseCls + '-Dropdown-menu-item-selected', $optionsMenu ).offset().top,
+			    offset = itemOffsetTop - $optionsMenu.offset().top;
+			$optionsMenu.animate( { scrollTop: offset } );
 		},
 		
 		
@@ -295,7 +305,6 @@ define( [
 		 * Handles when an option is clicked in the dropdown's menu.
 		 * 
 		 * @private
-		 * @method onOptionClick
 		 * @param {jQuery.Event} evt
 		 */
 		onOptionClick : function( evt ) {
@@ -330,7 +339,6 @@ define( [
 		 * has the properties 'text' and 'value'.  See the {@link #options} config for accepted formats to the `options`
 		 * parameter. 
 		 * 
-		 * @method setOptions
 		 * @param {Array/Function} options See the {@link #options} config for the accepted formats of this parameter.
 		 */
 		setOptions : function( options ) {
@@ -345,7 +353,6 @@ define( [
 		/**
 		 * Adds an option to the DropdownField, optionally at an `index`.
 		 * 
-		 * @method addOption
 		 * @param {Object} option The option to add to the DropdownField. For the acceptable format of an option object,
 		 *   see {@link #options}.
 		 * @param {Number} [index] The index to add the option to in the list. Defaults to appending the new option.
@@ -361,7 +368,6 @@ define( [
 		/**
 		 * Removes an option from the DropdownField by its value.
 		 * 
-		 * @method removeOptionByValue
 		 * @param {Mixed} value The value of the option to remove.
 		 */
 		removeOptionByValue : function( value ) {
@@ -375,7 +381,6 @@ define( [
 		/**
 		 * Removes an option from the DropdownField by its text.
 		 * 
-		 * @method removeOptionByText
 		 * @param {Mixed} text The text of the option to remove.
 		 */
 		removeOptionByText : function( text ) {
@@ -391,7 +396,6 @@ define( [
 		 * before the field is redrawn.  Can be extended by subclasses.
 		 * 
 		 * @protected
-		 * @method onOptionsChange
 		 */
 		onOptionsChange : function() {
 			var currentValue = this.getValue(),
@@ -420,7 +424,6 @@ define( [
 		 * Note that even if the options' values are specified as numbers, they will be converted to strings
 		 * (as strings are the only allowable values for the option tag).
 		 *
-		 * @method getOptions
 		 * @return {Object[]}
 		 */
 		getOptions : function() {
@@ -433,7 +436,6 @@ define( [
 		 * Updates the displayed options in the dropdown, based on the current options set by setOptions().
 		 * 
 		 * @private
-		 * @method redrawOptions
 		 */
 		redrawOptions : function() {
 			if( this.rendered ) {
@@ -449,28 +451,38 @@ define( [
 				
 				
 				// Append the markup all at once (for performance, instead of one element at a time)
-				var optionsMarkup = "";
+				var optionsMarkup = [];
 				for( i = 0; i < numOptions; i++ ) {
 					option = options[ i ];
 					
-					optionsMarkup += _.template( optionsMenuRenderTpl, {
-						anchorClass : ( option.cls || "" ) + ( ( option.value === currentFieldValue ) ? ' selected' : '' ),
-						anchorStyle : ( option.style ) ? Css.mapToString( option.style ) : '', 
-						text : option.text  
-					} );
+					var menuItemCls = ( option.cls || "" );
+					if( option.value === currentFieldValue ) {
+						menuItemCls += ' ' + this.baseCls + '-Dropdown-menu-item-selected';
+					}
+					
+					optionsMarkup.push(
+						optionsMenuRenderTpl.apply( {
+							baseCls     : this.baseCls,
+							
+							menuItemCls   : menuItemCls,
+							menuItemStyle : ( option.style ) ? Css.mapToString( option.style ) : '', 
+							text          : option.text
+						} )
+					);
 				}
-				$optionsMenu.append( optionsMarkup );	
+				$optionsMenu.append( optionsMarkup.join( "" ) );	
 				
 				
-				// Now that the markup is appended and DOM nodes have been created, assign the values to the anchor tags using .data() (so that values of any datatype may be assigned)
-				var $anchors = $optionsMenu.find( 'a' );
+				// Now that the markup is appended and DOM nodes have been created, assign the values to the menu item
+				// elements using .data() (so that values of any datatype may be assigned)
+				var $itemEls = $optionsMenu.find( '[data-elem="ui-form-Field-Dropdown-menu-item"]' );
 				for( i = 0; i < numOptions; i++ ) {
 					// Add the "value" as data (instead of an attribute), so that any datatype can be stored for the value
-					jQuery( $anchors[ i ] ).data( 'value', options[ i ].value );
+					$itemEls.eq( i ).data( 'value', options[ i ].value );
 				}
 				
-				// Attach a click handler to each of the options
-				$optionsMenu.find( 'a' ).click( _.bind( this.onOptionClick, this ) );
+				// Attach a click handler to each of the menu items
+				$itemEls.click( _.bind( this.onOptionClick, this ) );
 			}
 		},
 		
@@ -480,8 +492,6 @@ define( [
 		
 		/**
 		 * Expands and shows the options menu.
-		 * 
-		 * @method showOptionsMenu 
 		 */
 		showOptionsMenu : function() {
 			this.optionsMenuOpen = true;
@@ -503,8 +513,6 @@ define( [
 		
 		/**
 		 * Hides the options menu.
-		 * 
-		 * @method hideOptionsMenu 
 		 */
 		hideOptionsMenu : function( anim ) {
 			this.optionsMenuOpen = false;
@@ -516,8 +524,6 @@ define( [
 		/**
 		 * Toggles the options menu. If it is currently open, it will be closed. If it is currently
 		 * closed, it will be opened.
-		 * 
-		 * @method toggleOptionsMenu
 		 */
 		toggleOptionsMenu : function() {
 			if( this.optionsMenuOpen ) {
@@ -537,7 +543,6 @@ define( [
 		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * If the provided `value` is not an option, the value of the field will remain unchanged.
 		 * 
-		 * @method setValue
 		 * @param {String} value The value of the field.
 		 */
 		setValue : function( value ) {
@@ -554,19 +559,20 @@ define( [
 					// Create a new element for the $selectText's html, which will be styled based on the option's cls and/or style properties.
 					var $div = jQuery( '<div class="' + option.cls + '" style="' + ( option.style ? Css.mapToString( option.style ) : '' ) + '">' + option.text + '</div>' );					
 					// Set the $selectText's html
-					this.$selectText.empty().append( $div );
+					this.$selectText.html( $div );
 					
 					
 					// Update the options menu
-					var $optionsMenu = this.$optionsMenu;
-					$optionsMenu.find( 'a.selected' ).removeClass( 'selected' );  // De-select any currently selected item in the dropdown menu
+					var $optionsMenu = this.$optionsMenu,
+					    selectedCls = this.baseCls + '-Dropdown-menu-item-selected';
+					$optionsMenu.find( 'li.' + selectedCls ).removeClass( selectedCls );  // De-select any currently selected item in the dropdown menu
 					
 					// Select the item with the given value
-					var $anchors = $optionsMenu.find( 'a' );
-					for( var i = 0, len = $anchors.length; i < len; i++ ) {
-						var $a = jQuery( $anchors[ i ] );
-						if( $a.data( 'value' ) === value ) {
-							$a.addClass( 'selected' );
+					var $itemEls = $optionsMenu.find( 'li[data-elem="ui-form-Field-Dropdown-menu-item"]' );
+					for( var i = 0, len = $itemEls.length; i < len; i++ ) {
+						var $item = $itemEls.eq( i );
+						if( $item.data( 'value' ) === value ) {
+							$item.addClass( selectedCls );
 							break;
 						}
 					}
@@ -582,7 +588,6 @@ define( [
 		/**
 		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
-		 * @method getValue
 		 * @return {String} The value of the option that is selected in the dropdown.
 		 */
 		getValue : function() {
@@ -597,7 +602,6 @@ define( [
 		 * Convenience method for setting the selected option in the dropdown by its text (as opposed to its value). Use {@link #setValue}
 		 * to select by option value.  If the provided `text` is not an option, the field will remain unchanged.
 		 * 
-		 * @method setText
 		 * @param {String} text The text of the option that should be selected in the dropdown.
 		 */
 		setText : function( text ) {
@@ -612,7 +616,6 @@ define( [
 		/**
 		 * Convenience method for getting the text of the dropdown's selected option. Use {@link #getValue} to retrieve the selected option's value.
 		 * 
-		 * @method getText
 		 * @return {String} The text of the selected option in the dropdown. 
 		 */
 		getText : function() {
@@ -624,7 +627,6 @@ define( [
 		/**
 		 * Returns true if the dropdown has an {@link #options option} with the given value.
 		 * 
-		 * @method hasOptionValue
 		 * @param {Mixed} value The value to check for.
 		 * @return {Boolean} True if the dropdown has an option with the provided `value`, false otherwise.
 		 */
@@ -639,7 +641,12 @@ define( [
 		},
 		
 		
-		// protected
+		// ---------------------------------------------
+		
+		
+		/**
+		 * @inheritdoc
+		 */
 		onDestroy : function() {
 			if( this.rendered ) {
 				// Remove the document click handler, which hides the dropdown menu when its not clicked

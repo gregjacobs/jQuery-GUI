@@ -2,10 +2,9 @@
 define( [
 	'jquery',
 	'lodash',
-	'Class',
 	'ui/ComponentManager',
 	'ui/form/field/Field'
-], function( jQuery, _, Class, ComponentManager, Field ) {
+], function( jQuery, _, ComponentManager, Field ) {
 	
 	/**
 	 * @class ui.form.field.Field.Checkbox
@@ -13,14 +12,14 @@ define( [
 	 *  
 	 * Checkbox field component.
 	 */
-	var CheckboxField = Class.extend( Field, {
+	var CheckboxField = Field.extend( {
 		
 		/**
 		 * @cfg {String} checkboxLabel
 		 * 
 		 * The label for the checkbox itself, which will be placed to the right of the checkbox. This config is to differentiate from
 		 * the {@link ui.form.field.Field#label label} provided by {@link ui.form.field.Field Field} (the one which
-		 * affects all form field components uniformly).  Defaults to an empty string.<br><br>
+		 * affects all form field components uniformly).  Defaults to an empty string.
 		 * 
 		 * Note that if the checkbox should be aligned with other form fields that have "left side" labels (see 
 		 * {@link ui.form.field.Field#labelAlign}, then set its {@link ui.form.field.Field#label label} config to
@@ -42,11 +41,11 @@ define( [
 			this._super( arguments );
 			
 			// Create the input element, and append it to the $inputContainerEl
-			this.$inputEl = jQuery( '<input type="checkbox" class="checkbox" id="' + this.inputId + '" name="' + this.inputName + '"' + ( this.value ? ' checked' : '' ) + ' />' )
+			this.$inputEl = jQuery( '<input type="checkbox" class="' + this.baseCls + '-Checkbox" id="' + this.inputId + '" name="' + this.inputName + '"' + ( this.value ? ' checked' : '' ) + ' />' )
 				.appendTo( this.$inputContainerEl );
 			
 			// Create the checkbox label element, which comes up on the right side of the checkbox.
-			this.$checkboxLabelEl = jQuery( '<label for="' + this.inputId + '" class="dialog-formField-label" />&nbsp;' + ( this.checkboxLabel || "" ) )
+			this.$checkboxLabelEl = jQuery( '<label for="' + this.inputId + '" class="' + this.baseCls + '-Checkbox-label" />&nbsp;' + ( this.checkboxLabel || "" ) )
 				.appendTo( this.$inputContainerEl );
 			
 			// Add event handlers to the input element
@@ -62,7 +61,6 @@ define( [
 		/**
 		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
-		 * @method getValue
 		 * @param {Boolean} value The value of the field. If truthy, the checkbox will be checked. If falsy, the checkbox will be unchecked.
 		 */
 		setValue : function( value ) {
@@ -77,7 +75,6 @@ define( [
 		/**
 		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
-		 * @method getValue
 		 * @return {Boolean} The value of the field (true if it's checked, false otherwise).
 		 */
 		getValue : function() {

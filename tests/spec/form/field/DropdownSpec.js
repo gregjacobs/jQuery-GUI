@@ -172,6 +172,28 @@ define( [
 		} );
 		
 		
+		describe( "rendering", function() {
+			
+			it( "should have references to its own child elements once rendered", function() {
+				var field = new DropdownField( {
+					renderTo : 'body',
+					options : [
+						{ text: "Option 1", value: "value1" }, 
+						{ text: "Option 2", value: "value2" }	
+					]
+				} );
+				
+				expect( field.$inputEl.length ).toBe( 1 );
+				expect( field.$dropdownContainer.length ).toBe( 1 );
+				expect( field.$selectText.length ).toBe( 1 );
+				expect( field.$openButton.length ).toBe( 1 );
+				
+				field.destroy();  // clean up
+			} );
+			
+		} );
+		
+		
 		describe( "Test setValue()", function() {
 			it( "The value should not be set with 'non-existent' value.", function() {
 				for( var testNum = 0; testNum <= 1; testNum++ ) {

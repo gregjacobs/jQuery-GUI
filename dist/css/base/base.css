@@ -929,13 +929,8 @@ button.ui-Button::-moz-focus-inner {
   padding: 0;
 }
 
-/*
-****************************************
-             Overlay
-****************************************
-*/
-/* line 6, ../../../src/sass/base/_Overlay.scss */
-.ui-Overlay {
+/* line 1, ../../../src/sass/base/_Overlay.scss */
+.ui-Overlay, .ui-Window {
   position: absolute;
   top: 0;
   left: 0;
@@ -1005,6 +1000,100 @@ button.ui-Button::-moz-focus-inner {
   position: relative !important;
 }
 
+/* line 1, ../../../src/sass/base/form/field/_Field.scss */
+.ui-form-Field {
+  /* A "reset" for text and select elements */
+}
+/* line 11, ../../../src/sass/base/form/field/_Field.scss */
+.ui-form-Field input.ui-form-Field-Text,
+.ui-form-Field select,
+.ui-form-Field textarea {
+  background: none transparent;
+  border: none;
+  width: 100%;
+  padding: 0;
+  /* Override some user agent style sheets, like Chrome which puts on 1px and can cause scroll bars to appear */
+}
+/* line 20, ../../../src/sass/base/form/field/_Field.scss */
+.ui-form-Field input.ui-form-Field-Text:focus,
+.ui-form-Field select:focus,
+.ui-form-Field textarea:focus {
+  outline: 0;
+  /* Override some user agent style sheets, like Chrome which has a 5px outline */
+}
+
+/* 
+ * Wrapper element used so that the label itself can have padding, without messing up the sizing of the 
+ * label/fieldContainer when sized by percentages
+ */
+/* line 31, ../../../src/sass/base/form/field/_Field.scss */
+.ui-form-Field-leftLabel .ui-form-Field-labelWrap {
+  display: inline-block;
+}
+
+/* line 35, ../../../src/sass/base/form/field/_Field.scss */
+.ui-form-Field-noLabel .ui-form-Field-label {
+  display: none;
+}
+
+/* line 40, ../../../src/sass/base/form/field/_Field.scss */
+.ui-form-Field-leftLabel .ui-form-Field-inputContainerWrap {
+  display: inline-block;
+}
+
+/* This is for the custom implementation of dropdowns, which don't use the html <select> element 
+============================================================================================== */
+/* line 3, ../../../src/sass/base/form/field/_Dropdown.scss */
+.ui-form-Field-Dropdown {
+  position: relative;
+  left: 0px;
+  top: 0px;
+}
+
+/* For IE, need an iframe to cover certain elements */
+/* line 10, ../../../src/sass/base/form/field/_Dropdown.scss */
+iframe.ui-form-Field-Dropdown-shim {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  left: 0px;
+  top: 0px;
+}
+
+/* The box that shows the selected option's text */
+/* line 13, ../../../src/sass/base/form/field/_Dropdown.scss */
+.ui-form-Field-Dropdown-selectText {
+  overflow-x: hidden;
+  white-space: nowrap;
+  background: none transparent;
+  cursor: pointer;
+}
+
+/* line 20, ../../../src/sass/base/form/field/_Dropdown.scss */
+.ui-form-Field-Dropdown-openButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  cursor: pointer;
+}
+
+/* line 30, ../../../src/sass/base/form/field/_Dropdown.scss */
+.ui-form-Field-Dropdown-menu {
+  position: absolute;
+  list-style: none;
+  display: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  z-index: 5000;
+}
+
+/* line 40, ../../../src/sass/base/form/field/_Dropdown.scss */
+.ui-form-Field-Dropdown-menu-item {
+  cursor: pointer;
+}
+
 /* line 7, ../../../src/sass/base/panel/_Panel.scss */
 .ui-Panel-header-toolButtons {
   float: right;
@@ -1023,7 +1112,7 @@ button.ui-Button::-moz-focus-inner {
 }
 
 /* General Styles */
-/* line 10, ../../../src/sass/base/base.scss */
+/* line 13, ../../../src/sass/base/base.scss */
 .ui-clear {
   clear: both;
 }

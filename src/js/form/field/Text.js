@@ -2,21 +2,20 @@
 define( [
 	'jquery',
 	'lodash',
-	'Class',
 	'ui/util/Html',
 	'ui/ComponentManager',
-	'ui/form/field/WrappedInput',
+	'ui/form/field/Field',
 	'ui/form/field/Text.EmptyTextBehavior',
 	'ui/form/field/Text.InfieldLabelBehavior'
-], function( jQuery, _, Class, Html, ComponentManager, WrappedInputField, EmptyTextBehavior, InfieldLabelBehavior ) {
+], function( jQuery, _, Html, ComponentManager, Field, EmptyTextBehavior, InfieldLabelBehavior ) {
 	
 	/**
 	 * @class ui.form.field.Text
-	 * @extends ui.form.field.WrappedInput
+	 * @extends ui.form.field.Field
 	 * 
 	 * Text (string) field component for the editor.
 	 */
-	var TextField = Class.extend( WrappedInputField, {
+	var TextField = Field.extend( {
 		
 		/**
 		 * @cfg {Boolean} selectOnFocus
@@ -28,7 +27,7 @@ define( [
 		 * @cfg {String} labelAlign
 		 * A string that specifies where the field's label should be placed. Valid values are: "left", "top", 
 		 * and "infield". The "infield" label position places the label inside the text field itself, which 
-		 * is then hidden when the user starts typing into the field. Defaults to 'left'.<br><br>
+		 * is then hidden when the user starts typing into the field. Defaults to 'left'.
 		 * 
 		 * Note that a labelAlign set to "infield" is not compatible with the {@link #emptyText} 
 		 * config. The provided {@link #emptyText} will not be used in this case. 
@@ -135,10 +134,10 @@ define( [
 			this._super( arguments );
 			
 			// Create the input field, and append it to the $inputContainerEl with the 'text' css class
-			this.$inputEl = this.createInputEl().appendTo( this.$inputContainerEl );
+			var $inputEl = this.$inputEl = this.createInputEl().appendTo( this.$inputContainerEl );
 			
 			// Add event handlers to the input element
-			this.$inputEl.on( {
+			$inputEl.on( {
 				change   : _.bind( function( evt ) { this.onChange( this.getValue() ); }, this ),  // Call onChange() with the new value
 				focus    : _.bind( this.onFocus, this ),
 				blur     : _.bind( this.onBlur, this ),
@@ -159,12 +158,11 @@ define( [
 		 * initial {@link #value}.
 		 * 
 		 * @protected
-		 * @method createInputEl
 		 * @return {jQuery}
 		 */
 		createInputEl : function() {
-			var value = ( this.value ) ? Html.encode( this.value ) : "";
-			return jQuery( '<input type="text" class="text" id="' + this.inputId + '" name="' + this.inputName + '" value="' + value + '" />' );  
+			var value = Html.encode( this.value || "" );
+			return jQuery( '<input type="text" class="' + this.baseCls + '-Text" id="' + this.inputId + '" name="' + this.inputName + '" value="' + value + '" />' );  
 		},
 		
 		
@@ -174,7 +172,6 @@ define( [
 		 * This is mainly an accessor for the bevhavior state objects that operate on this class. The input element will not be
 		 * available until the TextField has been rendered.
 		 * 
-		 * @method getInputEl
 		 * @return {jQuery} The input element if the component is rendered, or null if it is not.
 		 */
 		getInputEl : function() {
@@ -186,8 +183,7 @@ define( [
 		 * Normalizes the value provided to a valid TextField value. Converts undefined/null into an empty string,
 		 * and numbers/booleans/objects into their string form.
 		 * 
-		 * @private
-		 * @method normalizeValue
+		 * @protected
 		 * @param {Mixed} value
 		 * @return {String}
 		 */
@@ -207,7 +203,6 @@ define( [
 		/**
 		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
-		 * @method getValue
 		 * @param {String} value The value of the field.
 		 */
 		setValue : function( value ) {
@@ -231,7 +226,6 @@ define( [
 		/**
 		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
-		 * @method getValue
 		 * @return {String} The value of the field.
 		 */
 		getValue : function() {
@@ -248,7 +242,6 @@ define( [
 		/**
 		 * Sets the {@link #emptyText} for the Field.
 		 * 
-		 * @method setEmptyText
 		 * @param {Mixed} emptyText The empty text to set to the Field.
 		 */
 		setEmptyText : function( emptyText ) {
@@ -259,7 +252,6 @@ define( [
 		/**
 		 * Retrieves the {@link #emptyText} of the Field.
 		 * 
-		 * @method getEmptyText
 		 * @return {Mixed} The {@link #emptyText} that was specified for the Field, or set using {@link #setEmptyText}.
 		 */
 		getEmptyText : function() {
@@ -269,8 +261,6 @@ define( [
 		
 		/**
 		 * Selects the text in the TextField.
-		 * 
-		 * @method select
 		 */
 		select : function() {
 			this.$inputEl.select();
@@ -282,7 +272,6 @@ define( [
 		 * the change event.
 		 *
 		 * @protected
-		 * @method onChange
 		 */
 		onChange : function() {
 			// Allow the TextField's behaviorState to handle the change event
@@ -295,28 +284,30 @@ define( [
 		/**
 		 * Focuses the text field.
 		 * 
-		 * @method focus
+		 * @chainable
 		 */
 		focus : function() {
 			this.$inputEl.focus();
 			
-			this._super( arguments );
+			return this._super( arguments );
 		},
 		
 		
 		/**
 		 * Blurs the text field.
 		 * 
-		 * @method blur
+		 * @chainable
 		 */
 		blur : function() {
 			this.$inputEl.blur();
 			
-			this._super( arguments );
+			return this._super( arguments );
 		},
 		
 		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		onFocus : function() {
 			// Allow the TextField's behaviorState to handle the focus event
 			this.behaviorState.onFocus( this );
@@ -330,7 +321,9 @@ define( [
 		},
 		
 		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		onBlur : function() {
 			// Allow the TextField's behaviorState to handle the blur event
 			this.behaviorState.onBlur( this );
@@ -343,7 +336,6 @@ define( [
 		 * Handles a keydown event in the text field. 
 		 * 
 		 * @protected
-		 * @method onKeyDown
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyDown : function( evt ) {
@@ -358,7 +350,6 @@ define( [
 		 * Handles a keyup event in the text field. 
 		 * 
 		 * @protected
-		 * @method onKeyUp
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyUp : function( evt ) {
@@ -373,7 +364,6 @@ define( [
 		 * Handles a keypress in the text field. 
 		 * 
 		 * @protected
-		 * @method onKeyPress
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyPress : function( evt ) {

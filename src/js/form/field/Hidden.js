@@ -2,10 +2,9 @@
 define( [
 	'jquery',
 	'lodash',
-	'Class',
 	'ui/ComponentManager',
 	'ui/form/field/Field'
-], function( jQuery, _, Class, ComponentManager, Field ) {
+], function( jQuery, _, ComponentManager, Field ) {
 	
 	/**
 	 * @class ui.form.field.Hidden
@@ -13,7 +12,7 @@ define( [
 	 * 
 	 * A hidden input. This class does not have any visible display.
 	 */
-	var HiddenField = Class.extend( Field, {
+	var HiddenField = Field.extend( {
 		
 		/**
 		 * @hide
@@ -22,16 +21,22 @@ define( [
 		
 		/**
 		 * @hide
+		 * @cfg {String} extraMsg
+		 */
+		
+		/**
+		 * @hide
 		 * @cfg {Boolean} hidden
 		 */
 		
 		
-		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		initComponent : function() {
-			// Make sure there is no label and help text
+			// Make sure there is no label and extraMsg text
 			this.label = "";
-			this.help = "";
+			this.extraMsg = "";
 			
 			// Make sure the outer element (created by ui.Component) is hidden, as there should be no visible indication of the field
 			this.hidden = true;
@@ -40,7 +45,9 @@ define( [
 		},
 		
 		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		onRender : function( container ) { 
 			// Call superclass onRender() first, to render this Component's element
 			this._super( arguments );
@@ -54,7 +61,6 @@ define( [
 		/**
 		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
-		 * @method getValue
 		 * @param {String} value The value of the field.
 		 */
 		setValue : function( value ) {
@@ -69,7 +75,6 @@ define( [
 		/**
 		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
-		 * @method getValue
 		 * @return {String} The value of the field.
 		 */
 		getValue : function() {

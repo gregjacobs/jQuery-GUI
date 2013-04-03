@@ -2,11 +2,11 @@
 define( [
 	'jquery',
 	'lodash',
-	'Class',
 	'ui/ComponentManager',
 	'ui/form/field/Field',
+	'ui/template/LoDash',
 	'ui/util/OptionsStore'
-], function( jQuery, _, Class, ComponentManager, Field, OptionsStore ) {
+], function( jQuery, _, ComponentManager, Field, LoDashTpl, OptionsStore ) {
 	
 	/**
 	 * @class ui.form.field.Radio
@@ -14,22 +14,25 @@ define( [
 	 * 
 	 * Set of radio buttons (buttons where only one selection can be made at a time).
 	 */
-	var RadioField = Class.extend( Field, {
+	var RadioField = Field.extend( {
 		
 		/**
-		 * @cfg {Boolean} stacked True if the radio buttons should be stacked instead of spread out horizontally across the line. Defaults to false.
+		 * @cfg {Boolean} stacked 
+		 * 
+		 * `true` if the radio buttons should be stacked instead of spread out horizontally across the line.
 		 */
 		stacked : false,
 		
 		/**
-		 * @cfg {Array/Function} options (required) 
-		 * The options for the RadioField, which creates the radio button based on this config. This config is required.<br><br>
+		 * @cfg {Array/Function} options (required)
+		 * 
+		 * The options for the RadioField, which creates the radio button based on this config. This config is required.
 		 * 
 		 * If this is a flat array, the values will be used as both the value and text
-		 * of the ButtonSet options.  Ex: <pre><code>[ "Yes", "No" ]</code></pre>
+		 * of the ButtonSet options.  Ex: `[ "Yes", "No" ]`
 		 * 
 		 * If you want to customize the value and text separately for each option (recommended), provide an array of objects, where the object has two
-		 * properties: `text` and `value`. Ex: <pre><code>[ { "text": "Yes", "value": "yes" }, { "text": "No", "value": "no" } ]</code></pre>
+		 * properties: `text` and `value`. Ex: `[ { "text": "Yes", "value": "yes" }, { "text": "No", "value": "no" } ]`
 		 * 
 		 * If this config is specified as a function, the function will be executed, and its return will be used as the options. Its return should match one of
 		 * the array forms defined above.
@@ -37,10 +40,11 @@ define( [
 		
 		/**
 		 * @cfg {String} inputName
+		 * 
 		 * The name to give the input. This will be set as the input's "name" attribute.  This is really only useful if
 		 * the form that the component exists in is going to be submitted by a standard form submission (as opposed to just
 		 * having its values retrieved, which are handled elsewhere). Defaults to the value of the 
-		 * {@link ui.form.field.Field#inputId} config.<br><br>
+		 * {@link ui.form.field.Field#inputId} config.
 		 * 
 		 * Note that because radio fields rely on their "name" attributes being the same, this should not be set to an
 		 * empty string (or another non-unique string).  If an explicit name is not needed, let this config default to the
@@ -50,25 +54,30 @@ define( [
 		
 		/**
 		 * @private
-		 * @property radioTpl
-		 * @type String
+		 * @property {String} radioTpl
+		 * 
 		 * The HTML template to use to create the radio elements.
 		 */
-		radioTpl : [
-			'<input type="radio" id="<%= name %>-<%= num %>" name="<%= name %>" class="radio" value="<%= inputValue %>" <% if( checked ) { %>checked<% } %>>',
+		radioTpl : new LoDashTpl( [
+			'<input type="radio" id="<%= name %>-<%= num %>" name="<%= name %>" class="<%= baseCls %>-Radio" value="<%= inputValue %>" <% if( checked ) { %>checked<% } %>>',
 			'<label for="<%= name %>-<%= num %>" ><%= text %></label>'
-		].join( "" ),
+		] ),
 		
 		
-		// protected
+		
+		/**
+		 * @inheritdoc
+		 */
 		initComponent : function() {
 			// Create the OptionsStore for managing the 'options'
 			this.optionsStore = new OptionsStore( this.options );
 			
 			// Make sure that options were provided
+			// <debug>
 			if( this.optionsStore.getOptions().length === 0 ) {
 				throw new Error( "Error: The ButtonSet's 'options' was not configured." );
 			}
+			// </debug>
 			
 			if( typeof this.value === 'undefined' ) {
 				// No 'value' config provided, set the value to the value of the first option
@@ -90,42 +99,52 @@ define( [
 			
 			// Make sure there is an inputName. This is needed for the radio functionality. It should have been created by Field if it wasn't provided,
 			// but this will make sure just in case.
+			// <debug>
 			if( !this.inputName ) {
 				throw new Error( "Error: RadioField must have a valid inputName. Make sure that the inputName and inputId configs have not been set to an empty string or other falsy value." );
 			}
+			// </debug>
 		},
 		
 		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		onRender : function( container ) {
 			// Call superclass onRender() first, to render this Component's element
 			this._super( arguments );
 			
 			var options = this.optionsStore.getOptions(),
 			    radioTpl = this.radioTpl,
+			    baseCls = this.baseCls,
 				inputName = this.inputName,
 				$inputContainerEl = this.$inputContainerEl,
 				stacked = this.stacked,
-				fieldValue = this.value;
-	
-			var markup = "";
+				fieldValue = this.value,
+				markup = [];
+			
 			for( var i = 0, len = options.length; i < len; i++ ) {
 				var option = options[ i ];
 				
 				// Append the radio
-				markup += 
-					_.template( radioTpl, {
-						name: inputName,
-						num: i,
-						inputValue: option.value,
-						text: option.text,
-						checked: ( fieldValue === option.value )
-					} ) + 
-					( stacked ? '<br />' : '' );   // If the radio's are to be stacked, append a line break
+				markup.push( 
+					radioTpl.apply( {
+						baseCls    : baseCls,
+						
+						name       : inputName,
+						num        : i,
+						inputValue : option.value,
+						text       : option.text,
+						checked    : ( fieldValue === option.value )
+					} )
+				);
+				if( stacked ) {
+					markup.push( '<br />' );     // If the radio's are to be stacked, append a line break
+				}
 			}
 			
 			// Append the markup
-			$inputContainerEl.append( markup );
+			$inputContainerEl.append( markup.join( "" ) );
 			
 			// Assign event handler to the container element, taking advantage of event bubbling
 			$inputContainerEl.on( {
@@ -138,7 +157,6 @@ define( [
 		/**
 		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
-		 * @method getValue
 		 * @param {String} value The value of the field.
 		 */
 		setValue : function( value ) {
@@ -159,7 +177,6 @@ define( [
 		/**
 		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
-		 * @method getValue
 		 * @return {String} The value of the field.
 		 */
 		getValue : function() {

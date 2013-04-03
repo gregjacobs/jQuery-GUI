@@ -2,10 +2,9 @@
 define( [
 	'jquery',
 	'lodash',
-	'Class',
 	'ui/ComponentManager',
 	'ui/form/field/Text'
-], function( jQuery, _, Class, ComponentManager, TextField ) {
+], function( jQuery, _, ComponentManager, TextField ) {
 	
 	/**
 	 * @class ui.form.field.TextArea
@@ -17,7 +16,7 @@ define( [
 		
 		/**
 		 * @cfg {Boolean} autoGrow
-		 * True to auto-grow the text field as the user types into it. Defaults to false.<br><br>
+		 * True to auto-grow the text field as the user types into it. Defaults to false.
 		 * 
 		 * Note that if autoGrow is true, the textarea will be given the "resize: none" style for Chrome and Safari, so that
 		 * the resize handle is removed. The resize handle does not make sense for auto-grow textareas because the textarea size
@@ -89,9 +88,9 @@ define( [
 				inputElHeight -= this.getTopBottomMarginPaddingHeight( this.$inputContainerEl );
 				inputElHeight -= this.getTopBottomMarginPaddingHeight( this.$inputEl );
 				
-				// And finally, minus off the height of the "help" element (if there is actually 'help' text)
-				if( this.help ) {
-					inputElHeight -= this.$helpEl.outerHeight( /* includeMargin */ true );
+				// And finally, minus off the height of the "extraMsg" element (if there is actually 'extraMsg' text)
+				if( this.extraMsg ) {
+					inputElHeight -= this.$extraMsgEl.outerHeight( /* includeMargin */ true );
 				}
 				
 				this.$inputEl.css( 'height', inputElHeight + 'px' );
@@ -167,7 +166,6 @@ define( [
 		 * creates a &lt;textarea&gt; element. See {@link ui.form.field.Text#createInputEl} for more information.
 		 * 
 		 * @protected
-		 * @method createInputEl
 		 * @return {jQuery}
 		 */
 		createInputEl : function() {
@@ -184,7 +182,6 @@ define( [
 		 * number of pixels taken up by the top and bottom margin + the top and bottom padding of a given element.
 		 * 
 		 * @private
-		 * @method getTopBottomMarginPaddingHeight
 		 * @param {jQuery} $targetEl The element to get the top/bottom margin/padding.
 		 * @return {Number} The number of pixels taken up by the top/bottom margin/padding.
 		 */
@@ -205,7 +202,6 @@ define( [
 		 * Utility method for the {@link #autoGrow} functionality. Sets a given `height` and `overflow` state on the textarea.
 		 * 
 		 * @private
-		 * @method setHeightAndOverflow
 		 * @param {Number} height
 		 * @param {String} overflow
 		 */ 
@@ -224,7 +220,6 @@ define( [
 		 * Utility method for the {@link #autoGrow} functionality. Update the height of the textarea, if necessary.
 		 * 
 		 * @private
-		 * @method updateAutoGrowHeight
 		 */
 		updateAutoGrowHeight : function() {
 			if( this.rendered ) {

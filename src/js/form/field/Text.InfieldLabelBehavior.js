@@ -2,9 +2,8 @@
 define( [
 	'jquery',
 	'lodash',
-	'Class',
 	'ui/form/field/Text.Behavior'
-], function( jQuery, _, Class, TextFieldBehavior ) {
+], function( jQuery, _, TextFieldBehavior ) {
 	
 	/**
 	 * @class ui.form.field.Text.InfieldLabelBehavior
@@ -12,7 +11,7 @@ define( [
 	 * 
 	 * Handles a {@link ui.form.field.Text TextField} when it is in the "infield label" state (i.e. it is displaying a label that
 	 * is shown inside the field itself).  This is opposed to when it is using the {@link ui.form.field.Text.EmptyTextBehavior EmptyTextBehavior}, 
-	 * which is incompatible with the field having an "infield" label.<br><br>
+	 * which is incompatible with the field having an "infield" label.
 	 * 
 	 * This implementation is based off of the jquery.infield labels plugin. http://fuelyourcoding.com/scripts/infield/
 	 */
@@ -45,7 +44,6 @@ define( [
 		/**
 		 * Called when the TextField is rendered.
 		 * 
-		 * @method onRender
 		 * @param {ui.form.field.Text} textField
 		 */
 		onRender : function( textField ) {
@@ -63,7 +61,6 @@ define( [
 		/**
 		 * Called when the TextField's setValue() method is called (if the TextField is rendered)
 		 * 
-		 * @method onSetValue
 		 * @param {ui.form.field.Text} textField
 		 * @param {String} value
 		 */
@@ -77,8 +74,6 @@ define( [
 		/**
 		 * Called when the TextField has been changed.
 		 * 
-		 * @abstract
-		 * @method onChange
 		 * @param {ui.form.field.Text} textField
 		 */
 		onChange : function( textField ) {
@@ -91,7 +86,6 @@ define( [
 		/**
 		 * Called when the TextField has been focused.
 		 * 
-		 * @method onFocus
 		 * @param {ui.form.field.Text} textField
 		 */
 		onFocus : function( textField ) {
@@ -105,7 +99,6 @@ define( [
 		/**
 		 * Called when the TextField has been blurred.
 		 * 
-		 * @method onBlur
 		 * @param {ui.form.field.Text} textField
 		 */
 		onBlur : function( textField ) {
@@ -118,7 +111,6 @@ define( [
 		/**
 		 * Called when the TextField gets a keydown event.
 		 * 
-		 * @method onKeyDown
 		 * @param {ui.form.field.Text} textField
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
@@ -144,7 +136,6 @@ define( [
 		 * Animates the label element's opacity of the TextField to the provided `opacity`.
 		 * 
 		 * @private
-		 * @method setLabelOpacity
 		 * @param {jQuery} $labelEl The label element.
 		 * @param {Number} opacity
 		 */
@@ -156,7 +147,6 @@ define( [
 		
 		/**
 		 * @private
-		 * @method prepLabelForShow
 		 * @param {jQuery} $labelEl The label element.
 		 */
 		prepLabelForShow : function( $labelEl ) {
@@ -171,7 +161,6 @@ define( [
 		 * If it's not empty, 
 		 * 
 		 * @private
-		 * @method checkForEmpty
 		 * @param {ui.form.field.Text} textField
 		 */
 		checkForEmpty : function( textField ) {

@@ -1,0 +1,44 @@
+.ui-form-Field {
+	&.ui-form-Field-focused {}
+	&.ui-form-Field-leftLabel {}
+	&.ui-form-Field-topLabel {}
+	&.ui-form-Field-noLabel {}
+	
+	
+	/* A "reset" for text and select elements */
+	input.ui-form-Field-Text, 
+	select,
+	textarea {
+		background: none transparent;
+		border: none;
+		width: 100%;
+		padding: 0;   /* Override some user agent style sheets, like Chrome which puts on 1px and can cause scroll bars to appear */
+	}
+
+	input.ui-form-Field-Text:focus,
+	select:focus,
+	textarea:focus {
+		outline: 0;   /* Override some user agent style sheets, like Chrome which has a 5px outline */
+	}
+}
+
+
+/* 
+ * Wrapper element used so that the label itself can have padding, without messing up the sizing of the 
+ * label/fieldContainer when sized by percentages
+ */
+.ui-form-Field-labelWrap {
+	.ui-form-Field-leftLabel & { display: inline-block; }   // "left" side labels need to be inline-block
+} 
+
+.ui-form-Field-label {
+	.ui-form-Field-noLabel & { display: none; }  // Hide the label element entirely if there is no label to show 
+}
+
+
+.ui-form-Field-inputContainerWrap {
+	.ui-form-Field-leftLabel & { display: inline-block; }
+}
+.ui-form-Field-inputContainer {}
+
+.ui-form-Field-extraMsg {}

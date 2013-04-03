@@ -2,9 +2,8 @@
 define( [
 	'jquery',
 	'lodash',
-	'Class',
 	'ui/form/field/Text.Behavior'
-], function( jQuery, _, Class, TextFieldBehavior ) {
+], function( jQuery, _, TextFieldBehavior ) {
 	
 	/**
 	 * @class ui.form.field.Text.EmptyTextBehavior
@@ -29,7 +28,6 @@ define( [
 		 * Called when the TextField's setValue() method is called (if the TextField is rendered), which handles
 		 * the {@link ui.form.field.Text#emptyText emptyText}.
 		 * 
-		 * @method onSetValue
 		 * @param {ui.form.field.Text} textField
 		 * @param {String} value
 		 */
@@ -49,7 +47,6 @@ define( [
 		 * Called when the TextField has been focused, which removes the {@link ui.form.field.Text#emptyText emptyText} in the TextField
 		 * if that is what is currently set.
 		 * 
-		 * @method onFocus
 		 * @param {ui.form.field.Text} textField
 		 */
 		onFocus : function( textField ) {		
@@ -69,7 +66,6 @@ define( [
 		 * {@link ui.form.field.Text#restoreEmptyText restoreEmptyText} config is true on the 
 		 * {@link ui.form.field.Text TextField}.
 		 * 
-		 * @method onBlur
 		 * @param {ui.form.field.Text} textField
 		 */
 		onBlur : function( textField ) {

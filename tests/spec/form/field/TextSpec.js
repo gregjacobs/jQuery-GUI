@@ -6,7 +6,7 @@ define( [
 	'ui/form/field/Text'
 ], function( jQuery, _, TextField ) {
 	
-	describe( '.ui.form.field.Text', function() {
+	describe( 'ui.form.field.Text', function() {
 		
 		describe( "Test the 'change' Event", function() {
 			
@@ -251,22 +251,45 @@ define( [
 		
 		describe( "Test setting the 'inputName' config", function() {
 			
-			it( "The 'for' of the label and the 'name' of the field should match the 'inputName' when set", function() {
+			it( "The 'for' of the label and the 'name' of the field should match the 'inputId' when set", function() {
 				var textField = new TextField( {
 					renderTo: document.body,
-					inputName: 'foo'
+					inputId: '__TextSpec_inputNameTestId'
 				} );
 				
-				var $container = textField.getEl(),
-					$label = $container.find( 'label' ),
-					$input = $container.find( 'input' );
+				var $labelEl = textField.$labelEl,
+				    $inputEl = textField.$inputEl;
 				
-				expect( 1 ).toEqual( $label.length );  // orig YUI Test err msg: "there should be exactly one label"
-				expect( 1 ).toEqual( $input.length );  // orig YUI Test err msg: "there should be exactly one input"
-				expect( 'foo' ).toEqual( $label.attr( 'for' ) );  // orig YUI Test err msg: "the label's 'for' attribute should match the 'inputName'"
-				expect( 'foo' ).toEqual( $input.attr( 'name' ) );  // orig YUI Test err msg: "the input's 'name' attribute should match the 'inputName'"
+				expect( $labelEl.length ).toEqual( 1 );  // make sure the element exists
+				expect( $inputEl.length ).toEqual( 1 );  // make sure the element exists
+				expect( $labelEl.attr( 'for' ) ).toEqual( '__TextSpec_inputNameTestId' );
+				expect( $inputEl.attr( 'id' ) ).toEqual( '__TextSpec_inputNameTestId' );
 				
 				textField.destroy();  // clean up
+			} );
+			
+		} );
+		
+		
+		
+		describe( 'focus()', function() {
+			
+			it( "should return a reference to the field, to allow for method chaining", function() {
+				var textField = new TextField( { renderTo: 'body' } );
+				
+				expect( textField.focus() ).toBe( textField );
+			} );
+			
+		} );
+		
+		
+		
+		describe( 'blur()', function() {
+			
+			it( "should return a reference to the field, to allow for method chaining", function() {
+				var textField = new TextField( { renderTo: 'body' } );
+				
+				expect( textField.blur() ).toBe( textField );
 			} );
 			
 		} );

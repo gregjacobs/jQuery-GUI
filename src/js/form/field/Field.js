@@ -1,9 +1,11 @@
 /*global define */
 define( [
+	'jquery',
 	'lodash',
 	'Class',
-	'ui/Component'
-], function( _, Class, Component ) {
+	'ui/Component',
+	'ui/template/LoDash'
+], function( jQuery, _, Class, Component, LoDashTpl ) {
 	
 	/**
 	 * @abstract
@@ -15,7 +17,7 @@ define( [
 	 * 
 	 * Each concrete subclass must implement the {@link #setValue} and {@link #getValue} methods.
 	 */
-	var Field = Class.extend( Component, {
+	var Field = Component.extend( {
 		abstractClass : true,
 		
 		/**
@@ -30,15 +32,14 @@ define( [
 		 * 
 		 * The name to give the input. This will be set as the input's "name" attribute. This is really only useful if
 		 * the form that the component exists in is going to be submitted by a standard form submission (as opposed to just
-		 * having its values retrieved, which are handled elsewhere). Defaults to the value of the 
-		 * {@link #inputId} config.
+		 * having its values retrieved, which are handled elsewhere). Defaults to the value of the {@link #inputId} config.
 		 */
 		
 		/**
 		 * @cfg {String} label
 		 * 
 		 * The field's label. If empty, no space will be reserved for the field's label. Defaults to an empty string.  If 
-		 * it is required that the label space be reserved, but should look empty, set to a non-breaking space (&amp;nbsp;)<br><br>
+		 * it is required that the label space be reserved, but should look empty, set to a non-breaking space (&amp;nbsp;)
 		 * 
 		 * Note that setting the label at a later time using {@link #setLabel} will re-reserve the necessary label space
 		 * if the label was originally empty.
@@ -65,16 +66,16 @@ define( [
 		labelWidth : '19%',
 		
 		/**
-		 * @cfg {String} help 
+		 * @cfg {String} extraMsg 
 		 * 
-		 * A help tip explaining the field to the user, which gets placed below the {@link #$inputContainerEl}. Defaults to an empty string.
+		 * A tip explaining the field to the user, or provides an example, which gets placed below the {@link #$inputContainerEl}. Defaults to an empty string.
 		 */
-		help : "",
-			
+		extraMsg : "",
+		
 		/**
 		 * @cfg {Mixed} value
 		 * 
-		 * The initial value for the field, if any. If this is a function, the function will be executed and its return value used for the value.
+		 * The initial value for the field, if any.
 		 */
 		 
 		
@@ -103,82 +104,68 @@ define( [
 		
 		/**
 		 * @protected
-		 * @property {jQuery} $helpEl
+		 * @property {jQuery} $extraMsgEl
 		 * 
-		 * The &lt;div&gt; element that wraps the help text.  Set HTML content to this element with {@link #setHelp},
-		 * or retrieve the element itself for any custom implementation with {@link #getHelpEl}.
+		 * The &lt;div&gt; element that wraps the "extra message" text.  Set HTML content to this element with {@link #setExtraMsg}.
 		 */
 		
 		
-		statics : {
-			/**
-			 * @private
-			 * @static
-			 * @property {String} fieldRenderTpl
-			 * 
-			 * The template to use to render the Field's elements.
-			 */
-			fieldRenderTpl : [
-				'<div class="dialog-formField-labelWrap" style="<%= labelWrapStyles %>">',
-					'<label for="<%= inputName %>" class="dialog-formField-label"><%= label %></label>',
-				'</div>',
-				'<div class="dialog-formField-inputContainerWrap" style="<%= inputContainerWrapStyles %>">',
-					'<div class="dialog-formField-inputContainer" style="position: relative;" />',
-				'</div>',
-				'<div class="dialog-formField-help" style="<%= helpStyles %>"><%= help %></div>'
-			].join( "" )
-		},
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		baseCls : 'ui-form-Field',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		renderTpl : new LoDashTpl( [
+			'<div class="<%= baseCls %>-labelWrap" style="<%= labelWrapStyles %>">',
+				'<label id="<%= elId %>-label" for="<%= inputId %>" class="<%= baseCls %>-label"><%= label %></label>',
+			'</div>',
+			'<div id="<%= elId %>-inputContainerWrap" class="<%= baseCls %>-inputContainerWrap" style="<%= inputContainerWrapStyles %>">',
+				'<div id="<%= elId %>-inputContainer" class="<%= baseCls %>-inputContainer" style="position: relative;" />',
+			'</div>',
+			'<div id="<%= elId %>-extraMsg" class="<%= baseCls %>-extraMsg" style="<%= extraMsgStyles %>"><%= extraMsg %></div>'
+		] ),
 		
 		
 		// protected
 		initComponent : function() {
 			this.addEvents(
 				/**
-				 * @event change
 				 * Fires when the input field has been changed.
+				 * 
+				 * @event change
 				 * @param {ui.form.field.Field} field This Field object.
 				 * @param {Object} newValue The new value of the field.
 				 */
 				'change',
 				
 				/**
-				 * @event focus
 				 * Fires when the input field has been focused.
+				 * 
+				 * @event focus
 				 * @param {ui.form.field.Field} field This Field object.
 				 */
 				'focus',
 				
 				/**
-				 * @event blur
 				 * Fires when the input field has been blurred.
+				 * 
+				 * @event blur
 				 * @param {ui.form.field.Field} field This Field object.
 				 */
 				'blur'
 			);
 			
 			
-			// Add the dialog-formField class, which creates a margin around form fields, and is the ancestor selector for all form field styling.
-			this.cls += ' dialog-formField';
-			
-			
-			// If the value is a function, execute it, and use its return value as the value. This is to provide a little backward compatibility for
-			// some fields that use it, and need a new (i.e. different) return value for each new instance.
-			if( typeof this.value === 'function' ) {
-				this.value = this.value();
-			}
-			
-			
-			// Fix labelAlign to be lowercase, juse in case
-			this.labelAlign = this.labelAlign.toLowerCase();
-			
-			
-			// Apply other appropriate CSS classes to the outer element
-			if( this.label === "" ) {
-				this.cls += ' dialog-formField-noLabel';
-			} else {
-				this.cls += ' dialog-formField-' + this.labelAlign + 'Label';  // will add the 'dialog-formField-leftLabel' or 'dialog-formField-topLabel' css classes
-			}
-			
+			// Fix labelAlign to be lowercase for use with setting the class name (just in case),
+			// and apply the appropriate CSS class for the label state
+			var labelAlign = this.labelAlign = this.labelAlign.toLowerCase(),
+			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'ui-form-Field-noLabel' if there is no label, or 'ui-form-Field-leftLabel' or 'ui-form-Field-topLabel' if there is one
+			this.addCls( labelCls );
 			
 			// Give the input a unique ID, if one was not provided
 			this.inputId = this.inputId || 'ui-cmp-input-' + _.uniqueId();
@@ -193,20 +180,12 @@ define( [
 		
 		
 		/**
-		 * Handles the basic rendering for all field subclasses. Takes care of adding a label (if specified), the
-		 * containing div for the input element, and the input element itself if specified.
-		 * 
-		 * @protected
-		 * @method onRender
+		 * @inheritdoc
 		 */
-		onRender : function() {
-			this._super( arguments );
-			
-			var $el = this.$el,
-			    fieldRenderTpl = Field.fieldRenderTpl,  // static property
-			    labelWrapStyles = "",
+		getRenderTplData : function() {
+			var labelWrapStyles = "",
 			    inputContainerWrapStyles = "",
-			    helpStyles = "";
+			    extraMsgStyles = "";
 			
 			// Size the label and input container elements (based on the labelWidth config) if the labelAlign is 'left', and there is an actual label.
 			if( this.label !== "" && this.labelAlign === 'left' ) {
@@ -216,76 +195,104 @@ define( [
 				labelWrapStyles += 'width: ' + labelWidth + '%;';
 				inputContainerWrapStyles += 'width: ' + ( 100 - labelWidth ) + '%;';  // the remaining width: 100% - minus the label width
 				
-				// Set the help element to line up with the field's input container
-				helpStyles += 'padding-left: ' + labelWidth + '%;';
+				// Set the extraMsg element to line up with the field's input container
+				extraMsgStyles += 'padding-left: ' + labelWidth + '%;';
 			}
 			
-			// Single DOM append of the render template
-			var renderHTML = _.template( fieldRenderTpl, {
-				inputName : this.inputName || this.inputId,
+			
+			// Add properties to the object provided by the superclass, and return
+			return _.assign( this._super( arguments ), {
+				inputId   : this.inputId,
+				inputName : this.inputName,
 				
-				label : this.label || "",
-				help  : this.help || "",
+				label    : this.label    || "",
+				extraMsg : this.extraMsg || "",
 				
 				labelWrapStyles          : labelWrapStyles,
 				inputContainerWrapStyles : inputContainerWrapStyles,
-				helpStyles               : helpStyles
+				extraMsgStyles           : extraMsgStyles
 			} );
-			$el.append( renderHTML );
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onRender : function() {
+			this._super( arguments );
 			
 			// Retrieve references from generated HTML/DOM append
-			this.$labelEl = $el.find( 'label.dialog-formField-label' );
-			this.$inputContainerWrapEl = $el.find( 'div.dialog-formField-inputContainerWrap' );
-			this.$inputContainerEl = $el.find( 'div.dialog-formField-inputContainer' );
-			this.$helpEl = $el.find( 'div.dialog-formField-help' );
+			var elId = this.elId;
+			this.$labelEl = jQuery( '#' + elId + '-label' );
+			this.$inputContainerWrapEl = jQuery( '#' + elId + '-inputContainerWrap' );
+			this.$inputContainerEl = jQuery( '#' + elId + '-inputContainer' );
+			this.$extraMsgEl = jQuery( '#' + elId + '-extraMsg' );
 		},
 		
 		
+		// --------------------------------------
+		
+		
 		/**
-		 * Sets the label text for the field.
+		 * Sets the {@link #label} for the field.
 		 * 
-		 * @method setLabel
 		 * @param {String} label
+		 * @chainable
 		 */
 		setLabel : function( label ) {
-			if( !this.rendered ) {
-				this.label = label;
+			this.label = label;
 				
-			} else {
-				// If a label was specified, make sure the dialog-formField-noLabel class has been removed. Otherwise, add it.
-				if( label !== "" ) {
-					this.$el.removeClass( 'dialog-formField-noLabel' );
-				} else {
-					this.$el.addClass( 'dialog-formField-noLabel' );
-				}
-				
-				this.$labelEl.empty().append( label );
+			if( this.rendered ) {
+				// If a label was specified, make sure the "noLabel" class has been removed. Otherwise, add it.
+				this.$el[ !label ? 'addClass' : 'removeClass' ]( this.baseCls + '-noLabel' );
+				this.$labelEl.html( label );
 			}
+			return this;
 		},
 		
 		
 		/**
-		 * Sets the help text for the field.
+		 * Retrieves the current {@link #label}.
 		 * 
-		 * @method setHelp
-		 * @param {String} helpText
+		 * @return {String}
 		 */
-		setHelp : function( helpText ) {
-			if( !this.rendered ) {
-				this.help = helpText;
-				
-			} else {
-				this.$helpEl.html( helpText );
-			}
+		getLabel : function() {
+			return this.label;
 		},
 		
 		
 		/**
-		 * Retrieves the label element. This is useful if you want to add other HTML elements into the label element itself.
-		 * Returns the element in a jQuery wrapper.
+		 * Sets the {@link #extraMsg "extra message"} text for the Field.
 		 * 
-		 * @method getLabelEl
-		 * @return {jQuery}
+		 * @param {String} extraMsg
+		 * @chainable
+		 */
+		setExtraMsg : function( extraMsg ) {
+			this.extraMsg = extraMsg;
+				
+			if( this.rendered ) {
+				this.$extraMsgEl.html( extraMsg );
+			}
+			return this;
+		},
+		
+		
+		/**
+		 * Retrieves the current {@link #extraMsg "extra message"} text.
+		 * 
+		 * @return {String}
+		 */
+		getExtraMsg : function() {
+			return this.extraMsg;
+		},
+		
+		
+		/**
+		 * Retrieves the label element. This is useful if you want to add other HTML elements into the label element itself
+		 * in a Field subclass.
+		 * 
+		 * @protected
+		 * @return {jQuery} The element, in a jQuery wrapped set.
 		 */
 		getLabelEl : function() {
 			return this.$labelEl;
@@ -293,26 +300,14 @@ define( [
 		
 		
 		/**
-		 * Retrieves the div element that is meant to wrap the input element. This is useful if you want to add other HTML elements
-		 * into the input container element itself. Returns the element in a jQuery wrapper.
+		 * Retrieves the div element that is meant to wrap the input element. This is useful if you want to add other HTML 
+		 * elements into the input container element itself in a Field subclass.
 		 * 
-		 * @method getInputContainerEl
-		 * @return {jQuery}
+		 * @protected
+		 * @return {jQuery} The element, in a jQuery wrapped set.
 		 */
 		getInputContainerEl : function() {
 			return this.$inputContainerEl;
-		},
-		
-		
-		/**
-		 * Retrieves the help div element. This is useful if you want to add other HTML elements into the help element itself.
-		 * Returns the element in a jQuery wrapper.
-		 * 
-		 * @method getHelpEl
-		 * @return {jQuery}
-		 */
-		getHelpEl : function() {
-			return this.$helpEl;
 		},
 		
 		
@@ -342,7 +337,6 @@ define( [
 		 * after their processing is complete.
 		 * 
 		 * @protected
-		 * @method onChange
 		 * @param {Mixed} newValue The new value of the field.
 		 */
 		onChange : function( newValue ) {
@@ -353,22 +347,25 @@ define( [
 		/**
 		 * Focuses the field.
 		 * 
-		 * @protected
-		 * @method focus
+		 * @chainable
 		 */
 		focus : function() {
 			this.onFocus();
+			
+			return this;
 		},
 		
 		
 		/**
-		 * Template method for handling the input field being focused. Extensions of this method should call this superclass method
-		 * after their processing is complete.
+		 * Hook method for handling the input field being focused. Extensions of this method should call this superclass 
+		 * method after their processing is complete.
 		 * 
 		 * @protected
-		 * @method onFocus
+		 * @template
 		 */
 		onFocus : function() {
+			this.addCls( this.baseCls + '-focused' );
+			
 			this.fireEvent( 'focus', this );
 		},
 		
@@ -376,22 +373,25 @@ define( [
 		/**
 		 * Blurs the field.
 		 * 
-		 * @protected
-		 * @method blur
+		 * @chainable
 		 */
 		blur : function() {
 			this.onBlur();
+			
+			return this;
 		},
 		
 		
 		/**
-		 * Template method for handling the input field being blurred. Extensions of this method should call this superclass method
-		 * after their processing is complete.
+		 * Hook method for handling the input field being blurred. Extensions of this method should call this superclass 
+		 * method after their processing is complete.
 		 * 
 		 * @protected
-		 * @method onBlur
+		 * @template
 		 */
 		onBlur : function() {
+			this.removeCls( this.baseCls + '-focused' );
+			
 			this.fireEvent( 'blur', this );
 		}
 		
