@@ -63,3 +63,31 @@
 .ui-ToolButton-icon {
   background-image: url("../../../../images/icons/ui-icons_222222_256x240.png");
 }
+
+/* line 1, ../../../../src/sass/theme/basic/window/_Window.scss */
+.ui-Window {
+  border-color: #000;
+  border-style: solid;
+  border-width: 0 1px 1px 1px;
+}
+
+/* line 3, ../../../../src/sass/theme/basic/window/_Window.scss */
+.ui-Window-header {
+  border-color: #000;
+  border-style: solid;
+  border-width: 1px 0 0 0;
+  background-color: #C2EBFF;
+}
+
+/* line 4, ../../../../src/sass/theme/basic/window/_Window.scss */
+.ui-Window-header-title {
+  font-weight: bold;
+}
+
+/* line 7, ../../../../src/sass/theme/basic/window/_Window.scss */
+.ui-Window-body {
+  border-color: #000;
+  border-style: solid;
+  border-width: 1px 0 0 0;
+  background-color: #FFF;
+}
