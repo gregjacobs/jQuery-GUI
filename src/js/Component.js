@@ -792,8 +792,8 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 					this.mask( this.deferredMaskConfig );  // deferredMaskConfig will be defined if a call to mask() has been made before the Component has been rendered. Otherwise, it will be undefined.
 				}
 				
-				// Call the afterRender hook method, and fire the 'render' event
-				this.afterRender( $containerEl, options );
+				// Call the onAfterRender hook method, and fire the 'render' event
+				this.onAfterRender( $containerEl, options );
 				this.fireEvent( 'render', this );
 				
 				// Finally, if the deferLayout option was not provided as true, run the layout on the Component (or Container, 
@@ -880,8 +880,8 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		
 		/**
-		 * Hook method that runs when a Component is being rendered, after the Component's base element has been created and appended
-		 * to its parent element.
+		 * Hook method that runs when a Component is being rendered, after the Component's base element has been created, its
+		 * {@link #renderTpl} has been processed and appended, and the element has been appended to its parent element.
 		 * 
 		 * @protected
 		 * @method onRender
@@ -892,16 +892,18 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		
 		/**
-		 * Hook method that runs when a Component has been completely rendered (i.e. the base element has been created,
-		 * the {@link #onRender} template method has run, the content/html has been appended, the sizing configs have been set,
-		 * and the element has had its initial {@link #cfg-hidden} state set).
+		 * Hook method that runs when a Component has been completely rendered. This includes everything up to the point of
+		 * when the {@link #onRender} hook method has been called, and after the {@link #html}, {@link #contentEl}, and 
+		 * {@link #tpl} configs have been processed and their content has been added to the Component's {@link #$el element}.
+		 * It is also called after the initial {@link #cfg-hidden} state has been processed, and any initial 
+		 * {@link #masked mask} has been applied.
 		 * 
 		 * @protected
-		 * @method afterRender
+		 * @method onAfterRender
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component has been rendered into.
 		 * @param {Object} options The options provided to {@link #method-render}.
 		 */
-		afterRender : UI.emptyFn,
+		onAfterRender : UI.emptyFn,
 		
 		
 		/**
