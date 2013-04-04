@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'lodash'
+], function( _ ) {
+	
+<span id='ui-Html'>	/**
+</span>	 * @class ui.Html
+	 * @singleton
+	 * 
+	 * Utility class for doing html/text transformations.
+	 */
+	var Html = {
+		
+<span id='ui-Html-method-encode'>		/**
+</span>		 * Converts certain characters (&amp;, &lt;, &gt;, and &quot;) to their HTML entity equivalents for literal display in web pages, and for
+		 * using HTML strings within HTML attributes.
+		 * 
+		 * @method encode
+		 * @param {String} value The string to encode
+		 * @return {String} The encoded text
+		 */
+		encode : function( value ) {
+			return !value ? value : String( value ).replace( /&amp;/g, &quot;&amp;amp;&quot; ).replace( /&gt;/g, &quot;&amp;gt;&quot; ).replace( /&lt;/g, &quot;&amp;lt;&quot; ).replace( /&quot;/g, &quot;&amp;quot;&quot; );
+		},
+		
+		
+<span id='ui-Html-method-decode'>		/**
+</span>		 * Converts certain characters (&amp;, &lt;, &gt;, and &quot;) from their HTML entity equivalents.
+		 * 
+		 * @method decode
+		 * @param {String} value The string to decode
+		 * @return {String} The decoded text
+		 */
+		decode : function( value ) {
+			return !value ? value : String( value ).replace( /&amp;gt;/g, &quot;&gt;&quot; ).replace( /&amp;lt;/g, &quot;&lt;&quot; ).replace( /&amp;quot;/g, '&quot;' ).replace( /&amp;amp;/g, &quot;&amp;&quot; ).replace( /&amp;nbsp;/g, &quot; &quot; );
+		},
+		
+		
+<span id='ui-Html-method-stripTags'>		/**
+</span>		 * Returns the html with all tags stripped.
+		 * 
+		 * @method stripTags
+		 * @param {String} v The html to be stripped.
+		 * @return {String} The resulting text.
+		 */
+		stripTags : function( v ) {
+			return !v ? v : String( v ).replace( /&lt;[^&gt;]+&gt;/g, &quot;&quot; );
+		},
+		
+		
+<span id='ui-Html-method-nl2br'>		/**
+</span>		 * Replace newlines with &amp;lt;br /&amp;gt; tags
+		 * 
+		 * @method nl2br
+		 * @param {String} text The text to convert newlines into &amp;lt;br /&amp;gt; tags.
+		 * @return {String} The converted text.
+		 */
+		nl2br : function( text ) {
+			return text.replace( /\n/g, &quot;&lt;br /&gt;&quot; );
+		},
+		
+		
+<span id='ui-Html-method-attrMapToString'>		/**
+</span>		 * Given an Object (map) of attribute name/value pairs, will return a string that can be placed directly
+		 * into an HTML tag to add attributes to that element.
+		 * 
+		 * @param {Object} attrMap An Object (map) of attribute name/value pairs. Ex: { id: 'myEl', title: &quot;My Tooltip&quot; }
+		 * @return {String} The string that can be used directly in an element tag to add the attributes. Ex:
+		 *   `id=&quot;myEl&quot; title=&quot;My Tooltip&quot;`
+		 */
+		attrMapToString : function( attrMap ) {
+			var attr = [];
+			
+			_.forOwn( attrMap, function( attrValue, attrName ) {
+				attr.push( attrName + '=&quot;' + attrValue + '&quot;' );
+			} );
+			return attr.join( &quot; &quot; );
+		}
+		
+	};
+	
+	return Html;
+	
+} );</pre>
+</body>
+</html>

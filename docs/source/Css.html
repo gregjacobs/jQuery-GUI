@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'jquery',
+	'lodash',
+	'ui/UI'
+],
+function( jQuery, _, UI ) {
+	
+<span id='UI-Css'>	/**
+</span>	 * @class UI.Css
+	 * @singleton
+	 * 
+	 * General CSS manipulation/reading functionality.  Allows the dynamic modification of 
+	 * style sheets, reading of values, etc. Also has some utility methods for working with CSS.
+	 */
+	var Css = {
+		
+<span id='UI-Css-property-SIDES_MAP'>		/**
+</span>		 * @private
+		 * @property {Object} SIDES_MAP
+		 * 
+		 * A helper property for the measuring methods (ex: {@link #getPadding}), which maps the single letter &quot;sides&quot;
+		 * names ('t', 'r', 'b', 'l') to the full CSS word (i.e. &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, &quot;left&quot;).
+		 */
+		SIDES_MAP : {
+			't' : 'top',
+			'r' : 'right',
+			'b' : 'bottom',
+			'l' : 'left'
+		},
+		
+		
+		// ------------------------------------
+		
+		
+<span id='UI-Css-method-mapToString'>		/**
+</span>		 * Given an Object (map) of CSS property/value pairs, will return a string that can be placed directly
+		 * into the &quot;style&quot; attribute of an element. camelCased CSS property names will be converted to 
+		 * dashes. Ex: &quot;fontSize&quot; will be converted to &quot;font-size&quot;.
+		 * 
+		 * @param {Object} cssProperties An Object (map) of CSS property/value pairs. Ex: { color: 'red', fontSize: '10px;' }
+		 * @return {String} The CSS string that can be used directly in an element's &quot;style&quot; attribute, or when using it
+		 *   to update an existing element's styles, can be used directly on the .style.cssText property.
+		 */
+		mapToString : function( cssProperties ) {
+			var replaceRegex = /([A-Z])/g,
+			    cssString = &quot;&quot;,
+			    normalizedProp;
+			
+			_.forOwn( cssProperties, function( value, prop ) {
+				normalizedProp = prop.replace( replaceRegex, '-$1' ).toLowerCase();
+				cssString += normalizedProp + ':' + value + ';';
+			} );
+			return cssString;
+		},
+		
+		
+<span id='UI-Css-method-updateStyleEl'>		/**
+</span>		 * Updates the given &amp;lt;style&amp;gt; element(s) with new CSS text. Handles the special case for IE.
+		 * 
+		 * @param {String/HTMLElement/jQuery} styleEl A selector, reference to an HTMLElement, or jQuery wrapped
+		 *   set of &amp;lt;style&amp;gt; elements to update.
+		 * @param {String} cssText The new CSS text to update the style element(s) with.
+		 */
+		updateStyleEl : function( styleEl, cssText ) {
+			var $styleEl = jQuery( styleEl );
+			
+			if( UI.isIE ) {
+				for( var i = 0, len = $styleEl.length; i &lt; len; i++ ) {   // in case there is more than one element
+					$styleEl[ i ].styleSheet.cssText = cssText;  // special case for IE
+				}
+			} else {
+				$styleEl.text( cssText );
+			}
+		},
+		
+		
+<span id='UI-Css-method-normalizeSizeValue'>		/**
+</span>		 * Normalizes a CSS &quot;size&quot; property value. When provided a number, or a string that converts to a number, this method adds 
+		 * the 'px' suffix. When provided any other string, it returns the string unchanged (for example, when providing a percentage 
+		 * size, such as &quot;50%&quot;).
+		 * 
+		 * @param {Number/String} sizeVal The size value. If the size is a number, it will have 'px' appended to it.
+		 * @return {String} The normalized CSS size value. 
+		 */
+		normalizeSizeValue : function( sizeVal ) {
+			if( !isNaN( +sizeVal ) ) {
+				sizeVal += 'px';
+			}
+			return sizeVal;
+		},
+		
+		
+		// ------------------------------------
+		
+		// Measurement Helpers
+		
+		
+<span id='UI-Css-method-getPadding'>		/**
+</span>		 * Retrieves the width of the padding for the given `sides` of the `element`. `sides` can be either 't', 'r', 'b', or 
+		 * 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* it can be a combination of more than one to add the padding widths
+		 * together. Ex: 'rl' would add the right and left padding together and return that number.
+		 * 
+		 * @param {String/HTMLElement/jQuery} element The element to calculate padding for. Can be a selector string, actual HTML element, 
+		 *   or jQuery wrapped set. In the case of a jQuery wrapped set, only the first element will be considered for the calculation. 
+		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
+		 *   See the description in this method.
+		 * @return {Number} The width of the padding for the given `sides`.
+		 */
+		getPadding : function( element, sides ) {
+			return this.sumSides( jQuery( element ), 'padding', sides );
+		},
+		
+		
+<span id='UI-Css-method-getMargin'>		/**
+</span>		 * Retrieves the width of the margin for the given `sides` of the `element`. `sides` can be either 't', 'r', 'b', or 
+		 * 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* it can be a combination of more than one to add the margin widths
+		 * together. Ex: 'rl' would add the right and left margin together and return that number.
+		 * 
+		 * @param {String/HTMLElement/jQuery} element The element to calculate margin for. Can be a selector string, actual HTML element, 
+		 *   or jQuery wrapped set. In the case of a jQuery wrapped set, only the first element will be considered for the calculation. 
+		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
+		 *   See the description in this method.
+		 * @return {Number} The width of the margin for the given `sides`.
+		 */
+		getMargin : function( element, sides ) {
+			return this.sumSides( jQuery( element ), 'margin', sides );
+		},
+		
+		
+<span id='UI-Css-method-getBorderWidth'>		/**
+</span>		 * Retrieves the width of the border for the given `sides` of the `element`. `sides` can be either 't', 'r', 'b', or 
+		 * 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* it can be a combination of more than one to add the border widths
+		 * together. Ex: 'rl' would add the right and left border together and return that number.
+		 * 
+		 * @param {String/HTMLElement/jQuery} element The element to calculate border for. Can be a selector string, actual HTML element, 
+		 *   or jQuery wrapped set. In the case of a jQuery wrapped set, only the first element will be considered for the calculation. 
+		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
+		 *   See the description in this method.
+		 * @return {Number} The width of the border for the given `sides`.
+		 */
+		getBorderWidth : function( element, sides ) {
+			return this.sumSides( jQuery( element ), 'border', sides, 'width' );
+		},
+		
+		
+		
+<span id='UI-Css-method-getFrameSize'>		/**
+</span>		 * Retrieves the &quot;frame&quot; size, which is the sum of the width of the padding, margin, and border, for the given `sides` of the `element`. `sides` 
+		 * can be either 't', 'r', 'b', or 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* it can be a combination of more than one to add the 
+		 * padding/border/margin widths together. Ex: 'rl' would add the right and left padding together and return that number.
+		 * 
+		 * @param {String/HTMLElement/jQuery} element The element to calculate border for. Can be a selector string, actual HTML element, 
+		 *   or jQuery wrapped set. In the case of a jQuery wrapped set, only the first element will be considered for the calculation. 
+		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
+		 *   See the description in this method.
+		 * @return {Number} The sum total of the width of the border, plus padding, plus margin, for the given `sides`.
+		 */
+		getFrameSize : function( element, sides ) {
+			return this.getPadding( element, sides ) + this.getMargin( element, sides ) + this.getBorderWidth( element, sides );
+		},
+		
+		
+<span id='UI-Css-method-sumSides'>		/**
+</span>		 * Private helper method to sum up the `sides` for a given `element` and `propertyName`.
+		 * 
+		 * @private
+		 * @param {String/HTMLElement/jQuery} element The element to read the CSS properties from (a combination of `propertyName`, and the sides. 
+		 *   ex: 'padding-left')
+		 * @param {String} propertyName The property name to read sides from. Ex: 'padding', 'margin', or 'border-width'. This will be combined with
+		 *   each of the `sides`. So this is specified as 'padding', and a side is specified as 'l', the property read will be 'padding-left'. 
+		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'.
+		 * @param {String} [propertyNameSuffix=&quot;&quot;] If there is a suffix for the CSS property name. This is pretty much only used in the case
+		 *   of 'border' as the full width property name for say, left border, is 'border-left-width'
+		 */
+		sumSides : function( element, propertyName, sides, propertyNameSuffix ) {
+			var total = 0,
+			    SIDES_MAP = this.SIDES_MAP,
+			    $element = jQuery( element );
+			
+			// If a property name suffix was provided, add a preceding '-'
+			propertyNameSuffix = ( propertyNameSuffix ) ? '-' + propertyNameSuffix : &quot;&quot;;
+			
+			for( var i = 0, len = sides.length; i &lt; len; i++ ) {
+				total += parseInt( $element.css( propertyName + '-' + SIDES_MAP[ sides.charAt( i ) ] + propertyNameSuffix ), 10 );
+			}
+			return total;
+		}
+		
+	};
+
+	return Css;
+	
+} );</pre>
+</body>
+</html>

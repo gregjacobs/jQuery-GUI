@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'jquery',
+	'lodash',
+	'ui/ComponentManager',
+	'ui/form/field/Field'
+], function( jQuery, _, ComponentManager, Field ) {
+	
+<span id='ui-form-field-Field-Checkbox'>	/**
+</span>	 * @class ui.form.field.Field.Checkbox
+	 * @extends ui.form.field.Field
+	 *  
+	 * Checkbox field component.
+	 */
+	var CheckboxField = Field.extend( {
+		
+<span id='ui-form-field-Field-Checkbox-cfg-checkboxLabel'>		/**
+</span>		 * @cfg {String} checkboxLabel
+		 * 
+		 * The label for the checkbox itself, which will be placed to the right of the checkbox. This config is to differentiate from
+		 * the {@link ui.form.field.Field#label label} provided by {@link ui.form.field.Field Field} (the one which
+		 * affects all form field components uniformly).  Defaults to an empty string.
+		 * 
+		 * Note that if the checkbox should be aligned with other form fields that have &quot;left side&quot; labels (see 
+		 * {@link ui.form.field.Field#labelAlign}, then set its {@link ui.form.field.Field#label label} config to
+		 * a non-breaking space (&amp;amp;nbsp;).
+		 */
+		checkboxLabel : &quot;&quot;,
+		
+<span id='ui-form-field-Field-Checkbox-cfg-value'>		/**
+</span>		 * @cfg {String/Function} value
+		 * 
+		 * The initial value for the field, if any. Any truthy value will initialize the checkbox as checked.
+		 */
+		
+<span id='ui-form-field-Field-Checkbox-cfg-componentCls'>		/**
+</span>		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'ui-form-CheckboxField',
+		
+		
+<span id='ui-form-field-Field-Checkbox-method-onRender'>		/**
+</span>		 * @inheritdoc
+		 */
+		onRender : function() {
+			this._super( arguments );
+			
+			// Create the input element, and append it to the $inputContainerEl
+			this.$inputEl = jQuery( '&lt;input type=&quot;checkbox&quot; class=&quot;' + this.componentCls + '-input&quot; id=&quot;' + this.inputId + '&quot; name=&quot;' + this.inputName + '&quot;' + ( this.value ? ' checked' : '' ) + ' /&gt;' )
+				.appendTo( this.$inputContainerEl );
+			
+			// Create the checkbox label element, which comes up on the right side of the checkbox.
+			this.$checkboxLabelEl = jQuery( '&lt;label for=&quot;' + this.inputId + '&quot; class=&quot;' + this.componentCls + '-label&quot; /&gt;&amp;nbsp;' + ( this.checkboxLabel || &quot;&quot; ) )
+				.appendTo( this.$inputContainerEl );
+			
+			// Add event handlers to the input element
+			this.$inputEl.on( {
+				'change' : _.bind( function() {
+					this.onChange( this.getValue() );  // call onChange() with the new value.
+				}, this )
+			} );
+		},
+		
+		
+		
+<span id='ui-form-field-Field-Checkbox-method-setValue'>		/**
+</span>		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * 
+		 * @param {Boolean} value The value of the field. If truthy, the checkbox will be checked. If falsy, the checkbox will be unchecked.
+		 */
+		setValue : function( value ) {
+			if( !this.rendered ) {
+				this.value = value;  // If the Component has not yet been rendered (i.e. the Field has not yet been created), store the value as the initial value to set.	
+			} else {
+				this.$inputEl.prop( 'checked', !!value );
+			}
+		},
+		
+		
+<span id='ui-form-field-Field-Checkbox-method-getValue'>		/**
+</span>		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * 
+		 * @return {Boolean} The value of the field (true if it's checked, false otherwise).
+		 */
+		getValue : function() {
+			if( !this.rendered ) {
+				return !!this.value;  // If the value was set before the Component has been rendered (i.e. before the Field has been created), return that. Make sure it returns a Boolean as well.
+			} else {
+				return this.$inputEl.prop( &quot;checked&quot; );
+			}
+		}
+		
+	} );
+	
+	
+	// Register the class so it can be created by the type string 'checkboxfield'
+	ComponentManager.registerType( 'checkboxfield', CheckboxField );
+	
+	return CheckboxField;
+	
+} );</pre>
+</body>
+</html>

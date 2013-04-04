@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'jquery',
+	'lodash',
+	'Class',
+	'ui/Component',
+	'ui/template/Template',
+	'ui/template/LoDash'
+], function( jQuery, _, Class, Component, Template, LoDashTpl ) {
+	
+<span id='ui-form-field-Field'>	/**
+</span>	 * @abstract
+	 * @class ui.form.field.Field
+	 * @extends ui.Component
+	 * 
+	 * Abstract base class for form fields, which lays out a label and a container for form field(s), while also 
+	 * providing the base functionality and other common field related tasks.
+	 * 
+	 * Each concrete subclass must implement the {@link #setValue} and {@link #getValue} methods.
+	 */
+	var Field = Component.extend( {
+		abstractClass : true,
+		
+<span id='ui-form-field-Field-cfg-inputId'>		/**
+</span>		 * @cfg {String} inputId
+		 * 
+		 * The id that should be used for the Component's input element. The label element (if {@link #label} is specified) 
+		 * will be created with a `for` attribute with this id. Defaults to a uniquely generated id.
+		 */
+		
+<span id='ui-form-field-Field-cfg-inputName'>		/**
+</span>		 * @cfg {String} inputName
+		 * 
+		 * The name to give the input. This will be set as the input's &quot;name&quot; attribute. This is really only useful if
+		 * the form that the component exists in is going to be submitted by a standard form submission (as opposed to just
+		 * having its values retrieved, which are handled elsewhere). Defaults to the value of the {@link #inputId} config.
+		 */
+		
+<span id='ui-form-field-Field-cfg-label'>		/**
+</span>		 * @cfg {String} label
+		 * 
+		 * The field's label. If empty, no space will be reserved for the field's label. Defaults to an empty string.  If 
+		 * it is required that the label space be reserved, but should look empty, set to a non-breaking space (&amp;amp;nbsp;)
+		 * 
+		 * Note that setting the label at a later time using {@link #setLabel} will re-reserve the necessary label space
+		 * if the label was originally empty.
+		 */
+		label : &quot;&quot;,
+		
+<span id='ui-form-field-Field-cfg-labelAlign'>		/**
+</span>		 * @cfg {String} labelAlign
+		 * 
+		 * A string that specifies where the field's label should be placed. Valid values are:
+		 * &quot;left&quot; and &quot;top&quot;. Defaults to 'left'.
+		 */
+		labelAlign : 'left',
+		
+<span id='ui-form-field-Field-cfg-labelWidth'>		/**
+</span>		 * @cfg {String} labelWidth
+		 * 
+		 * A string specifying how wide the label should be. This is only valid if the {@link #labelAlign} config is set 
+		 * to 'left'.
+		 */
+		labelWidth : '75',
+		
+<span id='ui-form-field-Field-cfg-extraMsg'>		/**
+</span>		 * @cfg {String} extraMsg 
+		 * 
+		 * A tip explaining the field to the user, or provides an example, which gets placed below the {@link #$inputContainerEl}. Defaults to an empty string.
+		 */
+		extraMsg : &quot;&quot;,
+		
+<span id='ui-form-field-Field-cfg-value'>		/**
+</span>		 * @cfg {Mixed} value
+		 * 
+		 * The initial value for the field, if any.
+		 */
+		 
+		
+<span id='ui-form-field-Field-property-S-labelEl'>		/**
+</span>		 * @protected
+		 * @property {jQuery} $labelEl
+		 * 
+		 * The &amp;lt;label&amp;gt; element that gets filled with the label text.  Set HTML content to this element with {@link #setLabel},
+		 * or retrieve the element itself for any custom implementation with {@link #getLabelEl}.
+		 */
+		
+<span id='ui-form-field-Field-property-S-inputContainerWrapEl'>		/**
+</span>		 * @protected
+		 * @property {jQuery} $inputContainerWrapEl
+		 * 
+		 * The &amp;lt;div&amp;gt; element that wraps the {@link #getInputContainerEl}.
+		 */
+		
+<span id='ui-form-field-Field-property-S-inputContainerEl'>		/**
+</span>		 * @protected
+		 * @property {jQuery} $inputContainerEl
+		 * 
+		 * The &amp;lt;div&amp;gt; element that wraps the input field.  Retrieve this element for any custom implementation 
+		 * with {@link #getInputContainerEl}.
+		 */
+		
+<span id='ui-form-field-Field-property-S-extraMsgEl'>		/**
+</span>		 * @protected
+		 * @property {jQuery} $extraMsgEl
+		 * 
+		 * The &amp;lt;div&amp;gt; element that wraps the &quot;extra message&quot; text.  Set HTML content to this element with {@link #setExtraMsg}.
+		 */
+		
+		
+<span id='ui-form-field-Field-cfg-baseCls'>		/**
+</span>		 * @cfg
+		 * @inheritdoc
+		 */
+		baseCls : 'ui-form-Field',
+		
+<span id='ui-form-field-Field-cfg-elType'>		/**
+</span>		 * @cfg
+		 * @inheritdoc
+		 */
+		elType : 'table',
+		
+		
+<span id='ui-form-field-Field-cfg-labelRenderTpl'>		/**
+</span>		 * @cfg {String/String[]/Function/ui.template.Template} labelRenderTpl
+		 * 
+		 * The template to use as the HTML template for the Field's label.
+		 * 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link ui.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link ui.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link ui.template.Template} 
+		 * subclass to this config. 
+		 * 
+		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template) 
+		 */
+		labelRenderTpl : new LoDashTpl( [
+			'&lt;label id=&quot;&lt;%= elId %&gt;-label&quot; for=&quot;&lt;%= inputId %&gt;&quot; class=&quot;&lt;%= baseCls %&gt;-label&quot;&gt;&lt;%= label %&gt;&lt;/label&gt;'
+		] ),
+		
+		
+<span id='ui-form-field-Field-cfg-renderTpl'>		/**
+</span>		 * @cfg
+		 * @inheritdoc
+		 */
+		renderTpl : new LoDashTpl( [
+			'&lt;% if( labelAlign === &quot;top&quot; ) { %&gt;',
+				'&lt;tr&gt;',
+					'&lt;td id=&quot;&lt;%= elId %&gt;-topLabelCell&quot; class=&quot;&lt;%= baseCls %&gt;-topLabelCell&quot; colspan=&quot;2&quot;&gt;',
+						'&lt;%= labelMarkup %&gt;',
+					'&lt;/td&gt;',
+				'&lt;/tr&gt;',
+			'&lt;% } %&gt;',
+			'&lt;tr&gt;',
+				'&lt;td id=&quot;&lt;%= elId %&gt;-leftLabelCell&quot; class=&quot;&lt;%= baseCls %&gt;-leftLabelCell&quot; width=&quot;&lt;%= leftLabelWidth %&gt;&quot;&gt;',
+					'&lt;% if( labelAlign === &quot;left&quot; ) { %&gt;',
+						'&lt;%= labelMarkup %&gt;',
+					'&lt;% } %&gt;',
+				'&lt;/td&gt;',
+				'&lt;td id=&quot;&lt;%= elId %&gt;-inputCell&quot; class=&quot;&lt;%= baseCls %&gt;-inputCell&quot;&gt;',
+					'&lt;div id=&quot;&lt;%= elId %&gt;-inputContainer&quot; class=&quot;&lt;%= baseCls %&gt;-inputContainer&quot; style=&quot;position: relative;&quot;&gt;&lt;/div&gt;',
+				'&lt;/td&gt;',
+			'&lt;/tr&gt;',
+			'&lt;tr&gt;',
+				'&lt;td&gt;&lt;/td&gt;',
+				'&lt;td class=&quot;&lt;%= baseCls %&gt;-extraMsgCell&quot;&gt;',
+					'&lt;div id=&quot;&lt;%= elId %&gt;-extraMsg&quot; class=&quot;&lt;%= baseCls %&gt;-extraMsg&quot;&gt;&lt;%= extraMsg %&gt;&lt;/div&gt;',
+				'&lt;/td&gt;',
+			'&lt;/tr&gt;'
+		] ),
+		
+		
+		
+		
+		// protected
+		initComponent : function() {
+			this.addEvents(
+<span id='ui-form-field-Field-event-change'>				/**
+</span>				 * Fires when the input field has been changed.
+				 * 
+				 * @event change
+				 * @param {ui.form.field.Field} field This Field object.
+				 * @param {Object} newValue The new value of the field.
+				 */
+				'change',
+				
+<span id='ui-form-field-Field-event-focus'>				/**
+</span>				 * Fires when the input field has been focused.
+				 * 
+				 * @event focus
+				 * @param {ui.form.field.Field} field This Field object.
+				 */
+				'focus',
+				
+<span id='ui-form-field-Field-event-blur'>				/**
+</span>				 * Fires when the input field has been blurred.
+				 * 
+				 * @event blur
+				 * @param {ui.form.field.Field} field This Field object.
+				 */
+				'blur'
+			);
+			
+			
+			// Fix labelAlign to be lowercase for use with setting the class name (just in case),
+			// and apply the appropriate CSS class for the label state
+			var labelAlign = this.labelAlign = this.labelAlign.toLowerCase(),
+			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'ui-form-Field-noLabel' if there is no label, or 'ui-form-Field-leftLabel' or 'ui-form-Field-topLabel' if there is one
+			this.addCls( labelCls );
+			
+			// Give the input a unique ID, if one was not provided
+			this.inputId = this.inputId || 'ui-cmp-input-' + _.uniqueId();
+			
+			// Default the inputName to the inputId, if not provided.
+			this.inputName = ( typeof this.inputName !== 'undefined' ) ? this.inputName : this.inputId;  // allowing for the possibility of providing an empty string for inputName here (so the field isn't submitted), so not using the || operator
+			
+			
+			// Call superclass initComponent
+			this._super( arguments );
+		},
+		
+		
+<span id='ui-form-field-Field-method-getRenderTplData'>		/**
+</span>		 * @inheritdoc
+		 */
+		getRenderTplData : function() {
+			var labelAlign = this.labelAlign,
+			    labelRenderTpl = ( labelRenderTpl instanceof Template ) ? this.labelRenderTpl : new LoDashTpl( this.labelRenderTpl ),
+			    labelMarkup = labelRenderTpl.apply( this.getLabelRenderTplData() );
+			
+			// Add properties to the object provided by the superclass, and return
+			return _.assign( this._super( arguments ), {
+				inputId   : this.inputId,
+				inputName : this.inputName,
+				
+				labelAlign     : labelAlign,
+				leftLabelWidth : ( this.label &amp;&amp; labelAlign === 'left' ) ? this.labelWidth : 0,
+				labelMarkup    : labelMarkup,
+				extraMsg       : this.extraMsg || &quot;&quot;
+			} );
+		},
+		
+		
+<span id='ui-form-field-Field-method-getLabelRenderTplData'>		/**
+</span>		 * Retrieves the data to provide to the {@link #labelRenderTpl}.
+		 * 
+		 * @protected
+		 * @return {Object}
+		 */
+		getLabelRenderTplData : function() {
+			return {
+				elId    : this.elId,
+				baseCls : this.baseCls,
+				inputId : this.inputId,
+				label   : this.label || &quot;&quot;
+			};
+		},
+		
+		
+<span id='ui-form-field-Field-method-onRender'>		/**
+</span>		 * @inheritdoc
+		 */
+		onRender : function() {
+			this._super( arguments );
+			
+			// Retrieve references from generated HTML/DOM append
+			var elId = this.elId;
+			this.$labelEl = jQuery( '#' + elId + '-label' );   // from the labelTpl
+			this.$inputContainerEl = jQuery( '#' + elId + '-inputContainer' );
+			this.$extraMsgEl = jQuery( '#' + elId + '-extraMsg' );
+		},
+		
+		
+		// --------------------------------------
+		
+		
+<span id='ui-form-field-Field-method-setLabel'>		/**
+</span>		 * Sets the {@link #label} for the field.
+		 * 
+		 * @param {String} label
+		 * @chainable
+		 */
+		setLabel : function( label ) {
+			this.label = label;
+				
+			if( this.rendered ) {
+				// If a label was specified, make sure the &quot;noLabel&quot; class has been removed. Otherwise, add it.
+				this.$el[ !label ? 'addClass' : 'removeClass' ]( this.baseCls + '-noLabel' );
+				this.$labelEl.html( label );
+			}
+			return this;
+		},
+		
+		
+<span id='ui-form-field-Field-method-getLabel'>		/**
+</span>		 * Retrieves the current {@link #label}.
+		 * 
+		 * @return {String}
+		 */
+		getLabel : function() {
+			return this.label;
+		},
+		
+		
+<span id='ui-form-field-Field-method-setExtraMsg'>		/**
+</span>		 * Sets the {@link #extraMsg &quot;extra message&quot;} text for the Field.
+		 * 
+		 * @param {String} extraMsg
+		 * @chainable
+		 */
+		setExtraMsg : function( extraMsg ) {
+			this.extraMsg = extraMsg;
+				
+			if( this.rendered ) {
+				this.$extraMsgEl.html( extraMsg );
+			}
+			return this;
+		},
+		
+		
+<span id='ui-form-field-Field-method-getExtraMsg'>		/**
+</span>		 * Retrieves the current {@link #extraMsg &quot;extra message&quot;} text.
+		 * 
+		 * @return {String}
+		 */
+		getExtraMsg : function() {
+			return this.extraMsg;
+		},
+		
+		
+<span id='ui-form-field-Field-method-getLabelEl'>		/**
+</span>		 * Retrieves the label element. This is useful if you want to add other HTML elements into the label element itself
+		 * in a Field subclass.
+		 * 
+		 * @protected
+		 * @return {jQuery} The element, in a jQuery wrapped set.
+		 */
+		getLabelEl : function() {
+			return this.$labelEl;
+		},
+		
+		
+<span id='ui-form-field-Field-method-getInputContainerEl'>		/**
+</span>		 * Retrieves the div element that is meant to wrap the input element. This is useful if you want to add other HTML 
+		 * elements into the input container element itself in a Field subclass.
+		 * 
+		 * @protected
+		 * @return {jQuery} The element, in a jQuery wrapped set.
+		 */
+		getInputContainerEl : function() {
+			return this.$inputContainerEl;
+		},
+		
+		
+		
+<span id='ui-form-field-Field-method-setValue'>		/**
+</span>		 * Sets the value for the field.
+		 * 
+		 * @abstract
+		 * @method setValue
+		 * @param {Mixed} value The value to set to the field.
+		 */
+		setValue : Class.abstractMethod,
+		
+		
+<span id='ui-form-field-Field-method-getValue'>		/**
+</span>		 * Retrieves the current value from the field.
+		 * 
+		 * @abstract
+		 * @method getValue
+		 * @return {Mixed} The value of the field.
+		 */
+		getValue : Class.abstractMethod,
+	    
+		
+<span id='ui-form-field-Field-method-onChange'>		/**
+</span>		 * Template method for handling a change to the field. Extensions of this method should call this superclass method
+		 * after their processing is complete.
+		 * 
+		 * @protected
+		 * @param {Mixed} newValue The new value of the field.
+		 */
+		onChange : function( newValue ) {
+			this.fireEvent( 'change', this, newValue );
+		},
+		
+		
+<span id='ui-form-field-Field-method-focus'>		/**
+</span>		 * Focuses the field.
+		 * 
+		 * @chainable
+		 */
+		focus : function() {
+			this.onFocus();
+			
+			return this;
+		},
+		
+		
+<span id='ui-form-field-Field-method-onFocus'>		/**
+</span>		 * Hook method for handling the input field being focused. Extensions of this method should call this superclass 
+		 * method after their processing is complete.
+		 * 
+		 * @protected
+		 * @template
+		 */
+		onFocus : function() {
+			this.addCls( this.baseCls + '-focused' );
+			
+			this.fireEvent( 'focus', this );
+		},
+		
+		
+<span id='ui-form-field-Field-method-blur'>		/**
+</span>		 * Blurs the field.
+		 * 
+		 * @chainable
+		 */
+		blur : function() {
+			this.onBlur();
+			
+			return this;
+		},
+		
+		
+<span id='ui-form-field-Field-method-onBlur'>		/**
+</span>		 * Hook method for handling the input field being blurred. Extensions of this method should call this superclass 
+		 * method after their processing is complete.
+		 * 
+		 * @protected
+		 * @template
+		 */
+		onBlur : function() {
+			this.removeCls( this.baseCls + '-focused' );
+			
+			this.fireEvent( 'blur', this );
+		}
+		
+	} );
+
+	return Field;
+	
+} );</pre>
+</body>
+</html>

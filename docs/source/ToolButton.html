@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'ui/Button',
+	'ui/ComponentManager'
+], function( Button, ComponentManager ) {
+	
+<span id='ui-panel-ToolButton'>	/**
+</span>	 * @class ui.panel.ToolButton
+	 * @extends ui.Button
+	 * 
+	 * Small utility class for a button that can be used in a {@link ui.panel.Panel Panel's} header.
+	 */
+	var ToolButton = Button.extend( {
+		
+<span id='ui-panel-ToolButton-cfg-ttype'>		/**
+</span>		 * @cfg {String} ttype (required)
+		 * 
+		 * The tool button type. Currently accepts the strings:
+		 * 
+		 * - close
+		 * - closethick
+		 */
+		
+		
+<span id='ui-panel-ToolButton-method-initComponent'>		/**
+</span>		 * @inheritdoc
+		 */
+		initComponent : function() {
+			// &lt;debug&gt;
+			if( !this.ttype ) throw new Error( &quot;'ttype' cfg required&quot; );
+			// &lt;/debug&gt;
+			
+			this.addCls( 'ui-ToolButton' );
+			this.iconCls = 'ui-ToolButton-icon ui-icon ui-icon-' + this.ttype;
+			
+			this._super( arguments );
+		}
+		
+	} );
+	
+	
+	// Register the type so it can be created by the type string 'toolbutton'
+	ComponentManager.registerType( 'toolbutton', ToolButton );
+	
+	return ToolButton;
+	
+} );</pre>
+</body>
+</html>

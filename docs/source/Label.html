@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'ui/ComponentManager',
+	'ui/Component'
+], function( ComponentManager, Component ) {
+	
+<span id='ui-Label'>	/**
+</span>	 * @class ui.Label
+	 * @extends ui.Component
+	 * 
+	 * Creates a label (piece of text).
+	 */
+	var Label = Component.extend( {
+	
+<span id='ui-Label-cfg-text'>		/**
+</span>		 * @cfg {String/HTMLElement/jQuery} text
+		 * 
+		 * The label's text. Accepts HTML, DOM nodes, and jQuery wrapped sets as well.
+		 */
+		text : &quot;&quot;,
+		
+<span id='ui-Label-cfg-baseCls'>		/**
+</span>		 * @cfg
+		 * @inheritdoc
+		 */
+		baseCls : 'ui-Label',
+		
+	
+<span id='ui-Label-method-onRender'>		/**
+</span>		 * @inheritdoc
+		 */
+		onRender : function() {
+			this._super( arguments );
+			
+			this.$el.append( this.text || &quot;&quot; );
+			delete this.text;  // no longer needed
+		},
+		
+		
+<span id='ui-Label-method-setText'>		/**
+</span>		 * Sets the label's text.  Accepts HTML, DOM nodes, and jQuery wrapper objects as well.
+		 * 
+		 * @method setText
+		 * @param {String/HTMLElement/jQuery} text The text, HTML, or DOM element to set to the label. 
+		 */
+		setText : function( text ) {
+			if( !this.rendered ) {
+				this.text = text;  // set the config. will be used when rendered
+			} else {
+				this.$el.html( text );
+			}
+		},
+		
+		
+<span id='ui-Label-method-getText'>		/**
+</span>		 * Gets the label's text.  Will return the HTML of the label if it has any.
+		 * 
+		 * @method getText
+		 * @return {String}
+		 */
+		getText : function() {
+			if( !this.rendered ) {
+				return this.text || &quot;&quot;;
+			} else {
+				return this.getEl().html();  // in case DOM nodes were provided as the `text`, return the html
+			}
+		}
+	
+	} );
+	
+	
+	// Register the class so it can be created by the type string 'label'
+	ComponentManager.registerType( 'label', Label );
+	
+	return Label;
+	
+} );</pre>
+</body>
+</html>
