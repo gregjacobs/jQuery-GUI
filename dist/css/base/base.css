@@ -1007,13 +1007,15 @@ button.ui-Button::-moz-focus-inner {
   border-collapse: collapse;
 }
 /* line 7, ../../../src/sass/base/form/field/_Field.scss */
-.ui-form-Field tbody, .ui-form-Field tr, .ui-form-Field th, .ui-form-Field td {
+.ui-form-Field tbody, .ui-form-Field tr, .ui-form-Field th {
   margin: 0;
   padding: 0;
 }
 
 /* line 14, ../../../src/sass/base/form/field/_Field.scss */
 .ui-form-Field-leftLabelCell {
+  margin: 0;
+  padding: 0;
   vertical-align: top;
 }
 

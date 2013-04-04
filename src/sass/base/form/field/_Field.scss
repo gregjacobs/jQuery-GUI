@@ -4,14 +4,14 @@
 	width: 100%;  // default to taking up 100% width
 	
 	border-collapse: collapse;
-	tbody, tr, th, td { margin: 0; padding: 0; }
+	tbody, tr, th { margin: 0; padding: 0; }
 	
 	&.ui-form-Field-leftLabel {}
 	&.ui-form-Field-topLabel {}
 	&.ui-form-Field-focused {}
 }
 
-.ui-form-Field-leftLabelCell { vertical-align: top; }
+.ui-form-Field-leftLabelCell { margin: 0; padding: 0; vertical-align: top; }
 .ui-form-Field-topLabelCell {}
 .ui-form-Field-label {}
 
