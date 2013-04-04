@@ -922,8 +922,7 @@
 
 /* workarounds */
 /* reset extra padding in Firefox, see h5bp.com/l */
-/* line 32, ../../../src/sass/base/_Button.scss */
-input.ui-Button::-moz-focus-inner,
+/* line 31, ../../../src/sass/base/_Button.scss */
 button.ui-Button::-moz-focus-inner {
   border: 0;
   padding: 0;
@@ -1102,13 +1101,7 @@ iframe.ui-form-DropdownField-shim {
   float: right;
 }
 
-/* line 1, ../../../src/sass/base/panel/_ToolButton.scss */
-.ui-ToolButton {
-  width: 16px;
-  height: 16px;
-}
-
-/* line 6, ../../../src/sass/base/panel/_ToolButton.scss */
+/* line 3, ../../../src/sass/base/panel/_ToolButton.scss */
 .ui-ToolButton .ui-Button-text {
   padding: 0;
   line-height: 0;

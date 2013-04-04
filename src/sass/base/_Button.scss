@@ -28,7 +28,6 @@
 
 /* workarounds */
 /* reset extra padding in Firefox, see h5bp.com/l */
-input.ui-Button::-moz-focus-inner,
 button.ui-Button::-moz-focus-inner {
 	border: 0;
 	padding: 0;
