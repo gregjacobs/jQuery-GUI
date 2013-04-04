@@ -32,7 +32,7 @@
 			}
 		} );
 		
-		
+		var win;
 		require( [
 			'jquery',
 			'ui/panel/Panel',
@@ -49,10 +49,11 @@
 			$( document ).ready( function() {
 				$( 'body' ).html( "Hello, Playground!" );
 				
-				var window = new Window( {
+				win = new Window( {
 					html : "HI!",
 					width : 300,
-					title: "Test Title 2",
+					title: "Test Title",
+					closeAction: 'destroy',
 					
 					items : [
 						{
@@ -98,7 +99,62 @@
 						}
 					]
 				} );
-				window.show();
+				win.show();
+				
+				var panel = new Panel( {
+					renderTo : 'body',
+					html : "HI!",
+					width : 300,
+					title: "Test Title 2",
+					
+					toolButtons : {
+						ttype: 'close'
+					},
+					
+					items : [
+						{
+							type : 'container',
+							layout : 'hbox',
+							items : [
+								{
+									flex : 1,
+									type: 'textfield',
+									value: "OHAI",
+									style: { border: '1px solid red' },
+									label : "Hello",
+									//labelAlign: 'top',
+									labelWidth : 50,
+									extraMsg: "Oh hello"
+								},
+								{
+									type: 'component',
+									html : "Test"
+								}
+							]
+						},{
+							type : 'container',
+							layout : 'hbox',
+							items : [
+								{
+									flex : 1,
+									type: 'component',
+									html : "Test"
+								},{
+									flex : 2,
+									type: 'textfield',
+									value: "OHAI",
+									style: { border: '1px solid red' }
+								}
+							]
+						},
+						{
+							type : 'textareafield',
+							label: "HI!",
+							labelAlign: 'left',
+							height : 200
+						}
+					]
+				} );
 			} );
 		} );
 	</script>
