@@ -180,7 +180,7 @@ define( [
 		createToolButtonsCt : function() {
 			return new Container( {
 				cls         : this.baseCls + '-header-toolButtons',
-				defaultType : 'toolbutton',
+				defaultType : 'toolbutton',   // ui.panel.ToolButton
 				items       : this.toolButtons
 			} );
 		},

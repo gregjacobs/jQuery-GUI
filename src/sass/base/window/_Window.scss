@@ -4,7 +4,7 @@
 
 .ui-Window-header {}
 .ui-Window-header-innerCt {}
-.ui-Window-header-title {}
-.ui-Window-header-toolButtons {}
+.ui-Window-header-title { float: left; }
+.ui-Window-header-toolButtons { float: right; }
 
 .ui-Window-body {}
