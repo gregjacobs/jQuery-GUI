@@ -68,10 +68,10 @@ define( [
 			// Add the close button if the config is true
 			if( this.closeButton ) {
 				this.toolButtons = ( this.toolButtons || [] ).concat( {
-					ttype   : 'close',
+					toolType : 'close',
 					
-					handler : this.doClose,
-					scope   : this
+					handler  : this.doClose,
+					scope    : this
 				} );
 			}
 			

@@ -13,7 +13,7 @@ define( [
 	var ToolButton = Button.extend( {
 		
 		/**
-		 * @cfg {String} ttype (required)
+		 * @cfg {String} toolType (required)
 		 * 
 		 * The tool button type. Currently accepts the strings:
 		 * 
@@ -21,17 +21,30 @@ define( [
 		 * - closethick
 		 */
 		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'ui-ToolButton',
+		
 		
 		/**
 		 * @inheritdoc
 		 */
 		initComponent : function() {
 			// <debug>
-			if( !this.ttype ) throw new Error( "'ttype' cfg required" );
+			if( !this.toolType ) throw new Error( "'toolType' cfg required" );
 			// </debug>
 			
-			this.addCls( 'ui-ToolButton' );
-			this.iconCls = 'ui-ToolButton-icon ui-icon ui-icon-' + this.ttype;
+			var componentCls = this.componentCls,
+			    toolType = this.toolType;
+			
+			this.iconCls = [
+				'ui-icon',
+				'ui-icon-' + toolType,
+				componentCls + '-icon',
+				componentCls + '-icon-' + toolType
+			].join( " " );
 			
 			this._super( arguments );
 		}

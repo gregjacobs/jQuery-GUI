@@ -53,6 +53,12 @@
   border-width: 1px 0 0 0;
 }
 
+/* line 1, ../../../../src/sass/theme/basic/panel/_ToolButton.scss */
+.ui-ToolButton {
+  margin-top: 2px;
+  margin-right: 2px;
+}
+
 /* line 3, ../../../../src/sass/theme/basic/panel/_ToolButton.scss */
 .ui-ToolButton .ui-Button-icon {
   top: -1px;
