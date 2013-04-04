@@ -78,7 +78,7 @@ define( [
 		 * @property {ui.form.field.Text.Behavior} behaviorState
 		 * 
 		 * The {@link ui.form.field.Text.Behavior} object that governs the TextField's behavior.
-		 * This currently applies to either the TextField having a {@link ui.form.field.Field#default default} value, 
+		 * This currently applies to either the TextField having an {@link #emptyText} value, 
 		 * or the TextField having an "infield" {@link #labelAlign}.
 		 */
 		

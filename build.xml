@@ -3,10 +3,10 @@
 	<target name="doc" description="Builds the documentation. Available in /docs/ afterwards.">
 		<exec executable="${basedir}/vendor/jsduck/jsduck-4.4.1.exe" failonerror="true">
 			<arg value="--output=docs" />
-			<arg value="--external=jQuery" />
+			<arg value="--external=jQuery,jQuery.Event" />
 			<arg value="--title=UI.js API Docs" />
 			
-			<arg value="js/" />
+			<arg value="src/js/" />
 			<arg value="vendor/class/" />
 			<arg value="vendor/observable/" />
 		</exec>
@@ -15,7 +15,7 @@
 	
 	<target name="concat" description="Just for testing purposes for now, to check filesize after minifying">
 		<concat destfile="test.js">
-			<fileset dir="js/">
+			<fileset dir="src/js/">
 				<include name="**/*.js" />
 			</fileset>
 		</concat>

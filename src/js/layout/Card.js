@@ -20,6 +20,7 @@ define( [
 		
 		/**
 		 * @cfg {Number/ui.Component} activeItem
+		 * 
 		 * The item number or {@link ui.Component} reference to set as the initially active item. Defaults to 0 (for the first item). 
 		 * If this is a {@link ui.Component}, it should be a {@link ui.Component Component} that exists in the {@link ui.Container Container}.
 		 */
@@ -27,6 +28,7 @@ define( [
 		
 		/**
 		 * @cfg {Boolean} autoSize
+		 * 
 		 * By default, the CardsLayout tries to make each child component of the {@link #container} take up the available space in the target
 		 * element (much like the {@link ui.layout.Fit}, but this may be set to true to simply allow the child components to determine their own size.
 		 */
@@ -44,19 +46,9 @@ define( [
 		 * True to only render a child {@link ui.Component component} once it is shown, false to render all child components immediately.
 		 * Leaving this as true can improve initial rendering time, as only the shown component's rendering routine is actually performed.
 		 * However, switching to a new component the first time may be slightly delayed as that component must be rendered and laid out.
-		 * 
-		 * When using a {@link #transition} of {@link ui.layout.Card.SlideTransition}, it is recommended that this config is set
-		 * to false to remove choppiness on the first slide for a complex card (component).
 		 */
 		deferredRender : true,
 		
-		
-		/**
-		 * @protected
-		 * @property {ui.Component} activeItem
-		 * 
-		 * Stores the currently active item ({@link ui.Component}), after the layout's onLayout method has run.
-		 */
 		
 		/**
 		 * @protected
@@ -72,8 +64,9 @@ define( [
 		initLayout : function() {
 			this.addEvents(
 				/**
+				 * Fires when the active item has been changed.
+				 * 
 				 * @event cardchange
-				 * Fires when the active item has been changed. 
 				 * @param {ui.Component} card The {@link ui.Component} instance of the card that was activated. If no card has
 				 *   been activated (either by a null argument to {@link #setActiveItem}, or an index out of range), then this
 				 *   will be null.

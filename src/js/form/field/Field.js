@@ -122,7 +122,7 @@ define( [
 		
 		
 		/**
-		 * @cfg {String/String[]/Function/ui.template.Template} labelTpl
+		 * @cfg {String/String[]/Function/ui.template.Template} labelRenderTpl
 		 * 
 		 * The template to use as the HTML template for the Field's label.
 		 * 

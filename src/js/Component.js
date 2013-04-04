@@ -380,7 +380,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @private
 		 * @property {ui.anim.Animation} currentAnimation
 		 * 
-		 * The currently running {@link method-show}/{@link #method-hide} animation, if any. Will be null if the Component
+		 * The currently running {@link #method-show}/{@link #method-hide} animation, if any. Will be null if the Component
 		 * is not currently in the process of showing or hiding. This is only relevant when {@link #method-show} or
 		 * {@link #method-hide} is called with the `anim` option.
 		 */
@@ -555,7 +555,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 	
 				/**
 				 * Fires when the Component is beginning to hide. This event is useful if an `anim` option is specified to the
-				 * {@link #method-hide} method, as it fires just before the animation starts. The {@link #hide} 
+				 * {@link #method-hide} method, as it fires just before the animation starts. The {@link #event-hide} 
 				 * (and {@link #afterhide}) event will fire when the animation is complete, and the Component has been completely 
 				 * hidden. Note that this event will  fire regardless of if an `anim` option is provided to the {@link #method-hide} 
 				 * method or not.
@@ -568,7 +568,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				'hidebegin',
 	
 				/**
-				 * An alias of the {@link #hide} event, which can make handler-adding code more consistent and clear.
+				 * An alias of the {@link #event-hide} event, which can make handler-adding code more consistent and clear.
 				 * Having a 'complete' event for 'hide' also maintains consistency with {@link #aftershow}.
 				 * 
 				 * Only fires if the Component has been {@link #method-render rendered}.
@@ -830,7 +830,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		/**
 		 * Retrieves the additional attributes that are used to render the Component's {@link #$el element} with.
-		 * This method is called from {@link #render} when initially rendering the component.
+		 * This method is called from {@link #method-render} when initially rendering the component.
 		 * 
 		 * @protected
 		 * @return {Object} An Object (map) of the additional attributes which should be applied to the Component's
@@ -843,7 +843,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		/**
 		 * Retrieves the style properties that are used to render the Component's {@link #$el element} with. This method 
-		 * is called from {@link #render} when initially rendering the component.
+		 * is called from {@link #method-render} when initially rendering the component.
 		 * 
 		 * @protected
 		 * @return {Object} An Object (map) of the style properties which should be applied to the Component's main 
@@ -920,7 +920,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * when the {@link #onRender} hook method has been called, and after the {@link #html}, {@link #contentEl}, and 
 		 * {@link #tpl} configs have been processed and their content has been added to the Component's {@link #$el element}.
 		 * It is also called after the initial {@link #cfg-hidden} state has been processed, and any initial 
-		 * {@link #masked mask} has been applied.
+		 * {@link #cfg-masked mask} has been applied.
 		 * 
 		 * @protected
 		 * @method onAfterRender
@@ -1713,14 +1713,14 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		/**
 		 * Determines if the Component is hidden.
 		 * 
-		 * If the `checkDom` flag is not passed or is `false`, then this method simply returns the value of the {@link #hidden}
+		 * If the `checkDom` flag is not passed or is `false`, then this method simply returns the value of the {@link #property-hidden}
 		 * flag. If the `checkDom` flag is passed as true, this method tests for the Component's element visibility, and will 
 		 * return true if 1) the element itself is set as "display: none", 2) a parent element of the Component is set to 
 		 * `display: none;`, or 3) the element is not attached to the document.
 		 * 
 		 * @param {Boolean} [checkDom=false] `true` to also interrogate the DOM to see if the Component is hidden to the user
 		 *   (i.e. the element is not attached to the DOM, or its CSS `display` property is set to 'none'). If this argument is 
-		 *   provided as `true`, and the component is not yet {@link method-render rendered}, then this method will always return 
+		 *   provided as `true`, and the component is not yet {@link #method-render rendered}, then this method will always return 
 		 *   `true` (as an unrendered component can't be visible, and therefore must be hidden).
 		 * @return {Boolean} `true` if the Component is hidden, `false` otherwise.
 		 */
@@ -1744,13 +1744,13 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * Tests to see if the Component is visible.
 		 * 
 		 * If the `domVisible` flag is not passed or is `false`, then this method simply returns the opposite state of the internal
-		 * {@link #hidden} flag. If the `domVisible` flag is passed as true, this method tests for the Component's element visibility, 
+		 * {@link #property-hidden} flag. If the `domVisible` flag is passed as true, this method tests for the Component's element visibility, 
 		 * and will return false if 1) the element itself is set as "display: none", 2) a parent element of the Component is set to 
 		 * `display: none;`, or 3) the element is not attached to the document.
 		 * 
 		 * @param {Boolean} [domVisible=true] `true` to also interrogate the DOM to see if the Component is visible to the user
 		 *   (i.e. the element is attached to the DOM, and its CSS `display` property is something other than 'none'). If this argument 
-		 *   is provided as `true`, and the component is not yet {@link method-render rendered}, then this method will always return 
+		 *   is provided as `true`, and the component is not yet {@link #method-render rendered}, then this method will always return 
 		 *   `false` (as an unrendered component can't be visible).
 		 * @return {Boolean} `true` if the Component is visible, `false` otherwise.
 		 */

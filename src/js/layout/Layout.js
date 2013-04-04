@@ -26,19 +26,19 @@ define( [
 	 * They should first call the superclass `onLayout` method, and then implement the code to perform the desired layout.
 	 * Note the following items:
 	 * 
-	 * - {@link #onLayout} and {@link #afterLayout} will be executed each time the {@link #property-container container's} 
+	 * - {@link #onLayout} and {@link #afterLayout} will be executed each time the {@link #container container's} 
 	 *   {@link ui.Container#doLayout} method is executed. This means that {@link #onLayout} and {@link #afterLayout}
 	 *   may be called multiple times during the lifetime of the Layout, and this should be handled. Some layouts choose
 	 *   to have completely separate "first run" and "update layout" methods.
 	 * - Use the helper methods in this Layout class to {@link #renderComponent render} and {link #sizeComponent size}
-	 *   child components of the {@link #property-container}. They take into account details of the Layout system, and sizing details
+	 *   child components of the {@link #container}. They take into account details of the Layout system, and sizing details
 	 *   (such as accounting for child component padding/margin/border) that aren't handled elsewhere. See the 
 	 *   {@link #renderComponent} and {@link #sizeComponent} methods for details.
-	 * - Layouts should handle the case of the {@link #property-container} they are laying out having 0 child components, and it should
+	 * - Layouts should handle the case of the {@link #container} they are laying out having 0 child components, and it should
 	 *   also handle the cases where child components are added, removed, or reordered. However, try not execute the
 	 *   {@link #renderComponent} method (and thus the {@link ui.Component#method-render} method) when the component is already
 	 *   rendered and in the correct position. This adds DOM overhead, and can cause some weird behavior such as having
-	 *   {@link ui.form.Text Text Fields} to lose focus if a layout runs that does this.
+	 *   {@link ui.form.field.Text Text Fields} to lose focus if a layout runs that does this.
 	 * - Browser window resize events should not be handled within the Layout. The top level {@link ui.Viewport} will
 	 *   call its {@link ui.Container#doLayout doLayout} method to fix the layout automatically, on resize.
 	 * 
@@ -60,14 +60,6 @@ define( [
 		 * after instantiation with {@link #setContainer}. 
 		 */
 		container : null,
-		
-		/**
-		 * @protected
-		 * @property {ui.Container} container
-		 * 
-		 * The {@link ui.Container} that this Layout object belongs to, set by either the config option,
-		 * or the {@link #setContainer} method.
-		 */
 		
 		/**
 		 * @private
@@ -123,9 +115,9 @@ define( [
 		/**
 		 * Hook method which should be extended to provide any of the Layout's initialization logic.
 		 * 
-		 * Note that the {@link #property-container} reference may or may not be available when this method is
+		 * Note that the {@link #container} reference may or may not be available when this method is
 		 * called, so you shouldn't rely on its existence in it. To set up any initialization for the
-		 * {@link #property-container}, extend {@link #onContainerSet} instead.
+		 * {@link #container}, extend {@link #onContainerSet} instead.
 		 * 
 		 * @protected
 		 * @template
@@ -156,7 +148,7 @@ define( [
 		
 		
 		/**
-		 * Hook method which is executed when the {@link #property-container} is set to the Layout.
+		 * Hook method which is executed when the {@link #container} is set to the Layout.
 		 * This is executed upon initialization if the {@link #cfg-container} config was provided (but
 		 * after {@link #initLayout} is executed), or when {@link #setContainer} is called.
 		 * 
@@ -280,8 +272,8 @@ define( [
 		 * The main reason that this method checks to see if the {@link ui.Component#method-render} method needs to be called before
 		 * doing so is so that we do not end up moving components around the DOM when they don't need to be. Doing so will
 		 * make the browser do more work, and can also cause unwanted side effects. One of these side effects could be if the user 
-		 * is editing a {@link ui.form.TextArea TextArea Field}, and the field resizes, triggering a layout routine 
-		 * (see {@link ui.form.TextArea#autoGrow}). If a parent layout of the TextArea moves a component in the DOM, 
+		 * is editing a {@link ui.form.field.TextArea TextArea Field}, and the field resizes, triggering a layout routine 
+		 * (see {@link ui.form.field.TextArea#autoGrow}). If a parent layout of the TextArea moves a component in the DOM, 
 		 * the TextArea will lose focus, and the user would have to click into it again to continue editing.
 		 * 
 		 * @protected

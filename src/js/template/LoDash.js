@@ -55,7 +55,7 @@ define( [
 		
 		/**
 		 * @constructor
-		 * @param {String/String[]/Function/ui.templateTemplate} tpl A string or an array of strings which will be concatenated 
+		 * @param {String/String[]/Function/ui.template.Template} tpl A string or an array of strings which will be concatenated 
 		 *   together to generate the Lo-Dash template, a compiled Lo-Dash template function, or a {@link ui.template.Template} 
 		 *   instance which will simply be returned from this constructor.
 		 * @param {Object} options Any options to provide to the Lo-Dash template generator function. This argument

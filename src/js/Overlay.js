@@ -25,7 +25,7 @@ define( [
 		 * 
 		 * True by default, the Overlay is destroyed when it is closed for automatic DOM/memory management. However, if
 		 * the Overlay is to be reused between many opens/closes (to avoid the overhead of creating new ones), this can be set
-		 * to false so that it can be re-opened after it is closed.  A call to {@link #destroy} must be done manually however
+		 * to false so that it can be re-opened after it is closed.  A call to {@link #method-destroy} must be done manually however
 		 * once the Overlay is no longer needed, to clean up its elements and event handlers (which includes its window resize
 		 * handler).
 		 */
@@ -34,7 +34,7 @@ define( [
 		/**
 		 * @cfg {Boolean} autoShow
 		 * 
-		 * Set to `true` to automatically show the Overlay when it is instantiated. If false, a call to {@link #show} is
+		 * Set to `true` to automatically show the Overlay when it is instantiated. If false, a call to {@link #method-show} is
 		 * required to open the overlay.
 		 */
 		autoShow : false,
@@ -70,7 +70,7 @@ define( [
 		 * to the {@link #method-hide} method. Note that an `anim` option provided to the {@link #method-hide} method 
 		 * always overrides this config for that call
 		 * 
-		 * This config is especially useful with the {@link #hideOnEscape} config, as the call to the {@link method-hide} method
+		 * This config is especially useful with the {@link #hideOnEscape} config, as the call to the {@link #method-hide} method
 		 * is made behind the scenes in this case.
 		 */
 	
