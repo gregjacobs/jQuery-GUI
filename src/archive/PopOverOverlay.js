@@ -20,7 +20,19 @@
  */
 /*global Class, window, jQuery, Jux, ui */
 ui.Overlay = Class.extend( ui.AbstractOverlay, {
-		
+
+	
+	/**
+	 * @cfg {Boolean} autoDestroy
+	 * 
+	 * True by default, the Overlay is destroyed when it is {@link #method-hide hidden} for automatic DOM/memory management. However, if
+	 * the Overlay is to be reused between many shows/hides (to avoid the overhead of creating new ones), this can be set
+	 * to false so that it can be re-shown after it is hidden.  A call to {@link #method-destroy} must be done manually however
+	 * once the Overlay is no longer needed, to clean up its elements and event handlers (which includes its window resize
+	 * handler).
+	 */
+	autoDestroy : true,
+	
 	/**
 	 * @cfg {Object} arrow
 	 * A position for an arrow on the overlay. This is an object (hash) which should have the following properties:
@@ -324,6 +336,24 @@ ui.Overlay = Class.extend( ui.AbstractOverlay, {
 			.unbind( 'touchend', this.docBodyClickHandler );
 		this.docBodyClickHandler = null;
 	},
+
+	
+	
+		/**
+		 * Implementation of hook method from superclass which implements the {@link #autoDestroy} config. If the {@link #autoDestroy}
+		 * config is true, it will be destroyed after the Overlay has been hidden.
+		 * 
+		 * @protected
+		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
+		 */
+		onAfterHide : function( options ) {
+			this._super( arguments );
+			
+			// If the `autoDestroy` config is true, destroy this Overlay when hidden for DOM/memory management
+			if( this.autoDestroy ) {
+				this.destroy();
+			}
+		},
 	
 	
 		// -----------------------------------------

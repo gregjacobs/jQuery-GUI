@@ -11,6 +11,7 @@ define( [
 ], function( jQuery, _, Class, UI, Animation, Component, Panel ) {
 	
 	/**
+	 * @abstract
 	 * @class ui.Overlay
 	 * @extends ui.panel.Panel
 	 *
@@ -19,34 +20,17 @@ define( [
 	 * {@link #anchor} config.
 	 */
 	var Overlay = Panel.extend( {
-	
-		/**
-		 * @cfg {Boolean} autoDestroy
-		 * 
-		 * True by default, the Overlay is destroyed when it is closed for automatic DOM/memory management. However, if
-		 * the Overlay is to be reused between many opens/closes (to avoid the overhead of creating new ones), this can be set
-		 * to false so that it can be re-opened after it is closed.  A call to {@link #method-destroy} must be done manually however
-		 * once the Overlay is no longer needed, to clean up its elements and event handlers (which includes its window resize
-		 * handler).
-		 */
-		autoDestroy : true,
+		abstractClass : true,
+		
 		
 		/**
 		 * @cfg {Boolean} autoShow
 		 * 
 		 * Set to `true` to automatically show the Overlay when it is instantiated. If false, a call to {@link #method-show} is
-		 * required to open the overlay.
+		 * required to show the overlay.
 		 */
 		autoShow : false,
 		
-		/**
-		 * @cfg {Boolean} hideOnEscape
-		 * 
-		 * `true` to have the Overlay hide when the 'esc' key is pressed. Set to `false` to disable this behavior.
-		 */
-		hideOnEscape : true,
-	
-	
 		/**
 		 * @cfg {Object} showAnim
 		 * 
@@ -58,20 +42,21 @@ define( [
 		 * to the {@link #method-show} method. Note that an `anim` option provided to the {@link #method-show} method 
 		 * always overrides this config for that call.
 		 */
-	
+		
 		/**
 		 * @cfg {Object} hideAnim
 		 * 
 		 * A {@link ui.anim.Animation} configuration object to animate the "hide" transition. You do not need to specify
 		 * the {@link ui.anim.Animation#target} parameter however, as it will be set to this Overlay.
 		 * 
-		 * This config is to provide a adefault animation that the Overlay always hides with. If the animation is to be
+		 * This config is to provide a default animation that the Overlay always hides with. If the animation is to be
 		 * different for different calls to {@link #method-hide}, one may supply the animation config in the `anim` option
 		 * to the {@link #method-hide} method. Note that an `anim` option provided to the {@link #method-hide} method 
 		 * always overrides this config for that call
 		 * 
-		 * This config is especially useful with the {@link #hideOnEscape} config, as the call to the {@link #method-hide} method
-		 * is made behind the scenes in this case.
+		 * This config is especially useful with the {@link ui.window.Window#closeOnEscape} config of the
+		 * {@link ui.window.Window Window} subclass, as the call to the {@link #method-hide} method is made behind the scenes 
+		 * in this case.
 		 */
 	
 	
@@ -147,7 +132,7 @@ define( [
 		 * viewable area of the browser's viewport (at least as much as possible).
 		 */
 		constrainToViewport : true,
-	
+		
 		/**
 		 * @cfg
 		 * @inheritdoc
@@ -162,7 +147,7 @@ define( [
 		 * automatically be rendered into the document body when it is opened.
 		 */
 		
-	
+		
 		/**
 		 * @protected
 		 * @property {jQuery} $contentContainer
@@ -198,24 +183,10 @@ define( [
 	
 	
 		/**
-		 * Extension of onRender which is used to create Overlay and its inner overlay content.
-		 *
-		 * @protected
-		 * @method onRender
+		 * @inheritdoc
 		 */
 		onRender : function() {
-			this._super( arguments );
-			
-			// If the closeOnEscape config is true, set up a keydown event for it to close the overlay.
-			if( this.closeOnEscape ) {
-				var me = this;  // for closure
-				this.$el.keyup( function( evt ) {
-					if( evt.keyCode === 27 ) {  // 'esc' char
-						me.close();
-					}
-				} );
-			}
-			
+			this._super( arguments );			
 			
 			// Set up an event handler for the window's resize event, to re-size and re-position the overlay based on the
 			// new viewport's size.  The handler for this event is "debounced" just a little, so that the many resize events
@@ -296,23 +267,6 @@ define( [
 				// No new `anchor` or x/y configs provided in the call to this method, position the Overlay based on any 
 				// pre-configured values
 				this.updatePosition();
-			}
-		},
-		
-		
-		/**
-		 * Implementation of hook method from superclass which implements the {@link #autoDestroy} config. If the {@link #autoDestroy}
-		 * config is true, it will be destroyed after the Overlay has been hidden.
-		 * 
-		 * @protected
-		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
-		 */
-		onAfterHide : function( options ) {
-			this._super( arguments );
-			
-			// If the `autoDestroy` config is true, destroy this Overlay when hidden for DOM/memory management
-			if( this.autoDestroy ) {
-				this.destroy();
 			}
 		},
 		
@@ -471,7 +425,6 @@ define( [
 		 * Event handler for the browser window's resize event, in which the Overlay is re-positioned.
 		 *
 		 * @protected
-		 * @method onWindowResize
 		 */
 		onWindowResize : function() {
 			this.updatePosition();
