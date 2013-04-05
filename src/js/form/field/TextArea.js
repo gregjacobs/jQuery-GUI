@@ -176,7 +176,16 @@ define( [
 		 * @return {jQuery}
 		 */
 		createInputEl : function() {
-			return jQuery( '<textarea id="' + this.inputId + '" name="' + this.inputName + '" class="' + this.componentCls + '-input">' + ( this.value || "" ) + '</textarea>' );  
+			return jQuery( [ 
+				'<textarea',
+				' id="' + this.inputId + '"',
+				' name="' + this.inputName + '"',
+				' class="' + this.componentCls + '-input"',
+				( this.readOnly ? ' readonly="readonly"' : '' ),
+				'>',
+					( this.value || "" ),
+				'</textarea>'
+			].join( "" ) );  
 		},
 		
 		

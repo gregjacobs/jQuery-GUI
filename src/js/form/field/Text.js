@@ -60,6 +60,12 @@ define( [
 		 */
 		
 		/**
+		 * @cfg {Boolean} readOnly
+		 * 
+		 * True to mark the Field as "read only" in the HTML. This prevents the user from editing the Field.
+		 */
+		
+		/**
 		 * @cfg
 		 * @inheritdoc
 		 */
@@ -171,7 +177,15 @@ define( [
 		 */
 		createInputEl : function() {
 			var value = Html.encode( this.value || "" );
-			return jQuery( '<input type="text" class="' + this.componentCls + '-input" id="' + this.inputId + '" name="' + this.inputName + '" value="' + value + '" />' );  
+			return jQuery( [ 
+				'<input type="text"',
+				' id="' + this.inputId + '"',
+				' name="' + this.inputName + '"',
+				' class="' + this.componentCls + '-input"',
+				' value="' + value + '"',
+				( this.readOnly ? ' readonly="readonly"' : '' ),
+				'/>'
+			].join( "" ) );
 		},
 		
 		

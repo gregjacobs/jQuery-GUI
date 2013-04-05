@@ -9,13 +9,62 @@ define( [
 		
 		describe( "rendering", function() {
 			
+			it( "should create the inputEl with the id of the `inputId` config", function() {
+				var textAreaField = new TextAreaField( {
+					renderTo : 'body',
+					inputId  : '__ui_form_field_TextArea_inputIdTest'
+				} );
+				
+				expect( textAreaField.getInputEl().attr( 'id' ) ).toBe( "__ui_form_field_TextArea_inputIdTest" );
+				
+				textAreaField.destroy();
+			} );
+			
+			
+			it( "should create the inputEl with the name of the `inputName` config", function() {
+				var textAreaField = new TextAreaField( {
+					renderTo : 'body',
+					inputName  : '__ui_form_field_TextArea_inputNameTest'
+				} );
+				
+				expect( textAreaField.getInputEl().attr( 'name' ) ).toBe( "__ui_form_field_TextArea_inputNameTest" );
+				
+				textAreaField.destroy();
+			} );
+			
+			
+			it( "should create the inputEl with the 'readonly' attribute, if the `readOnly` config is `true`", function() {
+				var textAreaField = new TextAreaField( {
+					renderTo : 'body',
+					readOnly : true
+				} );
+				
+				expect( textAreaField.getInputEl().attr( 'readonly' ) ).toBe( "readonly" );
+				
+				textAreaField.destroy();
+			} );
+			
+			
+			it( "should create the inputEl with the value of the `value` config", function() {
+				var textAreaField = new TextAreaField( {
+					renderTo : 'body',
+					value : "__ui_form_field_TextArea_inputValueTest"
+				} );
+				
+				expect( textAreaField.getInputEl().val() ).toBe( "__ui_form_field_TextArea_inputValueTest" );
+				
+				textAreaField.destroy();
+			} );
+			
+			
 			it( "should work correctly with a height configured on the component", function() {
 				var textAreaField = new TextAreaField( {
 					renderTo : 'body',
 					height   : 150
 				} );
 				
-				// test should simply not error (for now)
+				// test should simply not error (for now).
+				// TODO: Add logic to test that the height of the textarea itself is heightOfField - heightOfSurroundingElements
 				
 				textAreaField.destroy();
 			} );

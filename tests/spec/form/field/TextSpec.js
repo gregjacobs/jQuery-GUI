@@ -8,6 +8,58 @@ define( [
 	
 	describe( 'ui.form.field.Text', function() {
 		
+		describe( "rendering", function() {
+			
+			it( "should create the inputEl with the id of the `inputId` config", function() {
+				var textField = new TextField( {
+					renderTo : 'body',
+					inputId  : '__ui_form_field_Text_inputIdTest'
+				} );
+				
+				expect( textField.getInputEl().attr( 'id' ) ).toBe( "__ui_form_field_Text_inputIdTest" );
+				
+				textField.destroy();
+			} );
+			
+			
+			it( "should create the inputEl with the name of the `inputName` config", function() {
+				var textField = new TextField( {
+					renderTo : 'body',
+					inputName  : '__ui_form_field_Text_inputNameTest'
+				} );
+				
+				expect( textField.getInputEl().attr( 'name' ) ).toBe( "__ui_form_field_Text_inputNameTest" );
+				
+				textField.destroy();
+			} );
+			
+			
+			it( "should create the inputEl with the 'readonly' attribute, if the `readOnly` config is `true`", function() {
+				var textField = new TextField( {
+					renderTo : 'body',
+					readOnly : true
+				} );
+				
+				expect( textField.getInputEl().attr( 'readonly' ) ).toBe( "readonly" );
+				
+				textField.destroy();
+			} );
+			
+			
+			it( "should create the inputEl with the value of the `value` config", function() {
+				var textField = new TextField( {
+					renderTo : 'body',
+					value : "__ui_form_field_Text_inputValueTest"
+				} );
+				
+				expect( textField.getInputEl().val() ).toBe( "__ui_form_field_Text_inputValueTest" );
+				
+				textField.destroy();
+			} );
+			
+		} );
+		
+		
 		describe( "Test the 'change' Event", function() {
 			
 			it( "Setting the initial value to the field should *not* fire the 'change' event", function() {
