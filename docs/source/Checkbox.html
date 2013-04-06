@@ -23,15 +23,15 @@ define( [
 	'ui/form/field/Field'
 ], function( jQuery, _, ComponentManager, Field ) {
 	
-<span id='ui-form-field-Field-Checkbox'>	/**
-</span>	 * @class ui.form.field.Field.Checkbox
+<span id='ui-form-field-Checkbox'>	/**
+</span>	 * @class ui.form.field.Checkbox
 	 * @extends ui.form.field.Field
 	 *  
 	 * Checkbox field component.
 	 */
 	var CheckboxField = Field.extend( {
 		
-<span id='ui-form-field-Field-Checkbox-cfg-checkboxLabel'>		/**
+<span id='ui-form-field-Checkbox-cfg-checkboxLabel'>		/**
 </span>		 * @cfg {String} checkboxLabel
 		 * 
 		 * The label for the checkbox itself, which will be placed to the right of the checkbox. This config is to differentiate from
@@ -44,20 +44,20 @@ define( [
 		 */
 		checkboxLabel : &quot;&quot;,
 		
-<span id='ui-form-field-Field-Checkbox-cfg-value'>		/**
+<span id='ui-form-field-Checkbox-cfg-value'>		/**
 </span>		 * @cfg {String/Function} value
 		 * 
 		 * The initial value for the field, if any. Any truthy value will initialize the checkbox as checked.
 		 */
 		
-<span id='ui-form-field-Field-Checkbox-cfg-componentCls'>		/**
+<span id='ui-form-field-Checkbox-cfg-componentCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
 		componentCls : 'ui-form-CheckboxField',
 		
 		
-<span id='ui-form-field-Field-Checkbox-method-onRender'>		/**
+<span id='ui-form-field-Checkbox-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function() {
@@ -81,7 +81,7 @@ define( [
 		
 		
 		
-<span id='ui-form-field-Field-Checkbox-method-setValue'>		/**
+<span id='ui-form-field-Checkbox-method-setValue'>		/**
 </span>		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {Boolean} value The value of the field. If truthy, the checkbox will be checked. If falsy, the checkbox will be unchecked.
@@ -95,7 +95,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Field-Checkbox-method-getValue'>		/**
+<span id='ui-form-field-Checkbox-method-getValue'>		/**
 </span>		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {Boolean} The value of the field (true if it's checked, false otherwise).

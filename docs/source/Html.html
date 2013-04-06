@@ -20,15 +20,15 @@ define( [
 	'lodash'
 ], function( _ ) {
 	
-<span id='ui-Html'>	/**
-</span>	 * @class ui.Html
+<span id='ui-util-Html'>	/**
+</span>	 * @class ui.util.Html
 	 * @singleton
 	 * 
 	 * Utility class for doing html/text transformations.
 	 */
 	var Html = {
 		
-<span id='ui-Html-method-encode'>		/**
+<span id='ui-util-Html-method-encode'>		/**
 </span>		 * Converts certain characters (&amp;, &lt;, &gt;, and &quot;) to their HTML entity equivalents for literal display in web pages, and for
 		 * using HTML strings within HTML attributes.
 		 * 
@@ -41,7 +41,7 @@ define( [
 		},
 		
 		
-<span id='ui-Html-method-decode'>		/**
+<span id='ui-util-Html-method-decode'>		/**
 </span>		 * Converts certain characters (&amp;, &lt;, &gt;, and &quot;) from their HTML entity equivalents.
 		 * 
 		 * @method decode
@@ -53,7 +53,7 @@ define( [
 		},
 		
 		
-<span id='ui-Html-method-stripTags'>		/**
+<span id='ui-util-Html-method-stripTags'>		/**
 </span>		 * Returns the html with all tags stripped.
 		 * 
 		 * @method stripTags
@@ -65,7 +65,7 @@ define( [
 		},
 		
 		
-<span id='ui-Html-method-nl2br'>		/**
+<span id='ui-util-Html-method-nl2br'>		/**
 </span>		 * Replace newlines with &amp;lt;br /&amp;gt; tags
 		 * 
 		 * @method nl2br
@@ -77,7 +77,7 @@ define( [
 		},
 		
 		
-<span id='ui-Html-method-attrMapToString'>		/**
+<span id='ui-util-Html-method-attrMapToString'>		/**
 </span>		 * Given an Object (map) of attribute name/value pairs, will return a string that can be placed directly
 		 * into an HTML tag to add attributes to that element.
 		 * 
