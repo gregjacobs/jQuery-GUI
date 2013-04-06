@@ -193,7 +193,16 @@ define( [
 		 * @return {jQuery}
 		 */
 		createInputEl : function() {
-			return jQuery( '&lt;textarea id=&quot;' + this.inputId + '&quot; name=&quot;' + this.inputName + '&quot; class=&quot;' + this.componentCls + '-input&quot;&gt;' + ( this.value || &quot;&quot; ) + '&lt;/textarea&gt;' );  
+			return jQuery( [ 
+				'&lt;textarea',
+				' id=&quot;' + this.inputId + '&quot;',
+				' name=&quot;' + this.inputName + '&quot;',
+				' class=&quot;' + this.componentCls + '-input&quot;',
+				( this.readOnly ? ' readonly=&quot;readonly&quot;' : '' ),
+				'&gt;',
+					( this.value || &quot;&quot; ),
+				'&lt;/textarea&gt;'
+			].join( &quot;&quot; ) );  
 		},
 		
 		

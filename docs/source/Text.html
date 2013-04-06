@@ -76,6 +76,12 @@ define( [
 		 * The initial value for the field, if any.
 		 */
 		
+<span id='ui-form-field-Text-cfg-readOnly'>		/**
+</span>		 * @cfg {Boolean} readOnly
+		 * 
+		 * True to mark the Field as &quot;read only&quot; in the HTML. This prevents the user from editing the Field.
+		 */
+		
 <span id='ui-form-field-Text-cfg-componentCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
@@ -188,7 +194,15 @@ define( [
 		 */
 		createInputEl : function() {
 			var value = Html.encode( this.value || &quot;&quot; );
-			return jQuery( '&lt;input type=&quot;text&quot; class=&quot;' + this.componentCls + '-input&quot; id=&quot;' + this.inputId + '&quot; name=&quot;' + this.inputName + '&quot; value=&quot;' + value + '&quot; /&gt;' );  
+			return jQuery( [ 
+				'&lt;input type=&quot;text&quot;',
+				' id=&quot;' + this.inputId + '&quot;',
+				' name=&quot;' + this.inputName + '&quot;',
+				' class=&quot;' + this.componentCls + '-input&quot;',
+				' value=&quot;' + value + '&quot;',
+				( this.readOnly ? ' readonly=&quot;readonly&quot;' : '' ),
+				'/&gt;'
+			].join( &quot;&quot; ) );
 		},
 		
 		
