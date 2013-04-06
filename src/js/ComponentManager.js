@@ -15,9 +15,10 @@ define( [
 		
 		/**
 		 * @private
-		 * @property componentClasses
-		 * A map of the {@link ui.Component} classes, keyed by their type name.
-		 * @type Object
+		 * @property {Object} componentClasses
+		 * 
+		 * An Object (map) of the {@link ui.Component} classes which have been {@link #registerType registered}, 
+		 * keyed by their type name. 
 		 */
 		componentClasses : {},
 	   

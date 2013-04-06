@@ -17,12 +17,19 @@ define( [
 	 * @class UI
 	 * @singleton
 	 * 
-	 * Main singleton class of a few utility functions for the UI library.
+	 * Main singleton class of a few utility functions for the UI library. 
+	 * 
+	 * This class can be included in implementations by using the RequireJS path of 'ui/UI'. Ex:
+	 * 
+	 *     require( [ 'ui/UI' ], function( UI ) {
+	 *         console.log( "This browser's scrollbar width: ", UI.getScrollbarWidth(), "px" );
+	 *     } );
 	 */
 	var UI = Class.extend( Object, {
 
 		/**
-		 * @property {Boolean} isIE (readonly)
+		 * @readonly
+		 * @property {Boolean} isIE
 		 * 
 		 * Will be true if the browser is Internet Explorer, false otherwise.
 		 */

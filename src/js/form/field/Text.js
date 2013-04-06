@@ -89,7 +89,9 @@ define( [
 		 */
 		
 		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		initComponent : function() {
 			this._super( arguments );
 			
@@ -142,8 +144,9 @@ define( [
 		},
 		
 		
-		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		onRender : function( container ) {
 			// Call superclass onRender()
 			this._super( arguments );

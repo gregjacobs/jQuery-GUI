@@ -7,7 +7,7 @@ define( [
 function( jQuery, _, UI ) {
 	
 	/**
-	 * @class UI.Css
+	 * @class ui.util.Css
 	 * @singleton
 	 * 
 	 * General CSS manipulation/reading functionality.  Allows the dynamic modification of 

@@ -4,7 +4,7 @@ define( [
 ], function( _ ) {
 	
 	/**
-	 * @class ui.Html
+	 * @class ui.util.Html
 	 * @singleton
 	 * 
 	 * Utility class for doing html/text transformations.

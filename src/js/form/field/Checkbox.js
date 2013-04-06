@@ -7,7 +7,7 @@ define( [
 ], function( jQuery, _, ComponentManager, Field ) {
 	
 	/**
-	 * @class ui.form.field.Field.Checkbox
+	 * @class ui.form.field.Checkbox
 	 * @extends ui.form.field.Field
 	 *  
 	 * Checkbox field component.

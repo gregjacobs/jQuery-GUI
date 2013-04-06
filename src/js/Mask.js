@@ -8,6 +8,7 @@ function( jQuery, _, Class ) {
 	
 	/**
 	 * @class ui.Mask
+	 * @extends Object
 	 * 
 	 * Generalized class that can create a mask over any given element, and provides a simple interface
 	 * to show, hide, and add content to it.
