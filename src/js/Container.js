@@ -139,7 +139,6 @@ define( [
 				 * Fires after a Component has been added to this Container. This event bubbles.
 				 *
 				 * @event add
-				 * @bubbles
 				 * @param {ui.Container} container This Container.
 				 * @param {ui.Component} component The Component that was added.
 				 * @param {Number} index The index in this Container's child items array that the Component was added to.
@@ -174,7 +173,6 @@ define( [
 				 * Fires after a Component has been removed from this Container. This event bubbles.
 				 *
 				 * @event remove
-				 * @bubbles
 				 * @param {ui.Container} container This Container.
 				 * @param {ui.Component} component The Component that was removed.
 				 * @param {Number} index The index in this Container's child items array that the Component was removed from.
