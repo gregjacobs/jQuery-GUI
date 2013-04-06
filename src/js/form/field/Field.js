@@ -73,7 +73,7 @@ define( [
 		/**
 		 * @cfg {Mixed} value
 		 * 
-		 * The initial value for the field, if any.
+		 * The initial value for the Field, if any.
 		 */
 		 
 		
