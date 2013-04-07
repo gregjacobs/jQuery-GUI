@@ -1,6 +1,6 @@
 /*global define */
 define( [
-	'ui/Button',
+	'ui/button/Button',
 	'ui/ComponentManager'
 ], function( Button, ComponentManager ) {
 	

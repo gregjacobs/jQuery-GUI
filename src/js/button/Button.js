@@ -8,7 +8,7 @@ define( [
 ], function( jQuery, _, Component, ComponentManager, LoDashTpl ) {
 
 	/**
-	 * @class ui.Button
+	 * @class ui.button.Button
 	 * @extends ui.Component
 	 * 
 	 * A generic button that calls its {@link #handler} when clicked.
