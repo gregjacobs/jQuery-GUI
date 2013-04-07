@@ -28,7 +28,7 @@ define( [
 				var layout = fixture.getLayout();
 				layout.doLayout();
 				
-				JsMockito.verify( childComponents[ 1 ] ).setSize( fixture.getTargetElWidth() - cmp0Width, undefined );
+				JsMockito.verify( childComponents[ 1 ] ).setSize( fixture.getContainerWidth() - cmp0Width, undefined );
 			} );
 			
 			
@@ -47,10 +47,10 @@ define( [
 				layout.doLayout();
 				
 				// Note: Changed implementation to always use width: 100% to allow the browser to resize the components
-				JsMockito.verify( childComponents[ 0 ] ).setSize( Math.floor( 1/6 * fixture.getTargetElWidth() ), undefined );
-				JsMockito.verify( childComponents[ 1 ] ).setSize( Math.floor( 2/6 * fixture.getTargetElWidth() ), undefined );
-				JsMockito.verify( childComponents[ 2 ] ).setSize( Math.floor( 1/6 * fixture.getTargetElWidth() ), undefined );
-				JsMockito.verify( childComponents[ 3 ] ).setSize( Math.floor( 2/6 * fixture.getTargetElWidth() ) + 1, undefined );  // the + 1 is the floored sum of the trimmed off decimal remainders from flexing other components
+				JsMockito.verify( childComponents[ 0 ] ).setSize( Math.floor( 1/6 * fixture.getContainerWidth() ), undefined );
+				JsMockito.verify( childComponents[ 1 ] ).setSize( Math.floor( 2/6 * fixture.getContainerWidth() ), undefined );
+				JsMockito.verify( childComponents[ 2 ] ).setSize( Math.floor( 1/6 * fixture.getContainerWidth() ), undefined );
+				JsMockito.verify( childComponents[ 3 ] ).setSize( Math.floor( 2/6 * fixture.getContainerWidth() ) + 1, undefined );  // the + 1 is the floored sum of the trimmed off decimal remainders from flexing other components
 			} );
 			
 			
@@ -66,7 +66,7 @@ define( [
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();
-				JsMockito.verify( childComponents[ 0 ] ).setSize( fixture.getTargetElWidth(), undefined );
+				JsMockito.verify( childComponents[ 0 ] ).setSize( fixture.getContainerWidth(), undefined );
 			} );
 			
 			
@@ -83,7 +83,7 @@ define( [
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();
-				JsMockito.verify( childComponents[ 0 ] ).setSize( fixture.getTargetElWidth(), undefined );
+				JsMockito.verify( childComponents[ 0 ] ).setSize( fixture.getContainerWidth(), undefined );
 			} );
 			
 		} );

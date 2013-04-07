@@ -175,7 +175,7 @@ define( [
 		 * 
 		 * @return {Number} The target element's width.
 		 */
-		getTargetElWidth : function() {
+		getContainerWidth : function() {
 			return this.targetWidth;
 		},
 		
@@ -186,7 +186,7 @@ define( [
 		 * 
 		 * @return {Number} The target element's height.
 		 */
-		getTargetElHeight : function() {
+		getContainerHeight : function() {
 			return this.targetHeight;
 		},
 		

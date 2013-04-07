@@ -46,7 +46,7 @@ define( [
 				layout.doLayout();
 				
 				JsMockito.verify( childCmp ).render( fixture.getTargetEl() );
-				JsMockito.verify( childCmp ).setSize( fixture.getTargetElWidth() - lrPadding - lrMargin - lrBorderWidth, fixture.getTargetElHeight() - tbPadding - tbMargin - tbBorderWidth );
+				JsMockito.verify( childCmp ).setSize( fixture.getContainerWidth() - lrPadding - lrMargin - lrBorderWidth, fixture.getContainerHeight() - tbPadding - tbMargin - tbBorderWidth );
 			} );
 			
 			
@@ -61,7 +61,7 @@ define( [
 				var layout = fixture.getLayout();
 				layout.doLayout();
 				
-				JsMockito.verify( childCmp ).setSize( fixture.getTargetElWidth(), fixture.getTargetElHeight() );
+				JsMockito.verify( childCmp ).setSize( fixture.getContainerWidth(), fixture.getContainerHeight() );
 				JsMockito.verify( childCmp ).render( fixture.getTargetEl() );   // Call render(), to make sure the component is in the correct place
 				
 				$cmpEl.remove();
@@ -105,8 +105,8 @@ define( [
 				
 				JsMockito.verify( childCmp, JsMockito.Verifiers.once() ).render( fixture.getTargetEl() );   // should only be rendered the first time
 				
-				var targetWidth = fixture.getTargetElWidth(),
-				    targetHeight = fixture.getTargetElHeight();
+				var targetWidth = fixture.getContainerWidth(),
+				    targetHeight = fixture.getContainerHeight();
 				JsMockito.verify( childCmp ).setSize( targetWidth, targetHeight );   // verify that it was set to the initial size first
 				JsMockito.verify( childCmp ).setSize( 42, 7 );                       // verify that it was set to the new size as well
 			} );

@@ -29,7 +29,7 @@ define( [
 				layout.doLayout();
 				
 				// Note: Changed implementation to always use width: 100% to allow the browser to resize the components
-				JsMockito.verify( childComponents[ 1 ] ).setSize( /*thisSuite.targetWidth*/ '100%', fixture.getTargetElHeight() - cmp0Height );
+				JsMockito.verify( childComponents[ 1 ] ).setSize( /*thisSuite.targetWidth*/ '100%', fixture.getContainerHeight() - cmp0Height );
 			} );
 			
 			
@@ -48,10 +48,10 @@ define( [
 				layout.doLayout();
 				
 				// Note: Changed implementation to always use width: 100% to allow the browser to resize the components
-				JsMockito.verify( childComponents[ 0 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 1/6 * fixture.getTargetElHeight() ) );
-				JsMockito.verify( childComponents[ 1 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 2/6 * fixture.getTargetElHeight() ) );
-				JsMockito.verify( childComponents[ 2 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 1/6 * fixture.getTargetElHeight() ) );
-				JsMockito.verify( childComponents[ 3 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 2/6 * fixture.getTargetElHeight() ) + 1 );  // the + 1 is the floored sum of the trimmed off decimal remainders from flexing other components
+				JsMockito.verify( childComponents[ 0 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 1/6 * fixture.getContainerHeight() ) );
+				JsMockito.verify( childComponents[ 1 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 2/6 * fixture.getContainerHeight() ) );
+				JsMockito.verify( childComponents[ 2 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 1/6 * fixture.getContainerHeight() ) );
+				JsMockito.verify( childComponents[ 3 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 2/6 * fixture.getContainerHeight() ) + 1 );  // the + 1 is the floored sum of the trimmed off decimal remainders from flexing other components
 			} );
 			
 			
@@ -67,7 +67,7 @@ define( [
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();
-				JsMockito.verify( childComponents[ 0 ] ).setSize( '100%', fixture.getTargetElHeight() );
+				JsMockito.verify( childComponents[ 0 ] ).setSize( '100%', fixture.getContainerHeight() );
 			} );
 			
 			
@@ -84,7 +84,7 @@ define( [
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();
-				JsMockito.verify( childComponents[ 0 ] ).setSize( '100%', fixture.getTargetElHeight() );
+				JsMockito.verify( childComponents[ 0 ] ).setSize( '100%', fixture.getContainerHeight() );
 			} );
 			
 		} );
