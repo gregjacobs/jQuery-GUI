@@ -14,10 +14,10 @@ define( [
 ], function( Class, jQuery, _ ) {
 
 	/**
-	 * @class UI
+	 * @class ui.UI
 	 * @singleton
 	 * 
-	 * Main singleton class of a few utility functions for the UI library. 
+	 * Main singleton class of library with a few base utility functions. 
 	 * 
 	 * This class can be included in implementations by using the RequireJS path of 'ui/UI'. Ex:
 	 * 
