@@ -21,14 +21,14 @@ define( [
 				var childComponents = fixture.createChildComponents( 2 );
 				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( childComponents );
 				
-				var cmp0Width = 20;
+				var cmp0Width = 19;  // using 19 instead of 20, because HBox adds a pixel as a workaround for the cases that browsers are computing sub-pixel widths, and so we don't get float wrapping in these cases
 				JsMockito.when( childComponents[ 0 ] ).getOuterWidth().thenReturn( cmp0Width );
 				childComponents[ 1 ].flex = 1;  // Set the flex config on the 2nd component
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();
 				
-				JsMockito.verify( childComponents[ 1 ] ).setSize( fixture.getContainerWidth() - cmp0Width, undefined );
+				JsMockito.verify( childComponents[ 1 ] ).setSize( fixture.getContainerWidth() - (cmp0Width+1), undefined );  // +1 for HBox floats workaround w/ browser sub-pixel widths
 			} );
 			
 			

@@ -100,7 +100,12 @@ define( [
 					if( !childComponent.flex ) {
 						// Not a flexed component, do its layout
 						childComponent.doLayout();
-						totalUnflexedWidth += childComponent.getOuterWidth( /* includeMargin */ true );
+						
+						// Sadly, the element being measured may have a sub-pixel width, but jQuery returns the floor value of 
+						// it. And in this case, we would get float wrapping because the sum of the actual widths would be greater 
+						// than the container width after flex values are computed. So simply adding one pixel as a workaround
+						// at this point. May have to do something different in the future, with a table layout.
+						totalUnflexedWidth += Math.floor( 1 + childComponent.getOuterWidth( /* includeMargin */ true ) );
 						
 					} else {
 						// Flexed component: push it onto the flexed components processing array for the next step
