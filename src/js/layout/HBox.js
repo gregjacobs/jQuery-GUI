@@ -87,7 +87,10 @@ define( [
 			// While we're at it, we'll add up the total flex that components which *do* have a flex value have.
 			for( i = 0; i < numChildComponents; i++ ) {
 				childComponent = childComponents[ i ];
-				childComponent.setStyle( 'float', 'left' );  // need to float left so the elements don't take up full width
+				
+				// Add the CSS class to components to be able to place them in an HBox layout. This adds `float:left;`,
+				// and a few other fixing styles.
+				childComponent.addCls( 'ui-layout-HBox-component' );
 				
 				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
 				this.renderComponent( childComponent, $targetEl, { position: i } );
@@ -133,7 +136,7 @@ define( [
 			}
 			
 			if( !this.$clearEl ) {
-				this.$clearEl = jQuery( '<div style="clear: both;" />' );
+				this.$clearEl = jQuery( '<div class="ui-layout-HBox-clear" />' );  // to clear the floats
 			}
 			$targetEl.append( this.$clearEl );
 		},
