@@ -92,14 +92,18 @@ define( [
 				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
 				this.renderComponent( childComponent, $targetEl, { position: i } );
 				
-				if( !childComponent.flex ) {
-					// Not a flexed component, do its layout, and take note of its height
-					childComponent.doLayout();
-					totalUnflexedWidth += childComponent.getOuterWidth( /* includeMargin */ true );
-					
-				} else {
-					flexedComponents.push( childComponent );
-					totalFlex += childComponent.flex;
+				// Only process the child component if it is not hidden
+				if( !childComponent.isHidden() ) {
+					if( !childComponent.flex ) {
+						// Not a flexed component, do its layout
+						childComponent.doLayout();
+						totalUnflexedWidth += childComponent.getOuterWidth( /* includeMargin */ true );
+						
+					} else {
+						// Flexed component: push it onto the flexed components processing array for the next step
+						flexedComponents.push( childComponent );
+						totalFlex += childComponent.flex;
+					}
 				}
 			}
 			

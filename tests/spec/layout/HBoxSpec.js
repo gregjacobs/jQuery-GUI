@@ -17,7 +17,7 @@ define( [
 			} );
 			
 			
-			it( "doLayout() should properly lay out 2 child components, one regularly sized, and the other flexed", function() {
+			it( "should properly lay out 2 child components, one regularly sized, and the other flexed", function() {
 				var childComponents = fixture.createChildComponents( 2 );
 				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( childComponents );
 				
@@ -32,7 +32,7 @@ define( [
 			} );
 			
 			
-			it( "doLayout() should properly lay out 4 child components, all flexed", function() {
+			it( "should properly lay out 4 child components, all flexed", function() {
 				var childComponents = fixture.createChildComponents( 4 );
 				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( childComponents );
 				
@@ -51,6 +51,39 @@ define( [
 				JsMockito.verify( childComponents[ 1 ] ).setSize( Math.floor( 2/6 * fixture.getTargetElWidth() ), undefined );
 				JsMockito.verify( childComponents[ 2 ] ).setSize( Math.floor( 1/6 * fixture.getTargetElWidth() ), undefined );
 				JsMockito.verify( childComponents[ 3 ] ).setSize( Math.floor( 2/6 * fixture.getTargetElWidth() ) + 1, undefined );  // the + 1 is the floored sum of the trimmed off decimal remainders from flexing other components
+			} );
+			
+			
+			it( "should properly lay out child components, ignoring hidden ones that don't have a flex value", function() {
+				var childComponents = fixture.createChildComponents( 2 );
+				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( childComponents );
+				
+				// Set the flex config
+				childComponents[ 0 ].flex = 1;
+				
+				// Hide the other component
+				JsMockito.when( childComponents[ 1 ] ).isHidden().thenReturn( true );
+				
+				var layout = fixture.getLayout();
+				layout.doLayout();
+				JsMockito.verify( childComponents[ 0 ] ).setSize( fixture.getTargetElWidth(), undefined );
+			} );
+			
+			
+			it( "should properly lay out child components, ignoring hidden ones that do have a flex value", function() {
+				var childComponents = fixture.createChildComponents( 2 );
+				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( childComponents );
+				
+				// Set the flex configs
+				childComponents[ 0 ].flex = 1;
+				childComponents[ 1 ].flex = 1;
+				
+				// Hide the second component
+				JsMockito.when( childComponents[ 1 ] ).isHidden().thenReturn( true );
+				
+				var layout = fixture.getLayout();
+				layout.doLayout();
+				JsMockito.verify( childComponents[ 0 ] ).setSize( fixture.getTargetElWidth(), undefined );
 			} );
 			
 		} );

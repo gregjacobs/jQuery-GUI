@@ -54,6 +54,39 @@ define( [
 				JsMockito.verify( childComponents[ 3 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 2/6 * fixture.getTargetElHeight() ) + 1 );  // the + 1 is the floored sum of the trimmed off decimal remainders from flexing other components
 			} );
 			
+			
+			it( "should properly lay out child components, ignoring hidden ones that don't have a flex value", function() {
+				var childComponents = fixture.createChildComponents( 2 );
+				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( childComponents );
+				
+				// Set the flex config
+				childComponents[ 0 ].flex = 1;
+				
+				// Hide the other component
+				JsMockito.when( childComponents[ 1 ] ).isHidden().thenReturn( true );
+				
+				var layout = fixture.getLayout();
+				layout.doLayout();
+				JsMockito.verify( childComponents[ 0 ] ).setSize( '100%', fixture.getTargetElHeight() );
+			} );
+			
+			
+			it( "should properly lay out child components, ignoring hidden ones that do have a flex value", function() {
+				var childComponents = fixture.createChildComponents( 2 );
+				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( childComponents );
+				
+				// Set the flex configs
+				childComponents[ 0 ].flex = 1;
+				childComponents[ 1 ].flex = 1;
+				
+				// Hide the second component
+				JsMockito.when( childComponents[ 1 ] ).isHidden().thenReturn( true );
+				
+				var layout = fixture.getLayout();
+				layout.doLayout();
+				JsMockito.verify( childComponents[ 0 ] ).setSize( '100%', fixture.getTargetElHeight() );
+			} );
+			
 		} );
 		
 	} );

@@ -111,7 +111,7 @@ define( [
 		 * 
 		 * @method createChildComponents
 		 * @param {Number} howMany How many components to create.
-		 * @return {ui.Component[]} An array of the mocked {@link ui.Component components}.
+		 * @return {ui.Component[]} An array of mock {@link ui.Component components}.
 		 */
 		createChildComponents : function( howMany ) {
 			var childComponents = [],
