@@ -1274,17 +1274,6 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		setWidth : function( width ) {
 			this.setSize( width, undefined );
 		},
-	
-		
-		/**
-		 * Sets the height of the element.
-		 *
-		 * @method setHeight
-		 * @param {Number/String} height The height. If a number, assumes pixels, otherwise uses the exact string.
-		 */
-		setHeight : function( height ) {
-			this.setSize( undefined, height );
-		},
 		
 		
 		/**
@@ -1314,7 +1303,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		},
 		
 		
-		/** 
+		/**
 		 * Returns the outer width of the Component. The outer width of the Component is the Component's width, plus
 		 * its padding, plus its border width. Provide the optional argument `includeMargin` as true to include the margin
 		 * as well.
@@ -1326,7 +1315,18 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @return {Number}
 		 */
 		getOuterWidth : function( includeMargin ) {
-			return this.$el.outerWidth( includeMargin );
+			return this.$el.outerWidth( includeMargin || false );  // must pass boolean arg (at least for jQuery 1.9.1)
+		},
+	
+		
+		/**
+		 * Sets the height of the element.
+		 *
+		 * @method setHeight
+		 * @param {Number/String} height The height. If a number, assumes pixels, otherwise uses the exact string.
+		 */
+		setHeight : function( height ) {
+			this.setSize( undefined, height );
 		},
 		
 	
@@ -1369,7 +1369,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @return {Number}
 		 */
 		getOuterHeight : function( includeMargin ) {
-			return this.$el.outerHeight( includeMargin );
+			return this.$el.outerHeight( includeMargin || false );  // must pass boolean arg (at least for jQuery 1.9.1)
 		},
 	
 		

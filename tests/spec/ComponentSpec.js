@@ -1191,10 +1191,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 		
 		
 		
-		/*
-		 * Test setWidth()
-		 */
-		describe( "Test setWidth()", function() {
+		describe( 'setWidth()', function() {
 			var cmp;
 			
 			beforeEach( function() {
@@ -1206,13 +1203,13 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "setWidth() should set the width of the Component in an unrendered state", function() {
+			it( "should set the width of the Component in an unrendered state", function() {
 				cmp.setWidth( 10 );
 				
 				expect( cmp.getConfiguredWidth() ).toBe( 10 );  // The width should have been set
 			} );
 			
-			it( "setWidth() should set the width of the Component in a rendered state", function() {				
+			it( "should set the width of the Component in a rendered state", function() {				
 				cmp.render( 'body' );
 				cmp.setStyle( 'position', 'absolute' );
 				cmp.setWidth( 10 );
@@ -1223,10 +1220,50 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 		
 		
 		
-		/*
-		 * Test setHeight()
-		 */
-		describe( "Test setHeight()", function() {
+		describe( 'getWidth() / getInnerWidth() / getOuterWidth()', function() {
+			var cmp;
+			
+			beforeEach( function() {
+				cmp = new Component( {
+					style : {
+						'margin'  : '5px',
+						'border'  : '5px solid #000',
+						'padding' : '5px'
+					}
+				} );
+			} );
+			
+			afterEach( function() {
+				cmp.destroy();  // clean up
+			} );
+			
+			
+			it( "should report the width/innerWidth/outerWidth of a rendered component", function() {
+				cmp.setWidth( 10 );
+				cmp.render( 'body' );
+				
+				expect( cmp.getWidth() ).toBe( 10 );
+				expect( cmp.getInnerWidth() ).toBe( 20 );  // 5px top + 5px bottom padding
+				expect( cmp.getOuterWidth() ).toBe( 30 );  // 5px top + 5px bottom padding and border
+				expect( cmp.getOuterWidth( /* includeMargin */ true ) ).toBe( 40 );  // 5px top + 5px bottom padding, border, and margin
+			} );
+			
+			
+			it( "should report the width/innerWidth/outerWidth of a hidden component (so measurements can still be taken when needed)", function() {
+				cmp.setWidth( 10 );
+				cmp.render( 'body' );
+				cmp.hide();
+				
+				expect( cmp.getWidth() ).toBe( 10 );
+				expect( cmp.getInnerWidth() ).toBe( 20 );  // 5px top + 5px bottom padding
+				expect( cmp.getOuterWidth() ).toBe( 30 );  // 5px top + 5px bottom padding and border
+				expect( cmp.getOuterWidth( /* includeMargin */ true ) ).toBe( 40 );  // 5px top + 5px bottom padding, border, and margin
+			} );
+		} );
+		
+		
+		
+		describe( 'setHeight()', function() {
 			var cmp;
 			
 			beforeEach( function() {
@@ -1238,18 +1275,61 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "setHeight() should set the height of the Component in an unrendered state", function() {
+			it( "should set the height of the Component in an unrendered state", function() {
 				cmp.setHeight( 10 );
 				
 				expect( cmp.getConfiguredHeight() ).toBe( 10 );  // The height should have been set
 			} );
 			
-			it( "setHeight() should set the height of the Component in a rendered state", function() {
+			it( "should set the height of the Component in a rendered state", function() {
 				cmp.render( 'body' );
 				cmp.setStyle( 'position', 'absolute' );
 				cmp.setHeight( 10 );
 				
 				expect( cmp.getHeight() ).toBe( 10 );  // The height should have been set
+			} );
+		} );
+		
+		
+		
+		describe( 'getHeight() / getInnerHeight() / getOuterHeight()', function() {
+			var cmp;
+			
+			beforeEach( function() {
+				cmp = new Component( {
+					style : {
+						'margin'  : '5px',
+						'border'  : '5px solid #000',
+						'padding' : '5px'
+					}
+				} );
+			} );
+			
+			afterEach( function() {
+				cmp.destroy();  // clean up
+			} );
+			
+			
+			it( "should report the height/innerHeight/outerHeight of a rendered component", function() {
+				cmp.setHeight( 10 );
+				cmp.render( 'body' );
+				
+				expect( cmp.getHeight() ).toBe( 10 );
+				expect( cmp.getInnerHeight() ).toBe( 20 );  // 5px top + 5px bottom padding
+				expect( cmp.getOuterHeight() ).toBe( 30 );  // 5px top + 5px bottom padding and border
+				expect( cmp.getOuterHeight( /* includeMargin */ true ) ).toBe( 40 );  // 5px top + 5px bottom padding, border, and margin
+			} );
+			
+			
+			it( "should report the height/innerHeight/outerHeight of a hidden component (so measurements can still be taken when needed)", function() {
+				cmp.setHeight( 10 );
+				cmp.render( 'body' );
+				cmp.hide();
+				
+				expect( cmp.getHeight() ).toBe( 10 );
+				expect( cmp.getInnerHeight() ).toBe( 20 );  // 5px top + 5px bottom padding
+				expect( cmp.getOuterHeight() ).toBe( 30 );  // 5px top + 5px bottom padding and border
+				expect( cmp.getOuterHeight( /* includeMargin */ true ) ).toBe( 40 );  // 5px top + 5px bottom padding, border, and margin
 			} );
 		} );
 		
