@@ -41,8 +41,17 @@ define( [
 		 * @cfg {Object/Object[]/ui.panel.ToolButton/ui.panel.ToolButton[]} toolButtons
 		 * 
 		 * One or more {@link ui.panel.ToolButton ToolButtons} or ToolButton config objects. These will
-		 * be placed on the right side of the Panel's header.
+		 * be placed on the right side of the Panel's header (i.e. top right of the Panel).
 		 */
+		
+		/**
+		 * @cfg {Object/Object[]/ui.button.Button/ui.button.Button[]} buttons
+		 * 
+		 * One or more {@link ui.button.Button Buttons} or Button config objects for buttons to place
+		 * in the footer of the Panel. These will be placed on the right side of the Panel's footer 
+		 * (i.e. bottom right of the Panel).
+		 */
+		
 		
 		/**
 		 * @cfg
@@ -56,7 +65,8 @@ define( [
 		 */
 		renderTpl : new LoDashTpl( [
 			'<div id="<%= elId %>-header" class="<%= baseCls %>-header"><div class="ui-clear" /></div>',
-			'<div id="<%= elId %>-body" class="<%= baseCls %>-body" <% if( bodyStyle ) { %>style="<%= bodyStyle %>"<% } %>></div>'
+			'<div id="<%= elId %>-body" class="<%= baseCls %>-body" <% if( bodyStyle ) { %>style="<%= bodyStyle %>"<% } %>></div>',
+			'<div id="<%= elId %>-footer" class="<%= baseCls %>-footer"><div class="ui-clear" /></div>'
 		] ),
 		
 		
@@ -84,6 +94,13 @@ define( [
 		 * A reference to the Panel's body element. This will be available after the Panel is rendered.
 		 */
 		
+		/**
+		 * @protected
+		 * @property {jQuery} $footerEl
+		 * 
+		 * A reference to the Panel's footer container element. This will be available after the Panel is rendered.
+		 */
+		
 		
 		/**
 		 * @inheritdoc
@@ -91,6 +108,10 @@ define( [
 		initComponent : function() {			
 			if( this.title || this.toolButtons ) {
 				this.header = this.createHeader();
+			}
+			
+			if( this.buttons ) {
+				this.footer = this.createFooter();
 			}
 			
 			this._super( arguments );
@@ -106,9 +127,13 @@ define( [
 			var elId = this.elId;
 			this.$headerEl = jQuery( '#' + elId + '-header' );
 			this.$bodyEl = jQuery( '#' + elId + '-body' );
+			this.$footerEl = jQuery( '#' + elId + '-footer' );
 			
 			if( this.header ) {
-				this.header.render( this.$headerEl, /* prepend */ 0 );
+				this.header.render( this.$headerEl, /* prepend */ 0 );  // prepend before the "clear" el
+			}
+			if( this.footer ) {
+				this.footer.render( this.$footerEl, /* prepend */ 0 );  // prepend before the "clear" el
 			}
 		},
 		
@@ -140,7 +165,8 @@ define( [
 		
 		
 		/**
-		 * Creates the {@link #header}.
+		 * Creates the {@link #header} Container, which contains the {@link #title} and any
+		 * {@link #toolButtons} configured.
 		 * 
 		 * @protected
 		 * @return {ui.Container}
@@ -201,6 +227,33 @@ define( [
 				toolButtonsCt
 			];
 		},
+		
+		
+		/**
+		 * Creates the {@link #footer} Container, which contains any {@link #buttons} that were configured.
+		 * 
+		 * @protected
+		 * @return {ui.Container}
+		 */
+		createFooter : function() {
+			return new Container( {
+				cls    : this.baseCls + '-footer-innerCt',
+				layout : 'hbox',
+				items  : [
+					{ type: 'component', flex: 1 },  // to push the buttons to the right
+					{
+						type : 'container',
+						cls  : this.baseCls + '-footer-buttons',
+						
+						defaultType : 'button',   // ui.button.Button
+						items       : this.buttons
+					}
+				]
+			} );
+		},
+		
+		
+		// -----------------------------------
 		
 		
 		/**
