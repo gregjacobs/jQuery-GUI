@@ -14,26 +14,27 @@
   <script type="text/javascript" src="../vendor/require/require.js"></script>
   <script type="text/javascript">
   	require.config( {
-  		baseUrl : '../',
-  		
-  		paths : {
-  			// General dependencies
-  			'jquery'             : 'vendor/jquery/jquery',
-  			'jquery-ui.position' : 'vendor/jquery-ui.position/jquery-ui.position',
-  			'lodash'             : 'vendor/lodash/lodash',
-  			'Class'              : 'vendor/class/Class',
-  			'Observable'         : 'vendor/observable/Observable',
-  			
-  			// UI Library
-  			'ui' : 'src/js',
-  			
-  			// Specs
-  			'spec' : 'tests/spec'
-  		},
-  		
-  		shim : {
-  			'jquery-ui.position' : [ 'jquery' ]   // jQuery UI's 'position' plugin
-  		}
+			baseUrl : '../',
+
+			paths : {
+				// General dependencies
+				'jquery'             : 'vendor/jquery/jquery',
+				'jquery-ui.position' : 'vendor/jquery-ui.position/jquery-ui.position',
+				'lodash'             : 'vendor/lodash/lodash',
+				'Class'              : 'vendor/class/Class',
+				'Observable'         : 'vendor/observable/Observable',
+				'data'               : 'vendor/data',
+							
+				// UI Library
+				'ui' : 'src/js',
+				
+				// Specs
+				'spec' : 'tests/spec'
+			},
+
+			shim : {
+				'jquery-ui.position' : [ 'jquery' ]   // jQuery UI's 'position' plugin
+			}
   	} );
   	
   	
@@ -74,6 +75,7 @@
     			'spec/panel/PanelSpec',
     			'spec/plugin/PluginSpec',
     			'spec/template/LoDashSpec',
+    			'spec/view/CollectionSpec',
     			'spec/window/WindowSpec',
     			'spec/util/CssSpec',
     			'spec/util/HtmlSpec'

@@ -22,6 +22,7 @@
 				'lodash'             : 'vendor/lodash/lodash',
 				'Class'              : 'vendor/class/Class',
 				'Observable'         : 'vendor/observable/Observable',
+				'data'               : 'vendor/data',
 				
 				// UI Library
 				'ui' : 'src/js'
@@ -39,13 +40,14 @@
 			'ui/Overlay',
 			'ui/button/Button',
 			'ui/window/Window',
+			'data/Collection',
 			
 			// Dependencies used by type name
 			'ui/form/field/Text',
 			'ui/form/field/TextArea',
 			'ui/layout/HBox',
 			'ui/layout/VBox'
-		], function( $, Panel, Overlay, Button, Window ) {
+		], function( $, Panel, Overlay, Button, Window, Collection ) {
 			$( document ).ready( function() {
 				$( 'body' ).html( "Hello, Playground!" );
 				
