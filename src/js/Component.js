@@ -777,8 +777,9 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				// Call onRender hook method for subclasses to add their own elements, and whatever else they need 
 				this.onRender( $containerEl, options );
 				
-				// Make sure the `tpl` has been created into a LoDashTpl instance
-				if( this.tpl ) {
+				// Make sure the `tpl` has been created into a LoDashTpl instance, not only for the initial rendering,
+				// but also for when calling `update()` with a data object.
+				if( this.tpl && !( this.tpl instanceof Template ) ) {
 					this.tpl = new LoDashTpl( this.tpl );
 				}
 				
