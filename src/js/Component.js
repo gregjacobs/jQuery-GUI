@@ -789,7 +789,6 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				var $contentTarget = this.getContentTarget();
 				if( this.tpl && !this.updateCalledWithContent ) {  // tpl config takes precedence over html/contentEl configs, *unless* update() has been called with HTML content
 					$contentTarget.append( this.tpl.apply( this.tplData ) );
-					delete this.tplData;  // no longer needed
 					
 				} else {
 					if( this.html ) {
@@ -799,6 +798,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 						$contentTarget.append( this.contentEl );
 					}
 				}
+				delete this.tplData;                  // no longer needed
 				delete this.updateCalledWithContent;  // no longer needed
 				delete this.html;                     // no longer needed
 				delete this.contentEl;                // no longer needed
