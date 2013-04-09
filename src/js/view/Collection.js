@@ -201,7 +201,7 @@ define( [
 			if( this.collection !== collection || !this.firstBindComplete ) {
 				// If there is a current collection, and there have been listeners bound to it (i.e. it is not the initial bind
 				// call from having a `collection` config), then unbind its listeners in preparation to bind a new Collection
-				if( this.collection && this.collectionListeners ) {   
+				if( this.collection ) {
 					this.unbindCollectionListeners();
 				}
 				
@@ -260,7 +260,9 @@ define( [
 		 * @private
 		 */
 		unbindCollectionListeners : function() {
-			this.collection.un( this.collectionListeners );  // the Collection listener's set up in bindCollectionListeners()
+			if( this.collection && this.collectionListeners ) {
+				this.collection.un( this.collectionListeners );  // the Collection listener's set up in bindCollectionListeners()
+			}
 		},
 		
 		
@@ -384,6 +386,22 @@ define( [
 		 */
 		getElementFromModel : function( model ) {
 			return ( !this.rendered ) ? null : this.modelElCache[ model.getClientId() ] || null;
+		},
+		
+		
+		// ---------------------------------------
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onDestroy : function() {
+			if( this.collection ) {
+				this.unbindCollectionListeners();
+				delete this.collection;
+			}
+			
+			this._super( arguments );
 		}
 		
 	} );
