@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'lodash',
+	'Class',
+	'data/attribute/Attribute'
+], function( _, Class, Attribute ) {
+	
+<span id='data-attribute-Object'>	/**
+</span>	 * @class data.attribute.Object
+	 * @extends data.attribute.Attribute
+	 * 
+	 * Attribute definition class for an Attribute that takes an object value.
+	 */
+	var ObjectAttribute = Class.extend( Attribute, {
+		
+<span id='data-attribute-Object-cfg-defaultValue'>		/**
+</span>		 * @cfg {Object} defaultValue
+		 * @inheritdoc
+		 */
+		defaultValue : null,
+		
+		
+<span id='data-attribute-Object-method-beforeSet'>		/**
+</span>		 * Overridden `beforeSet` method used to normalize the value provided. All non-object values are converted to null,
+		 * while object values are returned unchanged.
+		 * 
+		 * @inheritdoc
+		 */
+		beforeSet : function( model, newValue, oldValue ) {
+			if( typeof newValue !== 'object' ) {
+				newValue = null;  // convert all non-object values to null
+			}
+			
+			return newValue;
+		}
+		
+	} );
+	
+	
+	// Register the Attribute type
+	Attribute.registerType( 'object', ObjectAttribute );
+	
+	return ObjectAttribute;
+	
+} );</pre>
+</body>
+</html>

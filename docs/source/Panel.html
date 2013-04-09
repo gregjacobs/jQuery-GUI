@@ -19,24 +19,24 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/util/Css',
-	'ui/ComponentManager',
-	'ui/Container',
-	'ui/Label',
-	'ui/template/LoDash',
-	'ui/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
+	'jqc/util/Css',
+	'jqc/ComponentManager',
+	'jqc/Container',
+	'jqc/Label',
+	'jqc/template/LoDash',
+	'jqc/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
 ], function( jQuery, _, Css, ComponentManager, Container, Label, LoDashTpl ) {
 
-<span id='ui-panel-Panel'>	/**
-</span>	 * @class ui.panel.Panel
-	 * @extends ui.Container
+<span id='jqc-panel-Panel'>	/**
+</span>	 * @class jqc.panel.Panel
+	 * @extends jqc.Container
 	 *
-	 * An application-oriented {@link ui.Container} subclass which supports adding a {@link #title} bar and 
+	 * An application-oriented {@link jqc.Container} subclass which supports adding a {@link #title} bar and 
 	 * {@link #toolButtons}.
 	 */
 	var Panel = Container.extend( {
 		
-<span id='ui-panel-Panel-cfg-bodyStyle'>		/**
+<span id='jqc-panel-Panel-cfg-bodyStyle'>		/**
 </span>		 * @cfg {Object} bodyStyle
 		 * 
 		 * Any additional CSS style(s) to apply to the Panel's {@link #$bodyEl body} element. Should be an object where the 
@@ -48,38 +48,69 @@ define( [
 		 *     }
 		 */
 		
-<span id='ui-panel-Panel-cfg-title'>		/**
+<span id='jqc-panel-Panel-cfg-title'>		/**
 </span>		 * @cfg {String} title
 		 * 
 		 * The title of the Panel.
 		 */
 		
-<span id='ui-panel-Panel-cfg-toolButtons'>		/**
-</span>		 * @cfg {Object/Object[]/ui.panel.ToolButton/ui.panel.ToolButton[]} toolButtons
+<span id='jqc-panel-Panel-cfg-toolButtons'>		/**
+</span>		 * @cfg {Object/Object[]/jqc.panel.ToolButton/jqc.panel.ToolButton[]} toolButtons
 		 * 
-		 * One or more {@link ui.panel.ToolButton ToolButtons} or ToolButton config objects. These will
-		 * be placed on the right side of the Panel's header.
+		 * One or more {@link jqc.panel.ToolButton ToolButtons} or ToolButton config objects. These will
+		 * be placed on the right side of the Panel's header (i.e. top right of the Panel).
 		 */
 		
-<span id='ui-panel-Panel-cfg-baseCls'>		/**
+<span id='jqc-panel-Panel-cfg-buttons'>		/**
+</span>		 * @cfg {Object/Object[]/jqc.button.Button/jqc.button.Button[]} buttons
+		 * 
+		 * One or more {@link jqc.button.Button Buttons} or Button config objects for buttons to place
+		 * in the footer of the Panel. These will be placed on the right side of the Panel's footer 
+		 * (i.e. bottom right of the Panel).
+		 */
+		
+		
+<span id='jqc-panel-Panel-cfg-baseCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'ui-Panel',
+		baseCls : 'jqc-Panel',
 		
-<span id='ui-panel-Panel-cfg-renderTpl'>		/**
+<span id='jqc-panel-Panel-cfg-renderTpl'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
 		renderTpl : new LoDashTpl( [
-			'&lt;div id=&quot;&lt;%= elId %&gt;-header&quot; class=&quot;&lt;%= baseCls %&gt;-header&quot;&gt;&lt;div class=&quot;ui-clear&quot; /&gt;&lt;/div&gt;',
-			'&lt;div id=&quot;&lt;%= elId %&gt;-body&quot; class=&quot;&lt;%= baseCls %&gt;-body&quot; &lt;% if( bodyStyle ) { %&gt;style=&quot;&lt;%= bodyStyle %&gt;&quot;&lt;% } %&gt;&gt;&lt;/div&gt;'
+			'&lt;div id=&quot;&lt;%= elId %&gt;-header&quot; class=&quot;&lt;%= baseCls %&gt;-header&quot;&gt;&lt;div class=&quot;jqc-clear&quot; /&gt;&lt;/div&gt;',
+			'&lt;div id=&quot;&lt;%= elId %&gt;-body&quot; class=&quot;&lt;%= baseCls %&gt;-body&quot; &lt;% if( bodyStyle ) { %&gt;style=&quot;&lt;%= bodyStyle %&gt;&quot;&lt;% } %&gt;&gt;&lt;/div&gt;',
+			'&lt;div id=&quot;&lt;%= elId %&gt;-footer&quot; class=&quot;&lt;%= baseCls %&gt;-footer&quot;&gt;&lt;div class=&quot;jqc-clear&quot; /&gt;&lt;/div&gt;'
 		] ),
 		
 		
-<span id='ui-panel-Panel-property-header'>		/**
+<span id='jqc-panel-Panel-property-S-headerEl'>		/**
 </span>		 * @protected
-		 * @property {ui.Container} header
+		 * @property {jQuery} $headerEl
+		 * 
+		 * A reference to the Panel's header container element. This will be available after the Panel is rendered.
+		 */
+		
+<span id='jqc-panel-Panel-property-S-bodyEl'>		/**
+</span>		 * @protected
+		 * @property {jQuery} $bodyEl
+		 * 
+		 * A reference to the Panel's body element. This will be available after the Panel is rendered.
+		 */
+		
+<span id='jqc-panel-Panel-property-S-footerEl'>		/**
+</span>		 * @protected
+		 * @property {jQuery} $footerEl
+		 * 
+		 * A reference to the Panel's footer container element. This will be available after the Panel is rendered.
+		 */
+		
+<span id='jqc-panel-Panel-property-header'>		/**
+</span>		 * @protected
+		 * @property {jqc.Container} header
 		 * 
 		 * The Container which acts as the Panel's header. The header holds the title, and any  {@link #toolButtons} 
 		 * specified. 
@@ -87,22 +118,17 @@ define( [
 		 * Note that this Container is only created if a {@link #title} or tool buttons have been specified.
 		 */
 		
-<span id='ui-panel-Panel-property-S-headerEl'>		/**
+<span id='jqc-panel-Panel-property-footer'>		/**
 </span>		 * @protected
-		 * @property {jQuery} $headerEl
+		 * @property {jqc.Container} footer
 		 * 
-		 * A reference to the Panel's header container element. This will be available after the Panel is rendered.
-		 */
-		
-<span id='ui-panel-Panel-property-S-bodyEl'>		/**
-</span>		 * @protected
-		 * @property {jQuery} $bodyEl
+		 * The Container which acts as the Panel's footer. The footer holds the any {@link #buttons} specified. 
 		 * 
-		 * A reference to the Panel's body element. This will be available after the Panel is rendered.
+		 * Note that this Container is only created if a {@link #buttons} config has been specified.
 		 */
 		
 		
-<span id='ui-panel-Panel-method-initComponent'>		/**
+<span id='jqc-panel-Panel-method-initComponent'>		/**
 </span>		 * @inheritdoc
 		 */
 		initComponent : function() {			
@@ -110,11 +136,15 @@ define( [
 				this.header = this.createHeader();
 			}
 			
+			if( this.buttons ) {
+				this.footer = this.createFooter();
+			}
+			
 			this._super( arguments );
 		},
 		
 		
-<span id='ui-panel-Panel-method-onRender'>		/**
+<span id='jqc-panel-Panel-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function() {
@@ -123,14 +153,18 @@ define( [
 			var elId = this.elId;
 			this.$headerEl = jQuery( '#' + elId + '-header' );
 			this.$bodyEl = jQuery( '#' + elId + '-body' );
+			this.$footerEl = jQuery( '#' + elId + '-footer' );
 			
 			if( this.header ) {
-				this.header.render( this.$headerEl, /* prepend */ 0 );
+				this.header.render( this.$headerEl, /* prepend */ 0 );  // prepend before the &quot;clear&quot; el
+			}
+			if( this.footer ) {
+				this.footer.render( this.$footerEl, /* prepend */ 0 );  // prepend before the &quot;clear&quot; el
 			}
 		},
 		
 		
-<span id='ui-panel-Panel-method-getRenderTplData'>		/**
+<span id='jqc-panel-Panel-method-getRenderTplData'>		/**
 </span>		 * @inheritdoc
 		 */
 		getRenderTplData : function() {
@@ -142,7 +176,7 @@ define( [
 		},
 		
 		
-<span id='ui-panel-Panel-method-getContentTarget'>		/**
+<span id='jqc-panel-Panel-method-getContentTarget'>		/**
 </span>		 * Override of superclass method, used to specify the {@link #$bodyEl} as the target for Panel content.
 		 * 
 		 * @protected
@@ -156,11 +190,12 @@ define( [
 		// ------------------------------------------
 		
 		
-<span id='ui-panel-Panel-method-createHeader'>		/**
-</span>		 * Creates the {@link #header}.
+<span id='jqc-panel-Panel-method-createHeader'>		/**
+</span>		 * Creates the {@link #header} Container, which contains the {@link #title} and any
+		 * {@link #toolButtons} configured.
 		 * 
 		 * @protected
-		 * @return {ui.Container}
+		 * @return {jqc.Container}
 		 */
 		createHeader : function() {
 			this.titleCmp = this.createTitleCmp();
@@ -173,12 +208,12 @@ define( [
 		},
 		
 		
-<span id='ui-panel-Panel-method-createTitleCmp'>		/**
+<span id='jqc-panel-Panel-method-createTitleCmp'>		/**
 </span>		 * Creates the title component. This is the component that the {@link #title}
 		 * config will be applied to, by default.
 		 * 
 		 * @protected
-		 * @return {ui.Label}
+		 * @return {jqc.Label}
 		 */
 		createTitleCmp : function() {
 			return new Label( {
@@ -188,28 +223,28 @@ define( [
 		},
 		
 		
-<span id='ui-panel-Panel-method-createToolButtonsCt'>		/**
+<span id='jqc-panel-Panel-method-createToolButtonsCt'>		/**
 </span>		 * Creates the tool buttons container.
 		 * 
 		 * @protected
-		 * @return {ui.Container}
+		 * @return {jqc.Container}
 		 */
 		createToolButtonsCt : function() {
 			return new Container( {
 				cls         : this.baseCls + '-header-toolButtons',
-				defaultType : 'toolbutton',   // ui.panel.ToolButton
+				defaultType : 'toolbutton',   // jqc.panel.ToolButton
 				items       : this.toolButtons
 			} );
 		},
 		
 		
-<span id='ui-panel-Panel-method-buildHeaderItems'>		/**
+<span id='jqc-panel-Panel-method-buildHeaderItems'>		/**
 </span>		 * Builds the array of the {@link #header header's} child items. The arguments are provided so they can be 
 		 * used to insert the components different positions in the items array in an override of this method.
 		 * 
 		 * @protected
-		 * @param {ui.Label} titleCmp The title component, created by {@link #createTitleCmp}.
-		 * @param {ui.Container} toolButtonsCt The tool buttons {@link ui.Container Container}.
+		 * @param {jqc.Label} titleCmp The title component, created by {@link #createTitleCmp}.
+		 * @param {jqc.Container} toolButtonsCt The tool buttons {@link jqc.Container Container}.
 		 * @return {Object[]}
 		 */
 		buildHeaderItems : function( titleCmp, toolButtonsCt ) {
@@ -220,7 +255,34 @@ define( [
 		},
 		
 		
-<span id='ui-panel-Panel-method-setTitle'>		/**
+<span id='jqc-panel-Panel-method-createFooter'>		/**
+</span>		 * Creates the {@link #footer} Container, which contains any {@link #buttons} that were configured.
+		 * 
+		 * @protected
+		 * @return {jqc.Container}
+		 */
+		createFooter : function() {
+			return new Container( {
+				cls    : this.baseCls + '-footer-innerCt',
+				layout : 'hbox',
+				items  : [
+					{ type: 'component', flex: 1 },  // to push the buttons to the right
+					{
+						type : 'container',
+						cls  : this.baseCls + '-footer-buttons',
+						
+						defaultType : 'button',   // jqc.button.Button
+						items       : this.buttons
+					}
+				]
+			} );
+		},
+		
+		
+		// -----------------------------------
+		
+		
+<span id='jqc-panel-Panel-method-setTitle'>		/**
 </span>		 * Sets the title of the Panel.
 		 * 
 		 * @param {String} title The title to set.

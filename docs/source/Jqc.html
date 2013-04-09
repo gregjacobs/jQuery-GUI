@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*!
+ * jQuery-Component
+ * Copyright(c) 2013 Gregory Jacobs.
+ * 
+ * MIT Licensed. http://www.opensource.org/licenses/mit-license.php
+ * https://github.com/gregjacobs/jQuery-Component
+ */
+
+/*global define */
+define( [
+	'Class',
+	'jquery',
+	'lodash'
+], function( Class, jQuery, _ ) {
+
+<span id='jqc-Jqc'>	/**
+</span>	 * @class jqc.Jqc
+	 * @singleton
+	 * 
+	 * Main singleton class of the jQuery-Component library, with a few base utility functions. 
+	 * 
+	 * This class can be included in implementations by using the RequireJS path of 'jqc/Jqc'. Ex:
+	 * 
+	 *     require( [ 'jqc/Jqc' ], function( Jqc ) {
+	 *         console.log( &quot;This browser's scrollbar width: &quot;, Jqc.getScrollbarWidth(), &quot;px&quot; );
+	 *     } );
+	 */
+	var Jqc = Class.extend( Object, {
+
+<span id='jqc-Jqc-property-isIE'>		/**
+</span>		 * @readonly
+		 * @property {Boolean} isIE
+		 * 
+		 * Will be true if the browser is Internet Explorer, false otherwise.
+		 */
+		
+<span id='jqc-Jqc-property-blankImgUrl'>		/**
+</span>		 * @private
+		 * @property {String} blankImgUrl
+		 * 
+		 * The url of a blank (transparent) 1x1 gif image. Retrieve with {@link #getBlankImgUrl}.
+		 */
+		blankImgUrl : 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==',
+
+	
+<span id='jqc-Jqc-method-constructor'>		/**
+</span>		 * @constructor
+		 */
+		constructor : function() {
+			var userAgent = window.navigator.userAgent.toLowerCase();
+			
+			this.isIE = /msie/.test( userAgent ) &amp;&amp; !( /opera/.test( userAgent ) );
+		},
+
+		
+		// -----------------------------------
+		
+		
+<span id='jqc-Jqc-method-emptyFn'>		/**
+</span>		 * An empty function. This can be referred to in cases where you need a function,
+		 * but do not want to create a new function object. Used for performance and clarity
+		 * reasons.
+		 *
+		 * @method emptyFn
+		 */
+		emptyFn : function() {},
+		
+
+<span id='jqc-Jqc-method-getBlankImgUrl'>		/**
+</span>		 * Retrieves the url of a 1x1 transparent gif image. This is actually a data url.
+		 * This may be placed into CSS styles as such:
+		 * 
+		 *     var $div = jQuery( '&lt;div /&gt;' );
+		 *     $div.css( 'background-image', 'url(' + Jqc.getBlankImgUrl() + ')' );
+		 * 
+		 * @method getBlankImgUrl
+		 * @return {String}
+		 */
+		getBlankImgUrl : function() {
+			return this.blankImgUrl;
+		},
+		
+		
+		// -----------------------------------
+		
+		
+<span id='jqc-Jqc-method-getScrollbarSizes'>		/**
+</span>		 * Retrieves the sizes of the scrollbars used on the current browser. This can differ
+		 * depending on browser, operating system, or even different accessibility settings.
+		 * 
+		 * @method getScrollbarSizes
+		 * @return {Object} An object containing the scrollbar sizes.
+		 * @return {Number} return.width The width of the vertical scrollbar.
+		 * @return {Number} return.height The height of the vertical scrollbar.
+		 */
+		getScrollbarSizes : (function() {
+			var scrollbarSizes;
+			
+			return function() {
+				if( !scrollbarSizes ) {
+					var $div = jQuery( '&lt;div style=&quot;position:absolute;width:100px;height:100px;overflow:scroll;top:-9999px;&quot; /&gt;' ),
+					    div = $div[ 0 ];
+					
+					$div.appendTo( 'body' );  // so we can measure it
+					
+					scrollbarSizes = {
+						width  : div.offsetWidth - div.clientWidth,
+						height : div.offsetHeight - div.clientHeight
+					};
+					
+					$div.remove();
+				}
+					
+				return scrollbarSizes;
+			};
+		})(),
+		
+		
+<span id='jqc-Jqc-method-getScrollbarWidth'>		/**
+</span>		 * Retrieves the width of the browser's vertical scrollbar. See {@link #getScrollbarSizes} for 
+		 * more details.
+		 * 
+		 * @method getScrollbarWidth
+		 * @return {Number} The width of the browser's vertical scrollbar.
+		 */
+		getScrollbarWidth : function() {
+			return this.getScrollbarSizes().width;
+		},
+		
+		
+<span id='jqc-Jqc-method-getScrollbarHeight'>		/**
+</span>		 * Retrieves the height of the browser's horizontal scrollbar. See {@link #getScrollbarSizes} for 
+		 * more details.
+		 * 
+		 * @method getScrollbarHeight
+		 * @return {Number} The height of the browser's horizontal scrollbar.
+		 */
+		getScrollbarHeight : function() {
+			return this.getScrollbarSizes().height;
+		},
+		
+		
+		// -----------------------------------
+		
+		
+		
+<span id='jqc-Jqc-method-loadImages'>		/**
+</span>		 * Preloads a set of images using the old-school Image object, and calls the callback
+		 * when all images have loaded. Right now, errors are not handled--they are treated 
+		 * the same way as if the image had loaded properly.
+		 *
+		 * @method loadImages
+		 * @param {Array} images A list of image URLs.
+		 * @param {Function} callback A callback function for after all the images have loaded.
+		 * @param {Object} [scope=window] The scope to run the callback function in.
+		 */
+		loadImages : function( images, callback, scope ) {
+			if( !_.isArray( images ) ) {
+				return;
+			}
+			
+			var imagesLoaded = 0,
+				imagesCount = images.length,
+				img;
+			
+			var onLoad = function() {
+				imagesLoaded++;
+				
+				if( imagesLoaded &gt;= imagesCount ) {
+					callback.call( scope || window );
+				}
+			};
+			
+			for( var i = 0; i &lt; imagesCount; i++ ) {
+				img = new Image();
+				jQuery( img ).on( 'load error', onLoad );
+				img.src = images[ i ];
+			}
+		},
+		
+		
+<span id='jqc-Jqc-method-loadImage'>		/**
+</span>		 * Convenience function for loading a single image.
+		 *
+		 * @method loadImage
+		 * @param {String} image An image URL.
+		 * @param {Function} callback A callback function for after the image has loaded.
+		 * @param {Object} [scope=window] The scope to run the callback function in.
+		 */
+		loadImage : function( image, callback, scope ) {
+			this.loadImages( [ image ], callback, scope );
+		}
+		
+	} );
+	
+	
+	// Return singleton instance
+	return new Jqc();
+	
+} );</pre>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'lodash',
+	'Class',
+	'data/attribute/Attribute'
+], function( _, Class, Attribute ) {
+	
+<span id='data-attribute-Primitive'>	/**
+</span>	 * @abstract
+	 * @class data.attribute.Primitive
+	 * @extends data.attribute.Attribute
+	 * 
+	 * Base Attribute definition class for an Attribute that holds a JavaScript primitive value 
+	 * (i.e. A Boolean, Number, or String).
+	 */
+	var PrimitiveAttribute = Class.extend( Attribute, {
+		
+		abstractClass: true,
+		
+<span id='data-attribute-Primitive-cfg-useNull'>		/**
+</span>		 * @cfg {Boolean} useNull
+		 * True to allow `null` to be set to the Attribute (which is usually used to denote that the 
+		 * Attribute is &quot;unset&quot;, and it shouldn't take an actual default value).
+		 * 
+		 * This is also used when parsing the provided value for the Attribute. If this config is true, and the value 
+		 * cannot be &quot;easily&quot; parsed into a valid representation of its primitive type, `null` will be used 
+		 * instead of converting to the primitive type's default.
+		 */
+		useNull : false
+		
+	} );
+	
+	return PrimitiveAttribute;
+	
+} );</pre>
+</body>
+</html>

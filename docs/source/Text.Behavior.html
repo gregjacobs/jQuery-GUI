@@ -20,99 +20,99 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'ui/UI'
-], function( jQuery, _, Class, UI ) {
+	'jqc/Jqc'
+], function( jQuery, _, Class, Jqc ) {
 	
-<span id='ui-form-field-Text-Behavior'>	/**
-</span>	 * @class ui.form.field.Text.Behavior
+<span id='jqc-form-field-Text-Behavior'>	/**
+</span>	 * @class jqc.form.field.Text.Behavior
 	 * @extends Object
 	 * 
-	 * Defines the interface for the strategy TextField behavior pattern implementation in {@link ui.form.field.Text}.
+	 * Defines the interface for the strategy TextField behavior pattern implementation in {@link jqc.form.field.Text}.
 	 */
 	var TextFieldBehavior = Class.extend( Object, {
 			
-<span id='ui-form-field-Text-Behavior-method-onRender'>		/**
+<span id='jqc-form-field-Text-Behavior-method-onRender'>		/**
 </span>		 * Called when the TextField is rendered.
 		 * 
 		 * @abstract
 		 * @method onRender
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
-		onRender : UI.emptyFn,
+		onRender : Jqc.emptyFn,
 		
 			
-<span id='ui-form-field-Text-Behavior-method-onSetValue'>		/**
+<span id='jqc-form-field-Text-Behavior-method-onSetValue'>		/**
 </span>		 * Called when the TextField's setValue() method is called (if the TextField is rendered)
 		 * 
 		 * @abstract
 		 * @method onSetValue
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 * @param {String} value
 		 */
-		onSetValue : UI.emptyFn,
+		onSetValue : Jqc.emptyFn,
 		
 		
-<span id='ui-form-field-Text-Behavior-method-onChange'>		/**
+<span id='jqc-form-field-Text-Behavior-method-onChange'>		/**
 </span>		 * Called when the TextField has been changed.
 		 * 
 		 * @abstract
 		 * @method onChange
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
-		onChange : UI.emptyFn,
+		onChange : Jqc.emptyFn,
 		
 		
-<span id='ui-form-field-Text-Behavior-method-onFocus'>		/**
+<span id='jqc-form-field-Text-Behavior-method-onFocus'>		/**
 </span>		 * Called when the TextField has been focused.
 		 * 
 		 * @abstract
 		 * @method onFocus
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
-		onFocus : UI.emptyFn,
+		onFocus : Jqc.emptyFn,
 		
 		
-<span id='ui-form-field-Text-Behavior-method-onBlur'>		/**
+<span id='jqc-form-field-Text-Behavior-method-onBlur'>		/**
 </span>		 * Called when the TextField has been blurred.
 		 * 
 		 * @abstract
 		 * @method onBlur
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
-		onBlur : UI.emptyFn,
+		onBlur : Jqc.emptyFn,
 		
 		
-<span id='ui-form-field-Text-Behavior-method-onKeyDown'>		/**
+<span id='jqc-form-field-Text-Behavior-method-onKeyDown'>		/**
 </span>		 * Called when the TextField gets a keydown event.
 		 * 
 		 * @abstract
 		 * @method onKeyDown
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
-		onKeyDown : UI.emptyFn,
+		onKeyDown : Jqc.emptyFn,
 		
 		
-<span id='ui-form-field-Text-Behavior-method-onKeyUp'>		/**
+<span id='jqc-form-field-Text-Behavior-method-onKeyUp'>		/**
 </span>		 * Called when the TextField gets a keyup event.
 		 * 
 		 * @abstract
 		 * @method onKeyUp
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
-		onKeyUp : UI.emptyFn,
+		onKeyUp : Jqc.emptyFn,
 		
 		
-<span id='ui-form-field-Text-Behavior-method-onKeyPress'>		/**
+<span id='jqc-form-field-Text-Behavior-method-onKeyPress'>		/**
 </span>		 * Called when the TextField gets a keypress event.
 		 * 
 		 * @abstract
 		 * @method onKeyPress
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
-		onKeyPress : UI.emptyFn
+		onKeyPress : Jqc.emptyFn
 		
 	} );
 

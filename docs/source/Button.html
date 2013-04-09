@@ -19,40 +19,40 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/Component',
-	'ui/ComponentManager',
-	'ui/template/LoDash'
+	'jqc/Component',
+	'jqc/ComponentManager',
+	'jqc/template/LoDash'
 ], function( jQuery, _, Component, ComponentManager, LoDashTpl ) {
 
-<span id='ui-Button'>	/**
-</span>	 * @class ui.Button
-	 * @extends ui.Component
+<span id='jqc-button-Button'>	/**
+</span>	 * @class jqc.button.Button
+	 * @extends jqc.Component
 	 * 
 	 * A generic button that calls its {@link #handler} when clicked.
 	 */
 	var Button = Component.extend( {
 		
-<span id='ui-Button-cfg-iconCls'>		/**
+<span id='jqc-button-Button-cfg-iconCls'>		/**
 </span>		 * @cfg {String} iconCls
 		 * 
 		 * A CSS class to use for the icon.
 		 */
 		
-<span id='ui-Button-cfg-iconAlign'>		/**
+<span id='jqc-button-Button-cfg-iconAlign'>		/**
 </span>		 * @cfg {String} iconAlign
 		 * 
 		 * Which side to put the icon on. Accepts 'left' or 'right'.
 		 */
 		iconAlign : 'left',
 		
-<span id='ui-Button-cfg-text'>		/**
+<span id='jqc-button-Button-cfg-text'>		/**
 </span>		 * @cfg {String} text
 		 *  
 		 * The text for the button.
 		 */
 		text : &quot;&quot;,
 	
-<span id='ui-Button-cfg-tooltip'>		/**
+<span id='jqc-button-Button-cfg-tooltip'>		/**
 </span>		 * @cfg {String} tooltip
 		 * 
 		 * The text to use as the button's tooltip for when the mouse is hovered over the button. Currently just sets the title 
@@ -60,38 +60,38 @@ define( [
 		 */
 		tooltip: &quot;&quot;,
 		
-<span id='ui-Button-cfg-handler'>		/**
+<span id='jqc-button-Button-cfg-handler'>		/**
 </span>		 * @cfg {Function} handler
 		 * 
 		 * A function to run when the button is clicked. Alternatively, one can listen to the {@link #click} event. 
 		 */
 		
-<span id='ui-Button-cfg-scope'>		/**
+<span id='jqc-button-Button-cfg-scope'>		/**
 </span>		 * @cfg {Object} scope
 		 * 
 		 * The scope to run the {@link #handler} function in. Defaults to the Button object.
 		 */
 		
-<span id='ui-Button-cfg-disabled'>		/**
+<span id='jqc-button-Button-cfg-disabled'>		/**
 </span>		 * @cfg {Boolean} disabled
 		 * 
 		 * Set to `true` to have the button be initially disabled.
 		 */
 		disabled : false,
 		
-<span id='ui-Button-cfg-elType'>		/**
+<span id='jqc-button-Button-cfg-elType'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
 		elType : 'button',
 		
-<span id='ui-Button-cfg-baseCls'>		/**
+<span id='jqc-button-Button-cfg-baseCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'ui-Button',
+		baseCls : 'jqc-Button',
 		
-<span id='ui-Button-cfg-renderTpl'>		/**
+<span id='jqc-button-Button-cfg-renderTpl'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
@@ -102,32 +102,32 @@ define( [
 		] ),
 		
 		
-<span id='ui-Button-method-initComponent'>		/**
+<span id='jqc-button-Button-method-initComponent'>		/**
 </span>		 * @inheritdoc
 		 */
 		initComponent : function() {
 			this.addEvents(
-<span id='ui-Button-event-click'>				/**
+<span id='jqc-button-Button-event-click'>				/**
 </span>				 * Fires when the button has been clicked.
 				 * 
 				 * @event click
-				 * @param {ui.Button} button This ui.Button instance.
+				 * @param {jqc.button.Button} button This jqc.Button instance.
 				 */
 				'click',
 				
-<span id='ui-Button-event-mouseenter'>				/**
+<span id='jqc-button-Button-event-mouseenter'>				/**
 </span>				 * Fires when the mouse has entered (hovered over) the button. Equivalent to the jQuery mouseenter event.
 				 * 
 				 * @event mouseenter
-				 * @param {ui.Button} button This ui.Button instance.
+				 * @param {jqc.button.Button} button This jqc.Button instance.
 				 */
 				'mouseenter',
 				
-<span id='ui-Button-event-mouseleave'>				/**
+<span id='jqc-button-Button-event-mouseleave'>				/**
 </span>				 * Fires when the mouse has left (no longer hovered over) the button. Equivalent to the jQuery mouseleave event.
 				 * 
 				 * @event mouseleave
-				 * @param {ui.Button} button This ui.Button instance.
+				 * @param {jqc.button.Button} button This jqc.Button instance.
 				 */
 				'mouseleave'
 			);
@@ -136,7 +136,7 @@ define( [
 		},
 		
 		
-<span id='ui-Button-method-getRenderAttributes'>		/**
+<span id='jqc-button-Button-method-getRenderAttributes'>		/**
 </span>		 * Override of superclass method used to add the {@link #tooltip} config as the &quot;title&quot; attribute.
 		 * 
 		 * @protected
@@ -152,7 +152,7 @@ define( [
 		},
 		
 		
-<span id='ui-Button-method-getRenderTplData'>		/**
+<span id='jqc-button-Button-method-getRenderTplData'>		/**
 </span>		 * Override of superclass method used to build the {@link #renderTplData} object.
 		 * 
 		 * @protected
@@ -186,7 +186,7 @@ define( [
 		},
 		
 		
-<span id='ui-Button-method-onRender'>		/**
+<span id='jqc-button-Button-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function() {
@@ -210,7 +210,7 @@ define( [
 		},
 		
 		
-<span id='ui-Button-method-setText'>		/**
+<span id='jqc-button-Button-method-setText'>		/**
 </span>		 * Sets the text on the button. Accepts HTML as well.
 		 * 
 		 * @param {String} text
@@ -224,7 +224,7 @@ define( [
 		},
 		
 		
-<span id='ui-Button-method-disable'>		/**
+<span id='jqc-button-Button-method-disable'>		/**
 </span>		 * Disables the button.
 		 * 
 		 * @method disable
@@ -238,7 +238,7 @@ define( [
 		},
 		
 		
-<span id='ui-Button-method-enable'>		/**
+<span id='jqc-button-Button-method-enable'>		/**
 </span>		 * Enables the button (if it was previously {@link #disable disabled}).
 		 * 
 		 * @method enable
@@ -252,7 +252,7 @@ define( [
 		},
 		
 		
-<span id='ui-Button-method-setDisabled'>		/**
+<span id='jqc-button-Button-method-setDisabled'>		/**
 </span>		 * Sets the disabled/enabled state of the Button based on the provided `disabled` flag.
 		 * 
 		 * @param {Boolean} disabled True to disable the Button, false to enable the Button.
@@ -262,7 +262,7 @@ define( [
 		},
 		
 		
-<span id='ui-Button-method-onClick'>		/**
+<span id='jqc-button-Button-method-onClick'>		/**
 </span>		 * Handles a click to the Button.
 		 * 
 		 * @protected
@@ -277,7 +277,7 @@ define( [
 		},
 		
 		
-<span id='ui-Button-method-onMouseEnter'>		/**
+<span id='jqc-button-Button-method-onMouseEnter'>		/**
 </span>		 * Method that is run when mouse hovers over the Button.
 		 * 
 		 * @protected
@@ -290,7 +290,7 @@ define( [
 		},
 		
 		
-<span id='ui-Button-method-onMouseLeave'>		/**
+<span id='jqc-button-Button-method-onMouseLeave'>		/**
 </span>		 * Method that is run when mouse un-hovers the Button.
 		 * 
 		 * @protected
@@ -303,7 +303,7 @@ define( [
 		},
 		
 		
-<span id='ui-Button-method-onMouseDown'>		/**
+<span id='jqc-button-Button-method-onMouseDown'>		/**
 </span>		 * Method that is run when mouse is pressed down on the Button.
 		 * 
 		 * @protected
@@ -314,7 +314,7 @@ define( [
 		},
 		
 		
-<span id='ui-Button-method-onMouseUp'>		/**
+<span id='jqc-button-Button-method-onMouseUp'>		/**
 </span>		 * Method that is run when mouse is release on the Button.
 		 * 
 		 * @protected

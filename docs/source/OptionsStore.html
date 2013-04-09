@@ -22,20 +22,20 @@ define( [
 	'Class'
 ], function( jQuery, _, Class ) {
 	
-<span id='ui-util-OptionsStore'>	/**
-</span>	 * @class ui.util.OptionsStore
+<span id='jqc-util-OptionsStore'>	/**
+</span>	 * @class jqc.util.OptionsStore
 	 * @extends Object
 	 * 
 	 * Helper utility class used for making the management of 'options' data easy, for any classes that use this format of data.
 	 * &quot;Options data&quot; in this context simply means &quot;text/value&quot; pairs, such as used by dropdowns. The purpose of this class 
 	 * was to not duplicate functionality for classes that use this format of data.
 	 * 
-	 * This class is currently used by {@link ui.form.field.Dropdown} and {@link ui.form.field.Radio}, which use it for 
+	 * This class is currently used by {@link jqc.form.field.Dropdown} and {@link jqc.form.field.Radio}, which use it for 
 	 * managing the options that they provide.
 	 */
 	var OptionsStore = Class.extend( Object, {
 		
-<span id='ui-util-OptionsStore-property-options'>		/**
+<span id='jqc-util-OptionsStore-property-options'>		/**
 </span>		 * @private
 		 * @property {Object[]} options
 		 * 
@@ -43,7 +43,7 @@ define( [
 		 */
 		
 		
-<span id='ui-util-OptionsStore-method-constructor'>		/**
+<span id='jqc-util-OptionsStore-method-constructor'>		/**
 </span>		 * Instantiates an OptionsStore.
 		 * 
 		 * @constructor
@@ -55,7 +55,7 @@ define( [
 		},
 		
 		
-<span id='ui-util-OptionsStore-method-normalizeOptions'>		/**
+<span id='jqc-util-OptionsStore-method-normalizeOptions'>		/**
 </span>		 * Normalizes the given array of options into text/value options.
 		 * 
 		 * @private
@@ -74,7 +74,7 @@ define( [
 		},
 		
 		
-<span id='ui-util-OptionsStore-method-normalizeOption'>		/**
+<span id='jqc-util-OptionsStore-method-normalizeOption'>		/**
 </span>		 * Normalizes a single option into an object with `text` and `value` properties. If a string is provided as the argument,
 		 * that string will be used as both the `text` and `value` properties. If an object is provided, it must at least have a 
 		 * `text` property, which will also be used for the `value` property should no `value` of its own exist.
@@ -109,7 +109,7 @@ define( [
 		},
 		
 		
-<span id='ui-util-OptionsStore-method-setOptions'>		/**
+<span id='jqc-util-OptionsStore-method-setOptions'>		/**
 </span>		 * Sets the options for the store. Normalizes the options into an array of objects, where each object
 		 * has the properties 'text' and 'value'.  Extra properties may be added however, when following the recommended format (an
 		 * array of objects).
@@ -140,7 +140,7 @@ define( [
 		},
 		
 		
-<span id='ui-util-OptionsStore-method-addOption'>		/**
+<span id='jqc-util-OptionsStore-method-addOption'>		/**
 </span>		 * Adds an option to the OptionsStore.
 		 * 
 		 * @method addOption
@@ -158,7 +158,7 @@ define( [
 		},
 		
 		
-<span id='ui-util-OptionsStore-method-removeOptionByValue'>		/**
+<span id='jqc-util-OptionsStore-method-removeOptionByValue'>		/**
 </span>		 * Removes an option from the OptionsStore by its value.
 		 * 
 		 * @method removeOptionByValue
@@ -175,7 +175,7 @@ define( [
 		},
 		
 		
-<span id='ui-util-OptionsStore-method-removeOptionByText'>		/**
+<span id='jqc-util-OptionsStore-method-removeOptionByText'>		/**
 </span>		 * Removes an option from the OptionsStore by its text.
 		 * 
 		 * @method removeOptionByText
@@ -196,7 +196,7 @@ define( [
 		
 		// Retrieval methods
 		
-<span id='ui-util-OptionsStore-method-getOptions'>		/**
+<span id='jqc-util-OptionsStore-method-getOptions'>		/**
 </span>		 * Retrives all of the options objects held by the OptionsStore. Each options object has properties: 'text' and 'value'.
 		 * 
 		 * @method getOptions
@@ -207,7 +207,7 @@ define( [
 		},
 		
 		
-<span id='ui-util-OptionsStore-method-getCount'>		/**
+<span id='jqc-util-OptionsStore-method-getCount'>		/**
 </span>		 * Retrieves the number of options held by the OptionsStore.
 		 * 
 		 * @method getCount
@@ -218,7 +218,7 @@ define( [
 		},
 		
 		
-<span id='ui-util-OptionsStore-method-getAtIndex'>		/**
+<span id='jqc-util-OptionsStore-method-getAtIndex'>		/**
 </span>		 * Retrieves an option based on its index position (0-based).
 		 * 
 		 * @method getAtIndex
@@ -230,7 +230,7 @@ define( [
 		},
 		
 		
-<span id='ui-util-OptionsStore-method-getByValue'>		/**
+<span id='jqc-util-OptionsStore-method-getByValue'>		/**
 </span>		 * Retrieves an option based on its `value`. An option object has properties 'text' and 'value'.
 		 * 
 		 * @method getByValue
@@ -249,7 +249,7 @@ define( [
 		},
 		
 		
-<span id='ui-util-OptionsStore-method-getByText'>		/**
+<span id='jqc-util-OptionsStore-method-getByText'>		/**
 </span>		 * Retrieves an option based on its `text`. An option object has properties 'text' and 'value'.
 		 * 
 		 * @method getByText

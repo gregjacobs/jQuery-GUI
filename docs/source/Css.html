@@ -19,12 +19,12 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/UI'
+	'jqc/Jqc'
 ],
-function( jQuery, _, UI ) {
+function( jQuery, _, Jqc ) {
 	
-<span id='ui-util-Css'>	/**
-</span>	 * @class ui.util.Css
+<span id='jqc-util-Css'>	/**
+</span>	 * @class jqc.util.Css
 	 * @singleton
 	 * 
 	 * General CSS manipulation/reading functionality.  Allows the dynamic modification of 
@@ -32,7 +32,7 @@ function( jQuery, _, UI ) {
 	 */
 	var Css = {
 		
-<span id='ui-util-Css-property-SIDES_MAP'>		/**
+<span id='jqc-util-Css-property-SIDES_MAP'>		/**
 </span>		 * @private
 		 * @property {Object} SIDES_MAP
 		 * 
@@ -50,7 +50,7 @@ function( jQuery, _, UI ) {
 		// ------------------------------------
 		
 		
-<span id='ui-util-Css-method-mapToString'>		/**
+<span id='jqc-util-Css-method-mapToString'>		/**
 </span>		 * Given an Object (map) of CSS property/value pairs, will return a string that can be placed directly
 		 * into the &quot;style&quot; attribute of an element. camelCased CSS property names will be converted to 
 		 * dashes. Ex: &quot;fontSize&quot; will be converted to &quot;font-size&quot;.
@@ -72,7 +72,7 @@ function( jQuery, _, UI ) {
 		},
 		
 		
-<span id='ui-util-Css-method-updateStyleEl'>		/**
+<span id='jqc-util-Css-method-updateStyleEl'>		/**
 </span>		 * Updates the given &amp;lt;style&amp;gt; element(s) with new CSS text. Handles the special case for IE.
 		 * 
 		 * @param {String/HTMLElement/jQuery} styleEl A selector, reference to an HTMLElement, or jQuery wrapped
@@ -82,7 +82,7 @@ function( jQuery, _, UI ) {
 		updateStyleEl : function( styleEl, cssText ) {
 			var $styleEl = jQuery( styleEl );
 			
-			if( UI.isIE ) {
+			if( Jqc.isIE ) {
 				for( var i = 0, len = $styleEl.length; i &lt; len; i++ ) {   // in case there is more than one element
 					$styleEl[ i ].styleSheet.cssText = cssText;  // special case for IE
 				}
@@ -92,7 +92,7 @@ function( jQuery, _, UI ) {
 		},
 		
 		
-<span id='ui-util-Css-method-normalizeSizeValue'>		/**
+<span id='jqc-util-Css-method-normalizeSizeValue'>		/**
 </span>		 * Normalizes a CSS &quot;size&quot; property value. When provided a number, or a string that converts to a number, this method adds 
 		 * the 'px' suffix. When provided any other string, it returns the string unchanged (for example, when providing a percentage 
 		 * size, such as &quot;50%&quot;).
@@ -113,7 +113,7 @@ function( jQuery, _, UI ) {
 		// Measurement Helpers
 		
 		
-<span id='ui-util-Css-method-getPadding'>		/**
+<span id='jqc-util-Css-method-getPadding'>		/**
 </span>		 * Retrieves the width of the padding for the given `sides` of the `element`. `sides` can be either 't', 'r', 'b', or 
 		 * 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* it can be a combination of more than one to add the padding widths
 		 * together. Ex: 'rl' would add the right and left padding together and return that number.
@@ -129,7 +129,7 @@ function( jQuery, _, UI ) {
 		},
 		
 		
-<span id='ui-util-Css-method-getMargin'>		/**
+<span id='jqc-util-Css-method-getMargin'>		/**
 </span>		 * Retrieves the width of the margin for the given `sides` of the `element`. `sides` can be either 't', 'r', 'b', or 
 		 * 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* it can be a combination of more than one to add the margin widths
 		 * together. Ex: 'rl' would add the right and left margin together and return that number.
@@ -145,7 +145,7 @@ function( jQuery, _, UI ) {
 		},
 		
 		
-<span id='ui-util-Css-method-getBorderWidth'>		/**
+<span id='jqc-util-Css-method-getBorderWidth'>		/**
 </span>		 * Retrieves the width of the border for the given `sides` of the `element`. `sides` can be either 't', 'r', 'b', or 
 		 * 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* it can be a combination of more than one to add the border widths
 		 * together. Ex: 'rl' would add the right and left border together and return that number.
@@ -162,7 +162,7 @@ function( jQuery, _, UI ) {
 		
 		
 		
-<span id='ui-util-Css-method-getFrameSize'>		/**
+<span id='jqc-util-Css-method-getFrameSize'>		/**
 </span>		 * Retrieves the &quot;frame&quot; size, which is the sum of the width of the padding, margin, and border, for the given `sides` of the `element`. `sides` 
 		 * can be either 't', 'r', 'b', or 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* it can be a combination of more than one to add the 
 		 * padding/border/margin widths together. Ex: 'rl' would add the right and left padding together and return that number.
@@ -178,7 +178,7 @@ function( jQuery, _, UI ) {
 		},
 		
 		
-<span id='ui-util-Css-method-sumSides'>		/**
+<span id='jqc-util-Css-method-sumSides'>		/**
 </span>		 * Private helper method to sum up the `sides` for a given `element` and `propertyName`.
 		 * 
 		 * @private

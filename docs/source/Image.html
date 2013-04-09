@@ -19,39 +19,39 @@
 define( [
 	'lodash',
 	'Class',
-	'ui/ComponentManager',
-	'ui/Component'
+	'jqc/ComponentManager',
+	'jqc/Component'
 ], function( _, Class, ComponentManager, Component ) {
 	
-<span id='ui-Image'>	/**
-</span>	 * @class ui.Image
-	 * @extends ui.Component
+<span id='jqc-Image'>	/**
+</span>	 * @class jqc.Image
+	 * @extends jqc.Component
 	 *
 	 * A simple component which is an image.
 	 */
 	var Image = Class.extend( Component, {
 		
-<span id='ui-Image-cfg-src'>		/**
+<span id='jqc-Image-cfg-src'>		/**
 </span>		 * @cfg {String} src
 		 * The initial src (url) for the image.
 		 */
 		src : &quot;&quot;,
 		
-<span id='ui-Image-cfg-elType'>		/**
+<span id='jqc-Image-cfg-elType'>		/**
 </span>		 * @hide
 		 * @cfg {String} elType
 		 * @inheritdoc
 		 */
 		elType : 'img',
 		
-<span id='ui-Image-cfg-baseCls'>		/**
+<span id='jqc-Image-cfg-baseCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'ui-Image',
+		baseCls : 'jqc-Image',
 		
 		
-<span id='ui-Image-property-loaded'>		/**
+<span id='jqc-Image-property-loaded'>		/**
 </span>		 * @protected
 		 * @property {Boolean} loaded
 		 * 
@@ -60,7 +60,7 @@ define( [
 		 */
 		loaded : false,
 		
-<span id='ui-Image-property-errored'>		/**
+<span id='jqc-Image-property-errored'>		/**
 </span>		 * @protected
 		 * @property {Boolean} errored
 		 * 
@@ -70,7 +70,7 @@ define( [
 		errored : false,
 		
 		
-<span id='ui-Image-property-blankImg'>		/**
+<span id='jqc-Image-property-blankImg'>		/**
 </span>		 * @protected
 		 * @property {String} blankImg
 		 * 
@@ -87,19 +87,19 @@ define( [
 		// protected
 		initComponent : function() {
 			this.addEvents(
-<span id='ui-Image-event-load'>				/**
+<span id='jqc-Image-event-load'>				/**
 </span>				 * Fires when the underlying image has loaded successfully.
 				 * 
 				 * @event load
-				 * @param {ui.Image} image This Image instance.
+				 * @param {jqc.Image} image This Image instance.
 				 */
 				'load',
 				
-<span id='ui-Image-event-error'>				/**
+<span id='jqc-Image-event-error'>				/**
 </span>				 * Fires when the underlying image has failed to load.
 				 * 
 				 * @event error
-				 * @param {ui.Image} image This Image instance.
+				 * @param {jqc.Image} image This Image instance.
 				 */
 				'error'
 			);
@@ -121,7 +121,7 @@ define( [
 		// -------------------------------------
 		
 		
-<span id='ui-Image-method-setSrc'>		/**
+<span id='jqc-Image-method-setSrc'>		/**
 </span>		 * Sets the {@link #src} (url) of the Image.
 		 * 
 		 * @method setSrc
@@ -148,7 +148,7 @@ define( [
 		},
 		
 		
-<span id='ui-Image-method-getSrc'>		/**
+<span id='jqc-Image-method-getSrc'>		/**
 </span>		 * Retrieves the {@link #src} (url) of the Image. If no {@link #src} has been provided (either by the configuration
 		 * option, or by {@link #setSrc}), will return an empty string.
 		 * 
@@ -160,7 +160,7 @@ define( [
 		},
 		
 		
-<span id='ui-Image-method-isLoaded'>		/**
+<span id='jqc-Image-method-isLoaded'>		/**
 </span>		 * Determines if the image has loaded successfully.
 		 * 
 		 * @method isLoaded
@@ -171,7 +171,7 @@ define( [
 		},
 		
 		
-<span id='ui-Image-method-isErrored'>		/**
+<span id='jqc-Image-method-isErrored'>		/**
 </span>		 * Determines if the image has failed to load.
 		 * 
 		 * @method isErrored
@@ -182,7 +182,7 @@ define( [
 		},
 		
 		
-<span id='ui-Image-method-onImageLoad'>		/**
+<span id='jqc-Image-method-onImageLoad'>		/**
 </span>		 * Called when the underlying image has loaded successfully.
 		 * 
 		 * @protected
@@ -194,7 +194,7 @@ define( [
 		},
 		
 		
-<span id='ui-Image-method-onImageError'>		/**
+<span id='jqc-Image-method-onImageError'>		/**
 </span>		 * Called when the underlying image has failed to load.
 		 * 
 		 * @protected

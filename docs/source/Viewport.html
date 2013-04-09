@@ -19,34 +19,34 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/ComponentManager',
-	'ui/Container'
+	'jqc/ComponentManager',
+	'jqc/Container'
 ], function( jQuery, _, ComponentManager, Container ) {
 
-<span id='ui-Viewport'>	/**
-</span>	 * @class ui.Viewport
-	 * @extends ui.Container
+<span id='jqc-Viewport'>	/**
+</span>	 * @class jqc.Viewport
+	 * @extends jqc.Container
 	 *  
-	 * A special {@link ui.Container Container} which keeps itself at the size of its parent element, and responds to window resizes
-	 * to re-layout its child {@link ui.Component Components}.
+	 * A special {@link jqc.Container Container} which keeps itself at the size of its parent element, and responds to window resizes
+	 * to re-layout its child {@link jqc.Component Components}.
 	 * 
 	 * Ideally, there should only be one Viewport on a page, and it should automatically be rendered into the document body.
 	 * However, until everything uses the UI framework, this is used on an individual basis in some areas. 
 	 * 
 	 * Note that a Viewport should not contain another Viewport though. A set of parent/child relationships should end at the
-	 * top with a Viewport, and all children should simply be {@link ui.Container Containers}. If they need to be sized to 100% height/width,
-	 * their parent {@link ui.Container Container} should be configured with a {@link ui.layout.Fit FitLayout}.
+	 * top with a Viewport, and all children should simply be {@link jqc.Container Containers}. If they need to be sized to 100% height/width,
+	 * their parent {@link jqc.Container Container} should be configured with a {@link jqc.layout.Fit FitLayout}.
 	 */
 	var Viewport = Container.extend( {
 		
-<span id='ui-Viewport-cfg-layout'>		/**
+<span id='jqc-Viewport-cfg-layout'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
 		layout : 'fit',
 		
 		
-<span id='ui-Viewport-property-onWindowResizeDelegate'>		/**
+<span id='jqc-Viewport-property-onWindowResizeDelegate'>		/**
 </span>		 * @private
 		 * @property {Function} onWindowResizeDelegate
 		 * 
@@ -55,7 +55,7 @@ define( [
 		 */
 		
 		
-<span id='ui-Viewport-method-initComponent'>		/**
+<span id='jqc-Viewport-method-initComponent'>		/**
 </span>		 * @inheritdoc
 		 */
 		initComponent : function() {
@@ -66,7 +66,7 @@ define( [
 		},
 		
 		
-<span id='ui-Viewport-method-onRender'>		/**
+<span id='jqc-Viewport-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function() {
@@ -82,7 +82,7 @@ define( [
 		},
 		
 		
-<span id='ui-Viewport-method-recalcDimensions'>		/**
+<span id='jqc-Viewport-method-recalcDimensions'>		/**
 </span>		 * Recalculates and sets the dimensions of the Viewport to the size of its parent element.
 		 * 
 		 * @private
@@ -100,7 +100,7 @@ define( [
 		},
 		
 		
-<span id='ui-Viewport-method-onWindowResize'>		/**
+<span id='jqc-Viewport-method-onWindowResize'>		/**
 </span>		 * Handler for when the window is resized. Re-calculates the dimensions of the Viewport,
 		 * and runs {@link #doLayout}.
 		 * 
@@ -113,7 +113,7 @@ define( [
 		},
 		
 		
-<span id='ui-Viewport-method-doResize'>		/**
+<span id='jqc-Viewport-method-doResize'>		/**
 </span>		 * Performs a resize of the Viewport and a layout of its {@link #childComponents} in response to the buffered
 		 * window resize task.
 		 * 
@@ -129,7 +129,7 @@ define( [
 		// -----------------------------
 		
 		
-<span id='ui-Viewport-method-onDestroy'>		/**
+<span id='jqc-Viewport-method-onDestroy'>		/**
 </span>		 * @inheritdoc
 		 */
 		onDestroy : function() {

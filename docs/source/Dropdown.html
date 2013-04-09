@@ -19,25 +19,25 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/util/Css',
-	'ui/ComponentManager',
-	'ui/form/field/Field',
-	'ui/template/LoDash',
-	'ui/util/OptionsStore'
+	'jqc/util/Css',
+	'jqc/ComponentManager',
+	'jqc/form/field/Field',
+	'jqc/template/LoDash',
+	'jqc/util/OptionsStore'
 ], function( jQuery, _, Css, ComponentManager, Field, LoDashTpl, OptionsStore ) {
 	
-<span id='ui-form-field-Dropdown'>	/**
-</span>	 * @class ui.form.field.Dropdown
-	 * @extends ui.form.field.Field
+<span id='jqc-form-field-Dropdown'>	/**
+</span>	 * @class jqc.form.field.Dropdown
+	 * @extends jqc.form.field.Field
 	 * 
 	 * Dropdown list where only one item may be selected.
 	 */
 	var DropdownField = Field.extend( {
 		
-<span id='ui-form-field-Dropdown-cfg-options'>		/**
+<span id='jqc-form-field-Dropdown-cfg-options'>		/**
 </span>		 * @cfg {Array/Function} options
 		 * 
-		 * The options for the dropdown. See the description of the {@link ui.util.OptionsStore#setOptions} method for accepted formats.
+		 * The options for the dropdown. See the description of the {@link jqc.util.OptionsStore#setOptions} method for accepted formats.
 		 * 
 		 * Note that along with 'text' and 'value' properties, options can have the extra properties of 'cls' and 'style', which can specify the
 		 * css class name(s) to style the dropdown option with, or a hash of styles to style the dropdown option with, repectively. Ex:
@@ -49,7 +49,7 @@ define( [
 		 * {@link #setOptions} and {@link #addOption} methods.
 		 */
 		
-<span id='ui-form-field-Dropdown-cfg-menuCls'>		/**
+<span id='jqc-form-field-Dropdown-cfg-menuCls'>		/**
 </span>		 * @cfg {String} menuCls
 		 * 
 		 * Any additional css class(es) to add to the dropdown menu itself. The dropdown menu is appended to the document body, and therefore can not be
@@ -57,7 +57,7 @@ define( [
 		 */
 		menuCls : &quot;&quot;,
 		
-<span id='ui-form-field-Dropdown-cfg-menuCollisionStrategy'>		/**
+<span id='jqc-form-field-Dropdown-cfg-menuCollisionStrategy'>		/**
 </span>		 * @cfg {String} menuCollisionStrategy
 		 * 
 		 * The strategy to use to re-position the dropdown menu when it collides with the edge of the screen.  Can be one of the following values:
@@ -66,21 +66,21 @@ define( [
 		 */
 		menuCollisionStrategy : 'flip',
 		
-<span id='ui-form-field-Dropdown-cfg-componentCls'>		/**
+<span id='jqc-form-field-Dropdown-cfg-componentCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'ui-form-DropdownField',
+		componentCls : 'jqc-form-DropdownField',
 		
 		
-<span id='ui-form-field-Dropdown-property-optionsStore'>		/**
+<span id='jqc-form-field-Dropdown-property-optionsStore'>		/**
 </span>		 * @private
-		 * @property {ui.util.OptionsStore} optionsStore
+		 * @property {jqc.util.OptionsStore} optionsStore
 		 * 
 		 * The OptionsStore instance used for managing the DropdownField's options.
 		 */
 		
-<span id='ui-form-field-Dropdown-property-optionsMenuOpen'>		/**
+<span id='jqc-form-field-Dropdown-property-optionsMenuOpen'>		/**
 </span>		 * @private
 		 * @property {Boolean} optionsMenuOpen
 		 * 
@@ -92,7 +92,7 @@ define( [
 		
 		statics : {
 			
-<span id='ui-form-field-Dropdown-static-property-dropdownRenderTpl'>			/**
+<span id='jqc-form-field-Dropdown-static-property-dropdownRenderTpl'>			/**
 </span>			 * @private
 			 * @static
 			 * @property {String} dropdownRenderTpl
@@ -111,7 +111,7 @@ define( [
 			] ),
 			
 			
-<span id='ui-form-field-Dropdown-static-property-optionsMenuRenderTpl'>			/**
+<span id='jqc-form-field-Dropdown-static-property-optionsMenuRenderTpl'>			/**
 </span>			 * @private
 			 * @static
 			 * @property {String} optionsMenuRenderTpl
@@ -119,7 +119,7 @@ define( [
 			 * The template to use to render the dropdown's options menu elements.
 			 */
 			optionsMenuRenderTpl : new LoDashTpl( [
-				'&lt;li data-elem=&quot;ui-form-DropdownField-menu-item&quot; class=&quot;&lt;%= componentCls %&gt;-menu-item &lt;%= menuItemCls %&gt;&quot; style=&quot;&lt;%= menuItemStyle %&gt;&quot;&gt;',
+				'&lt;li data-elem=&quot;jqc-form-DropdownField-menu-item&quot; class=&quot;&lt;%= componentCls %&gt;-menu-item &lt;%= menuItemCls %&gt;&quot; style=&quot;&lt;%= menuItemStyle %&gt;&quot;&gt;',
 					'&lt;%= text %&gt;',
 				'&lt;/li&gt;'
 			] )
@@ -128,7 +128,7 @@ define( [
 		
 	
 		
-<span id='ui-form-field-Dropdown-method-initComponent'>		/**
+<span id='jqc-form-field-Dropdown-method-initComponent'>		/**
 </span>		 * @inheritdoc
 		 */
 		initComponent : function() {
@@ -145,7 +145,7 @@ define( [
 		
 		
 		
-<span id='ui-form-field-Dropdown-method-initValue'>		/**
+<span id='jqc-form-field-Dropdown-method-initValue'>		/**
 </span>		 * Initializes the Dropdown's {@link #value}. If the {@link #value} property is undefined, or it doesn't match any of the values in the 
 		 * {@link #options} provided to the DropdownField, it is initialized to the first {@link #options option's} value.  This guarantees that 
 		 * the DropdownField's initial value is always set to a valid option value. This method may be extended by subclasses for any pre/post 
@@ -175,7 +175,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Dropdown-method-onRender'>		/**
+<span id='jqc-form-field-Dropdown-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function( container ) {
@@ -186,7 +186,7 @@ define( [
 			// an actual dropdown field (&lt;select&gt; element). Leaving this (old) code here for now.  
 			/*
 			// Create the dropdown
-			this.$inputEl = jQuery( '&lt;select id=&quot;' + this.inputId + '&quot; name=&quot;' + this.inputName + '&quot; class=&quot;ui-corner-all dropdown&quot;&gt;&lt;/select&gt;' )
+			this.$inputEl = jQuery( '&lt;select id=&quot;' + this.inputId + '&quot; name=&quot;' + this.inputName + '&quot; class=&quot;jqc-corner-all dropdown&quot;&gt;&lt;/select&gt;' )
 				.bind( {
 					change : _.bind( function() { this.onChange( this.getValue() ); }, this ),  // Call onChange() with the new value
 					focus  : _.bind( this.onFocus, this ),
@@ -238,7 +238,7 @@ define( [
 			
 			// TODO: Add IE iframe shim
 			/*if ($.browser.msie &amp;&amp; jQuery.browser.version &lt; 7) {
-				$select.after($('&lt;iframe src=&quot;javascript:\'\';&quot; class=&quot;ui-dropdownField-shim&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; align=&quot;bottom&quot; scrolling=&quot;no&quot; tabIndex=&quot;-1&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;').css({ height: $select.height()+4 +'px' }));
+				$select.after($('&lt;iframe src=&quot;javascript:\'\';&quot; class=&quot;jqc-dropdownField-shim&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; align=&quot;bottom&quot; scrolling=&quot;no&quot; tabIndex=&quot;-1&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;').css({ height: $select.height()+4 +'px' }));
 			}*/
 			
 			// Now, draw the initial set of options
@@ -275,7 +275,7 @@ define( [
 		
 		
 		
-<span id='ui-form-field-Dropdown-method-onDocumentClick'>		/**
+<span id='jqc-form-field-Dropdown-method-onDocumentClick'>		/**
 </span>		 * Method that is run as a click handler on the document body, which tests if a click was made away
 		 * from the dropdown itself or its menu, which will close the dropdown's menu if that is the case.
 		 * 
@@ -304,7 +304,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Dropdown-method-onDropdownClick'>		/**
+<span id='jqc-form-field-Dropdown-method-onDropdownClick'>		/**
 </span>		 * Method that is run when the dropdown itself, or the &quot;open&quot; button, is clicked. This opens the dropdown's options menu.
 		 * 
 		 * @private
@@ -325,7 +325,7 @@ define( [
 		
 		
 		
-<span id='ui-form-field-Dropdown-method-onOptionClick'>		/**
+<span id='jqc-form-field-Dropdown-method-onOptionClick'>		/**
 </span>		 * Handles when an option is clicked in the dropdown's menu.
 		 * 
 		 * @private
@@ -358,7 +358,7 @@ define( [
 		
 		// Options management methods
 		
-<span id='ui-form-field-Dropdown-method-setOptions'>		/**
+<span id='jqc-form-field-Dropdown-method-setOptions'>		/**
 </span>		 * Sets the options for the dropdown. Normalizes the options into an array of objects, where each object
 		 * has the properties 'text' and 'value'.  See the {@link #options} config for accepted formats to the `options`
 		 * parameter. 
@@ -374,7 +374,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Dropdown-method-addOption'>		/**
+<span id='jqc-form-field-Dropdown-method-addOption'>		/**
 </span>		 * Adds an option to the DropdownField, optionally at an `index`.
 		 * 
 		 * @param {Object} option The option to add to the DropdownField. For the acceptable format of an option object,
@@ -389,7 +389,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Dropdown-method-removeOptionByValue'>		/**
+<span id='jqc-form-field-Dropdown-method-removeOptionByValue'>		/**
 </span>		 * Removes an option from the DropdownField by its value.
 		 * 
 		 * @param {Mixed} value The value of the option to remove.
@@ -402,7 +402,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Dropdown-method-removeOptionByText'>		/**
+<span id='jqc-form-field-Dropdown-method-removeOptionByText'>		/**
 </span>		 * Removes an option from the DropdownField by its text.
 		 * 
 		 * @param {Mixed} text The text of the option to remove.
@@ -415,7 +415,7 @@ define( [
 		},
 	
 	
-<span id='ui-form-field-Dropdown-method-onOptionsChange'>		/**
+<span id='jqc-form-field-Dropdown-method-onOptionsChange'>		/**
 </span>		 * Handler to react to the changing of the options/optionsStore, after the value is normalized, but
 		 * before the field is redrawn.  Can be extended by subclasses.
 		 * 
@@ -439,7 +439,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Dropdown-method-getOptions'>		/**
+<span id='jqc-form-field-Dropdown-method-getOptions'>		/**
 </span>		 * Retrieves the options of the dropdown. This returns an array of objects, where the objects have 
 		 * properties `text` and `value`. Example of a returned array:
 		 * 
@@ -456,7 +456,7 @@ define( [
 		
 		
 		
-<span id='ui-form-field-Dropdown-method-redrawOptions'>		/**
+<span id='jqc-form-field-Dropdown-method-redrawOptions'>		/**
 </span>		 * Updates the displayed options in the dropdown, based on the current options set by setOptions().
 		 * 
 		 * @private
@@ -499,7 +499,7 @@ define( [
 				
 				// Now that the markup is appended and DOM nodes have been created, assign the values to the menu item
 				// elements using .data() (so that values of any datatype may be assigned)
-				var $itemEls = $optionsMenu.find( '[data-elem=&quot;ui-form-DropdownField-menu-item&quot;]' );
+				var $itemEls = $optionsMenu.find( '[data-elem=&quot;jqc-form-DropdownField-menu-item&quot;]' );
 				for( i = 0; i &lt; numOptions; i++ ) {
 					// Add the &quot;value&quot; as data (instead of an attribute), so that any datatype can be stored for the value
 					$itemEls.eq( i ).data( 'value', options[ i ].value );
@@ -514,7 +514,7 @@ define( [
 		// --------------------------------------
 		
 		
-<span id='ui-form-field-Dropdown-method-showOptionsMenu'>		/**
+<span id='jqc-form-field-Dropdown-method-showOptionsMenu'>		/**
 </span>		 * Expands and shows the options menu.
 		 */
 		showOptionsMenu : function() {
@@ -535,7 +535,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Dropdown-method-hideOptionsMenu'>		/**
+<span id='jqc-form-field-Dropdown-method-hideOptionsMenu'>		/**
 </span>		 * Hides the options menu.
 		 */
 		hideOptionsMenu : function( anim ) {
@@ -545,7 +545,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Dropdown-method-toggleOptionsMenu'>		/**
+<span id='jqc-form-field-Dropdown-method-toggleOptionsMenu'>		/**
 </span>		 * Toggles the options menu. If it is currently open, it will be closed. If it is currently
 		 * closed, it will be opened.
 		 */
@@ -563,8 +563,8 @@ define( [
 		// --------------------------------------
 		
 		
-<span id='ui-form-field-Dropdown-method-setValue'>		/**
-</span>		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
+<span id='jqc-form-field-Dropdown-method-setValue'>		/**
+</span>		 * Implementation of {@link jqc.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * If the provided `value` is not an option, the value of the field will remain unchanged.
 		 * 
 		 * @param {String} value The value of the field.
@@ -592,7 +592,7 @@ define( [
 					$optionsMenu.find( 'li.' + selectedCls ).removeClass( selectedCls );  // De-select any currently selected item in the dropdown menu
 					
 					// Select the item with the given value
-					var $itemEls = $optionsMenu.find( 'li[data-elem=&quot;ui-form-DropdownField-menu-item&quot;]' );
+					var $itemEls = $optionsMenu.find( 'li[data-elem=&quot;jqc-form-DropdownField-menu-item&quot;]' );
 					for( var i = 0, len = $itemEls.length; i &lt; len; i++ ) {
 						var $item = $itemEls.eq( i );
 						if( $item.data( 'value' ) === value ) {
@@ -609,8 +609,8 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Dropdown-method-getValue'>		/**
-</span>		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
+<span id='jqc-form-field-Dropdown-method-getValue'>		/**
+</span>		 * Implementation of {@link jqc.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the option that is selected in the dropdown.
 		 */
@@ -622,7 +622,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Dropdown-method-setText'>		/**
+<span id='jqc-form-field-Dropdown-method-setText'>		/**
 </span>		 * Convenience method for setting the selected option in the dropdown by its text (as opposed to its value). Use {@link #setValue}
 		 * to select by option value.  If the provided `text` is not an option, the field will remain unchanged.
 		 * 
@@ -637,7 +637,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Dropdown-method-getText'>		/**
+<span id='jqc-form-field-Dropdown-method-getText'>		/**
 </span>		 * Convenience method for getting the text of the dropdown's selected option. Use {@link #getValue} to retrieve the selected option's value.
 		 * 
 		 * @return {String} The text of the selected option in the dropdown. 
@@ -648,7 +648,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Dropdown-method-hasOptionValue'>		/**
+<span id='jqc-form-field-Dropdown-method-hasOptionValue'>		/**
 </span>		 * Returns true if the dropdown has an {@link #options option} with the given value.
 		 * 
 		 * @param {Mixed} value The value to check for.
@@ -668,7 +668,7 @@ define( [
 		// ---------------------------------------------
 		
 		
-<span id='ui-form-field-Dropdown-method-onDestroy'>		/**
+<span id='jqc-form-field-Dropdown-method-onDestroy'>		/**
 </span>		 * @inheritdoc
 		 */
 		onDestroy : function() {

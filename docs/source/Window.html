@@ -17,27 +17,27 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">/*global define */
 define( [
-	'ui/ComponentManager',
-	'ui/Overlay'
+	'jqc/ComponentManager',
+	'jqc/Overlay'
 ], function( ComponentManager, Overlay ) {
 	
-<span id='ui-window-Window'>	/**
-</span>	 * @class ui.window.Window
-	 * @extends ui.Overlay
+<span id='jqc-window-Window'>	/**
+</span>	 * @class jqc.window.Window
+	 * @extends jqc.Overlay
 	 * 
-	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link ui.panel.Panel Panel}, the Window
+	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link jqc.panel.Panel Panel}, the Window
 	 * may accept a {@link #title}, and it also adds a {@link #closeButton close button} to the top right  
 	 */
 	var Window = Overlay.extend( {
 		
-<span id='ui-window-Window-cfg-closeButton'>		/**
+<span id='jqc-window-Window-cfg-closeButton'>		/**
 </span>		 * @cfg {Boolean} closeButton
 		 * 
 		 * `true` to show the close button on the top right, `false` to hide it.
 		 */
 		closeButton : true,
 		
-<span id='ui-window-Window-cfg-closeAction'>		/**
+<span id='jqc-window-Window-cfg-closeAction'>		/**
 </span>		 * @cfg {String} closeAction
 		 * 
 		 * The action to take when the {@link #closeButton} is clicked, or the Window is closed by the 'esc' button.
@@ -51,7 +51,7 @@ define( [
 		 */
 		closeAction : 'destroy',
 		
-<span id='ui-window-Window-cfg-closeOnEscape'>		/**
+<span id='jqc-window-Window-cfg-closeOnEscape'>		/**
 </span>		 * @cfg {Boolean} closeOnEscape
 		 * 
 		 * `true` to have the Window close when the 'esc' key is pressed. Set to `false` to disable this behavior. The action taken (whether
@@ -59,26 +59,26 @@ define( [
 		 */
 		closeOnEscape : true,
 		
-<span id='ui-window-Window-cfg-baseCls'>		/**
+<span id='jqc-window-Window-cfg-baseCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'ui-Window',
+		baseCls : 'jqc-Window',
 		
-<span id='ui-window-Window-cfg-x'>		/**
+<span id='jqc-window-Window-cfg-x'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
 		x : 'center',
 		
-<span id='ui-window-Window-cfg-y'>		/**
+<span id='jqc-window-Window-cfg-y'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
 		y : 'center',
 		
 		
-<span id='ui-window-Window-method-initComponent'>		/**
+<span id='jqc-window-Window-method-initComponent'>		/**
 </span>		 * @inheritdoc
 		 */
 		initComponent : function() {
@@ -96,7 +96,7 @@ define( [
 		},
 		
 		
-<span id='ui-window-Window-method-onRender'>		/**
+<span id='jqc-window-Window-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function() {
@@ -114,7 +114,7 @@ define( [
 		},
 		
 		
-<span id='ui-window-Window-method-doClose'>		/**
+<span id='jqc-window-Window-method-doClose'>		/**
 </span>		 * Protected method which handles the {@link #closeAction} of the Window.
 		 * 
 		 * @protected

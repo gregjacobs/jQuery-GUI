@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'lodash',
+	'Class',
+	'data/attribute/Attribute'
+], function( _, Class, Attribute ) {
+	
+<span id='data-attribute-Mixed'>	/**
+</span>	 * @class data.attribute.Mixed
+	 * @extends data.attribute.Attribute
+	 * 
+	 * Attribute definition class for an Attribute that takes any data value.
+	 */
+	var MixedAttribute = Class.extend( Attribute, {
+			
+		// No specific implementation at this time. All handled by the base class Attribute.
+		
+	} );
+	
+	
+	// Register the Attribute type
+	Attribute.registerType( 'mixed', MixedAttribute );
+	
+	return MixedAttribute;
+	
+} );</pre>
+</body>
+</html>

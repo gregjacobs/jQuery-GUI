@@ -19,28 +19,28 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/ComponentManager',
-	'ui/form/field/Field',
-	'ui/template/LoDash',
-	'ui/util/OptionsStore'
+	'jqc/ComponentManager',
+	'jqc/form/field/Field',
+	'jqc/template/LoDash',
+	'jqc/util/OptionsStore'
 ], function( jQuery, _, ComponentManager, Field, LoDashTpl, OptionsStore ) {
 	
-<span id='ui-form-field-Radio'>	/**
-</span>	 * @class ui.form.field.Radio
-	 * @extends ui.form.field.Field
+<span id='jqc-form-field-Radio'>	/**
+</span>	 * @class jqc.form.field.Radio
+	 * @extends jqc.form.field.Field
 	 * 
 	 * Set of radio buttons (buttons where only one selection can be made at a time).
 	 */
 	var RadioField = Field.extend( {
 		
-<span id='ui-form-field-Radio-cfg-stacked'>		/**
+<span id='jqc-form-field-Radio-cfg-stacked'>		/**
 </span>		 * @cfg {Boolean} stacked 
 		 * 
 		 * `true` if the radio buttons should be stacked instead of spread out horizontally across the line.
 		 */
 		stacked : false,
 		
-<span id='ui-form-field-Radio-cfg-options'>		/**
+<span id='jqc-form-field-Radio-cfg-options'>		/**
 </span>		 * @cfg {Array/Function} options (required)
 		 * 
 		 * The options for the RadioField, which creates the radio button based on this config. This config is required.
@@ -55,27 +55,27 @@ define( [
 		 * the array forms defined above.
 		 */
 		
-<span id='ui-form-field-Radio-cfg-inputName'>		/**
+<span id='jqc-form-field-Radio-cfg-inputName'>		/**
 </span>		 * @cfg {String} inputName
 		 * 
 		 * The name to give the input. This will be set as the input's &quot;name&quot; attribute.  This is really only useful if
 		 * the form that the component exists in is going to be submitted by a standard form submission (as opposed to just
 		 * having its values retrieved, which are handled elsewhere). Defaults to the value of the 
-		 * {@link ui.form.field.Field#inputId} config.
+		 * {@link jqc.form.field.Field#inputId} config.
 		 * 
 		 * Note that because radio fields rely on their &quot;name&quot; attributes being the same, this should not be set to an
 		 * empty string (or another non-unique string).  If an explicit name is not needed, let this config default to the
-		 * {@link ui.form.field.Field#inputId} config.
+		 * {@link jqc.form.field.Field#inputId} config.
 		 */
 		
-<span id='ui-form-field-Radio-cfg-componentCls'>		/**
+<span id='jqc-form-field-Radio-cfg-componentCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'ui-form-RadioField',
+		componentCls : 'jqc-form-RadioField',
 		
 		
-<span id='ui-form-field-Radio-property-radioTpl'>		/**
+<span id='jqc-form-field-Radio-property-radioTpl'>		/**
 </span>		 * @protected
 		 * @property {String} radioTpl
 		 * 
@@ -88,7 +88,7 @@ define( [
 		
 		
 		
-<span id='ui-form-field-Radio-method-initComponent'>		/**
+<span id='jqc-form-field-Radio-method-initComponent'>		/**
 </span>		 * @inheritdoc
 		 */
 		initComponent : function() {
@@ -130,7 +130,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Radio-method-onRender'>		/**
+<span id='jqc-form-field-Radio-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function( container ) {
@@ -176,8 +176,8 @@ define( [
 		
 		
 		
-<span id='ui-form-field-Radio-method-setValue'>		/**
-</span>		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
+<span id='jqc-form-field-Radio-method-setValue'>		/**
+</span>		 * Implementation of {@link jqc.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {String} value The value of the field.
 		 */
@@ -196,8 +196,8 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Radio-method-getValue'>		/**
-</span>		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
+<span id='jqc-form-field-Radio-method-getValue'>		/**
+</span>		 * Implementation of {@link jqc.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the field.
 		 */

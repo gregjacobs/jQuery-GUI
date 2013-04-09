@@ -20,27 +20,27 @@ define( [
 	'require'
 ], function( require ) {
 	
-<span id='ui-ComponentManager'>	/**
-</span>	 * @class ui.ComponentManager
+<span id='jqc-ComponentManager'>	/**
+</span>	 * @class jqc.ComponentManager
 	 *
-	 * Object used to manage {@link ui.Component} &quot;types&quot;, and handles instantiating them based on the string that is specified
+	 * Object used to manage {@link jqc.Component} &quot;types&quot;, and handles instantiating them based on the string that is specified
 	 * for them in the manifest.  
 	 *
 	 * @singleton
 	 */
 	var ComponentManager = {
 		
-<span id='ui-ComponentManager-property-componentClasses'>		/**
+<span id='jqc-ComponentManager-property-componentClasses'>		/**
 </span>		 * @private
 		 * @property {Object} componentClasses
 		 * 
-		 * An Object (map) of the {@link ui.Component} classes which have been {@link #registerType registered}, 
+		 * An Object (map) of the {@link jqc.Component} classes which have been {@link #registerType registered}, 
 		 * keyed by their type name. 
 		 */
 		componentClasses : {},
 	   
 	   
-<span id='ui-ComponentManager-method-registerType'>		/**
+<span id='jqc-ComponentManager-method-registerType'>		/**
 </span>		 * Registers a given class with a `type` name. This is used to map the type names specified in Bit manifests
 		 * to the class that should be instantiated.  Note that type names are case-insensitive.
 		 * 
@@ -57,12 +57,12 @@ define( [
 			if( !this.componentClasses[ type ] ) { 
 				this.componentClasses[ type ] = jsClass;
 			} else {
-				throw new Error( &quot;Error: ui.ComponentManager already has a type '&quot; + type + &quot;'&quot; );
+				throw new Error( &quot;Error: jqc.ComponentManager already has a type '&quot; + type + &quot;'&quot; );
 			}
 		},
 		
 		
-<span id='ui-ComponentManager-method-getType'>		/**
+<span id='jqc-ComponentManager-method-getType'>		/**
 </span>		 * Retrieves the Component class (constructor function) that has been registered by the supplied `type` name. 
 		 * 
 		 * @method getType
@@ -74,7 +74,7 @@ define( [
 		},
 		
 		
-<span id='ui-ComponentManager-method-hasType'>		/**
+<span id='jqc-ComponentManager-method-hasType'>		/**
 </span>		 * Determines if the ComponentManager has (i.e. can instantiate) a given `type`.
 		 * 
 		 * @method hasType
@@ -90,21 +90,21 @@ define( [
 		},
 		
 		
-<span id='ui-ComponentManager-method-create'>		/**
-</span>		 * Creates (instantiates) a {@link ui.Component Component} based on its type name, given
+<span id='jqc-ComponentManager-method-create'>		/**
+</span>		 * Creates (instantiates) a {@link jqc.Component Component} based on its type name, given
 		 * a configuration object that has a `type` property. If an already-instantiated 
-		 * {@link ui.Component Component} is provided, it will simply be returned unchanged.
+		 * {@link jqc.Component Component} is provided, it will simply be returned unchanged.
 		 * 
 		 * @method create
 		 * @param {Object} config The configuration object for the Component. Config objects should have the property `type`, 
-		 *   which determines which type of {@link ui.Component Component} will be instantiated. If the object does not
+		 *   which determines which type of {@link jqc.Component Component} will be instantiated. If the object does not
 		 *   have a `type` property, it will default to &quot;container&quot;, which makes it simple to create things like tab containers. 
-		 *   Note that already-instantiated {@link ui.Component Components} will simply be returned unchanged. 
-		 * @return {ui.Component} The instantiated Component.
+		 *   Note that already-instantiated {@link jqc.Component Components} will simply be returned unchanged. 
+		 * @return {jqc.Component} The instantiated Component.
 		 */
 		create : function( config ) {
 			var type = config.type ? config.type.toLowerCase() : undefined,
-			    Component = require( 'ui/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (ui.Component depends on ui.ComponentManager)
+			    Component = require( 'jqc/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (jqc.Component depends on jqc.ComponentManager)
 			
 			if( config instanceof Component ) {
 				// Already a Component instance, return it

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'lodash',
+	'Class'
+], function( _, Class ) {
+	
+<span id='data-persistence-operation-Batch'>	/**
+</span>	 * @class data.persistence.operation.Batch
+	 * 
+	 * Represents one or more {@link data.persistence.operation.Operation Operations} which were executed in a logical
+	 * group.
+	 * 
+	 * The Batch object provides access to each {@link data.persistence.operation.Operation Operation}, and also provides
+	 * methods for determining the overall success or failure (error) state of the Operations within it.
+	 * 
+	 * This class is mainly used internally by the library, and is provided to client code at the times when multiple
+	 * {@link data.persistence.operation.Operation Operations} were needed to satisfy a request, so that it may be inspected
+	 * for any needed information.
+	 */
+	var OperationBatch = Class.extend( Object, {
+		
+<span id='data-persistence-operation-Batch-cfg-operations'>		/**
+</span>		 * @cfg {data.persistence.operation.Operation/data.persistence.operation.Operation[]} operations
+		 * 
+		 * One or more Operation(s) that make up the Batch.
+		 */
+		
+		
+<span id='data-persistence-operation-Batch-method-constructor'>		/**
+</span>		 * @constructor
+		 * @param {Object} [cfg] Any of the configuration options for this class, in an Object (map).
+		 */
+		constructor : function( cfg ) {
+			_.assign( this, cfg );
+			
+			// normalize the `operations` config to an array
+			this.operations = ( this.operations ) ? [].concat( this.operations ) : [];
+		},
+		
+		
+<span id='data-persistence-operation-Batch-method-getOperations'>		/**
+</span>		 * Retrieves all of the {@link #operations} for this Batch. 
+		 * 
+		 * @return {data.persistence.operation.Operation[]}
+		 */
+		getOperations : function() {
+			return this.operations;
+		},
+		
+		
+<span id='data-persistence-operation-Batch-method-wasSuccessful'>		/**
+</span>		 * Determines if the Batch of {@link #operations} completed successfully. All {@link #operations}
+		 * must have completed successfully for the Batch to be considered successful.
+		 * 
+		 * @return {Boolean}
+		 */
+		wasSuccessful : function() {
+			return !_.find( this.operations, function( op ) { return op.hasErrored(); } );  // _.find() returns `undefined` if no errored operations are found
+		},
+		
+		
+<span id='data-persistence-operation-Batch-method-hasErrored'>		/**
+</span>		 * Determines if the Batch failed to complete successfully. If any of the {@link #operations}
+		 * has errored, this method returns true.
+		 * 
+		 * @return {Boolean}
+		 */
+		hasErrored : function() {
+			return !this.wasSuccessful();
+		},
+		
+		
+<span id='data-persistence-operation-Batch-method-getSuccessfulOperations'>		/**
+</span>		 * Retrieves each {@link data.persistence.operation.Operation Operation} object that has completed
+		 * successfully.
+		 * 
+		 * @return {data.persistence.operation.Operation[]} An array of the Operations which have completed
+		 *   successfully.
+		 */
+		getSuccessfulOperations : function() {
+			return _.filter( this.operations, function( op ) { return !op.hasErrored(); } );
+		},
+		
+		
+<span id='data-persistence-operation-Batch-method-getErroredOperations'>		/**
+</span>		 * Retrieves each {@link data.persistence.operation.Operation Operation} object that has errored.
+		 * 
+		 * @return {data.persistence.operation.Operation[]} An array of the Operations which have errored.
+		 */
+		getErroredOperations : function() {
+			return _.filter( this.operations, function( op ) { return op.hasErrored(); } );
+		},
+		
+		
+<span id='data-persistence-operation-Batch-method-isComplete'>		/**
+</span>		 * Determines if all {@link data.persistence.operation.Operation Operations} in the batch are complete.
+		 * 
+		 * @return {Boolean} `true` if all Operations are complete, `false` if any are not yet complete.
+		 */
+		isComplete : function() {
+			return _.all( this.operations, function( op ) { return op.isComplete(); } );
+		}
+		
+	} );
+	
+	return OperationBatch;
+	
+} );</pre>
+</body>
+</html>

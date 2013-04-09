@@ -19,28 +19,28 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/util/Html',
-	'ui/ComponentManager',
-	'ui/form/field/Field',
-	'ui/form/field/Text.EmptyTextBehavior',
-	'ui/form/field/Text.InfieldLabelBehavior'
+	'jqc/util/Html',
+	'jqc/ComponentManager',
+	'jqc/form/field/Field',
+	'jqc/form/field/Text.EmptyTextBehavior',
+	'jqc/form/field/Text.InfieldLabelBehavior'
 ], function( jQuery, _, Html, ComponentManager, Field, EmptyTextBehavior, InfieldLabelBehavior ) {
 	
-<span id='ui-form-field-Text'>	/**
-</span>	 * @class ui.form.field.Text
-	 * @extends ui.form.field.Field
+<span id='jqc-form-field-Text'>	/**
+</span>	 * @class jqc.form.field.Text
+	 * @extends jqc.form.field.Field
 	 * 
 	 * Text (string) field component for the editor.
 	 */
 	var TextField = Field.extend( {
 		
-<span id='ui-form-field-Text-cfg-selectOnFocus'>		/**
+<span id='jqc-form-field-Text-cfg-selectOnFocus'>		/**
 </span>		 * @cfg {Boolean} selectOnFocus
 		 * True to have the field's text automatically selected when the field is focused. Defaults to false. 
 		 */
 		selectOnFocus : false,
 		
-<span id='ui-form-field-Text-cfg-labelAlign'>		/**
+<span id='jqc-form-field-Text-cfg-labelAlign'>		/**
 </span>		 * @cfg {String} labelAlign
 		 * A string that specifies where the field's label should be placed. Valid values are: &quot;left&quot;, &quot;top&quot;, 
 		 * and &quot;infield&quot;. The &quot;infield&quot; label position places the label inside the text field itself, which 
@@ -50,7 +50,7 @@ define( [
 		 * config. The provided {@link #emptyText} will not be used in this case. 
 		 */
 		
-<span id='ui-form-field-Text-cfg-emptyText'>		/**
+<span id='jqc-form-field-Text-cfg-emptyText'>		/**
 </span>		 * @cfg {String} emptyText
 		 * The text to show in the field when the field is empty. When the user focuses the field, this text
 		 * will be removed, allowing the user to type their value. If provided, and no {@link #value} is provided,
@@ -59,7 +59,7 @@ define( [
 		 * Note that this is not compatible with the {@link #labelAlign} config set to &quot;infield&quot;. See the description of {@link #labelAlign}.
 		 */
 		
-<span id='ui-form-field-Text-cfg-restoreEmptyText'>		/**
+<span id='jqc-form-field-Text-cfg-restoreEmptyText'>		/**
 </span>		 * @cfg {Boolean} restoreEmptyText
 		 * True to enable the restoration of the {@link #emptyText} (if any) when the field loses focus (is blurred), and is empty.
 		 * If this is true, the {@link #emptyText} will be re-applied to the field when it has no value (i.e. it's an
@@ -71,71 +71,71 @@ define( [
 		 */
 		restoreEmptyText : true,
 		
-<span id='ui-form-field-Text-cfg-value'>		/**
+<span id='jqc-form-field-Text-cfg-value'>		/**
 </span>		 * @cfg {String} value
 		 * The initial value for the field, if any.
 		 */
 		
-<span id='ui-form-field-Text-cfg-readOnly'>		/**
+<span id='jqc-form-field-Text-cfg-readOnly'>		/**
 </span>		 * @cfg {Boolean} readOnly
 		 * 
 		 * True to mark the Field as &quot;read only&quot; in the HTML. This prevents the user from editing the Field.
 		 */
 		
-<span id='ui-form-field-Text-cfg-componentCls'>		/**
+<span id='jqc-form-field-Text-cfg-componentCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'ui-form-TextField',
+		componentCls : 'jqc-form-TextField',
 		
 		
-<span id='ui-form-field-Text-property-S-inputEl'>		/**
+<span id='jqc-form-field-Text-property-S-inputEl'>		/**
 </span>		 * @protected
 		 * @property {jQuery} $inputEl
 		 * 
 		 * The &amp;lt;input&amp;gt; element; the text field. Will only be available after render.
 		 */
 		
-<span id='ui-form-field-Text-property-behaviorState'>		/**
+<span id='jqc-form-field-Text-property-behaviorState'>		/**
 </span>		 * @private
-		 * @property {ui.form.field.Text.Behavior} behaviorState
+		 * @property {jqc.form.field.Text.Behavior} behaviorState
 		 * 
-		 * The {@link ui.form.field.Text.Behavior} object that governs the TextField's behavior.
+		 * The {@link jqc.form.field.Text.Behavior} object that governs the TextField's behavior.
 		 * This currently applies to either the TextField having an {@link #emptyText} value, 
 		 * or the TextField having an &quot;infield&quot; {@link #labelAlign}.
 		 */
 		
 		
-<span id='ui-form-field-Text-method-initComponent'>		/**
+<span id='jqc-form-field-Text-method-initComponent'>		/**
 </span>		 * @inheritdoc
 		 */
 		initComponent : function() {
 			this._super( arguments );
 			
 			this.addEvents(
-<span id='ui-form-field-Text-event-keydown'>				/**
+<span id='jqc-form-field-Text-event-keydown'>				/**
 </span>				 * Fires when a key is pressed down in the field.
 				 * 
 				 * @event keydown
-				 * @param {ui.form.field.Field} field This TextField object.
+				 * @param {jqc.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keydown',
 				
-<span id='ui-form-field-Text-event-keyup'>				/**
+<span id='jqc-form-field-Text-event-keyup'>				/**
 </span>				 * Fires when a key is pressed and let up in the field.
 				 * 
 				 * @event keyup
-				 * @param {ui.form.field.Field} field This TextField object.
+				 * @param {jqc.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keyup',
 				
-<span id='ui-form-field-Text-event-keypress'>				/**
+<span id='jqc-form-field-Text-event-keypress'>				/**
 </span>				 * Fires when a key is pressed in the field.
 				 * 
 				 * @event keypress
-				 * @param {ui.form.field.Field} field This TextField object.
+				 * @param {jqc.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keypress'
@@ -161,7 +161,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-onRender'>		/**
+<span id='jqc-form-field-Text-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function( container ) {
@@ -186,7 +186,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-createInputEl'>		/**
+<span id='jqc-form-field-Text-method-createInputEl'>		/**
 </span>		 * Overridable method for creating the input element for the TextField. This may be overrided in a subclass for
 		 * a different implementation than the regular &amp;lt;input type=&quot;text&quot;&amp;gt; element.  The implementation should
 		 * add the field's &quot;id&quot; ({@link #inputId}) and &quot;name&quot; ({@link #inputName}) properties, and populate the field's
@@ -209,7 +209,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-getInputEl'>		/**
+<span id='jqc-form-field-Text-method-getInputEl'>		/**
 </span>		 * Retrieves the input element from the TextField. Use only if absolutely needed however, otherwise relying on the public
 		 * interface to this class to perform common tasks such as getting/setting the value, or focusing/blurring the field.  
 		 * This is mainly an accessor for the bevhavior state objects that operate on this class. The input element will not be
@@ -222,7 +222,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-normalizeValue'>		/**
+<span id='jqc-form-field-Text-method-normalizeValue'>		/**
 </span>		 * Normalizes the value provided to a valid TextField value. Converts undefined/null into an empty string,
 		 * and numbers/booleans/objects into their string form.
 		 * 
@@ -243,8 +243,8 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-setValue'>		/**
-</span>		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
+<span id='jqc-form-field-Text-method-setValue'>		/**
+</span>		 * Implementation of {@link jqc.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {String} value The value of the field.
 		 */
@@ -266,8 +266,8 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-getValue'>		/**
-</span>		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
+<span id='jqc-form-field-Text-method-getValue'>		/**
+</span>		 * Implementation of {@link jqc.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the field.
 		 */
@@ -282,7 +282,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-setEmptyText'>		/**
+<span id='jqc-form-field-Text-method-setEmptyText'>		/**
 </span>		 * Sets the {@link #emptyText} for the Field.
 		 * 
 		 * @param {Mixed} emptyText The empty text to set to the Field.
@@ -292,7 +292,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-getEmptyText'>		/**
+<span id='jqc-form-field-Text-method-getEmptyText'>		/**
 </span>		 * Retrieves the {@link #emptyText} of the Field.
 		 * 
 		 * @return {Mixed} The {@link #emptyText} that was specified for the Field, or set using {@link #setEmptyText}.
@@ -302,7 +302,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-select'>		/**
+<span id='jqc-form-field-Text-method-select'>		/**
 </span>		 * Selects the text in the TextField.
 		 */
 		select : function() {
@@ -310,7 +310,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-onChange'>		/**
+<span id='jqc-form-field-Text-method-onChange'>		/**
 </span>		 * Extension of onChange template method used to allow the {@link #behaviorState} to handle
 		 * the change event.
 		 *
@@ -324,7 +324,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-focus'>		/**
+<span id='jqc-form-field-Text-method-focus'>		/**
 </span>		 * Focuses the text field.
 		 * 
 		 * @chainable
@@ -336,7 +336,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-blur'>		/**
+<span id='jqc-form-field-Text-method-blur'>		/**
 </span>		 * Blurs the text field.
 		 * 
 		 * @chainable
@@ -348,7 +348,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-onFocus'>		/**
+<span id='jqc-form-field-Text-method-onFocus'>		/**
 </span>		 * @inheritdoc
 		 */
 		onFocus : function() {
@@ -364,7 +364,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-onBlur'>		/**
+<span id='jqc-form-field-Text-method-onBlur'>		/**
 </span>		 * @inheritdoc
 		 */
 		onBlur : function() {
@@ -375,7 +375,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-onKeyDown'>		/**
+<span id='jqc-form-field-Text-method-onKeyDown'>		/**
 </span>		 * Handles a keydown event in the text field. 
 		 * 
 		 * @protected
@@ -389,7 +389,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-onKeyUp'>		/**
+<span id='jqc-form-field-Text-method-onKeyUp'>		/**
 </span>		 * Handles a keyup event in the text field. 
 		 * 
 		 * @protected
@@ -403,7 +403,7 @@ define( [
 		},
 		
 		
-<span id='ui-form-field-Text-method-onKeyPress'>		/**
+<span id='jqc-form-field-Text-method-onKeyPress'>		/**
 </span>		 * Handles a keypress in the text field. 
 		 * 
 		 * @protected
