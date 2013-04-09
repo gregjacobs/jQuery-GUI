@@ -204,6 +204,7 @@ define( [
 		} );
 		
 		
+		
 		describe( "refresh functionality", function() {
 			var collection,
 			    collectionView;
@@ -279,6 +280,37 @@ define( [
 				
 				collectionView.bindCollection( collection2 );
 				expect( collectionView.getEl().html() ).toMatch( /<div.*?>Doe, Jane<\/div>/ );
+			} );
+
+			
+			// -----------------------------------
+			
+			
+			it( "collectModels() should be able to be overridden to supply a different array of models to be rendered", function() {
+				var model0 = new UserModel( { id: 1, firstName: "John", lastName: "Smith" } ),
+				    model1 = new UserModel( { id: 2, firstName: "Jane", lastName: "Doe" } );
+				collection.add( [ model0, model1 ] );
+				
+				var MyCollectionView = ConfiguredCollectionView.extend( {
+					collectModels : function() {
+						return [ this.collection.getAt( 1 ) ];  // only return the second model, model1
+					}
+				} );
+				
+				var collectionView = new MyCollectionView( { 
+					renderTo: 'body',
+					collection : collection
+				} );
+				var $el = collectionView.getEl();
+				
+				expect( $el.html() ).toMatch( /<div.*?>Doe, Jane<\/div>/ );  // should only see the data for model1
+				
+				// Methods like getModelFromElement() and getElementFromModel() should still work with the subset of rendered models
+				var divEl = $el.find( collectionView.modelSelector )[ 0 ];
+				expect( collectionView.getModelFromElement( divEl ) ).toBe( model1 );
+				expect( collectionView.getElementFromModel( model1 )[ 0 ] ).toBe( divEl );
+				
+				collectionView.destroy();  // clean up
 			} );
 			
 		} );

@@ -73,6 +73,9 @@ define( [
 		 * 1. The models should always be looped over in the order that they are given. This is because the Collection View
 		 *    needs to match up the elements that are created for the models, with the models themselves. It can only do this
 		 *    after the models' markup is generated, and by element position.
+		 * 2. Following on the first point, all models that are provided to the template should be rendered by the template.
+		 *    That is, do not use `if` statements to filter out certain models. If this needs to be done, do so in an overridden
+		 *    {@link #collectModels} method instead, so the Collection View knows what it's working with.
 		 * 
 		 * For more information on templates themselves, see the {@link jqc.Component#tpl tpl} config in the superclass, 
 		 * {@link jqc.Component Component}.
@@ -181,7 +184,9 @@ define( [
 		onAfterRender : function() {
 			this._super( arguments );
 			
-			this.collectModelElements();
+			if( this.collection ) {
+				this.collectModelElements( this.collectModels() );  // need to determine the initial set of models that were rendered (if any)
+			}
 		},
 		
 		
@@ -275,10 +280,16 @@ define( [
 		 * directly, as the view will automatically be updated when changes are detected on the {@link #collection}.
 		 */
 		refresh : function() {
-			this.update( this.prepareTplData() );
-			
-			if( this.rendered ) {
-				this.collectModelElements();
+			if( !this.collection ) {
+				this.update( "" );  // don't display anything
+				
+			} else {
+				var models = this.collectModels();
+				this.update( this.prepareTplData( models ) );
+				
+				if( this.rendered ) {
+					this.collectModelElements( models );
+				}
 			}
 		},
 		
@@ -291,12 +302,14 @@ define( [
 		 * to the {@link #tpl}.
 		 * 
 		 * @protected
+		 * @param {data.Model[]} models The models that are to be rendered by the {@link #tpl} (collected from 
+		 *   {@link #collectModels}).
 		 * @return {Object} An Object (map) of the properties which will be {@link jqc.template.Template#apply applied}
 		 *   to the {@link #tpl}, to produce the output.
 		 */
-		prepareTplData : function() {
+		prepareTplData : function( models ) {
 			var data = {};
-			data[ this.modelsVar ] = this.collectModels();
+			data[ this.modelsVar ] = models;
 			
 			return data;
 		},
@@ -322,10 +335,11 @@ define( [
 		 * {@link data.Model#getClientId clientId}. 
 		 * 
 		 * @private
+		 * @param {data.Model[]} models The models that were rendered by the {@link #tpl} (collected from 
+		 *   {@link #collectModels}).
 		 */
-		collectModelElements : function() {
-			var modelElCache = this.modelElCache = {},    // clear the modelElCache to start
-			    models = ( this.collection ) ? this.collection.getModels() : [];
+		collectModelElements : function( models ) {
+			var modelElCache = this.modelElCache = {};    // clear the modelElCache to start
 			
 			var $els = this.getContentTarget().find( this.modelSelector );
 			for( var i = 0, len = $els.length; i < len; i++ ) {
