@@ -294,9 +294,21 @@ define( [
 		 */
 		prepareTplData : function() {
 			var data = {};
-			data[ this.modelsVar ] = ( this.collection ) ? this.collection.getModels() : [];
+			data[ this.modelsVar ] = this.collectModels();
 			
 			return data;
+		},
+		
+		
+		/**
+		 * Returns the array of {@link data.Model Models} which will be provided to the {@link #tpl}. This method
+		 * may be overridden in subclasses for different implementations (such as to support paging).
+		 * 
+		 * @protected
+		 * @return {data.Model[]} The array of models which will be processed by the {@link #tpl}.
+		 */
+		collectModels : function() {
+			return ( this.collection ) ? this.collection.getModels() : [];
 		},
 		
 		
@@ -322,6 +334,9 @@ define( [
 				modelElCache[ clientId ] = $el;
 			}
 		},
+		
+		
+		// -----------------------------------
 		
 		
 		/**
