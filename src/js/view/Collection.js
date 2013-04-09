@@ -353,14 +353,14 @@ define( [
 		 *   model-encapsulating element for the `element` provided.
 		 */
 		getModelFromElement : function( element ) {
-			var $modelEl = this.getModelElement( element );
+			var $modelEl = this.getParentModelElement( element );
 			return this.collection.getByClientId( $modelEl ? $modelEl.attr( 'data-CollectionView-clientId' ) : -1 );
 		},
 		
 		
 		/**
-		 * Retrieves the "top level" HTMLElement that represents a {@link data.Model} in the markup, for the given
-		 * child element. The DOM tree will be walked up until the model's element is found. If the model's element
+		 * Retrieves the HTMLElement that represents a {@link data.Model} in the markup, given a child element. The 
+		 * DOM tree will be walked up until the model's encapsulating element is found. If the model's element
 		 * itself is provided, it will simply be returned.
 		 * 
 		 * @protected
@@ -368,7 +368,7 @@ define( [
 		 * @return {jQuery} The HTMLElement for the model, wrapped in a jQuery set, of `null` if the `childEl`
 		 *   was not a child element of a model-encapsulating element.
 		 */
-		getModelElement : function( childEl ) {
+		getParentModelElement : function( childEl ) {
 			var $modelEl = jQuery( childEl ).closest( this.modelSelector );
 			return ( $modelEl.length > 0 ) ? $modelEl : null;
 		},
