@@ -316,22 +316,22 @@ define( [
 			}
 			
 			
-			this.addEvents(
-				/**
-				 * Fires when a {@link data.attribute.Attribute} in the Model has changed its value. This is a 
-				 * convenience event to respond to just a single attribute's change. Ex: if you want to
-				 * just respond to the `title` attribute's change, you could subscribe to `change:title`. Ex:
-				 * 
-				 *     model.addListener( 'change:title', function( model, newValue ) { ... } );
-				 * 
-				 * @event change:[attributeName]
-				 * @param {data.Model} model This Model instance.
-				 * @param {Mixed} newValue The new value, processed by the attribute's {@link data.attribute.Attribute#get get} function if one exists. 
-				 * @param {Mixed} oldValue The old (previous) value, processed by the attribute's {@link data.attribute.Attribute#get get} function if one exists. 
-				 */
-				
+			this.addEvents(				
 				/**
 				 * Fires when a {@link data.attribute.Attribute} in the Model has changed its value.
+				 * 
+				 * This event has two forms:
+				 * 
+				 * 1. The form documented as this event, where the `attributeName` is provided, and
+				 * 2. The form where a particular attribute name may be listened to directly. In this second form,
+				 *    one may subscribe to the event by adding a colon and then the attribute name to the event name. 
+				 *    For example, if you want to just respond to `title` attribute changes on a model, you could subscribe
+				 *    to the `change:title` event. Ex:
+				 *    
+				 *        model.on( 'change:title', function( model, newValue, oldValue ) { ... } );
+				 *        
+				 *    In this second form, the `attributeName` argument is *not* provided, as you are only listening for 
+				 *    changes on one particular attribute.
 				 * 
 				 * @event change
 				 * @param {data.Model} model This Model instance.

@@ -792,7 +792,7 @@ define( [
 		/**
 		 * Retrieves a Model by its {@link data.Model#clientId clientId}.
 		 * 
-		 * @param {Number} clientId
+		 * @param {String} clientId
 		 * @return {data.Model} The Model with the given {@link data.Model#clientId clientId}, or null if there is 
 		 *   no Model in the Collection with that {@link data.Model#clientId clientId}.
 		 */
