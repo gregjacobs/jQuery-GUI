@@ -2,16 +2,16 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/util/Html',
-	'ui/ComponentManager',
-	'ui/form/field/Field',
-	'ui/form/field/Text.EmptyTextBehavior',
-	'ui/form/field/Text.InfieldLabelBehavior'
+	'jqc/util/Html',
+	'jqc/ComponentManager',
+	'jqc/form/field/Field',
+	'jqc/form/field/Text.EmptyTextBehavior',
+	'jqc/form/field/Text.InfieldLabelBehavior'
 ], function( jQuery, _, Html, ComponentManager, Field, EmptyTextBehavior, InfieldLabelBehavior ) {
 	
 	/**
-	 * @class ui.form.field.Text
-	 * @extends ui.form.field.Field
+	 * @class jqc.form.field.Text
+	 * @extends jqc.form.field.Field
 	 * 
 	 * Text (string) field component for the editor.
 	 */
@@ -69,7 +69,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'ui-form-TextField',
+		componentCls : 'jqc-form-TextField',
 		
 		
 		/**
@@ -81,9 +81,9 @@ define( [
 		
 		/**
 		 * @private
-		 * @property {ui.form.field.Text.Behavior} behaviorState
+		 * @property {jqc.form.field.Text.Behavior} behaviorState
 		 * 
-		 * The {@link ui.form.field.Text.Behavior} object that governs the TextField's behavior.
+		 * The {@link jqc.form.field.Text.Behavior} object that governs the TextField's behavior.
 		 * This currently applies to either the TextField having an {@link #emptyText} value, 
 		 * or the TextField having an "infield" {@link #labelAlign}.
 		 */
@@ -100,7 +100,7 @@ define( [
 				 * Fires when a key is pressed down in the field.
 				 * 
 				 * @event keydown
-				 * @param {ui.form.field.Field} field This TextField object.
+				 * @param {jqc.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keydown',
@@ -109,7 +109,7 @@ define( [
 				 * Fires when a key is pressed and let up in the field.
 				 * 
 				 * @event keyup
-				 * @param {ui.form.field.Field} field This TextField object.
+				 * @param {jqc.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keyup',
@@ -118,7 +118,7 @@ define( [
 				 * Fires when a key is pressed in the field.
 				 * 
 				 * @event keypress
-				 * @param {ui.form.field.Field} field This TextField object.
+				 * @param {jqc.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keypress'
@@ -227,7 +227,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link jqc.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {String} value The value of the field.
 		 */
@@ -250,7 +250,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link jqc.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the field.
 		 */

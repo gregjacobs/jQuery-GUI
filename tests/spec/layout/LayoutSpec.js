@@ -1,13 +1,13 @@
 /*global define, describe, beforeEach, afterEach, it, expect, JsMockito */
 define( [
 	'jquery',
-	'ui/Component',
-	'ui/Container',
-	'ui/layout/Layout',
+	'jqc/Component',
+	'jqc/Container',
+	'jqc/layout/Layout',
 	'spec/layout/LayoutFixture'
 ], function( jQuery, Component, Container, Layout, LayoutFixture ) {
 
-	describe( 'ui.layout.Layout', function() {
+	describe( 'jqc.layout.Layout', function() {
 		var fixture;
 		
 		beforeEach( function() {

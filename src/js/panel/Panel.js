@@ -2,19 +2,19 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/util/Css',
-	'ui/ComponentManager',
-	'ui/Container',
-	'ui/Label',
-	'ui/template/LoDash',
-	'ui/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
+	'jqc/util/Css',
+	'jqc/ComponentManager',
+	'jqc/Container',
+	'jqc/Label',
+	'jqc/template/LoDash',
+	'jqc/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
 ], function( jQuery, _, Css, ComponentManager, Container, Label, LoDashTpl ) {
 
 	/**
-	 * @class ui.panel.Panel
-	 * @extends ui.Container
+	 * @class jqc.panel.Panel
+	 * @extends jqc.Container
 	 *
-	 * An application-oriented {@link ui.Container} subclass which supports adding a {@link #title} bar and 
+	 * An application-oriented {@link jqc.Container} subclass which supports adding a {@link #title} bar and 
 	 * {@link #toolButtons}.
 	 */
 	var Panel = Container.extend( {
@@ -38,16 +38,16 @@ define( [
 		 */
 		
 		/**
-		 * @cfg {Object/Object[]/ui.panel.ToolButton/ui.panel.ToolButton[]} toolButtons
+		 * @cfg {Object/Object[]/jqc.panel.ToolButton/jqc.panel.ToolButton[]} toolButtons
 		 * 
-		 * One or more {@link ui.panel.ToolButton ToolButtons} or ToolButton config objects. These will
+		 * One or more {@link jqc.panel.ToolButton ToolButtons} or ToolButton config objects. These will
 		 * be placed on the right side of the Panel's header (i.e. top right of the Panel).
 		 */
 		
 		/**
-		 * @cfg {Object/Object[]/ui.button.Button/ui.button.Button[]} buttons
+		 * @cfg {Object/Object[]/jqc.button.Button/jqc.button.Button[]} buttons
 		 * 
-		 * One or more {@link ui.button.Button Buttons} or Button config objects for buttons to place
+		 * One or more {@link jqc.button.Button Buttons} or Button config objects for buttons to place
 		 * in the footer of the Panel. These will be placed on the right side of the Panel's footer 
 		 * (i.e. bottom right of the Panel).
 		 */
@@ -57,28 +57,18 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'ui-Panel',
+		baseCls : 'jqc-Panel',
 		
 		/**
 		 * @cfg
 		 * @inheritdoc
 		 */
 		renderTpl : new LoDashTpl( [
-			'<div id="<%= elId %>-header" class="<%= baseCls %>-header"><div class="ui-clear" /></div>',
+			'<div id="<%= elId %>-header" class="<%= baseCls %>-header"><div class="jqc-clear" /></div>',
 			'<div id="<%= elId %>-body" class="<%= baseCls %>-body" <% if( bodyStyle ) { %>style="<%= bodyStyle %>"<% } %>></div>',
-			'<div id="<%= elId %>-footer" class="<%= baseCls %>-footer"><div class="ui-clear" /></div>'
+			'<div id="<%= elId %>-footer" class="<%= baseCls %>-footer"><div class="jqc-clear" /></div>'
 		] ),
 		
-		
-		/**
-		 * @protected
-		 * @property {ui.Container} header
-		 * 
-		 * The Container which acts as the Panel's header. The header holds the title, and any  {@link #toolButtons} 
-		 * specified. 
-		 * 
-		 * Note that this Container is only created if a {@link #title} or tool buttons have been specified.
-		 */
 		
 		/**
 		 * @protected
@@ -99,6 +89,25 @@ define( [
 		 * @property {jQuery} $footerEl
 		 * 
 		 * A reference to the Panel's footer container element. This will be available after the Panel is rendered.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {jqc.Container} header
+		 * 
+		 * The Container which acts as the Panel's header. The header holds the title, and any  {@link #toolButtons} 
+		 * specified. 
+		 * 
+		 * Note that this Container is only created if a {@link #title} or tool buttons have been specified.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {jqc.Container} footer
+		 * 
+		 * The Container which acts as the Panel's footer. The footer holds the any {@link #buttons} specified. 
+		 * 
+		 * Note that this Container is only created if a {@link #buttons} config has been specified.
 		 */
 		
 		
@@ -169,7 +178,7 @@ define( [
 		 * {@link #toolButtons} configured.
 		 * 
 		 * @protected
-		 * @return {ui.Container}
+		 * @return {jqc.Container}
 		 */
 		createHeader : function() {
 			this.titleCmp = this.createTitleCmp();
@@ -187,7 +196,7 @@ define( [
 		 * config will be applied to, by default.
 		 * 
 		 * @protected
-		 * @return {ui.Label}
+		 * @return {jqc.Label}
 		 */
 		createTitleCmp : function() {
 			return new Label( {
@@ -201,12 +210,12 @@ define( [
 		 * Creates the tool buttons container.
 		 * 
 		 * @protected
-		 * @return {ui.Container}
+		 * @return {jqc.Container}
 		 */
 		createToolButtonsCt : function() {
 			return new Container( {
 				cls         : this.baseCls + '-header-toolButtons',
-				defaultType : 'toolbutton',   // ui.panel.ToolButton
+				defaultType : 'toolbutton',   // jqc.panel.ToolButton
 				items       : this.toolButtons
 			} );
 		},
@@ -217,8 +226,8 @@ define( [
 		 * used to insert the components different positions in the items array in an override of this method.
 		 * 
 		 * @protected
-		 * @param {ui.Label} titleCmp The title component, created by {@link #createTitleCmp}.
-		 * @param {ui.Container} toolButtonsCt The tool buttons {@link ui.Container Container}.
+		 * @param {jqc.Label} titleCmp The title component, created by {@link #createTitleCmp}.
+		 * @param {jqc.Container} toolButtonsCt The tool buttons {@link jqc.Container Container}.
 		 * @return {Object[]}
 		 */
 		buildHeaderItems : function( titleCmp, toolButtonsCt ) {
@@ -233,7 +242,7 @@ define( [
 		 * Creates the {@link #footer} Container, which contains any {@link #buttons} that were configured.
 		 * 
 		 * @protected
-		 * @return {ui.Container}
+		 * @return {jqc.Container}
 		 */
 		createFooter : function() {
 			return new Container( {
@@ -245,7 +254,7 @@ define( [
 						type : 'container',
 						cls  : this.baseCls + '-footer-buttons',
 						
-						defaultType : 'button',   // ui.button.Button
+						defaultType : 'button',   // jqc.button.Button
 						items       : this.buttons
 					}
 				]

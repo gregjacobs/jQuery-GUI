@@ -1,14 +1,14 @@
 /*global define */
 define( [
-	'ui/ComponentManager',
-	'ui/Overlay'
+	'jqc/ComponentManager',
+	'jqc/Overlay'
 ], function( ComponentManager, Overlay ) {
 	
 	/**
-	 * @class ui.window.Window
-	 * @extends ui.Overlay
+	 * @class jqc.window.Window
+	 * @extends jqc.Overlay
 	 * 
-	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link ui.panel.Panel Panel}, the Window
+	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link jqc.panel.Panel Panel}, the Window
 	 * may accept a {@link #title}, and it also adds a {@link #closeButton close button} to the top right  
 	 */
 	var Window = Overlay.extend( {
@@ -46,7 +46,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'ui-Window',
+		baseCls : 'jqc-Window',
 		
 		/**
 		 * @cfg

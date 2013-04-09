@@ -2,10 +2,10 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/form/field/Checkbox'
+	'jqc/form/field/Checkbox'
 ], function( jQuery, _, CheckboxField ) {
 	
-	describe( 'ui.form.field.Checkbox', function() {
+	describe( 'jqc.form.field.Checkbox', function() {
 		
 		describe( "sanity", function() {
 			

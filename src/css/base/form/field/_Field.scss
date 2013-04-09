@@ -1,4 +1,4 @@
-.ui-form-Field {
+.jqc-form-Field {
 	margin: 0;
 	padding: 0;
 	width: 100%;  // default to taking up 100% width
@@ -6,17 +6,17 @@
 	border-collapse: collapse;
 	tbody, tr, th { margin: 0; padding: 0; }
 	
-	&.ui-form-Field-leftLabel {}
-	&.ui-form-Field-topLabel {}
-	&.ui-form-Field-focused {}
+	&.jqc-form-Field-leftLabel {}
+	&.jqc-form-Field-topLabel {}
+	&.jqc-form-Field-focused {}
 }
 
-.ui-form-Field-leftLabelCell { margin: 0; padding: 0; vertical-align: top; }
-.ui-form-Field-topLabelCell {}
-.ui-form-Field-label {}
+.jqc-form-Field-leftLabelCell { margin: 0; padding: 0; vertical-align: top; }
+.jqc-form-Field-topLabelCell {}
+.jqc-form-Field-label {}
 
-.ui-form-Field-inputCell { vertical-align: top; }
-.ui-form-Field-inputContainer {}
+.jqc-form-Field-inputCell { vertical-align: top; }
+.jqc-form-Field-inputContainer {}
 
-.ui-form-Field-extraMsgCell {}
-.ui-form-Field-extraMsg {}
+.jqc-form-Field-extraMsgCell {}
+.jqc-form-Field-extraMsg {}

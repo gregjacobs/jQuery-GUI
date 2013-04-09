@@ -5,21 +5,21 @@ define( [
 	'lodash',
 	'Class',
 	'Observable',
-	'ui/Component'
+	'jqc/Component'
 ], function( require, jQuery, _, Class, Observable, Component ) {
 	
 	/**
-	 * @class ui.anim.Animation
+	 * @class jqc.anim.Animation
 	 * @extends Observable
 	 * 
-	 * A class that encapsulates a single animation of a given HTMLElement, jQuery wrapped set, or {@link ui.Component}.
+	 * A class that encapsulates a single animation of a given HTMLElement, jQuery wrapped set, or {@link jqc.Component}.
 	 */
 	var Animation = Class.extend( Observable, {
 		
 		/**
-		 * @cfg {HTMLElement/jQuery/ui.Component} target (required)
+		 * @cfg {HTMLElement/jQuery/jqc.Component} target (required)
 		 * 
-		 * The target element(s) to animate. In the case of a {@link ui.Component}, the Component's {@link ui.Component#getEl getEl}
+		 * The target element(s) to animate. In the case of a {@link jqc.Component}, the Component's {@link jqc.Component#getEl getEl}
 		 * method is run to retrieve the element to animate.
 		 * 
 		 * Note that this config is not required upon instantiation of the Animation, but must be present at the time that
@@ -128,7 +128,7 @@ define( [
 				 * prevent the animation from starting.
 				 * 
 				 * @event beforeanimate
-				 * @param {ui.anim.Animation} animation This Animation instance.
+				 * @param {jqc.anim.Animation} animation This Animation instance.
 				 * @preventable
 				 */
 				'beforeanimate',
@@ -137,7 +137,7 @@ define( [
 				 * Fires when the animation completes.
 				 * 
 				 * @event afteranimate
-				 * @param {ui.anim.Animation} animation This Animation instance.
+				 * @param {jqc.anim.Animation} animation This Animation instance.
 				 */
 				'afteranimate',
 				
@@ -145,7 +145,7 @@ define( [
 				 * An alias of {@link #afteranimate}, fires when the animation completes.
 				 * 
 				 * @event complete
-				 * @param {ui.anim.Animation} animation This Animation instance.
+				 * @param {jqc.anim.Animation} animation This Animation instance.
 				 */
 				'complete'
 			);
@@ -156,8 +156,8 @@ define( [
 		 * Sets the {@link #target} for the Animation. This method allows it to be set after instantiation,
 		 * if the {@link #target} config was not provided.
 		 * 
-		 * @param {HTMLElement/jQuery/ui.Component} target The target element(s) to animate. In the case of a {@link ui.Component}, 
-		 *   the Component's {@link ui.Component#getEl getEl} method is run to retrieve the element to animate.
+		 * @param {HTMLElement/jQuery/jqc.Component} target The target element(s) to animate. In the case of a {@link jqc.Component}, 
+		 *   the Component's {@link jqc.Component#getEl getEl} method is run to retrieve the element to animate.
 		 * @chainable
 		 */
 		setTarget : function( target ) {
@@ -183,7 +183,7 @@ define( [
 			// Make sure there is a 'target' config, and normalize it if need be
 			var target = this.target;
 			if( target ) {
-				if( target instanceof require( 'ui/Component' ) ) {   // need to require() ui.Component here, because it is a circular dependency
+				if( target instanceof require( 'jqc/Component' ) ) {   // need to require() jqc.Component here, because it is a circular dependency
 					$target = jQuery( target.getEl() );
 				} else {
 					$target = jQuery( target );
@@ -210,10 +210,10 @@ define( [
 			// <debug>
 			// Make sure there is a target element, and either a 'to' config or an 'effect' config
 			if( !$target ) {
-				throw new Error( "ui.anim.Animation.start(): Error. No `target` config provided" );
+				throw new Error( "jqc.anim.Animation.start(): Error. No `target` config provided" );
 			}
 			if( !to && !effect ) {
-				throw new Error( "ui.anim.Animation.start(): Error. No `to` or `effect` config provided" );
+				throw new Error( "jqc.anim.Animation.start(): Error. No `to` or `effect` config provided" );
 			}
 			// </debug>
 			

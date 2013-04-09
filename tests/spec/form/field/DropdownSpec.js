@@ -2,10 +2,10 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/form/field/Dropdown'
+	'jqc/form/field/Dropdown'
 ], function( jQuery, _, DropdownField ) {
 	
-	describe( 'ui.form.field.Dropdown', function() {
+	describe( 'jqc.form.field.Dropdown', function() {
 		
 		describe( "Test Initialization", function() {
 			it( "The initial value for the field with no 'value' config, and no options, should be undefined", function() {

@@ -1,14 +1,14 @@
 /*global define */
 define( [
 	'jquery',
-	'ui/Component',
-	'ui/Container',
-	'ui/layout/Layout'
+	'jqc/Component',
+	'jqc/Container',
+	'jqc/layout/Layout'
 ], function( jQuery, Component, Container, Layout ) {
 
 	/**
-	 * @class ui.layout.HBox
-	 * @extends ui.layout.Layout
+	 * @class jqc.layout.HBox
+	 * @extends jqc.layout.Layout
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
 	 * in the Container that should have a flexible width that proportionally should take up the remaining area of its parent
@@ -70,7 +70,7 @@ define( [
 		 * 
 		 * @protected
 		 * @template
-		 * @param {ui.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
@@ -90,7 +90,7 @@ define( [
 				
 				// Add the CSS class to components to be able to place them in an HBox layout. This adds `float:left;`,
 				// and a few other fixing styles.
-				childComponent.addCls( 'ui-layout-HBox-component' );
+				childComponent.addCls( 'jqc-layout-HBox-component' );
 				
 				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
 				this.renderComponent( childComponent, $targetEl, { position: i } );
@@ -141,7 +141,7 @@ define( [
 			}
 			
 			if( !this.$clearEl ) {
-				this.$clearEl = jQuery( '<div class="ui-layout-HBox-clear" />' );  // to clear the floats
+				this.$clearEl = jQuery( '<div class="jqc-layout-HBox-clear" />' );  // to clear the floats
 			}
 			$targetEl.append( this.$clearEl );
 		},
@@ -161,7 +161,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the ui.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'hbox', HBoxLayout );
 	
 	return HBoxLayout;

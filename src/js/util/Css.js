@@ -2,12 +2,12 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/UI'
+	'jqc/Jqc'
 ],
-function( jQuery, _, UI ) {
+function( jQuery, _, Jqc ) {
 	
 	/**
-	 * @class ui.util.Css
+	 * @class jqc.util.Css
 	 * @singleton
 	 * 
 	 * General CSS manipulation/reading functionality.  Allows the dynamic modification of 
@@ -65,7 +65,7 @@ function( jQuery, _, UI ) {
 		updateStyleEl : function( styleEl, cssText ) {
 			var $styleEl = jQuery( styleEl );
 			
-			if( UI.isIE ) {
+			if( Jqc.isIE ) {
 				for( var i = 0, len = $styleEl.length; i < len; i++ ) {   // in case there is more than one element
 					$styleEl[ i ].styleSheet.cssText = cssText;  // special case for IE
 				}

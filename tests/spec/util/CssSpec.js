@@ -1,10 +1,10 @@
 /*global define, describe, it, expect */
 define( [
-	'ui/util/Css'
+	'jqc/util/Css'
 ], 
 function( Css ) {
 	
-	describe( 'ui.util.Css', function() {
+	describe( 'jqc.util.Css', function() {
 	
 		describe( 'mapToString()', function() {
 			

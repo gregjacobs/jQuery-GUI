@@ -1,12 +1,12 @@
 /*global define */
 define( [
 	'lodash',
-	'ui/template/Template'
+	'jqc/template/Template'
 ], function( _, Template ) {
 	
 	/**
-	 * @class ui.template.LoDash
-	 * @extends ui.template.Template
+	 * @class jqc.template.LoDash
+	 * @extends jqc.template.Template
 	 * 
 	 * A wrapper class for Lo-Dash templates which helps with a few normalization procedures, and
 	 * allows for lazy compilation of a template from its string source.
@@ -55,8 +55,8 @@ define( [
 		
 		/**
 		 * @constructor
-		 * @param {String/String[]/Function/ui.template.Template} tpl A string or an array of strings which will be concatenated 
-		 *   together to generate the Lo-Dash template, a compiled Lo-Dash template function, or a {@link ui.template.Template} 
+		 * @param {String/String[]/Function/jqc.template.Template} tpl A string or an array of strings which will be concatenated 
+		 *   together to generate the Lo-Dash template, a compiled Lo-Dash template function, or a {@link jqc.template.Template} 
 		 *   instance which will simply be returned from this constructor.
 		 * @param {Object} options Any options to provide to the Lo-Dash template generator function. This argument
 		 *   is only valid when the first argument to this constructor is a string or array of strings. See 

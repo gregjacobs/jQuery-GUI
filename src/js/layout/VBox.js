@@ -1,12 +1,12 @@
 /*global define */
 define( [
-	'ui/Container',
-	'ui/layout/Layout'
+	'jqc/Container',
+	'jqc/layout/Layout'
 ], function( Container, Layout ) {
 
 	/**
-	 * @class ui.layout.VBox
-	 * @extends ui.layout.Layout
+	 * @class jqc.layout.VBox
+	 * @extends jqc.layout.Layout
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
 	 * in the Container that should have a flexible height that proportionally should take up the remaining area of its parent
@@ -62,7 +62,7 @@ define( [
 		 * @protected
 		 * @template
 		 * @method onLayout
-		 * @param {ui.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
@@ -126,7 +126,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the ui.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'vbox', VBoxLayout );
 	
 	return VBoxLayout;

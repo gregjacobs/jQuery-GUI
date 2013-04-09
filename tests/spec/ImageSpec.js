@@ -1,10 +1,10 @@
 /*global define, describe, it, expect */
 define( [
-	'ui/Image'
+	'jqc/Image'
 ],
 function( Image ) {
 	
-	describe( 'ui.Image', function() {
+	describe( 'jqc.Image', function() {
 		
 		describe( "sanity", function() {
 			

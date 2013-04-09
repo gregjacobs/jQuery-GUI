@@ -6,14 +6,14 @@ define( [
 ], function( jQuery, _, Class ) {
 	
 	/**
-	 * @class ui.util.OptionsStore
+	 * @class jqc.util.OptionsStore
 	 * @extends Object
 	 * 
 	 * Helper utility class used for making the management of 'options' data easy, for any classes that use this format of data.
 	 * "Options data" in this context simply means "text/value" pairs, such as used by dropdowns. The purpose of this class 
 	 * was to not duplicate functionality for classes that use this format of data.
 	 * 
-	 * This class is currently used by {@link ui.form.field.Dropdown} and {@link ui.form.field.Radio}, which use it for 
+	 * This class is currently used by {@link jqc.form.field.Dropdown} and {@link jqc.form.field.Radio}, which use it for 
 	 * managing the options that they provide.
 	 */
 	var OptionsStore = Class.extend( Object, {

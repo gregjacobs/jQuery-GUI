@@ -7,7 +7,7 @@ define( [
 function( jQuery, _, Class ) {
 	
 	/**
-	 * @class ui.Mask
+	 * @class jqc.Mask
 	 * @extends Object
 	 * 
 	 * Generalized class that can create a mask over any given element, and provides a simple interface
@@ -99,12 +99,12 @@ function( jQuery, _, Class ) {
 				
 			} else if( targetEl instanceof jQuery ) {
 				if( targetEl.length !== 1 ) {
-					throw new Error( "If the 'targetEl' argument to the ui.Mask constructor is a jQuery wrapped set, it must contain exactly one element." );
+					throw new Error( "If the 'targetEl' argument to the jqc.Mask constructor is a jQuery wrapped set, it must contain exactly one element." );
 				}
 				this.$targetEl = targetEl;
 				
 			} else {
-				throw new Error( "ui.Mask requires the first argument to its constructor to be an HTMLElement, or a jQuery wrapped set" );
+				throw new Error( "jqc.Mask requires the first argument to its constructor to be an HTMLElement, or a jQuery wrapped set" );
 			}
 			
 			// Apply any additional configuration properties onto this object
@@ -148,16 +148,16 @@ function( jQuery, _, Class ) {
 			if( !this.rendered ) {
 				var $targetEl = this.$targetEl;
 				
-				this.$maskEl = jQuery( '<div class="ui-mask" />' )
+				this.$maskEl = jQuery( '<div class="jqc-mask" />' )
 					.click( function( evt ) { evt.stopPropagation(); } )   // the mask should swallow any click events to it, to prevent any behavior from the bubbling of the event
 					.appendTo( $targetEl );
 				
-				this.$contentEl = jQuery( '<div class="ui-mask-content" />' )
-					.append( '<img class="ui-mask-content-spinner" src="' + this.spinnerURL + '" />' )  // This image will only be shown if the spinner config is true (i.e. the $contentEl has the 'ui-mask-spinnerEnabled' css class)
+				this.$contentEl = jQuery( '<div class="jqc-mask-content" />' )
+					.append( '<img class="jqc-mask-content-spinner" src="' + this.spinnerURL + '" />' )  // This image will only be shown if the spinner config is true (i.e. the $contentEl has the 'jqc-mask-spinnerEnabled' css class)
 					.click( function( evt ) { evt.stopPropagation(); } )   // the mask should swallow any click events to it, to prevent any behavior from the bubbling of the event
 					.appendTo( $targetEl );
 				
-				this.$msgEl = jQuery( '<div class="ui-mask-msg" />' ).appendTo( this.$contentEl );
+				this.$msgEl = jQuery( '<div class="jqc-mask-msg" />' ).appendTo( this.$contentEl );
 				
 				this.rendered = true;
 				this.updateMaskElements();
@@ -176,21 +176,21 @@ function( jQuery, _, Class ) {
 			if( this.rendered ) {
 				// Update the spinner
 				if( this.spinner ) {
-					this.$contentEl.addClass( 'ui-mask-spinnerEnabled' );
+					this.$contentEl.addClass( 'jqc-mask-spinnerEnabled' );
 				} else {
-					this.$contentEl.removeClass( 'ui-mask-spinnerEnabled' );
+					this.$contentEl.removeClass( 'jqc-mask-spinnerEnabled' );
 				}
 				
 				// Update the message
 				this.$msgEl.empty();
 				if( this.msg ) {
-					// Add the ui-mask-contentBox css class if there is actually a message. This css class
+					// Add the jqc-mask-contentBox css class if there is actually a message. This css class
 					// creates an opaque "box" that is shown in the middle of the mask where text can be placed
 					// and easily read. Then append the message itself to the $msgEl.
-					this.$contentEl.addClass( 'ui-mask-contentBox' );
+					this.$contentEl.addClass( 'jqc-mask-contentBox' );
 					this.$msgEl.append( this.msg );
 				} else {
-					this.$contentEl.removeClass( 'ui-mask-contentBox' );
+					this.$contentEl.removeClass( 'jqc-mask-contentBox' );
 				}
 			}
 		},
@@ -218,13 +218,13 @@ function( jQuery, _, Class ) {
 			    $maskEl = this.$maskEl,
 			    $contentEl = this.$contentEl;
 			
-			// First, add the ui-masked css class to the target element, which removes the target element's scroll bars
-			$targetEl.addClass( 'ui-masked' );
+			// First, add the jqc-masked css class to the target element, which removes the target element's scroll bars
+			$targetEl.addClass( 'jqc-masked' );
 			
 			// Next, give the target element a relative positioning context if it currently does not have one (i.e. it 
 			// has "position: static"), and the target element not the document body (the document body already has a positioning context)
 			if( $targetEl.css( 'position' ) === 'static' && !$targetEl.is( 'body' ) ) {
-				$targetEl.addClass( 'ui-masked-relative' );
+				$targetEl.addClass( 'jqc-masked-relative' );
 			}
 			
 			
@@ -286,7 +286,7 @@ function( jQuery, _, Class ) {
 				// to its original state (i.e. scrollbars allowed, and no positioning context if it didn't have one)
 				this.$maskEl.hide();
 				this.$contentEl.hide();
-				this.$targetEl.removeClass( 'ui-masked' ).removeClass( 'ui-masked-relative' );
+				this.$targetEl.removeClass( 'jqc-masked' ).removeClass( 'jqc-masked-relative' );
 				
 				this.shown = false;
 			}

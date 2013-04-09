@@ -1,10 +1,10 @@
 /*global define, describe, beforeEach, afterEach, it, expect */
 define( [
 	'lodash',
-	'ui/template/LoDash'
+	'jqc/template/LoDash'
 ], function( _, LoDashTpl ) {
 	
-	describe( 'ui.template.LoDash', function() {
+	describe( 'jqc.template.LoDash', function() {
 		
 		describe( "constructor", function() {
 			

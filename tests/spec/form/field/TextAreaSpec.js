@@ -2,10 +2,10 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/form/field/TextArea'
+	'jqc/form/field/TextArea'
 ], function( jQuery, _, TextAreaField ) {
 	
-	describe( 'ui.form.field.TextArea', function() {
+	describe( 'jqc.form.field.TextArea', function() {
 		
 		describe( "rendering", function() {
 			

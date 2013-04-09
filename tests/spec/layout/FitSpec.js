@@ -4,7 +4,7 @@ define( [
 	'spec/layout/FitFixture'
 ], function( jQuery, FitLayoutFixture ) {
 	
-	describe( 'ui.layout.Fit', function() {
+	describe( 'jqc.layout.Fit', function() {
 		
 		describe( "Test doLayout()", function() {
 			var fixture;

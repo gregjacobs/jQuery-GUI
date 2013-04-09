@@ -2,13 +2,13 @@
 define( [
 	'lodash',
 	'Class',
-	'ui/ComponentManager',
-	'ui/Component'
+	'jqc/ComponentManager',
+	'jqc/Component'
 ], function( _, Class, ComponentManager, Component ) {
 	
 	/**
-	 * @class ui.Image
-	 * @extends ui.Component
+	 * @class jqc.Image
+	 * @extends jqc.Component
 	 *
 	 * A simple component which is an image.
 	 */
@@ -31,7 +31,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'ui-Image',
+		baseCls : 'jqc-Image',
 		
 		
 		/**
@@ -74,7 +74,7 @@ define( [
 				 * Fires when the underlying image has loaded successfully.
 				 * 
 				 * @event load
-				 * @param {ui.Image} image This Image instance.
+				 * @param {jqc.Image} image This Image instance.
 				 */
 				'load',
 				
@@ -82,7 +82,7 @@ define( [
 				 * Fires when the underlying image has failed to load.
 				 * 
 				 * @event error
-				 * @param {ui.Image} image This Image instance.
+				 * @param {jqc.Image} image This Image instance.
 				 */
 				'error'
 			);

@@ -2,15 +2,15 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/form/field/Text.Behavior'
+	'jqc/form/field/Text.Behavior'
 ], function( jQuery, _, TextFieldBehavior ) {
 	
 	/**
-	 * @class ui.form.field.Text.InfieldLabelBehavior
-	 * @extends ui.form.field.Text.Behavior
+	 * @class jqc.form.field.Text.InfieldLabelBehavior
+	 * @extends jqc.form.field.Text.Behavior
 	 * 
-	 * Handles a {@link ui.form.field.Text TextField} when it is in the "infield label" state (i.e. it is displaying a label that
-	 * is shown inside the field itself).  This is opposed to when it is using the {@link ui.form.field.Text.EmptyTextBehavior EmptyTextBehavior}, 
+	 * Handles a {@link jqc.form.field.Text TextField} when it is in the "infield label" state (i.e. it is displaying a label that
+	 * is shown inside the field itself).  This is opposed to when it is using the {@link jqc.form.field.Text.EmptyTextBehavior EmptyTextBehavior}, 
 	 * which is incompatible with the field having an "infield" label.
 	 * 
 	 * This implementation is based off of the jquery.infield labels plugin. http://fuelyourcoding.com/scripts/infield/
@@ -44,7 +44,7 @@ define( [
 		/**
 		 * Called when the TextField is rendered.
 		 * 
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
 		onRender : function( textField ) {
 			// "infield" labels move the label element into the input container. It is absolutely positioned from there.
@@ -61,7 +61,7 @@ define( [
 		/**
 		 * Called when the TextField's setValue() method is called (if the TextField is rendered)
 		 * 
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 * @param {String} value
 		 */
 		onSetValue : function( textField, value ) {
@@ -74,7 +74,7 @@ define( [
 		/**
 		 * Called when the TextField has been changed.
 		 * 
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
 		onChange : function( textField ) {
 			if( textField.rendered ) {
@@ -86,7 +86,7 @@ define( [
 		/**
 		 * Called when the TextField has been focused.
 		 * 
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
 		onFocus : function( textField ) {
 			// If the label is currently shown, fade it to the fadeOpacity config
@@ -99,7 +99,7 @@ define( [
 		/**
 		 * Called when the TextField has been blurred.
 		 * 
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
 		onBlur : function( textField ) {
 			if( textField.rendered ) {
@@ -111,7 +111,7 @@ define( [
 		/**
 		 * Called when the TextField gets a keydown event.
 		 * 
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyDown : function( textField, evt ) {
@@ -161,7 +161,7 @@ define( [
 		 * If it's not empty, 
 		 * 
 		 * @private
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
 		checkForEmpty : function( textField ) {
 			var $labelEl = textField.getLabelEl();

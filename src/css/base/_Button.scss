@@ -1,4 +1,4 @@
-.ui-Button {
+.jqc-Button {
 	display: inline-block;
 	position: relative;
 	margin: 0;
@@ -12,15 +12,15 @@
 }
 
 /* General Button Styles */
-.ui-Button-hiddenEl { display: none !important; }
+.jqc-Button-hiddenEl { display: none !important; }
 
 /* Icons */
-.ui-Button-icon { display: inline-block; }
-.ui-Button-icon-left {}
-.ui-Button-icon-right {}
+.jqc-Button-icon { display: inline-block; }
+.jqc-Button-icon-left {}
+.jqc-Button-icon-right {}
 
 /* button text element */
-.ui-Button-text {
+.jqc-Button-text {
 	display: inline-block;
 	line-height: normal;
 }
@@ -28,7 +28,7 @@
 
 /* workarounds */
 /* reset extra padding in Firefox, see h5bp.com/l */
-button.ui-Button::-moz-focus-inner {
+button.jqc-Button::-moz-focus-inner {
 	border: 0;
 	padding: 0;
 }

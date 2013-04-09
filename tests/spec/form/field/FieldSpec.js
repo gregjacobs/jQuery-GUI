@@ -2,10 +2,10 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/form/field/Field'
+	'jqc/form/field/Field'
 ], function( jQuery, _, Field ) {
 	
-	describe( 'ui.form.field.Field', function() {
+	describe( 'jqc.form.field.Field', function() {
 		
 		// A Field with implemented setValue() and getValue() methods used for testing.
 		var ConcreteField = Field.extend( {

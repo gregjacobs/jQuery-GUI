@@ -1,4 +1,4 @@
-UI.js
+jQuery Component
 =====
 
-[Docs](http://gregjacobs.github.com/UI/docs/)
+[Docs](http://gregjacobs.github.com/jQuery-Component/docs/)

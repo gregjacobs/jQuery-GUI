@@ -4,9 +4,9 @@ define( [
 ], function( require ) {
 	
 	/**
-	 * @class ui.ComponentManager
+	 * @class jqc.ComponentManager
 	 *
-	 * Object used to manage {@link ui.Component} "types", and handles instantiating them based on the string that is specified
+	 * Object used to manage {@link jqc.Component} "types", and handles instantiating them based on the string that is specified
 	 * for them in the manifest.  
 	 *
 	 * @singleton
@@ -17,7 +17,7 @@ define( [
 		 * @private
 		 * @property {Object} componentClasses
 		 * 
-		 * An Object (map) of the {@link ui.Component} classes which have been {@link #registerType registered}, 
+		 * An Object (map) of the {@link jqc.Component} classes which have been {@link #registerType registered}, 
 		 * keyed by their type name. 
 		 */
 		componentClasses : {},
@@ -40,7 +40,7 @@ define( [
 			if( !this.componentClasses[ type ] ) { 
 				this.componentClasses[ type ] = jsClass;
 			} else {
-				throw new Error( "Error: ui.ComponentManager already has a type '" + type + "'" );
+				throw new Error( "Error: jqc.ComponentManager already has a type '" + type + "'" );
 			}
 		},
 		
@@ -74,20 +74,20 @@ define( [
 		
 		
 		/**
-		 * Creates (instantiates) a {@link ui.Component Component} based on its type name, given
+		 * Creates (instantiates) a {@link jqc.Component Component} based on its type name, given
 		 * a configuration object that has a `type` property. If an already-instantiated 
-		 * {@link ui.Component Component} is provided, it will simply be returned unchanged.
+		 * {@link jqc.Component Component} is provided, it will simply be returned unchanged.
 		 * 
 		 * @method create
 		 * @param {Object} config The configuration object for the Component. Config objects should have the property `type`, 
-		 *   which determines which type of {@link ui.Component Component} will be instantiated. If the object does not
+		 *   which determines which type of {@link jqc.Component Component} will be instantiated. If the object does not
 		 *   have a `type` property, it will default to "container", which makes it simple to create things like tab containers. 
-		 *   Note that already-instantiated {@link ui.Component Components} will simply be returned unchanged. 
-		 * @return {ui.Component} The instantiated Component.
+		 *   Note that already-instantiated {@link jqc.Component Components} will simply be returned unchanged. 
+		 * @return {jqc.Component} The instantiated Component.
 		 */
 		create : function( config ) {
 			var type = config.type ? config.type.toLowerCase() : undefined,
-			    Component = require( 'ui/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (ui.Component depends on ui.ComponentManager)
+			    Component = require( 'jqc/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (jqc.Component depends on jqc.ComponentManager)
 			
 			if( config instanceof Component ) {
 				// Already a Component instance, return it

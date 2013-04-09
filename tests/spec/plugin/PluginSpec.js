@@ -1,11 +1,11 @@
 /*global define, describe, it, expect */
 define( [
 	'Class',
-	'ui/plugin/Plugin'
+	'jqc/plugin/Plugin'
 ],
 function( Class, Plugin ) {
 	
-	describe( 'ui.plugin.Plugin', function() {
+	describe( 'jqc.plugin.Plugin', function() {
 		
 		describe( 'constructor', function() {
 			

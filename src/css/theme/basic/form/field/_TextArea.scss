@@ -1,11 +1,11 @@
-.ui-form-TextAreaField {
+.jqc-form-TextAreaField {
 	
-	.ui-form-Field-inputContainer {
+	.jqc-form-Field-inputContainer {
 		border: 1px solid #C6C6C6;
 	}
 	
 }
 
-.ui-form-TextAreaField-input {
+.jqc-form-TextAreaField-input {
 	resize: none;  // don't allow resizing for Chrome. Layout system can't update when resized by user.
 }

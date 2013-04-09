@@ -3,7 +3,7 @@ define( [
 	'spec/layout/VBoxFixture'
 ], function( VBoxLayoutFixture ) {
 	
-	describe( 'ui.layout.VBox', function() {
+	describe( 'jqc.layout.VBox', function() {
 		
 		describe( "Test doLayout()", function() {
 			var fixture;

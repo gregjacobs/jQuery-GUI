@@ -4,7 +4,7 @@ define( [
 ], function( _ ) {
 	
 	/**
-	 * @class ui.util.Html
+	 * @class jqc.util.Html
 	 * @singleton
 	 * 
 	 * Utility class for doing html/text transformations.

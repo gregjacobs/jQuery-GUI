@@ -1,14 +1,15 @@
-<project name="UI">
+<project name="jQuery-Component">
 
 	<target name="doc" description="Builds the documentation. Available in /docs/ afterwards.">
 		<exec executable="${basedir}/vendor/jsduck/jsduck-4.7.1.exe" failonerror="true">
 			<arg value="--output=docs" />
-			<arg value="--external=jQuery,jQuery.Event" />
-			<arg value="--title=UI.js API Docs" />
+			<arg value="--external=jQuery,jQuery.Event,jQuery.Deferred,jQuery.Promise" />
+			<arg value="--title=jQuery-Component API Docs" />
 			
 			<arg value="src/js/" />
 			<arg value="vendor/class/" />
 			<arg value="vendor/observable/" />
+			<arg value="vendor/data/" />
 		</exec>
 	</target>
 	

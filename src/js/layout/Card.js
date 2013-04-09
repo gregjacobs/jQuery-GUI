@@ -1,16 +1,16 @@
 /*global define */
 define( [
-	'ui/Component',
-	'ui/Container',
-	'ui/layout/Layout',
-	'ui/layout/Card.SwitchTransition'
+	'jqc/Component',
+	'jqc/Container',
+	'jqc/layout/Layout',
+	'jqc/layout/Card.SwitchTransition'
 ], function( Component, Container, Layout, SwitchTransition ) {
 	
 	/**
-	 * @class ui.layout.Card
-	 * @extends ui.layout.Layout
+	 * @class jqc.layout.Card
+	 * @extends jqc.layout.Layout
 	 * 
-	 * A layout that renders a {@link ui.Container Container's} child components where only one child (card) can be shown 
+	 * A layout that renders a {@link jqc.Container Container's} child components where only one child (card) can be shown 
 	 * at a time (such as showing only the top card in a deck of cards).  Methods are available in this class to control
 	 * which card is shown.
 	 * 
@@ -19,10 +19,10 @@ define( [
 	var CardLayout = Layout.extend( {
 		
 		/**
-		 * @cfg {Number/ui.Component} activeItem
+		 * @cfg {Number/jqc.Component} activeItem
 		 * 
-		 * The item number or {@link ui.Component} reference to set as the initially active item. Defaults to 0 (for the first item). 
-		 * If this is a {@link ui.Component}, it should be a {@link ui.Component Component} that exists in the {@link ui.Container Container}.
+		 * The item number or {@link jqc.Component} reference to set as the initially active item. Defaults to 0 (for the first item). 
+		 * If this is a {@link jqc.Component}, it should be a {@link jqc.Component Component} that exists in the {@link jqc.Container Container}.
 		 */
 		activeItem : 0,
 		
@@ -30,20 +30,20 @@ define( [
 		 * @cfg {Boolean} autoSize
 		 * 
 		 * By default, the CardsLayout tries to make each child component of the {@link #container} take up the available space in the target
-		 * element (much like the {@link ui.layout.Fit}, but this may be set to true to simply allow the child components to determine their own size.
+		 * element (much like the {@link jqc.layout.Fit}, but this may be set to true to simply allow the child components to determine their own size.
 		 */
 		autoSize : false,
 		
 		/**
-		 * @cfg {ui.layout.Card.AbstractTransition} transition The {@link ui.layout.Card.AbstractTransition AbstractTransition} subclass to use
-		 * for switching between cards. The default transition is the {@link ui.layout.Card.SwitchTransition SwitchTransition}, which simply hides
+		 * @cfg {jqc.layout.Card.AbstractTransition} transition The {@link jqc.layout.Card.AbstractTransition AbstractTransition} subclass to use
+		 * for switching between cards. The default transition is the {@link jqc.layout.Card.SwitchTransition SwitchTransition}, which simply hides
 		 * the currently active card, and shows the new card. This may be changed to provide a different method of changing cards, such as to implement
 		 * animation. 
 		 */
 		
 		/**
 		 * @cfg {Boolean} deferredRender
-		 * True to only render a child {@link ui.Component component} once it is shown, false to render all child components immediately.
+		 * True to only render a child {@link jqc.Component component} once it is shown, false to render all child components immediately.
 		 * Leaving this as true can improve initial rendering time, as only the shown component's rendering routine is actually performed.
 		 * However, switching to a new component the first time may be slightly delayed as that component must be rendered and laid out.
 		 */
@@ -54,7 +54,7 @@ define( [
 		 * @protected
 		 * @property {Object} componentSizeCache
 		 * 
-		 * A hashmap of component's uuid's (retrieved with {@link ui.Component#getUuid}) and an inner hashmap
+		 * A hashmap of component's uuid's (retrieved with {@link jqc.Component#getUuid}) and an inner hashmap
 		 * with width and height properties, which stores the last set width/height for each component in the CardsLayout.
 		 */
 		
@@ -67,7 +67,7 @@ define( [
 				 * Fires when the active item has been changed.
 				 * 
 				 * @event cardchange
-				 * @param {ui.Component} card The {@link ui.Component} instance of the card that was activated. If no card has
+				 * @param {jqc.Component} card The {@link jqc.Component} instance of the card that was activated. If no card has
 				 *   been activated (either by a null argument to {@link #setActiveItem}, or an index out of range), then this
 				 *   will be null.
 				 */
@@ -88,18 +88,18 @@ define( [
 		
 		/**
 		 * Layout implementation for CardsLayout, which renders each child component into the Container's content target 
-		 * (see {@link ui.Component#getContentTarget}), and then hides them.  The one given by the {@link #activeItem}
+		 * (see {@link jqc.Component#getContentTarget}), and then hides them.  The one given by the {@link #activeItem}
 		 * config is then shown.
 		 * 
 		 * @protected
 		 * @method onLayout
-		 * @param {ui.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
 			this._super( arguments );
 			
-			// First normalize the activeItem config to the ui.Component it refers to.
+			// First normalize the activeItem config to the jqc.Component it refers to.
 			if( typeof this.activeItem === 'number' ) {
 				this.activeItem = this.getContainer().getItemAt( this.activeItem );
 			}
@@ -134,7 +134,7 @@ define( [
 		 * 
 		 * @protected
 		 * @method renderAndSizeCard
-		 * @param {ui.Component} component The card ({@link ui.Component}) which is to be rendered and sized.
+		 * @param {jqc.Component} component The card ({@link jqc.Component}) which is to be rendered and sized.
 		 * @param {jQuery} $targetEl The target element where the component is to be rendered.
 		 * @param {Number} targetWidth The width to size the card component to (if the {@link #autoSize} config is false).
 		 * @param {Number} targetHeight The height to size the card component to (if the {@link #autoSize} config is false).
@@ -166,10 +166,10 @@ define( [
 		 * Sets the active item.
 		 * 
 		 * @method setActiveItem
-		 * @param {ui.Component/Number} item The ui.Component to set as the active item, or the item index to set as the active item (0 for the first item).
-		 *   Note that if a ui.Component is provided, it must be an *instantiated* ui.Component, and not the anonymous config object used to create the ui.Component.
+		 * @param {jqc.Component/Number} item The jqc.Component to set as the active item, or the item index to set as the active item (0 for the first item).
+		 *   Note that if a jqc.Component is provided, it must be an *instantiated* jqc.Component, and not the anonymous config object used to create the jqc.Component.
 		 * @param {Object} options (optional) An object which will be passed along as options to the CardsLayout {@link #transition}. See the setActiveItem method in the
-		 *   {ui.layout.Card.AbstractTransition AbstractTransition} subclass that you are using for a list of valid options (if any).
+		 *   {jqc.layout.Card.AbstractTransition AbstractTransition} subclass that you are using for a list of valid options (if any).
 		 */
 		setActiveItem : function( item, options ) {
 			// Item was provided as a number, find the Component
@@ -193,7 +193,7 @@ define( [
 				if( !item || this.activeItem !== item || !item.isRendered() || item.isHidden() ) {
 					
 					// Delegate to the transition strategy for the change in cards (active item)
-					// Make sure the activeItem is passed in only if it is an instantiated ui.Component (i.e. not null, and not the numbered config)
+					// Make sure the activeItem is passed in only if it is an instantiated jqc.Component (i.e. not null, and not the numbered config)
 					var activeItem = this.activeItem;
 					if( !( activeItem instanceof Component ) ) {
 						activeItem = null;
@@ -220,7 +220,7 @@ define( [
 		 * Gets the currently active item. Returns null if there is no active item. 
 		 * 
 		 * @method getActiveItem
-		 * @return {ui.Component} The Component that is currently shown as the active item. Returns null if there is no active item.
+		 * @return {jqc.Component} The Component that is currently shown as the active item. Returns null if there is no active item.
 		 */
 		getActiveItem : function() {
 			var activeItem = this.activeItem;
@@ -258,7 +258,7 @@ define( [
 		
 		
 		/**
-		 * Extended onDestroy method for the CardsLayout to destroy its CardsLayout {@link ui.layout.Card.AbstractTransition} object.
+		 * Extended onDestroy method for the CardsLayout to destroy its CardsLayout {@link jqc.layout.Card.AbstractTransition} object.
 		 * 
 		 * @protected
 		 * @method onDestroy
@@ -273,7 +273,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the ui.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'card', CardLayout );
 	
 	return CardLayout;

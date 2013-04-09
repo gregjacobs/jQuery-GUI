@@ -2,12 +2,12 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/Component'
+	'jqc/Component'
 ], function( jQuery, _, Component ) {
 	
 	/**
-	 * @class ui.view.Collection
-	 * @extends ui.Component
+	 * @class jqc.view.Collection
+	 * @extends jqc.Component
 	 * 
 	 * A view of a {@link data.Collection}. The view uses the {@link #tpl} config, which is automatically
 	 * passed the {@link #collection collection's} data to populate the template. 
@@ -28,7 +28,7 @@ define( [
 		 */
 		
 		/**
-		 * @cfg {String/String[]/Function/ui.template.Template} tpl (required)
+		 * @cfg {String/String[]/Function/jqc.template.Template} tpl (required)
 		 * 
 		 * The template which will be used to populate the Collection View. By default, this template will be provided
 		 * the variable `models`, which is an array of the {@link data.Model Models} that should be rendered
@@ -38,7 +38,7 @@ define( [
 		 * that holds the models may be configured using the {@link #modelsVar} config.
 		 * 
 		 * For example, if we had a "User" model, which had fields `id`, `firstName`, and `lastName`, then we
-		 * might want to display this information in a template as such: (using a {@link ui.template.LoDash Lo-Dash template}
+		 * might want to display this information in a template as such: (using a {@link jqc.template.LoDash Lo-Dash template}
 		 * in this case)
 		 * 
 		 *     tpl : new LoDashTpl( [
@@ -74,8 +74,8 @@ define( [
 		 *    needs to match up the elements that are created for the models, with the models themselves. It can only do this
 		 *    after the models' markup is generated, and by element position.
 		 * 
-		 * For more information on templates themselves, see the {@link ui.Component#tpl tpl} config in the superclass, 
-		 * {@link ui.Component Component}.
+		 * For more information on templates themselves, see the {@link jqc.Component#tpl tpl} config in the superclass, 
+		 * {@link jqc.Component Component}.
 		 */
 		
 		/**
@@ -114,7 +114,7 @@ define( [
 		 * 
 		 * This may be used to provide a variable name that makes more sense inside the template for the type of models 
 		 * being used. For example, if the Collection View is working with "User" models, one might want to
-		 * set this config to `users`: (using a {@link ui.template.LoDash Lo-Dash template} in this case)
+		 * set this config to `users`: (using a {@link jqc.template.LoDash Lo-Dash template} in this case)
 		 * 
 		 *     modelsVar : 'users',
 		 *     tpl : new LoDashTpl( [
@@ -282,14 +282,14 @@ define( [
 		
 		
 		/**
-		 * Retrieves the data that will be {@link ui.template.Template#applied applied} to the {@link #tpl} upon 
+		 * Retrieves the data that will be {@link jqc.template.Template#apply applied} to the {@link #tpl} upon 
 		 * {@link #refresh}. 
 		 * 
 		 * This method may be overridden by subclasses to add additional properties which will be provided
 		 * to the {@link #tpl}.
 		 * 
 		 * @protected
-		 * @return {Object} An Object (map) of the properties which will be {@link ui.template.Template#applied applied}
+		 * @return {Object} An Object (map) of the properties which will be {@link jqc.template.Template#apply applied}
 		 *   to the {@link #tpl}, to produce the output.
 		 */
 		prepareTplData : function() {

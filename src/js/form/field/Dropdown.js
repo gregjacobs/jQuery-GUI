@@ -2,16 +2,16 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/util/Css',
-	'ui/ComponentManager',
-	'ui/form/field/Field',
-	'ui/template/LoDash',
-	'ui/util/OptionsStore'
+	'jqc/util/Css',
+	'jqc/ComponentManager',
+	'jqc/form/field/Field',
+	'jqc/template/LoDash',
+	'jqc/util/OptionsStore'
 ], function( jQuery, _, Css, ComponentManager, Field, LoDashTpl, OptionsStore ) {
 	
 	/**
-	 * @class ui.form.field.Dropdown
-	 * @extends ui.form.field.Field
+	 * @class jqc.form.field.Dropdown
+	 * @extends jqc.form.field.Field
 	 * 
 	 * Dropdown list where only one item may be selected.
 	 */
@@ -20,7 +20,7 @@ define( [
 		/**
 		 * @cfg {Array/Function} options
 		 * 
-		 * The options for the dropdown. See the description of the {@link ui.util.OptionsStore#setOptions} method for accepted formats.
+		 * The options for the dropdown. See the description of the {@link jqc.util.OptionsStore#setOptions} method for accepted formats.
 		 * 
 		 * Note that along with 'text' and 'value' properties, options can have the extra properties of 'cls' and 'style', which can specify the
 		 * css class name(s) to style the dropdown option with, or a hash of styles to style the dropdown option with, repectively. Ex:
@@ -53,12 +53,12 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'ui-form-DropdownField',
+		componentCls : 'jqc-form-DropdownField',
 		
 		
 		/**
 		 * @private
-		 * @property {ui.util.OptionsStore} optionsStore
+		 * @property {jqc.util.OptionsStore} optionsStore
 		 * 
 		 * The OptionsStore instance used for managing the DropdownField's options.
 		 */
@@ -102,7 +102,7 @@ define( [
 			 * The template to use to render the dropdown's options menu elements.
 			 */
 			optionsMenuRenderTpl : new LoDashTpl( [
-				'<li data-elem="ui-form-DropdownField-menu-item" class="<%= componentCls %>-menu-item <%= menuItemCls %>" style="<%= menuItemStyle %>">',
+				'<li data-elem="jqc-form-DropdownField-menu-item" class="<%= componentCls %>-menu-item <%= menuItemCls %>" style="<%= menuItemStyle %>">',
 					'<%= text %>',
 				'</li>'
 			] )
@@ -169,7 +169,7 @@ define( [
 			// an actual dropdown field (<select> element). Leaving this (old) code here for now.  
 			/*
 			// Create the dropdown
-			this.$inputEl = jQuery( '<select id="' + this.inputId + '" name="' + this.inputName + '" class="ui-corner-all dropdown"></select>' )
+			this.$inputEl = jQuery( '<select id="' + this.inputId + '" name="' + this.inputName + '" class="jqc-corner-all dropdown"></select>' )
 				.bind( {
 					change : _.bind( function() { this.onChange( this.getValue() ); }, this ),  // Call onChange() with the new value
 					focus  : _.bind( this.onFocus, this ),
@@ -221,7 +221,7 @@ define( [
 			
 			// TODO: Add IE iframe shim
 			/*if ($.browser.msie && jQuery.browser.version < 7) {
-				$select.after($('<iframe src="javascript:\'\';" class="ui-dropdownField-shim" marginwidth="0" marginheight="0" align="bottom" scrolling="no" tabIndex="-1" frameborder="0"></iframe>').css({ height: $select.height()+4 +'px' }));
+				$select.after($('<iframe src="javascript:\'\';" class="jqc-dropdownField-shim" marginwidth="0" marginheight="0" align="bottom" scrolling="no" tabIndex="-1" frameborder="0"></iframe>').css({ height: $select.height()+4 +'px' }));
 			}*/
 			
 			// Now, draw the initial set of options
@@ -482,7 +482,7 @@ define( [
 				
 				// Now that the markup is appended and DOM nodes have been created, assign the values to the menu item
 				// elements using .data() (so that values of any datatype may be assigned)
-				var $itemEls = $optionsMenu.find( '[data-elem="ui-form-DropdownField-menu-item"]' );
+				var $itemEls = $optionsMenu.find( '[data-elem="jqc-form-DropdownField-menu-item"]' );
 				for( i = 0; i < numOptions; i++ ) {
 					// Add the "value" as data (instead of an attribute), so that any datatype can be stored for the value
 					$itemEls.eq( i ).data( 'value', options[ i ].value );
@@ -547,7 +547,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link jqc.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * If the provided `value` is not an option, the value of the field will remain unchanged.
 		 * 
 		 * @param {String} value The value of the field.
@@ -575,7 +575,7 @@ define( [
 					$optionsMenu.find( 'li.' + selectedCls ).removeClass( selectedCls );  // De-select any currently selected item in the dropdown menu
 					
 					// Select the item with the given value
-					var $itemEls = $optionsMenu.find( 'li[data-elem="ui-form-DropdownField-menu-item"]' );
+					var $itemEls = $optionsMenu.find( 'li[data-elem="jqc-form-DropdownField-menu-item"]' );
 					for( var i = 0, len = $itemEls.length; i < len; i++ ) {
 						var $item = $itemEls.eq( i );
 						if( $item.data( 'value' ) === value ) {
@@ -593,7 +593,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link jqc.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the option that is selected in the dropdown.
 		 */

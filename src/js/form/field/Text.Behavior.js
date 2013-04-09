@@ -3,14 +3,14 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'ui/UI'
-], function( jQuery, _, Class, UI ) {
+	'jqc/Jqc'
+], function( jQuery, _, Class, Jqc ) {
 	
 	/**
-	 * @class ui.form.field.Text.Behavior
+	 * @class jqc.form.field.Text.Behavior
 	 * @extends Object
 	 * 
-	 * Defines the interface for the strategy TextField behavior pattern implementation in {@link ui.form.field.Text}.
+	 * Defines the interface for the strategy TextField behavior pattern implementation in {@link jqc.form.field.Text}.
 	 */
 	var TextFieldBehavior = Class.extend( Object, {
 			
@@ -19,9 +19,9 @@ define( [
 		 * 
 		 * @abstract
 		 * @method onRender
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
-		onRender : UI.emptyFn,
+		onRender : Jqc.emptyFn,
 		
 			
 		/**
@@ -29,10 +29,10 @@ define( [
 		 * 
 		 * @abstract
 		 * @method onSetValue
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 * @param {String} value
 		 */
-		onSetValue : UI.emptyFn,
+		onSetValue : Jqc.emptyFn,
 		
 		
 		/**
@@ -40,9 +40,9 @@ define( [
 		 * 
 		 * @abstract
 		 * @method onChange
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
-		onChange : UI.emptyFn,
+		onChange : Jqc.emptyFn,
 		
 		
 		/**
@@ -50,9 +50,9 @@ define( [
 		 * 
 		 * @abstract
 		 * @method onFocus
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
-		onFocus : UI.emptyFn,
+		onFocus : Jqc.emptyFn,
 		
 		
 		/**
@@ -60,9 +60,9 @@ define( [
 		 * 
 		 * @abstract
 		 * @method onBlur
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 */
-		onBlur : UI.emptyFn,
+		onBlur : Jqc.emptyFn,
 		
 		
 		/**
@@ -70,10 +70,10 @@ define( [
 		 * 
 		 * @abstract
 		 * @method onKeyDown
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
-		onKeyDown : UI.emptyFn,
+		onKeyDown : Jqc.emptyFn,
 		
 		
 		/**
@@ -81,10 +81,10 @@ define( [
 		 * 
 		 * @abstract
 		 * @method onKeyUp
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
-		onKeyUp : UI.emptyFn,
+		onKeyUp : Jqc.emptyFn,
 		
 		
 		/**
@@ -92,10 +92,10 @@ define( [
 		 * 
 		 * @abstract
 		 * @method onKeyPress
-		 * @param {ui.form.field.Text} textField
+		 * @param {jqc.form.field.Text} textField
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
-		onKeyPress : UI.emptyFn
+		onKeyPress : Jqc.emptyFn
 		
 	} );
 

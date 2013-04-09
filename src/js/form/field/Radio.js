@@ -2,15 +2,15 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/ComponentManager',
-	'ui/form/field/Field',
-	'ui/template/LoDash',
-	'ui/util/OptionsStore'
+	'jqc/ComponentManager',
+	'jqc/form/field/Field',
+	'jqc/template/LoDash',
+	'jqc/util/OptionsStore'
 ], function( jQuery, _, ComponentManager, Field, LoDashTpl, OptionsStore ) {
 	
 	/**
-	 * @class ui.form.field.Radio
-	 * @extends ui.form.field.Field
+	 * @class jqc.form.field.Radio
+	 * @extends jqc.form.field.Field
 	 * 
 	 * Set of radio buttons (buttons where only one selection can be made at a time).
 	 */
@@ -44,18 +44,18 @@ define( [
 		 * The name to give the input. This will be set as the input's "name" attribute.  This is really only useful if
 		 * the form that the component exists in is going to be submitted by a standard form submission (as opposed to just
 		 * having its values retrieved, which are handled elsewhere). Defaults to the value of the 
-		 * {@link ui.form.field.Field#inputId} config.
+		 * {@link jqc.form.field.Field#inputId} config.
 		 * 
 		 * Note that because radio fields rely on their "name" attributes being the same, this should not be set to an
 		 * empty string (or another non-unique string).  If an explicit name is not needed, let this config default to the
-		 * {@link ui.form.field.Field#inputId} config.
+		 * {@link jqc.form.field.Field#inputId} config.
 		 */
 		
 		/**
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'ui-form-RadioField',
+		componentCls : 'jqc-form-RadioField',
 		
 		
 		/**
@@ -160,7 +160,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link ui.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link jqc.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {String} value The value of the field.
 		 */
@@ -180,7 +180,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link ui.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link jqc.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the field.
 		 */

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>UI Playground</title>
+<title>Playground - jQuery-Component</title>
 
 	<link rel="stylesheet" href="../dist/css/base/base.css" />
 	<link rel="stylesheet" href="../dist/css/theme/basic/basic.css" />
@@ -24,8 +24,8 @@
 				'Observable'         : 'vendor/observable/Observable',
 				'data'               : 'vendor/data',
 				
-				// UI Library
-				'ui' : 'src/js'
+				// jQuery-Component Library
+				'jqc' : 'src/js'
 			},
 			
 			shim : {
@@ -36,17 +36,17 @@
 		var win;
 		require( [
 			'jquery',
-			'ui/panel/Panel',
-			'ui/Overlay',
-			'ui/button/Button',
-			'ui/window/Window',
+			'jqc/panel/Panel',
+			'jqc/Overlay',
+			'jqc/button/Button',
+			'jqc/window/Window',
 			'data/Collection',
 			
 			// Dependencies used by type name
-			'ui/form/field/Text',
-			'ui/form/field/TextArea',
-			'ui/layout/HBox',
-			'ui/layout/VBox'
+			'jqc/form/field/Text',
+			'jqc/form/field/TextArea',
+			'jqc/layout/HBox',
+			'jqc/layout/VBox'
 		], function( $, Panel, Overlay, Button, Window, Collection ) {
 			$( document ).ready( function() {
 				$( 'body' ).html( "Hello, Playground!" );

@@ -3,10 +3,10 @@
 define( [
 	'jquery',
 	'lodash',
-	'ui/form/field/Text'
+	'jqc/form/field/Text'
 ], function( jQuery, _, TextField ) {
 	
-	describe( 'ui.form.field.Text', function() {
+	describe( 'jqc.form.field.Text', function() {
 		
 		describe( "rendering", function() {
 			

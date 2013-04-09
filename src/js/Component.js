@@ -3,21 +3,21 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'ui/UI',
+	'jqc/Jqc',
 	'Observable',
-	'ui/ComponentManager',
-	'ui/util/Css',
-	'ui/util/Html',
-	'ui/Mask',
-	'ui/anim/Animation',
-	'ui/plugin/Plugin',
-	'ui/template/Template',
-	'ui/template/LoDash'
+	'jqc/ComponentManager',
+	'jqc/util/Css',
+	'jqc/util/Html',
+	'jqc/Mask',
+	'jqc/anim/Animation',
+	'jqc/plugin/Plugin',
+	'jqc/template/Template',
+	'jqc/template/LoDash'
 ],
-function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
+function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
 
 	/**
-	 * @class ui.Component
+	 * @class jqc.Component
 	 * @extends Observable
 	 * 
 	 * Generalized component that defines a displayable item that can be placed onto a page. Provides a base element (by default, a div),
@@ -25,7 +25,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 	 * each step of the way.
 	 * 
 	 * Components can be constructed via anonymous config objects, based on their `type` property. This is useful for defining components in
-	 * an anonymous object, when added as items of a {@link ui.Container}.
+	 * an anonymous object, when added as items of a {@link jqc.Container}.
 	 * 
 	 * Some other things to note about Component and its subclasses are:
 	 * 
@@ -42,7 +42,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @cfg {String} id
 		 *  
 		 * The id that identifies this Component instance. Defaults to a unique id, and may be retrieved by {@link #getId}. 
-		 * This component is retrievable from a {@link ui.Container} via {@link ui.Container#findById}.
+		 * This component is retrievable from a {@link jqc.Container} via {@link jqc.Container#findById}.
 		 */
 		 
 		/**
@@ -83,12 +83,12 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * is applied to the Component's {@link #$el element}. 
 		 * 
 		 * The value of this config, by convention, is also used to prefix descendent elements of a Component subclass. For 
-		 * example, {@link ui.panel.Panel Panel} sets this config to 'ui-Panel', and its header and body elements are prefixed with 
-		 * this to become 'ui-Panel-header' and 'ui-Panel-body', respectively. However when a {@link ui.window.Window Window} is 
-		 * created (which is a subclass of {@link ui.panel.Panel Panel}, the value is 'ui-Window', and the header and body become 
-		 * 'ui-Window-header' and 'ui-Window-body' instead.
+		 * example, {@link jqc.panel.Panel Panel} sets this config to 'jqc-Panel', and its header and body elements are prefixed with 
+		 * this to become 'jqc-Panel-header' and 'jqc-Panel-body', respectively. However when a {@link jqc.window.Window Window} is 
+		 * created (which is a subclass of {@link jqc.panel.Panel Panel}, the value is 'jqc-Window', and the header and body become 
+		 * 'jqc-Window-header' and 'jqc-Window-body' instead.
 		 */
-		baseCls : 'ui-Component',
+		baseCls : 'jqc-Component',
 		
 		/**
 		 * @protected
@@ -98,11 +98,11 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * This is used for subclasses whose parent defines a {@link #baseCls}, but then have to add additional styling
 		 * themselves. 
 		 * 
-		 * For example, the base form {@link ui.form.field.Field Field} class adds the {@link #baseCls} 'ui-form-Field', and
-		 * the {@link ui.form.field.Text Text} field subclass wants to keep that class, and also add 'ui-form-TextField'
+		 * For example, the base form {@link jqc.form.field.Field Field} class adds the {@link #baseCls} 'jqc-form-Field', and
+		 * the {@link jqc.form.field.Text Text} field subclass wants to keep that class, and also add 'jqc-form-TextField'
 		 * to allow for any different styling of that particular subclass component. The result is two css classes:
-		 * 'ui-form-Field' and 'ui-form-TextField'. In the case of {@link ui.form.field.TextArea TextArea} (a subclass
-		 * of the Text field}, its componentCls is 'ui-form-TextAreaField', which overrides Text field's componentCls.
+		 * 'jqc-form-Field' and 'jqc-form-TextField'. In the case of {@link jqc.form.field.TextArea TextArea} (a subclass
+		 * of the Text field}, its componentCls is 'jqc-form-TextAreaField', which overrides Text field's componentCls.
 		 */
 		
 		/**
@@ -137,7 +137,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		/**
 		 * @protected
-		 * @cfg {String/String[]/Function/ui.template.LoDash} renderTpl
+		 * @cfg {String/String[]/Function/jqc.template.LoDash} renderTpl
 		 * 
 		 * The template to use to render the Component's **internal** structure. This is used for Component subclasses to
 		 * generate the markup that will make up the Component's structure that does not change. This is opposed to the {@link #tpl}
@@ -164,9 +164,9 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * If, for example, the {@link #html} config is provided, then the value of the config will be placed into the "body" div.
 		 * 
 		 * 
-		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link ui.template.Template} 
-		 * instance. For the string, array of strings, or function form, a {@link ui.template.LoDash LoDash template} instance will be 
-		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link ui.template.Template} 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqc.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link jqc.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqc.template.Template} 
 		 * subclass to this config. 
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
@@ -198,9 +198,9 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * 
 		 * - **elId**: The value of the {@link #elId} config, or its auto-generated value.
 		 * - **baseCls**: The {@link #baseCls} config, which is the base CSS class to prefix descendent elements' CSS
-		 *   classes with. Ex: a {@link #baseCls} of 'ui-Panel' is used to prefix a {@link ui.panel.Panel Panel's} body
-		 *   element to become 'ui-Panel-body', but when a {@link ui.window.Window Window} is created, the value is
-		 *   'ui-Window', and the body becomes 'ui-Window-body' instead. 
+		 *   classes with. Ex: a {@link #baseCls} of 'jqc-Panel' is used to prefix a {@link jqc.panel.Panel Panel's} body
+		 *   element to become 'jqc-Panel-body', but when a {@link jqc.window.Window Window} is created, the value is
+		 *   'jqc-Window', and the body becomes 'jqc-Window-body' instead. 
 		 * - **componentCls**: The {@link #componentCls} config.
 		 */
 		
@@ -224,7 +224,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 */
 		
 		/**
-		 * @cfg {String/String[]/Function/ui.template.Template} tpl
+		 * @cfg {String/String[]/Function/jqc.template.Template} tpl
 		 * 
 		 * The template to use as the HTML template of the Component. 
 		 * 
@@ -236,9 +236,9 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * outputs can be updated with new data by using the {@link #update} method, and providing an Object as its first argument.
 		 * 
 		 * 
-		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link ui.template.Template} 
-		 * instance. For the string, array of strings, or function form, a {@link ui.template.LoDash LoDash template} instance will be 
-		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link ui.template.Template} 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqc.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link jqc.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqc.template.Template} 
 		 * subclass to this config. 
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
@@ -294,7 +294,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * when it is first rendered).  This default maskConfig can be overrided when calling {@link #mask} by passing a configuration object for its argument.
 		 * 
 		 * Masks are shown and hidden using the {@link #mask} and {@link #unMask} methods. If this configuration option is not provided, the configuration
-		 * options default to the default values of the configuration options for {@link ui.Mask}.
+		 * options default to the default values of the configuration options for {@link jqc.Mask}.
 		 */
 		
 		/**
@@ -305,10 +305,10 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		
 		/**
-		 * @cfg {ui.plugin.Plugin/ui.plugin.Plugin[]} plugins
+		 * @cfg {jqc.plugin.Plugin/jqc.plugin.Plugin[]} plugins
 		 * 
-		 * A single plugin or array of plugins to attach to the Component. Plugins must extend the class {@link ui.plugin.Plugin}.
-		 * See {@link ui.plugin.Plugin} for details on creating plugins.
+		 * A single plugin or array of plugins to attach to the Component. Plugins must extend the class {@link jqc.plugin.Plugin}.
+		 * See {@link jqc.plugin.Plugin} for details on creating plugins.
 		 * 
 		 * Note that Component will normalize this config into an array, converting a single plugin into a one-element array, or creating
 		 * an empty array if no plugins were provided.  This is done so that subclasses may add plugins by pushing them directly
@@ -321,14 +321,14 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @private
 		 * @property {Number} uuid
 		 * 
-		 * A globally unique identifier for the Component, which is different between all {@link ui.Container} heirarchies.
+		 * A globally unique identifier for the Component, which is different between all {@link jqc.Container} heirarchies.
 		 */
 		
 		/**
 		 * @private
-		 * @cfg {ui.Container} parentContainer
+		 * @cfg {jqc.Container} parentContainer
 		 * 
-		 * The parent {@link ui.Container Container} of this Component (if any). This is set by the {@link ui.Container} that is adding this Component
+		 * The parent {@link jqc.Container Container} of this Component (if any). This is set by the {@link jqc.Container} that is adding this Component
 		 * as a child, and should not be supplied directly.
 		 */
 		parentContainer: null,
@@ -378,7 +378,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 	
 		/**
 		 * @private
-		 * @property {ui.anim.Animation} currentAnimation
+		 * @property {jqc.anim.Animation} currentAnimation
 		 * 
 		 * The currently running {@link #method-show}/{@link #method-hide} animation, if any. Will be null if the Component
 		 * is not currently in the process of showing or hiding. This is only relevant when {@link #method-show} or
@@ -399,7 +399,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @property {Boolean} deferMaskShow
 		 * 
 		 * Flag that is set to true if the {@link #mask} method is run, but the Component is currently hidden.
-		 * The Component must be in a visible state to show the mask, as the ui.Mask class makes a calculation of 
+		 * The Component must be in a visible state to show the mask, as the jqc.Mask class makes a calculation of 
 		 * the height of the mask target element.  When the Component's {@link #method-show} method runs, this flag will be
 		 * tested to see if it is true, and if so, will run the {@link #mask} method at that time.
 		 */
@@ -407,10 +407,10 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		/**
 		 * @private
-		 * @property {ui.Mask} _mask
+		 * @property {jqc.Mask} _mask
 		 * 
-		 * The ui.Mask instance that the Component is currently using to mask over the Component. This will be null
-		 * if no ui.Mask has been created (i.e. the {@link #mask} method has never been called). 
+		 * The jqc.Mask instance that the Component is currently using to mask over the Component. This will be null
+		 * if no jqc.Mask has been created (i.e. the {@link #mask} method has never been called). 
 		 */
 		
 		/**
@@ -469,7 +469,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				 * Fires when this Component has been {@link #method-render rendered}.
 				 * 
 				 * @event render
-				 * @param {ui.Component} component This Component instance.
+				 * @param {jqc.Component} component This Component instance.
 				 */
 				'render',
 				
@@ -480,7 +480,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event beforeshow
-				 * @param {ui.Component} component This Component instance.
+				 * @param {jqc.Component} component This Component instance.
 				 * @preventable
 				 */
 				'beforeshow',
@@ -498,7 +498,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 * 
 				 * @event show
-				 * @param {ui.Component} component This Component instance.
+				 * @param {jqc.Component} component This Component instance.
 				 */
 				'show',
 	
@@ -509,7 +509,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event showbegin
-				 * @param {ui.Component} component This Component instance.
+				 * @param {jqc.Component} component This Component instance.
 				 */
 				'showbegin',
 	
@@ -520,7 +520,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event aftershow
-				 * @param {ui.Component} component This Component instance.
+				 * @param {jqc.Component} component This Component instance.
 				 */
 				'aftershow',
 				
@@ -531,7 +531,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event beforehide
-				 * @param {ui.Component} component This Component instance.
+				 * @param {jqc.Component} component This Component instance.
 				 * @preventable
 				 */
 				'beforehide',
@@ -549,7 +549,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 * 
 				 * @event hide
-				 * @param {ui.Component} component This Component instance.
+				 * @param {jqc.Component} component This Component instance.
 				 */
 				'hide',
 	
@@ -563,7 +563,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event hidebegin
-				 * @param {ui.Component} component This Component instance.
+				 * @param {jqc.Component} component This Component instance.
 				 */
 				'hidebegin',
 	
@@ -574,7 +574,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event afterhide
-				 * @param {ui.Component} component This Component instance.
+				 * @param {jqc.Component} component This Component instance.
 				 */
 				'afterhide',
 				
@@ -583,7 +583,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				 * the destruction process for the Component.
 				 * 
 				 * @event beforedestroy
-				 * @param {ui.Component} component This Component instance. 
+				 * @param {jqc.Component} component This Component instance. 
 				 * @preventable
 				 */
 				'beforedestroy',
@@ -592,7 +592,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				 * Fires when this Component has been destroyed.
 				 * 
 				 * @event destroy
-				 * @param {ui.Component} component This Component instance.
+				 * @param {jqc.Component} component This Component instance.
 				 */
 				'destroy'
 			);
@@ -604,7 +604,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 			
 			// Generate a unique ID for this component (which is the ID for a component in a given Container hierarchy). A unique element 
 			// ID for the component's div element will be created (if not provided) in render().
-			this.id = this.id || 'ui-cmp-' + _.uniqueId();
+			this.id = this.id || 'jqc-cmp-' + _.uniqueId();
 			
 			// Normalize the 'plugins' config into an array before calling initComponent, so that subclasses may just push any
 			// plugins that they wish directly onto the array without extra processing.
@@ -638,7 +638,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @protected
 		 * @method initComponent
 		 */
-		initComponent : UI.emptyFn,
+		initComponent : Jqc.emptyFn,
 		
 		
 		/**
@@ -646,7 +646,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * 
 		 * @private
 		 * @method initPlugins
-		 * @param {ui.plugin.Plugin/ui.plugin.Plugin[]} plugin A single plugin, or array of plugins to initialize.
+		 * @param {jqc.plugin.Plugin/jqc.plugin.Plugin[]} plugin A single plugin, or array of plugins to initialize.
 		 */
 		initPlugins : function( plugin ) {
 			if( _.isArray( plugin ) ) {
@@ -657,7 +657,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 			}
 			
 			if( !( plugin instanceof Plugin ) ) {
-				throw new Error( "error: a plugin provided to this Component was not of type ui.plugin.Plugin" );
+				throw new Error( "error: a plugin provided to this Component was not of type jqc.plugin.Plugin" );
 			}
 			
 			// Initialize the plugin, passing a reference to this Component into it.
@@ -726,7 +726,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				
 			} else {
 				// First, generate an element ID for the component's element, if one has not been provided as a config
-				this.elId = this.elId || 'ui-cmp-' + _.uniqueId();
+				this.elId = this.elId || 'jqc-cmp-' + _.uniqueId();
 				
 				// Handle any additional attributes (the `attr` config) that were specified to add (or any attributes
 				// added by subclass implementations of getRenderAttributes())
@@ -821,7 +821,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				this.fireEvent( 'render', this );
 				
 				// Finally, if the deferLayout option was not provided as true, run the layout on the Component (or Container, 
-				// if it's a ui.Container subclass!)
+				// if it's a jqc.Container subclass!)
 				if( !options.deferLayout ) {
 					this.doLayout();
 				}
@@ -913,7 +913,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component is being rendered into.
 		 * @param {Object} options The options provided to {@link #method-render}.
 		 */
-		onRender : UI.emptyFn,
+		onRender : Jqc.emptyFn,
 		
 		
 		/**
@@ -928,7 +928,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component has been rendered into.
 		 * @param {Object} options The options provided to {@link #method-render}.
 		 */
-		onAfterRender : UI.emptyFn,
+		onAfterRender : Jqc.emptyFn,
 		
 		
 		/**
@@ -969,19 +969,19 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		// Layout Functionality
 		
 		/**
-		 * This method was initially intended to bring Component layouts into the mix (instead of only having {@link ui.Container Container}
-		 * layouts, which lay out {@link ui.Container#items child components}). A Component layout was going to size and position the HTML 
+		 * This method was initially intended to bring Component layouts into the mix (instead of only having {@link jqc.Container Container}
+		 * layouts, which lay out {@link jqc.Container#items child components}). A Component layout was going to size and position the HTML 
 		 * elements that a particular Component had created in its {@link #onRender} method.
 		 * 
-		 * However, at the time of this writing, we never got around to implementing this feature, and {@link ui.Container} extends
-		 * this method for its {@link ui.Container#layout layout} of {@link ui.Container#items child components}. This method was added into 
+		 * However, at the time of this writing, we never got around to implementing this feature, and {@link jqc.Container} extends
+		 * this method for its {@link jqc.Container#layout layout} of {@link jqc.Container#items child components}. This method was added into 
 		 * the Component class (this class) later though, in an effort to allow Components to respond to being laid out by their {@link #parentContainer}.
-		 * When the Component's {@link #parentContainer} runs its {@link ui.Container#layout layout}, this method is executed from it. A 
+		 * When the Component's {@link #parentContainer} runs its {@link jqc.Container#layout layout}, this method is executed from it. A 
 		 * Component author may implement an extension of the {@link #onComponentLayout} hook method to respond to the Component being laid 
 		 * out by its {@link #parentContainer}, such as to implement updating the size or positioning of its child elements upon being laid out.
 		 * Note that {@link #onComponentLayout} will eventually be called just from the Component's initial {@link #method-render rendering} 
 		 * process as well, if the Component is not being rendered by a {@link #parentContainer} layout (i.e. it is a standalone Component,
-		 * not part of a {@link ui.Container Container}/Component hierarchy).
+		 * not part of a {@link jqc.Container Container}/Component hierarchy).
 		 * 
 		 * So, bottom line, if you wish for your Component to do something when it is laid out by its {@link #parentContainer},
 		 * implement the {@link #onComponentLayout} method. See {@link #onComponentLayout} for details.
@@ -989,7 +989,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @method doLayout
 		 */
 		doLayout : function() {
-			// Note: this method is extended in the ui.Container subclass. Keep this in mind if ever implementing Component
+			// Note: this method is extended in the jqc.Container subclass. Keep this in mind if ever implementing Component
 			// layouts properly, which should both run both the Component's layout, *and* the Container's layout (in that order).
 			
 			// Simply call the hook method to allow subclasses to participate in the Component being laid out, and fire the event.
@@ -1001,12 +1001,12 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * Hook method that is executed when {@link #doLayout} has executed. Extend this method (calling the superclass method first)
 		 * to implement any logic that the Component subclass should perform when it is either: 
 		 * 
-		 * a) Initially rendered (as a standalone component, not part of a {@link ui.Container Container}/Component hierarchy), or
+		 * a) Initially rendered (as a standalone component, not part of a {@link jqc.Container Container}/Component hierarchy), or
 		 * b) Has been laid out by its {@link #parentContainer}. If initially rendered by its {@link #parentContainer parent container's}
 		 * layout, then this will be the same event.
 		 * 
 		 * For example, a Component could resize its inner elements for new dimensions set on the Component by its 
-		 * {@link #parentContainer parentContainer's} {@link ui.Container#layout layout} algorithm. The layout may size the Component
+		 * {@link #parentContainer parentContainer's} {@link jqc.Container#layout layout} algorithm. The layout may size the Component
 		 * upon its initial rendering, an update to the child components of the {@link #parentContainer}, or from say, a browser resize
 		 * where the layout runs again.
 		 *
@@ -1014,11 +1014,11 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @template
 		 * @method onComponentLayout
 		 */
-		onComponentLayout : UI.emptyFn,
+		onComponentLayout : Jqc.emptyFn,
 		
 		
 		/**
-		 * When called on the Component, this method bubbles up to the top of the {@link ui.Container Container}/Component hierarchy,
+		 * When called on the Component, this method bubbles up to the top of the {@link jqc.Container Container}/Component hierarchy,
 		 * and runs {@link #doLayout} on the top-most component. This has the effect of re-doing the layout for all Containers/Components
 		 * in that particular hierarchy. As such, this may be an expensive operation; use with care. This may be useful however for components
 		 * that are sized based on their content, and when their content size changes, they should force a layout to adjust for the new
@@ -1047,7 +1047,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @param {String/Object} name The attribute name. This first argument may also be provided as an Object of key/value
 		 *   pairs for attribute names/values to apply to the Component's {@link #$el element}.
 		 * @param {String} value The value for the attribute. Optional if the first argument is an Object.
-		 * @return {ui.Component} This Component, to allow method chaining.
+		 * @return {jqc.Component} This Component, to allow method chaining.
 		 */
 		setAttr : function( name, value ) {
 			if( !this.rendered ) {
@@ -1072,7 +1072,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @method addCls
 		 * @param {String} cssClass One or more CSS classes to add to the Component's element. If specifying multiple CSS classes,
 		 *   they should be separated with a space. Ex: "class1 class2"
-		 * @return {ui.Component} This Component, to allow method chaining.
+		 * @return {jqc.Component} This Component, to allow method chaining.
 		 */
 		addCls : function( cssClass ) {
 			if( !this.rendered ) {
@@ -1100,7 +1100,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @method removeCls
 		 * @param {String} cssClass One or more CSS classes to remove from the Component's element. If specifying multiple CSS classes,
 		 *   they should be separated with a space. Ex: "class1 class2"
-		 * @return {ui.Component} This Component, to allow method chaining.
+		 * @return {jqc.Component} This Component, to allow method chaining.
 		 */
 		removeCls : function( cssClass ) {
 			if( !this.rendered ) {
@@ -1132,7 +1132,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 *   they should be separated with a space. Ex: "class1 class2"
 		 * @param {Boolean} [flag] True if the class(es) should be added, false if they should be removed. This argument is optional,
 		 *   and if provided, determines if the class should be added or removed.
-		 * @return {ui.Component} This Component, to allow method chaining.
+		 * @return {jqc.Component} This Component, to allow method chaining.
 		 */
 		toggleCls : function( cssClass, flag ) {
 			if( typeof flag === 'undefined' ) {
@@ -1169,7 +1169,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @param {String/Object} name The CSS property name. This first argument may also be provided as an Object of key/value
 		 *   pairs for CSS property names/values to apply to the Component's {@link #$el element}.
 		 * @param {String} value The value for the CSS property. Optional if the first argument is an Object.
-		 * @return {ui.Component} This Component, to allow method chaining.
+		 * @return {jqc.Component} This Component, to allow method chaining.
 		 */
 		setStyle : function( name, value ) {
 			if( !this.rendered ) {
@@ -1192,7 +1192,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		
 		/**
-		 * Retrieves the element that should be the target for the Component's content (html).  For ui.Component, this is just the Component's
+		 * Retrieves the element that should be the target for the Component's content (html).  For jqc.Component, this is just the Component's
 		 * base element (see {@link #$el}), but this method can be overridden in subclasses that define a more complex structure, where their
 		 * content should be placed elsewhere. 
 		 * 
@@ -1474,7 +1474,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * 
 		 * @method setVisible
 		 * @param {Boolean} visible True to show the Component, false to hide it.
-		 * @return {ui.Component} This Component, to allow method chaining.
+		 * @return {jqc.Component} This Component, to allow method chaining.
 		 */
 		setVisible : function( visible ) {
 			return this[ visible ? 'show' : 'hide' ]();
@@ -1486,8 +1486,8 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 *
 		 * @method show
 		 * @param {Object} [options] An object which may contain the following options:
-		 * @param {Object} [options.anim] An {@link ui.anim.Animation Animation} config object (minus the 
-		 *   {@link ui.anim.Animation#target target} property) for animating the showing of the Component. 
+		 * @param {Object} [options.anim] An {@link jqc.anim.Animation Animation} config object (minus the 
+		 *   {@link jqc.anim.Animation#target target} property) for animating the showing of the Component. 
 		 *   Note that this will only be run if the Component is currently {@link #rendered}.
 		 * @chainable
 		 */
@@ -1573,7 +1573,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @method onBeforeShow
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onBeforeShow : UI.emptyFn,
+		onBeforeShow : Jqc.emptyFn,
 		
 		
 		/**
@@ -1586,7 +1586,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @method onShow
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onShow : UI.emptyFn,
+		onShow : Jqc.emptyFn,
 		
 		
 		/**
@@ -1598,7 +1598,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @method onAfterShow
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onAfterShow : UI.emptyFn,
+		onAfterShow : Jqc.emptyFn,
 		
 		
 		
@@ -1607,8 +1607,8 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 *
 		 * @method hide
 		 * @param {Object} [options] An object which may contain the following options:
-		 * @param {Object} [options.anim] An {@link ui.anim.Animation Animation} config object (minus the 
-		 *   {@link ui.anim.Animation#target target) property) for animating the showing of the Component. 
+		 * @param {Object} [options.anim] An {@link jqc.anim.Animation Animation} config object (minus the 
+		 *   {@link jqc.anim.Animation#target target) property) for animating the showing of the Component. 
 		 *   Note that this will only be run if the Component is currently {@link #rendered}.
 		 * @chainable
 		 */
@@ -1682,7 +1682,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @method onBeforeHide
 		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
-		onBeforeHide : UI.emptyFn,
+		onBeforeHide : Jqc.emptyFn,
 		
 		
 		/**
@@ -1695,7 +1695,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @method onHide
 		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
-		onHide : UI.emptyFn,
+		onHide : Jqc.emptyFn,
 	
 	
 		/**
@@ -1708,7 +1708,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @method onAfterHide
 		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
-		onAfterHide : UI.emptyFn,
+		onAfterHide : Jqc.emptyFn,
 		
 		
 		/**
@@ -1835,11 +1835,11 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		
 		/**
-		 * Masks the component with a {@link ui.Mask}. Uses the default mask configuration provided by the {@link #maskConfig} configuration object,
+		 * Masks the component with a {@link jqc.Mask}. Uses the default mask configuration provided by the {@link #maskConfig} configuration object,
 		 * or optionally, the provided `maskConfig` argument.
 		 * 
 		 * @method mask
-		 * @param {Object} maskConfig (optional) The explicit configuration options to set the {@link ui.Mask} that will mask over the Component.
+		 * @param {Object} maskConfig (optional) The explicit configuration options to set the {@link jqc.Mask} that will mask over the Component.
 		 *   If not provided, will use the default options provided by the {@link #maskConfig} configuration option.
 		 */
 		mask : function( maskConfig ) {
@@ -1853,7 +1853,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 				
 			} else {
 				// If the Component is currently hidden when the mask() request is made, we need to defer
-				// it to when the Component's show() method is run. This is because ui.Mask has to make a calculation
+				// it to when the Component's show() method is run. This is because jqc.Mask has to make a calculation
 				// of the mask target's height. 
 				if( this.isHidden() ) {
 					this.deferMaskShow = true;
@@ -1909,7 +1909,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		
 		/**
-		 * Method that defines which element the Component's mask should be shown over. For ui.Component,
+		 * Method that defines which element the Component's mask should be shown over. For jqc.Component,
 		 * this is the Component's base {@link #$el element}, but this may be redefined by subclasses.
 		 * 
 		 * @protected
@@ -1928,7 +1928,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * Sets the Container that owns (i.e. is a parent of) this Component.
 		 * 
 		 * @method setParentContainer
-		 * @param {ui.Container} container
+		 * @param {jqc.Container} container
 		 */
 		setParentContainer : function( container ) {
 			this.parentContainer = container;
@@ -1939,7 +1939,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * Gets the Container that owns (i.e. is a parent of) this Component.
 		 * 
 		 * @method getParentContainer
-		 * @return {ui.Container} The Container that owns this Component, or null if there is none.
+		 * @return {jqc.Container} The Container that owns this Component, or null if there is none.
 		 */
 		getParentContainer : function() {
 			return this.parentContainer;
@@ -1972,12 +1972,12 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		
 		/**
-		 * Finds a {@link ui.Container Container} above this Component at any level by a custom function. If the passed function returns
-		 * true, the {@link ui.Container Container} will be returned.
+		 * Finds a {@link jqc.Container Container} above this Component at any level by a custom function. If the passed function returns
+		 * true, the {@link jqc.Container Container} will be returned.
 		 * 
 		 * @method findParentBy
 		 * @param {Function} fn The custom function to call with the arguments (Container, this Component).
-		 * @return {ui.Container} The first Container for which the custom function returns true.
+		 * @return {jqc.Container} The first Container for which the custom function returns true.
 		 */
 		findParentBy : function( fn ) {
 			for( var p = this.parentContainer; (p !== null) && !fn( p, this ); p = p.parentContainer );  // intentional semicolon, loop does the work
@@ -1986,12 +1986,12 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		
 		/**
-		 * Finds a {@link ui.Container Container} above this Component at any level by {@link #id}.  If there is no parent Container
+		 * Finds a {@link jqc.Container Container} above this Component at any level by {@link #id}.  If there is no parent Container
 		 * with the supplied `id`, this method returns null.
 		 * 
 		 * @method findParentById
 		 * @param {String} id The {@link #id} of the parent Container to look for.
-		 * @return {ui.Container} The first Container which matches the supplied {@link #id}.
+		 * @return {jqc.Container} The first Container which matches the supplied {@link #id}.
 		 *   If no Container for the supplied {@link #id} is found, this method returns null.
 		 */
 		findParentById : function( id ) {
@@ -2001,13 +2001,13 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		
 		
 		/**
-		 * Finds the closest {@link ui.Container Container} above this Component by Container `type`.  The Container `type` can be either
-		 * the type name that is registered to the {@link ui.ComponentManager ComponentManager} (see the description of this class), or the JavaScript
+		 * Finds the closest {@link jqc.Container Container} above this Component by Container `type`.  The Container `type` can be either
+		 * the type name that is registered to the {@link jqc.ComponentManager ComponentManager} (see the description of this class), or the JavaScript
 		 * class (constructor function) of the Container.
 		 * 
 		 * @method findParentByType
-		 * @param {Function} type The type name registered with the {@link ui.ComponentManager ComponentManager}, or the constructor function (class) of the Container.
-		 * @return {ui.Container} The first Container which is an instance of the supplied type. 
+		 * @param {Function} type The type name registered with the {@link jqc.ComponentManager ComponentManager}, or the constructor function (class) of the Container.
+		 * @return {jqc.Container} The first Container which is an instance of the supplied type. 
 		 */
 		findParentByType : function( type ) {
 			if( typeof type === 'string' ) {
@@ -2051,7 +2051,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 						this.currentAnimation.end();
 					}
 					
-					// Destroy the mask, if it is an instantiated ui.Mask object (it may not be if the mask was never used)
+					// Destroy the mask, if it is an instantiated jqc.Mask object (it may not be if the mask was never used)
 					if( this._mask instanceof Mask ) {
 						this._mask.destroy();
 					}
@@ -2089,7 +2089,7 @@ function( jQuery, _, Class, UI, Observable, ComponentManager, Css, Html, Mask, A
 		 * @protected
 		 * @method onDestroy
 		 */
-		onDestroy : UI.emptyFn
+		onDestroy : Jqc.emptyFn
 	
 	} );
 	

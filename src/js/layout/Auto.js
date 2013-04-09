@@ -1,29 +1,29 @@
 /*global define */
 define( [
 	'require',
-	'ui/layout/Layout',
-	'ui/Container'
+	'jqc/layout/Layout',
+	'jqc/Container'
 ], function( require, Layout ) {
 	
 	/**
-	 * @class ui.layout.Auto
-	 * @extends ui.layout.Layout
+	 * @class jqc.layout.Auto
+	 * @extends jqc.layout.Layout
 	 * 
-	 * The default layout that is used for a {@link ui.Container Container}, which simply
+	 * The default layout that is used for a {@link jqc.Container Container}, which simply
 	 * renders each child component into their own div element, and does no further sizing or formatting.
 	 * 
 	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'auto' (or
-	 * by not giving a {@link ui.Container Container} any {@link ui.Container#layout layout} config).
+	 * by not giving a {@link jqc.Container Container} any {@link jqc.Container#layout layout} config).
 	 */
 	var AutoLayout = Layout.extend( {
 		
 		/**
 		 * Layout implementation for AutoLayout, which simply renders each child component directly into the 
-		 * Container's content target (see {@link ui.Component#getContentTarget}). 
+		 * Container's content target (see {@link jqc.Component#getContentTarget}). 
 		 * 
 		 * @protected
 		 * @method onLayout
-		 * @param {ui.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
@@ -38,8 +38,8 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the ui.Container class, which is used to be able to instantiate the layout via its type name.
-	require( [ 'ui/Container' ], function( Container ) {
+	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
+	require( [ 'jqc/Container' ], function( Container ) {
 		Container.registerLayout( 'auto', AutoLayout );
 	} );
 

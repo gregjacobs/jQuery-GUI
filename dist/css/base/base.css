@@ -2,892 +2,892 @@
 /*
  * These icon CSS classes are to be used with the background images found in /images/icons/. 
  * 
- * For example, background-image: url( '../../images/icons/ui-icons_222222_256x240.png' )
+ * For example, background-image: url( '../../resources/img/icons/ui-icons_222222_256x240.png' )
  */
 /* line 8, ../../../src/css/base/_icons.scss */
-.ui-icon {
+.jqc-icon {
   width: 16px;
   height: 16px;
 }
 
 /* line 12, ../../../src/css/base/_icons.scss */
-.ui-icon-blank {
+.jqc-icon-blank {
   background-position: 16px 16px;
 }
 
 /* line 13, ../../../src/css/base/_icons.scss */
-.ui-icon-carat-1-n {
+.jqc-icon-carat-1-n {
   background-position: 0 0;
 }
 
 /* line 14, ../../../src/css/base/_icons.scss */
-.ui-icon-carat-1-ne {
+.jqc-icon-carat-1-ne {
   background-position: -16px 0;
 }
 
 /* line 15, ../../../src/css/base/_icons.scss */
-.ui-icon-carat-1-e {
+.jqc-icon-carat-1-e {
   background-position: -32px 0;
 }
 
 /* line 16, ../../../src/css/base/_icons.scss */
-.ui-icon-carat-1-se {
+.jqc-icon-carat-1-se {
   background-position: -48px 0;
 }
 
 /* line 17, ../../../src/css/base/_icons.scss */
-.ui-icon-carat-1-s {
+.jqc-icon-carat-1-s {
   background-position: -64px 0;
 }
 
 /* line 18, ../../../src/css/base/_icons.scss */
-.ui-icon-carat-1-sw {
+.jqc-icon-carat-1-sw {
   background-position: -80px 0;
 }
 
 /* line 19, ../../../src/css/base/_icons.scss */
-.ui-icon-carat-1-w {
+.jqc-icon-carat-1-w {
   background-position: -96px 0;
 }
 
 /* line 20, ../../../src/css/base/_icons.scss */
-.ui-icon-carat-1-nw {
+.jqc-icon-carat-1-nw {
   background-position: -112px 0;
 }
 
 /* line 21, ../../../src/css/base/_icons.scss */
-.ui-icon-carat-2-n-s {
+.jqc-icon-carat-2-n-s {
   background-position: -128px 0;
 }
 
 /* line 22, ../../../src/css/base/_icons.scss */
-.ui-icon-carat-2-e-w {
+.jqc-icon-carat-2-e-w {
   background-position: -144px 0;
 }
 
 /* line 23, ../../../src/css/base/_icons.scss */
-.ui-icon-triangle-1-n {
+.jqc-icon-triangle-1-n {
   background-position: 0 -16px;
 }
 
 /* line 24, ../../../src/css/base/_icons.scss */
-.ui-icon-triangle-1-ne {
+.jqc-icon-triangle-1-ne {
   background-position: -16px -16px;
 }
 
 /* line 25, ../../../src/css/base/_icons.scss */
-.ui-icon-triangle-1-e {
+.jqc-icon-triangle-1-e {
   background-position: -32px -16px;
 }
 
 /* line 26, ../../../src/css/base/_icons.scss */
-.ui-icon-triangle-1-se {
+.jqc-icon-triangle-1-se {
   background-position: -48px -16px;
 }
 
 /* line 27, ../../../src/css/base/_icons.scss */
-.ui-icon-triangle-1-s {
+.jqc-icon-triangle-1-s {
   background-position: -64px -16px;
 }
 
 /* line 28, ../../../src/css/base/_icons.scss */
-.ui-icon-triangle-1-sw {
+.jqc-icon-triangle-1-sw {
   background-position: -80px -16px;
 }
 
 /* line 29, ../../../src/css/base/_icons.scss */
-.ui-icon-triangle-1-w {
+.jqc-icon-triangle-1-w {
   background-position: -96px -16px;
 }
 
 /* line 30, ../../../src/css/base/_icons.scss */
-.ui-icon-triangle-1-nw {
+.jqc-icon-triangle-1-nw {
   background-position: -112px -16px;
 }
 
 /* line 31, ../../../src/css/base/_icons.scss */
-.ui-icon-triangle-2-n-s {
+.jqc-icon-triangle-2-n-s {
   background-position: -128px -16px;
 }
 
 /* line 32, ../../../src/css/base/_icons.scss */
-.ui-icon-triangle-2-e-w {
+.jqc-icon-triangle-2-e-w {
   background-position: -144px -16px;
 }
 
 /* line 33, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-1-n {
+.jqc-icon-arrow-1-n {
   background-position: 0 -32px;
 }
 
 /* line 34, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-1-ne {
+.jqc-icon-arrow-1-ne {
   background-position: -16px -32px;
 }
 
 /* line 35, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-1-e {
+.jqc-icon-arrow-1-e {
   background-position: -32px -32px;
 }
 
 /* line 36, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-1-se {
+.jqc-icon-arrow-1-se {
   background-position: -48px -32px;
 }
 
 /* line 37, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-1-s {
+.jqc-icon-arrow-1-s {
   background-position: -64px -32px;
 }
 
 /* line 38, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-1-sw {
+.jqc-icon-arrow-1-sw {
   background-position: -80px -32px;
 }
 
 /* line 39, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-1-w {
+.jqc-icon-arrow-1-w {
   background-position: -96px -32px;
 }
 
 /* line 40, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-1-nw {
+.jqc-icon-arrow-1-nw {
   background-position: -112px -32px;
 }
 
 /* line 41, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-2-n-s {
+.jqc-icon-arrow-2-n-s {
   background-position: -128px -32px;
 }
 
 /* line 42, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-2-ne-sw {
+.jqc-icon-arrow-2-ne-sw {
   background-position: -144px -32px;
 }
 
 /* line 43, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-2-e-w {
+.jqc-icon-arrow-2-e-w {
   background-position: -160px -32px;
 }
 
 /* line 44, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-2-se-nw {
+.jqc-icon-arrow-2-se-nw {
   background-position: -176px -32px;
 }
 
 /* line 45, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowstop-1-n {
+.jqc-icon-arrowstop-1-n {
   background-position: -192px -32px;
 }
 
 /* line 46, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowstop-1-e {
+.jqc-icon-arrowstop-1-e {
   background-position: -208px -32px;
 }
 
 /* line 47, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowstop-1-s {
+.jqc-icon-arrowstop-1-s {
   background-position: -224px -32px;
 }
 
 /* line 48, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowstop-1-w {
+.jqc-icon-arrowstop-1-w {
   background-position: -240px -32px;
 }
 
 /* line 49, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthick-1-n {
+.jqc-icon-arrowthick-1-n {
   background-position: 0 -48px;
 }
 
 /* line 50, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthick-1-ne {
+.jqc-icon-arrowthick-1-ne {
   background-position: -16px -48px;
 }
 
 /* line 51, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthick-1-e {
+.jqc-icon-arrowthick-1-e {
   background-position: -32px -48px;
 }
 
 /* line 52, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthick-1-se {
+.jqc-icon-arrowthick-1-se {
   background-position: -48px -48px;
 }
 
 /* line 53, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthick-1-s {
+.jqc-icon-arrowthick-1-s {
   background-position: -64px -48px;
 }
 
 /* line 54, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthick-1-sw {
+.jqc-icon-arrowthick-1-sw {
   background-position: -80px -48px;
 }
 
 /* line 55, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthick-1-w {
+.jqc-icon-arrowthick-1-w {
   background-position: -96px -48px;
 }
 
 /* line 56, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthick-1-nw {
+.jqc-icon-arrowthick-1-nw {
   background-position: -112px -48px;
 }
 
 /* line 57, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthick-2-n-s {
+.jqc-icon-arrowthick-2-n-s {
   background-position: -128px -48px;
 }
 
 /* line 58, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthick-2-ne-sw {
+.jqc-icon-arrowthick-2-ne-sw {
   background-position: -144px -48px;
 }
 
 /* line 59, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthick-2-e-w {
+.jqc-icon-arrowthick-2-e-w {
   background-position: -160px -48px;
 }
 
 /* line 60, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthick-2-se-nw {
+.jqc-icon-arrowthick-2-se-nw {
   background-position: -176px -48px;
 }
 
 /* line 61, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthickstop-1-n {
+.jqc-icon-arrowthickstop-1-n {
   background-position: -192px -48px;
 }
 
 /* line 62, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthickstop-1-e {
+.jqc-icon-arrowthickstop-1-e {
   background-position: -208px -48px;
 }
 
 /* line 63, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthickstop-1-s {
+.jqc-icon-arrowthickstop-1-s {
   background-position: -224px -48px;
 }
 
 /* line 64, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowthickstop-1-w {
+.jqc-icon-arrowthickstop-1-w {
   background-position: -240px -48px;
 }
 
 /* line 65, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowreturnthick-1-w {
+.jqc-icon-arrowreturnthick-1-w {
   background-position: 0 -64px;
 }
 
 /* line 66, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowreturnthick-1-n {
+.jqc-icon-arrowreturnthick-1-n {
   background-position: -16px -64px;
 }
 
 /* line 67, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowreturnthick-1-e {
+.jqc-icon-arrowreturnthick-1-e {
   background-position: -32px -64px;
 }
 
 /* line 68, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowreturnthick-1-s {
+.jqc-icon-arrowreturnthick-1-s {
   background-position: -48px -64px;
 }
 
 /* line 69, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowreturn-1-w {
+.jqc-icon-arrowreturn-1-w {
   background-position: -64px -64px;
 }
 
 /* line 70, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowreturn-1-n {
+.jqc-icon-arrowreturn-1-n {
   background-position: -80px -64px;
 }
 
 /* line 71, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowreturn-1-e {
+.jqc-icon-arrowreturn-1-e {
   background-position: -96px -64px;
 }
 
 /* line 72, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowreturn-1-s {
+.jqc-icon-arrowreturn-1-s {
   background-position: -112px -64px;
 }
 
 /* line 73, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowrefresh-1-w {
+.jqc-icon-arrowrefresh-1-w {
   background-position: -128px -64px;
 }
 
 /* line 74, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowrefresh-1-n {
+.jqc-icon-arrowrefresh-1-n {
   background-position: -144px -64px;
 }
 
 /* line 75, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowrefresh-1-e {
+.jqc-icon-arrowrefresh-1-e {
   background-position: -160px -64px;
 }
 
 /* line 76, ../../../src/css/base/_icons.scss */
-.ui-icon-arrowrefresh-1-s {
+.jqc-icon-arrowrefresh-1-s {
   background-position: -176px -64px;
 }
 
 /* line 77, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-4 {
+.jqc-icon-arrow-4 {
   background-position: 0 -80px;
 }
 
 /* line 78, ../../../src/css/base/_icons.scss */
-.ui-icon-arrow-4-diag {
+.jqc-icon-arrow-4-diag {
   background-position: -16px -80px;
 }
 
 /* line 79, ../../../src/css/base/_icons.scss */
-.ui-icon-extlink {
+.jqc-icon-extlink {
   background-position: -32px -80px;
 }
 
 /* line 80, ../../../src/css/base/_icons.scss */
-.ui-icon-newwin {
+.jqc-icon-newwin {
   background-position: -48px -80px;
 }
 
 /* line 81, ../../../src/css/base/_icons.scss */
-.ui-icon-refresh {
+.jqc-icon-refresh {
   background-position: -64px -80px;
 }
 
 /* line 82, ../../../src/css/base/_icons.scss */
-.ui-icon-shuffle {
+.jqc-icon-shuffle {
   background-position: -80px -80px;
 }
 
 /* line 83, ../../../src/css/base/_icons.scss */
-.ui-icon-transfer-e-w {
+.jqc-icon-transfer-e-w {
   background-position: -96px -80px;
 }
 
 /* line 84, ../../../src/css/base/_icons.scss */
-.ui-icon-transferthick-e-w {
+.jqc-icon-transferthick-e-w {
   background-position: -112px -80px;
 }
 
 /* line 85, ../../../src/css/base/_icons.scss */
-.ui-icon-folder-collapsed {
+.jqc-icon-folder-collapsed {
   background-position: 0 -96px;
 }
 
 /* line 86, ../../../src/css/base/_icons.scss */
-.ui-icon-folder-open {
+.jqc-icon-folder-open {
   background-position: -16px -96px;
 }
 
 /* line 87, ../../../src/css/base/_icons.scss */
-.ui-icon-document {
+.jqc-icon-document {
   background-position: -32px -96px;
 }
 
 /* line 88, ../../../src/css/base/_icons.scss */
-.ui-icon-document-b {
+.jqc-icon-document-b {
   background-position: -48px -96px;
 }
 
 /* line 89, ../../../src/css/base/_icons.scss */
-.ui-icon-note {
+.jqc-icon-note {
   background-position: -64px -96px;
 }
 
 /* line 90, ../../../src/css/base/_icons.scss */
-.ui-icon-mail-closed {
+.jqc-icon-mail-closed {
   background-position: -80px -96px;
 }
 
 /* line 91, ../../../src/css/base/_icons.scss */
-.ui-icon-mail-open {
+.jqc-icon-mail-open {
   background-position: -96px -96px;
 }
 
 /* line 92, ../../../src/css/base/_icons.scss */
-.ui-icon-suitcase {
+.jqc-icon-suitcase {
   background-position: -112px -96px;
 }
 
 /* line 93, ../../../src/css/base/_icons.scss */
-.ui-icon-comment {
+.jqc-icon-comment {
   background-position: -128px -96px;
 }
 
 /* line 94, ../../../src/css/base/_icons.scss */
-.ui-icon-person {
+.jqc-icon-person {
   background-position: -144px -96px;
 }
 
 /* line 95, ../../../src/css/base/_icons.scss */
-.ui-icon-print {
+.jqc-icon-print {
   background-position: -160px -96px;
 }
 
 /* line 96, ../../../src/css/base/_icons.scss */
-.ui-icon-trash {
+.jqc-icon-trash {
   background-position: -176px -96px;
 }
 
 /* line 97, ../../../src/css/base/_icons.scss */
-.ui-icon-locked {
+.jqc-icon-locked {
   background-position: -192px -96px;
 }
 
 /* line 98, ../../../src/css/base/_icons.scss */
-.ui-icon-unlocked {
+.jqc-icon-unlocked {
   background-position: -208px -96px;
 }
 
 /* line 99, ../../../src/css/base/_icons.scss */
-.ui-icon-bookmark {
+.jqc-icon-bookmark {
   background-position: -224px -96px;
 }
 
 /* line 100, ../../../src/css/base/_icons.scss */
-.ui-icon-tag {
+.jqc-icon-tag {
   background-position: -240px -96px;
 }
 
 /* line 101, ../../../src/css/base/_icons.scss */
-.ui-icon-home {
+.jqc-icon-home {
   background-position: 0 -112px;
 }
 
 /* line 102, ../../../src/css/base/_icons.scss */
-.ui-icon-flag {
+.jqc-icon-flag {
   background-position: -16px -112px;
 }
 
 /* line 103, ../../../src/css/base/_icons.scss */
-.ui-icon-calendar {
+.jqc-icon-calendar {
   background-position: -32px -112px;
 }
 
 /* line 104, ../../../src/css/base/_icons.scss */
-.ui-icon-cart {
+.jqc-icon-cart {
   background-position: -48px -112px;
 }
 
 /* line 105, ../../../src/css/base/_icons.scss */
-.ui-icon-pencil {
+.jqc-icon-pencil {
   background-position: -64px -112px;
 }
 
 /* line 106, ../../../src/css/base/_icons.scss */
-.ui-icon-clock {
+.jqc-icon-clock {
   background-position: -80px -112px;
 }
 
 /* line 107, ../../../src/css/base/_icons.scss */
-.ui-icon-disk {
+.jqc-icon-disk {
   background-position: -96px -112px;
 }
 
 /* line 108, ../../../src/css/base/_icons.scss */
-.ui-icon-calculator {
+.jqc-icon-calculator {
   background-position: -112px -112px;
 }
 
 /* line 109, ../../../src/css/base/_icons.scss */
-.ui-icon-zoomin {
+.jqc-icon-zoomin {
   background-position: -128px -112px;
 }
 
 /* line 110, ../../../src/css/base/_icons.scss */
-.ui-icon-zoomout {
+.jqc-icon-zoomout {
   background-position: -144px -112px;
 }
 
 /* line 111, ../../../src/css/base/_icons.scss */
-.ui-icon-search {
+.jqc-icon-search {
   background-position: -160px -112px;
 }
 
 /* line 112, ../../../src/css/base/_icons.scss */
-.ui-icon-wrench {
+.jqc-icon-wrench {
   background-position: -176px -112px;
 }
 
 /* line 113, ../../../src/css/base/_icons.scss */
-.ui-icon-gear {
+.jqc-icon-gear {
   background-position: -192px -112px;
 }
 
 /* line 114, ../../../src/css/base/_icons.scss */
-.ui-icon-heart {
+.jqc-icon-heart {
   background-position: -208px -112px;
 }
 
 /* line 115, ../../../src/css/base/_icons.scss */
-.ui-icon-star {
+.jqc-icon-star {
   background-position: -224px -112px;
 }
 
 /* line 116, ../../../src/css/base/_icons.scss */
-.ui-icon-link {
+.jqc-icon-link {
   background-position: -240px -112px;
 }
 
 /* line 117, ../../../src/css/base/_icons.scss */
-.ui-icon-cancel {
+.jqc-icon-cancel {
   background-position: 0 -128px;
 }
 
 /* line 118, ../../../src/css/base/_icons.scss */
-.ui-icon-plus {
+.jqc-icon-plus {
   background-position: -16px -128px;
 }
 
 /* line 119, ../../../src/css/base/_icons.scss */
-.ui-icon-plusthick {
+.jqc-icon-plusthick {
   background-position: -32px -128px;
 }
 
 /* line 120, ../../../src/css/base/_icons.scss */
-.ui-icon-minus {
+.jqc-icon-minus {
   background-position: -48px -128px;
 }
 
 /* line 121, ../../../src/css/base/_icons.scss */
-.ui-icon-minusthick {
+.jqc-icon-minusthick {
   background-position: -64px -128px;
 }
 
 /* line 122, ../../../src/css/base/_icons.scss */
-.ui-icon-close {
+.jqc-icon-close {
   background-position: -80px -128px;
 }
 
 /* line 123, ../../../src/css/base/_icons.scss */
-.ui-icon-closethick {
+.jqc-icon-closethick {
   background-position: -96px -128px;
 }
 
 /* line 124, ../../../src/css/base/_icons.scss */
-.ui-icon-key {
+.jqc-icon-key {
   background-position: -112px -128px;
 }
 
 /* line 125, ../../../src/css/base/_icons.scss */
-.ui-icon-lightbulb {
+.jqc-icon-lightbulb {
   background-position: -128px -128px;
 }
 
 /* line 126, ../../../src/css/base/_icons.scss */
-.ui-icon-scissors {
+.jqc-icon-scissors {
   background-position: -144px -128px;
 }
 
 /* line 127, ../../../src/css/base/_icons.scss */
-.ui-icon-clipboard {
+.jqc-icon-clipboard {
   background-position: -160px -128px;
 }
 
 /* line 128, ../../../src/css/base/_icons.scss */
-.ui-icon-copy {
+.jqc-icon-copy {
   background-position: -176px -128px;
 }
 
 /* line 129, ../../../src/css/base/_icons.scss */
-.ui-icon-contact {
+.jqc-icon-contact {
   background-position: -192px -128px;
 }
 
 /* line 130, ../../../src/css/base/_icons.scss */
-.ui-icon-image {
+.jqc-icon-image {
   background-position: -208px -128px;
 }
 
 /* line 131, ../../../src/css/base/_icons.scss */
-.ui-icon-video {
+.jqc-icon-video {
   background-position: -224px -128px;
 }
 
 /* line 132, ../../../src/css/base/_icons.scss */
-.ui-icon-script {
+.jqc-icon-script {
   background-position: -240px -128px;
 }
 
 /* line 133, ../../../src/css/base/_icons.scss */
-.ui-icon-alert {
+.jqc-icon-alert {
   background-position: 0 -144px;
 }
 
 /* line 134, ../../../src/css/base/_icons.scss */
-.ui-icon-info {
+.jqc-icon-info {
   background-position: -16px -144px;
 }
 
 /* line 135, ../../../src/css/base/_icons.scss */
-.ui-icon-notice {
+.jqc-icon-notice {
   background-position: -32px -144px;
 }
 
 /* line 136, ../../../src/css/base/_icons.scss */
-.ui-icon-help {
+.jqc-icon-help {
   background-position: -48px -144px;
 }
 
 /* line 137, ../../../src/css/base/_icons.scss */
-.ui-icon-check {
+.jqc-icon-check {
   background-position: -64px -144px;
 }
 
 /* line 138, ../../../src/css/base/_icons.scss */
-.ui-icon-bullet {
+.jqc-icon-bullet {
   background-position: -80px -144px;
 }
 
 /* line 139, ../../../src/css/base/_icons.scss */
-.ui-icon-radio-on {
+.jqc-icon-radio-on {
   background-position: -96px -144px;
 }
 
 /* line 140, ../../../src/css/base/_icons.scss */
-.ui-icon-radio-off {
+.jqc-icon-radio-off {
   background-position: -112px -144px;
 }
 
 /* line 141, ../../../src/css/base/_icons.scss */
-.ui-icon-pin-w {
+.jqc-icon-pin-w {
   background-position: -128px -144px;
 }
 
 /* line 142, ../../../src/css/base/_icons.scss */
-.ui-icon-pin-s {
+.jqc-icon-pin-s {
   background-position: -144px -144px;
 }
 
 /* line 143, ../../../src/css/base/_icons.scss */
-.ui-icon-play {
+.jqc-icon-play {
   background-position: 0 -160px;
 }
 
 /* line 144, ../../../src/css/base/_icons.scss */
-.ui-icon-pause {
+.jqc-icon-pause {
   background-position: -16px -160px;
 }
 
 /* line 145, ../../../src/css/base/_icons.scss */
-.ui-icon-seek-next {
+.jqc-icon-seek-next {
   background-position: -32px -160px;
 }
 
 /* line 146, ../../../src/css/base/_icons.scss */
-.ui-icon-seek-prev {
+.jqc-icon-seek-prev {
   background-position: -48px -160px;
 }
 
 /* line 147, ../../../src/css/base/_icons.scss */
-.ui-icon-seek-end {
+.jqc-icon-seek-end {
   background-position: -64px -160px;
 }
 
 /* line 148, ../../../src/css/base/_icons.scss */
-.ui-icon-seek-start {
+.jqc-icon-seek-start {
   background-position: -80px -160px;
 }
 
-/* ui-icon-seek-first is deprecated, use ui-icon-seek-start instead */
+/* jqc-icon-seek-first is deprecated, use jqc-icon-seek-start instead */
 /* line 150, ../../../src/css/base/_icons.scss */
-.ui-icon-seek-first {
+.jqc-icon-seek-first {
   background-position: -80px -160px;
 }
 
 /* line 151, ../../../src/css/base/_icons.scss */
-.ui-icon-stop {
+.jqc-icon-stop {
   background-position: -96px -160px;
 }
 
 /* line 152, ../../../src/css/base/_icons.scss */
-.ui-icon-eject {
+.jqc-icon-eject {
   background-position: -112px -160px;
 }
 
 /* line 153, ../../../src/css/base/_icons.scss */
-.ui-icon-volume-off {
+.jqc-icon-volume-off {
   background-position: -128px -160px;
 }
 
 /* line 154, ../../../src/css/base/_icons.scss */
-.ui-icon-volume-on {
+.jqc-icon-volume-on {
   background-position: -144px -160px;
 }
 
 /* line 155, ../../../src/css/base/_icons.scss */
-.ui-icon-power {
+.jqc-icon-power {
   background-position: 0 -176px;
 }
 
 /* line 156, ../../../src/css/base/_icons.scss */
-.ui-icon-signal-diag {
+.jqc-icon-signal-diag {
   background-position: -16px -176px;
 }
 
 /* line 157, ../../../src/css/base/_icons.scss */
-.ui-icon-signal {
+.jqc-icon-signal {
   background-position: -32px -176px;
 }
 
 /* line 158, ../../../src/css/base/_icons.scss */
-.ui-icon-battery-0 {
+.jqc-icon-battery-0 {
   background-position: -48px -176px;
 }
 
 /* line 159, ../../../src/css/base/_icons.scss */
-.ui-icon-battery-1 {
+.jqc-icon-battery-1 {
   background-position: -64px -176px;
 }
 
 /* line 160, ../../../src/css/base/_icons.scss */
-.ui-icon-battery-2 {
+.jqc-icon-battery-2 {
   background-position: -80px -176px;
 }
 
 /* line 161, ../../../src/css/base/_icons.scss */
-.ui-icon-battery-3 {
+.jqc-icon-battery-3 {
   background-position: -96px -176px;
 }
 
 /* line 162, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-plus {
+.jqc-icon-circle-plus {
   background-position: 0 -192px;
 }
 
 /* line 163, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-minus {
+.jqc-icon-circle-minus {
   background-position: -16px -192px;
 }
 
 /* line 164, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-close {
+.jqc-icon-circle-close {
   background-position: -32px -192px;
 }
 
 /* line 165, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-triangle-e {
+.jqc-icon-circle-triangle-e {
   background-position: -48px -192px;
 }
 
 /* line 166, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-triangle-s {
+.jqc-icon-circle-triangle-s {
   background-position: -64px -192px;
 }
 
 /* line 167, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-triangle-w {
+.jqc-icon-circle-triangle-w {
   background-position: -80px -192px;
 }
 
 /* line 168, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-triangle-n {
+.jqc-icon-circle-triangle-n {
   background-position: -96px -192px;
 }
 
 /* line 169, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-arrow-e {
+.jqc-icon-circle-arrow-e {
   background-position: -112px -192px;
 }
 
 /* line 170, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-arrow-s {
+.jqc-icon-circle-arrow-s {
   background-position: -128px -192px;
 }
 
 /* line 171, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-arrow-w {
+.jqc-icon-circle-arrow-w {
   background-position: -144px -192px;
 }
 
 /* line 172, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-arrow-n {
+.jqc-icon-circle-arrow-n {
   background-position: -160px -192px;
 }
 
 /* line 173, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-zoomin {
+.jqc-icon-circle-zoomin {
   background-position: -176px -192px;
 }
 
 /* line 174, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-zoomout {
+.jqc-icon-circle-zoomout {
   background-position: -192px -192px;
 }
 
 /* line 175, ../../../src/css/base/_icons.scss */
-.ui-icon-circle-check {
+.jqc-icon-circle-check {
   background-position: -208px -192px;
 }
 
 /* line 176, ../../../src/css/base/_icons.scss */
-.ui-icon-circlesmall-plus {
+.jqc-icon-circlesmall-plus {
   background-position: 0 -208px;
 }
 
 /* line 177, ../../../src/css/base/_icons.scss */
-.ui-icon-circlesmall-minus {
+.jqc-icon-circlesmall-minus {
   background-position: -16px -208px;
 }
 
 /* line 178, ../../../src/css/base/_icons.scss */
-.ui-icon-circlesmall-close {
+.jqc-icon-circlesmall-close {
   background-position: -32px -208px;
 }
 
 /* line 179, ../../../src/css/base/_icons.scss */
-.ui-icon-squaresmall-plus {
+.jqc-icon-squaresmall-plus {
   background-position: -48px -208px;
 }
 
 /* line 180, ../../../src/css/base/_icons.scss */
-.ui-icon-squaresmall-minus {
+.jqc-icon-squaresmall-minus {
   background-position: -64px -208px;
 }
 
 /* line 181, ../../../src/css/base/_icons.scss */
-.ui-icon-squaresmall-close {
+.jqc-icon-squaresmall-close {
   background-position: -80px -208px;
 }
 
 /* line 182, ../../../src/css/base/_icons.scss */
-.ui-icon-grip-dotted-vertical {
+.jqc-icon-grip-dotted-vertical {
   background-position: 0 -224px;
 }
 
 /* line 183, ../../../src/css/base/_icons.scss */
-.ui-icon-grip-dotted-horizontal {
+.jqc-icon-grip-dotted-horizontal {
   background-position: -16px -224px;
 }
 
 /* line 184, ../../../src/css/base/_icons.scss */
-.ui-icon-grip-solid-vertical {
+.jqc-icon-grip-solid-vertical {
   background-position: -32px -224px;
 }
 
 /* line 185, ../../../src/css/base/_icons.scss */
-.ui-icon-grip-solid-horizontal {
+.jqc-icon-grip-solid-horizontal {
   background-position: -48px -224px;
 }
 
 /* line 186, ../../../src/css/base/_icons.scss */
-.ui-icon-gripsmall-diagonal-se {
+.jqc-icon-gripsmall-diagonal-se {
   background-position: -64px -224px;
 }
 
 /* line 187, ../../../src/css/base/_icons.scss */
-.ui-icon-grip-diagonal-se {
+.jqc-icon-grip-diagonal-se {
   background-position: -80px -224px;
 }
 
 /* line 1, ../../../src/css/base/_Button.scss */
-.ui-Button {
+.jqc-Button {
   display: inline-block;
   position: relative;
   margin: 0;
@@ -903,19 +903,19 @@
 
 /* General Button Styles */
 /* line 15, ../../../src/css/base/_Button.scss */
-.ui-Button-hiddenEl {
+.jqc-Button-hiddenEl {
   display: none !important;
 }
 
 /* Icons */
 /* line 18, ../../../src/css/base/_Button.scss */
-.ui-Button-icon {
+.jqc-Button-icon {
   display: inline-block;
 }
 
 /* button text element */
 /* line 23, ../../../src/css/base/_Button.scss */
-.ui-Button-text {
+.jqc-Button-text {
   display: inline-block;
   line-height: normal;
 }
@@ -923,13 +923,13 @@
 /* workarounds */
 /* reset extra padding in Firefox, see h5bp.com/l */
 /* line 31, ../../../src/css/base/_Button.scss */
-button.ui-Button::-moz-focus-inner {
+button.jqc-Button::-moz-focus-inner {
   border: 0;
   padding: 0;
 }
 
 /* line 1, ../../../src/css/base/_Overlay.scss */
-.ui-Overlay, .ui-Window {
+.jqc-Overlay, .jqc-Window {
   position: absolute;
   top: 0;
   left: 0;
@@ -939,7 +939,7 @@ button.ui-Button::-moz-focus-inner {
 /* Generalized Mask Component (ui.Mask) 
 --------------------------------------------*/
 /* line 3, ../../../src/css/base/_Mask.scss */
-.ui-mask {
+.jqc-mask {
   position: absolute;
   top: 0;
   left: 0;
@@ -954,7 +954,7 @@ button.ui-Button::-moz-focus-inner {
 }
 
 /* line 5, ../../../src/css/base/_Mask.scss */
-.ui-mask-content {
+.jqc-mask-content {
   position: absolute;
   top: 0;
   left: 0;
@@ -964,70 +964,70 @@ button.ui-Button::-moz-focus-inner {
 }
 
 /* line 6, ../../../src/css/base/_Mask.scss */
-.ui-mask-contentBox {
+.jqc-mask-contentBox {
   background-color: #BBBBBB;
   padding: 8px;
   border: 1px solid black;
 }
 
 /* line 8, ../../../src/css/base/_Mask.scss */
-.ui-mask-content-spinner {
+.jqc-mask-content-spinner {
   display: none;
   padding: 5px;
 }
 
 /* line 9, ../../../src/css/base/_Mask.scss */
-.ui-mask-spinnerEnabled .ui-mask-content-spinner {
+.jqc-mask-spinnerEnabled .jqc-mask-content-spinner {
   display: inline-block;
 }
 
 /* line 12, ../../../src/css/base/_Mask.scss */
-.ui-mask-msg {
+.jqc-mask-msg {
   display: inline-block;
 }
 
 /* For elements that are masked, they should have their overflow hidden to remove scroll bars */
 /* Note: the uses of !important are necessary to override more specific css classes! */
 /* line 16, ../../../src/css/base/_Mask.scss */
-.ui-masked {
+.jqc-masked {
   overflow: hidden !important;
 }
 
 /* For elements that are masked, they need a positioning context if they don't have one */
 /* line 20, ../../../src/css/base/_Mask.scss */
-.ui-masked-relative {
+.jqc-masked-relative {
   position: relative !important;
 }
 
 /* line 1, ../../../src/css/base/form/field/_Field.scss */
-.ui-form-Field {
+.jqc-form-Field {
   margin: 0;
   padding: 0;
   width: 100%;
   border-collapse: collapse;
 }
 /* line 7, ../../../src/css/base/form/field/_Field.scss */
-.ui-form-Field tbody, .ui-form-Field tr, .ui-form-Field th {
+.jqc-form-Field tbody, .jqc-form-Field tr, .jqc-form-Field th {
   margin: 0;
   padding: 0;
 }
 
 /* line 14, ../../../src/css/base/form/field/_Field.scss */
-.ui-form-Field-leftLabelCell {
+.jqc-form-Field-leftLabelCell {
   margin: 0;
   padding: 0;
   vertical-align: top;
 }
 
 /* line 18, ../../../src/css/base/form/field/_Field.scss */
-.ui-form-Field-inputCell {
+.jqc-form-Field-inputCell {
   vertical-align: top;
 }
 
 /* This is for the custom implementation of dropdowns, which don't use the html <select> element 
 ============================================================================================== */
 /* line 3, ../../../src/css/base/form/field/_Dropdown.scss */
-.ui-form-DropdownField {
+.jqc-form-DropdownField {
   position: relative;
   left: 0px;
   top: 0px;
@@ -1035,7 +1035,7 @@ button.ui-Button::-moz-focus-inner {
 
 /* For IE, need an iframe to cover certain elements */
 /* line 10, ../../../src/css/base/form/field/_Dropdown.scss */
-iframe.ui-form-DropdownField-shim {
+iframe.jqc-form-DropdownField-shim {
   position: absolute;
   z-index: 1;
   width: 100%;
@@ -1045,7 +1045,7 @@ iframe.ui-form-DropdownField-shim {
 
 /* The box that shows the selected option's text */
 /* line 15, ../../../src/css/base/form/field/_Dropdown.scss */
-.ui-form-DropdownField-selectText {
+.jqc-form-DropdownField-selectText {
   overflow-x: hidden;
   white-space: nowrap;
   background: none transparent;
@@ -1053,7 +1053,7 @@ iframe.ui-form-DropdownField-shim {
 }
 
 /* line 22, ../../../src/css/base/form/field/_Dropdown.scss */
-.ui-form-DropdownField-openButton {
+.jqc-form-DropdownField-openButton {
   position: absolute;
   top: 0;
   right: 0;
@@ -1062,7 +1062,7 @@ iframe.ui-form-DropdownField-shim {
 }
 
 /* line 32, ../../../src/css/base/form/field/_Dropdown.scss */
-.ui-form-DropdownField-menu {
+.jqc-form-DropdownField-menu {
   position: absolute;
   list-style: none;
   display: none;
@@ -1073,12 +1073,12 @@ iframe.ui-form-DropdownField-shim {
 }
 
 /* line 42, ../../../src/css/base/form/field/_Dropdown.scss */
-.ui-form-DropdownField-menu-item {
+.jqc-form-DropdownField-menu-item {
   cursor: pointer;
 }
 
 /* line 3, ../../../src/css/base/form/field/_Text.scss */
-.ui-form-TextField-input, .ui-form-TextAreaField-input {
+.jqc-form-TextField-input, .jqc-form-TextAreaField-input {
   background: none transparent;
   border: none;
   width: 100%;
@@ -1088,50 +1088,50 @@ iframe.ui-form-DropdownField-shim {
 }
 
 /* line 11, ../../../src/css/base/form/field/_Text.scss */
-.ui-form-TextField-input:focus, .ui-form-TextAreaField-input:focus {
+.jqc-form-TextField-input:focus, .jqc-form-TextAreaField-input:focus {
   outline: 0;
   /* Override some user agent style sheets, like Chrome which has a 5px outline */
 }
 
 /* line 2, ../../../src/css/base/layout/_Hbox.scss */
-.ui-layout-HBox-component {
+.jqc-layout-HBox-component {
   float: left;
   min-height: 1px;
 }
 
 /* line 8, ../../../src/css/base/layout/_Hbox.scss */
-.ui-layout-HBox-clear {
+.jqc-layout-HBox-clear {
   clear: both;
 }
 
 /* line 6, ../../../src/css/base/panel/_Panel.scss */
-.ui-Panel-header-title {
+.jqc-Panel-header-title {
   float: left;
 }
 
 /* line 7, ../../../src/css/base/panel/_Panel.scss */
-.ui-Panel-header-toolButtons {
+.jqc-Panel-header-toolButtons {
   float: right;
 }
 
 /* line 3, ../../../src/css/base/panel/_ToolButton.scss */
-.ui-ToolButton .ui-Button-text {
+.jqc-ToolButton .jqc-Button-text {
   padding: 0;
   line-height: 0;
 }
 
 /* line 7, ../../../src/css/base/window/_Window.scss */
-.ui-Window-header-title {
+.jqc-Window-header-title {
   float: left;
 }
 
 /* line 8, ../../../src/css/base/window/_Window.scss */
-.ui-Window-header-toolButtons {
+.jqc-Window-header-toolButtons {
   float: right;
 }
 
 /* General Styles */
 /* line 18, ../../../src/css/base/base.scss */
-.ui-clear {
+.jqc-clear {
   clear: both;
 }

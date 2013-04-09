@@ -1,17 +1,17 @@
 /*global define */
 define( [
 	'Class',
-	'ui/Component',
-	'ui/Container',
-	'ui/layout/Layout'
+	'jqc/Component',
+	'jqc/Container',
+	'jqc/layout/Layout'
 ], function( Class, Component, Container, Layout ) {
 
 	/**
-	 * @class ui.layout.Fit
-	 * @extends ui.layout.Layout
+	 * @class jqc.layout.Fit
+	 * @extends jqc.layout.Layout
 	 * 
-	 * A layout that renders a {@link ui.Container Container's} child component to full height and width of the container. 
-	 * A FitLayout only renders the first {@link ui.Container#items child component} of a {@link ui.Container Container}.
+	 * A layout that renders a {@link jqc.Container Container's} child component to full height and width of the container. 
+	 * A FitLayout only renders the first {@link jqc.Container#items child component} of a {@link jqc.Container Container}.
 	 * 
 	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'fit'.
 	 */
@@ -34,7 +34,7 @@ define( [
 		
 		/**
 		 * @protected
-		 * @property {ui.Component} lastRenderedComponent
+		 * @property {jqc.Component} lastRenderedComponent
 		 * 
 		 * Keeps track of the last component that was rendered by the FitLayout. This has to do with caching
 		 * the size (stored by {@link #lastRenderedSize}). We don't want to cache the size of another component
@@ -52,12 +52,12 @@ define( [
 		
 	
 		/**
-		 * Implementation of the FitLayout, which sizes the {@link #container container's} first {@link ui.Container#items child component}
+		 * Implementation of the FitLayout, which sizes the {@link #container container's} first {@link jqc.Container#items child component}
 		 * to be the full height and width of the {@link #container container's} element.
 		 * 
 		 * @protected
 		 * @method onLayout
-		 * @param {ui.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
@@ -99,7 +99,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the ui.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'fit', FitLayout );
 
 	return FitLayout;

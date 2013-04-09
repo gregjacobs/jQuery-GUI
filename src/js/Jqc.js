@@ -1,9 +1,9 @@
 /*!
- * UI.js Library
+ * jQuery-Component
  * Copyright(c) 2013 Gregory Jacobs.
  * 
  * MIT Licensed. http://www.opensource.org/licenses/mit-license.php
- * https://github.com/gregjacobs/UI
+ * https://github.com/gregjacobs/jQuery-Component
  */
 
 /*global define */
@@ -14,18 +14,18 @@ define( [
 ], function( Class, jQuery, _ ) {
 
 	/**
-	 * @class ui.UI
+	 * @class jqc.Jqc
 	 * @singleton
 	 * 
-	 * Main singleton class of library with a few base utility functions. 
+	 * Main singleton class of the jQuery-Component library, with a few base utility functions. 
 	 * 
-	 * This class can be included in implementations by using the RequireJS path of 'ui/UI'. Ex:
+	 * This class can be included in implementations by using the RequireJS path of 'jqc/Jqc'. Ex:
 	 * 
-	 *     require( [ 'ui/UI' ], function( UI ) {
-	 *         console.log( "This browser's scrollbar width: ", UI.getScrollbarWidth(), "px" );
+	 *     require( [ 'jqc/Jqc' ], function( Jqc ) {
+	 *         console.log( "This browser's scrollbar width: ", Jqc.getScrollbarWidth(), "px" );
 	 *     } );
 	 */
-	var UI = Class.extend( Object, {
+	var Jqc = Class.extend( Object, {
 
 		/**
 		 * @readonly
@@ -71,7 +71,7 @@ define( [
 		 * This may be placed into CSS styles as such:
 		 * 
 		 *     var $div = jQuery( '<div />' );
-		 *     $div.css( 'background-image', 'url(' + UI.getBlankImgUrl() + ')' );
+		 *     $div.css( 'background-image', 'url(' + Jqc.getBlankImgUrl() + ')' );
 		 * 
 		 * @method getBlankImgUrl
 		 * @return {String}
@@ -195,6 +195,6 @@ define( [
 	
 	
 	// Return singleton instance
-	return new UI();
+	return new Jqc();
 	
 } );

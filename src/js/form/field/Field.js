@@ -3,15 +3,15 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'ui/Component',
-	'ui/template/Template',
-	'ui/template/LoDash'
+	'jqc/Component',
+	'jqc/template/Template',
+	'jqc/template/LoDash'
 ], function( jQuery, _, Class, Component, Template, LoDashTpl ) {
 	
 	/**
 	 * @abstract
-	 * @class ui.form.field.Field
-	 * @extends ui.Component
+	 * @class jqc.form.field.Field
+	 * @extends jqc.Component
 	 * 
 	 * Abstract base class for form fields, which lays out a label and a container for form field(s), while also 
 	 * providing the base functionality and other common field related tasks.
@@ -112,7 +112,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'ui-form-Field',
+		baseCls : 'jqc-form-Field',
 		
 		/**
 		 * @cfg
@@ -122,13 +122,13 @@ define( [
 		
 		
 		/**
-		 * @cfg {String/String[]/Function/ui.template.Template} labelRenderTpl
+		 * @cfg {String/String[]/Function/jqc.template.Template} labelRenderTpl
 		 * 
 		 * The template to use as the HTML template for the Field's label.
 		 * 
-		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link ui.template.Template} 
-		 * instance. For the string, array of strings, or function form, a {@link ui.template.LoDash LoDash template} instance will be 
-		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link ui.template.Template} 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqc.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link jqc.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqc.template.Template} 
 		 * subclass to this config. 
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template) 
@@ -178,7 +178,7 @@ define( [
 				 * Fires when the input field has been changed.
 				 * 
 				 * @event change
-				 * @param {ui.form.field.Field} field This Field object.
+				 * @param {jqc.form.field.Field} field This Field object.
 				 * @param {Object} newValue The new value of the field.
 				 */
 				'change',
@@ -187,7 +187,7 @@ define( [
 				 * Fires when the input field has been focused.
 				 * 
 				 * @event focus
-				 * @param {ui.form.field.Field} field This Field object.
+				 * @param {jqc.form.field.Field} field This Field object.
 				 */
 				'focus',
 				
@@ -195,7 +195,7 @@ define( [
 				 * Fires when the input field has been blurred.
 				 * 
 				 * @event blur
-				 * @param {ui.form.field.Field} field This Field object.
+				 * @param {jqc.form.field.Field} field This Field object.
 				 */
 				'blur'
 			);
@@ -204,11 +204,11 @@ define( [
 			// Fix labelAlign to be lowercase for use with setting the class name (just in case),
 			// and apply the appropriate CSS class for the label state
 			var labelAlign = this.labelAlign = this.labelAlign.toLowerCase(),
-			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'ui-form-Field-noLabel' if there is no label, or 'ui-form-Field-leftLabel' or 'ui-form-Field-topLabel' if there is one
+			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'jqc-form-Field-noLabel' if there is no label, or 'jqc-form-Field-leftLabel' or 'jqc-form-Field-topLabel' if there is one
 			this.addCls( labelCls );
 			
 			// Give the input a unique ID, if one was not provided
-			this.inputId = this.inputId || 'ui-cmp-input-' + _.uniqueId();
+			this.inputId = this.inputId || 'jqc-cmp-input-' + _.uniqueId();
 			
 			// Default the inputName to the inputId, if not provided.
 			this.inputName = ( typeof this.inputName !== 'undefined' ) ? this.inputName : this.inputId;  // allowing for the possibility of providing an empty string for inputName here (so the field isn't submitted), so not using the || operator
