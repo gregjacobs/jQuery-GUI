@@ -128,6 +128,14 @@ define( [
 		 */
 		modelsVar : 'models',
 		
+		/**
+		 * @cfg {Boolean} maskOnLoad
+		 * 
+		 * True to automatically mask the Collection View while the backing {@link #collection} is loading. The mask that is shown
+		 * can be configured with the {@link #maskConfig} configuration option, or defaults to showing the message "Loading..."
+		 */
+		maskOnLoad : true,
+		
 		
 		
 		/**
@@ -175,6 +183,10 @@ define( [
 			
 			this.modelElCache = {};
 			this.bindCollection( this.collection || null );
+			
+			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
+			// while the collection is loading.
+			this.maskConfig = this.maskConfig || { msg: "Loading..." };
 		},
 		
 		
@@ -184,8 +196,14 @@ define( [
 		onAfterRender : function() {
 			this._super( arguments );
 			
-			if( this.collection ) {
+			var collection = this.collection;
+			if( collection ) {
 				this.collectModelElements( this.collectModels() );  // need to determine the initial set of models that were rendered (if any)
+				
+				// Mask the view if the Collection is currently loading when the view is rendered
+				if( this.maskOnLoad && collection.isLoading() ) {
+					this.mask();
+				}
 			}
 		},
 		
@@ -249,6 +267,8 @@ define( [
 		 */
 		getCollectionListeners : function( collection ) {
 			return {
+				'loadbegin' : this.onLoadBegin,
+				'load'      : this.onLoadComplete,
 				'addset'    : this.refresh,
 				'removeset' : this.refresh,
 				'reorder'   : this.refresh,
@@ -272,6 +292,35 @@ define( [
 		
 		
 		// -----------------------------------
+		
+		
+		/**
+		 * Handles the {@link #collection} starting to load, by displaying the "loading" mask over the Collection View
+		 * if the {@link #maskOnLoad} config is true.
+		 * 
+		 * @protected
+		 */
+		onLoadBegin : function() {
+			if( this.maskOnLoad ) {
+				this.mask();
+			}
+		},
+		
+		
+		/**
+		 * Handles the {@link #collection} completing its load, by removing the "loading" mask from the Collection View,
+		 * which was shown by {@link #onLoadBegin} if the {@link #maskOnLoad} config was true..
+		 * 
+		 * Note: The view will be refreshed due to the addition/removal of models, and doesn't need to be refreshed
+		 * from this method.
+		 * 
+		 * @protected
+		 */
+		onLoadComplete : function() {
+			if( this.maskOnLoad ) {
+				this.unMask();
+			}
+		},
 		
 		
 		/**
