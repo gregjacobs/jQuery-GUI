@@ -418,7 +418,7 @@ define( [
 		 *   model-encapsulating element for the `element` provided.
 		 */
 		getModelFromElement : function( element ) {
-			var $modelEl = this.getParentModelElement( element );
+			var $modelEl = this.getModelParentElement( element );
 			return this.collection.getByClientId( $modelEl ? $modelEl.attr( 'data-CollectionView-clientId' ) : -1 );
 		},
 		
@@ -433,7 +433,7 @@ define( [
 		 * @return {jQuery} The HTMLElement for the model, wrapped in a jQuery set, of `null` if the `childEl`
 		 *   was not a child element of a model-encapsulating element.
 		 */
-		getParentModelElement : function( childEl ) {
+		getModelParentElement : function( childEl ) {
 			var $modelEl = jQuery( childEl ).closest( this.modelSelector );
 			return ( $modelEl.length > 0 ) ? $modelEl : null;
 		},
