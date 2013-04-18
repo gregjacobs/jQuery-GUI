@@ -92,37 +92,36 @@ define( [
 					
 					collectionView.destroy();  // clean up
 				} );
+			} );
 				
 				
-				describe( "`modelsVar` config", function() {
-					var ModelsVarCollectionView = CollectionView.extend( {
-						tpl : new LoDashTpl( [
-							'<% _.forEach( users, function( user ) { %>',
-								'<div><%= user.get( "lastName" ) %>, <%= user.get( "firstName" ) %></div>',
-							'<% } ) %>'
-						] ),
-						modelSelector : 'div'
+			describe( "`modelsVar` config", function() {
+				var ModelsVarCollectionView = CollectionView.extend( {
+					tpl : new LoDashTpl( [
+						'<% _.forEach( users, function( user ) { %>',
+							'<div><%= user.get( "lastName" ) %>, <%= user.get( "firstName" ) %></div>',
+						'<% } ) %>'
+					] ),
+					modelSelector : 'div'
+				} );
+				
+				it( "should change the name of the variable provided to the template which has the models to render", function() {
+					var collectionView = new ModelsVarCollectionView( {
+						renderTo  : 'body',
+						modelsVar : 'users',
+						
+						collection : new Collection( {
+							model  : UserModel,
+							models : [
+								{ id: 1, firstName: "John", lastName: "Smith" }
+							]
+						} )
 					} );
 					
-					it( "should change the name of the variable provided to the template which has the models to render", function() {
-						var collectionView = new ModelsVarCollectionView( {
-							renderTo  : 'body',
-							modelsVar : 'users',
-							
-							collection : new Collection( {
-								model  : UserModel,
-								models : [
-									{ id: 1, firstName: "John", lastName: "Smith" }
-								]
-							} )
-						} );
-						
-						// Using toMatch matcher because of additional attributes added by the Collection View to the model element
-						expect( collectionView.getEl().html() ).toMatch( /<div.*?>Smith, John<\/div>/ );
-						
-						collectionView.destroy();  // clean up
-					} );
+					// Using toMatch matcher because of additional attributes added by the Collection View to the model element
+					expect( collectionView.getEl().html() ).toMatch( /<div.*?>Smith, John<\/div>/ );
 					
+					collectionView.destroy();  // clean up
 				} );
 				
 			} );

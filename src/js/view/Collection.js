@@ -9,11 +9,13 @@ define( [
 	 * @class jqc.view.Collection
 	 * @extends jqc.Component
 	 * 
-	 * A view of a {@link data.Collection}. The view uses the {@link #tpl} config, which is automatically
-	 * passed the {@link #collection collection's} data to populate the template. 
+	 * A view of the {@link data.Model Models} in a {@link data.Collection}. The view uses the {@link #tpl} config, which 
+	 * is automatically passed the {@link #collection collection's} models to populate the template. When the 
+	 * {@link #collection} changes, or any of its {@link data.Model Models} change, the Collection View is 
+	 * automatically refreshed to reflect the change.  
 	 * 
-	 * When the {@link #collection} changes, or any of its {@link data.Model Models} change, the Collection View 
-	 * is automatically refreshed to reflect the change.  
+	 * This view is similar to the {@link jqc.view.Model Model View}, but instead of showing a single {@link data.Model Model},
+	 * it shows a {@link data.Collection Collection} of them.
 	 */
 	var CollectionView = Component.extend( {
 		
@@ -24,7 +26,7 @@ define( [
 		 * does not need to be provided upon instantiation. It may be provided at a later time with the
 		 * {@link #bindCollection} method.
 		 * 
-		 * The collection is monitored for changes, and the view is refreshed when they occur.
+		 * The Collection is monitored for changes, and the view is refreshed when they occur.
 		 */
 		
 		/**
@@ -64,7 +66,7 @@ define( [
 		 * While the above example may be more readable than the example before it, it may involve more processing and
 		 * conversions being executed behind the scenes for attribute retrieval than are needed by the template. If only 
 		 * a subset of the attributes in a {@link data.Model Model} are needed for the template, it would be more efficient 
-		 * to only retrieve those particular attributes.
+		 * to only retrieve those particular attributes using {@link data.Model#get}.
 		 * 
 		 * ### Notes
 		 * 
@@ -117,7 +119,7 @@ define( [
 		 * 
 		 * This may be used to provide a variable name that makes more sense inside the template for the type of models 
 		 * being used. For example, if the Collection View is working with "User" models, one might want to
-		 * set this config to `users`: (using a {@link jqc.template.LoDash Lo-Dash template} in this case)
+		 * set this config to `users`. Example: (using a {@link jqc.template.LoDash Lo-Dash template} in this case)
 		 * 
 		 *     modelsVar : 'users',
 		 *     tpl : new LoDashTpl( [
@@ -217,6 +219,8 @@ define( [
 		 * Binds a {@link data.Collection} to the view. The Collection will be used to populate the {@link #tpl},
 		 * and will also be monitored for changes to refresh the view as well.
 		 * 
+		 * Any previous {@link #collection} will be unbound from the view.
+		 * 
 		 * @param {data.Collection} collection The Collection to bind. To unbind the currently-bound Collection,
 		 *   pass `null`.
 		 */
@@ -309,7 +313,7 @@ define( [
 		
 		/**
 		 * Handles the {@link #collection} completing its load, by removing the "loading" mask from the Collection View,
-		 * which was shown by {@link #onLoadBegin} if the {@link #maskOnLoad} config was true..
+		 * which was shown by {@link #onLoadBegin} if the {@link #maskOnLoad} config was true.
 		 * 
 		 * Note: The view will be refreshed due to the addition/removal of models, and doesn't need to be refreshed
 		 * from this method.
