@@ -1,6 +1,7 @@
 /*global define */
 define( [
-	'require'
+	'require',
+	'jqc/Component'  // loaded via require() call in the code below, as it is a circular dependency
 ], function( require ) {
 	
 	/**
@@ -92,6 +93,9 @@ define( [
 			if( config instanceof Component ) {
 				// Already a Component instance, return it
 				return config;
+				
+			} else if( type === 'component' ) {  // special case, added to get around the RequireJS circular dependency issue where Component can't register itself with the ComponentManager
+				return new Component( config );
 				
 			} else if( this.hasType( type || "container" ) ) {
 				return new this.componentClasses[ type || "container" ]( config );

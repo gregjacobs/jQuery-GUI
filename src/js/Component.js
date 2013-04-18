@@ -5,16 +5,16 @@ define( [
 	'Class',
 	'jqc/Jqc',
 	'Observable',
-	'jqc/ComponentManager',
 	'jqc/util/Css',
 	'jqc/util/Html',
 	'jqc/Mask',
 	'jqc/anim/Animation',
 	'jqc/plugin/Plugin',
 	'jqc/template/Template',
-	'jqc/template/LoDash'
+	'jqc/template/LoDash',
+	'jqc/ComponentManager'   // circular dependency. used via require() call in code below
 ],
-function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
+function( jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
 
 	/**
 	 * @class jqc.Component
@@ -2011,7 +2011,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 */
 		findParentByType : function( type ) {
 			if( typeof type === 'string' ) {
-				type = ComponentManager.getType( type );
+				type = require( 'jqc/ComponentManager' ).getType( type );
 				
 				// No type found for the given type name, return null immediately
 				if( !type ) {
@@ -2094,8 +2094,10 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 	} );
 	
 	
-	// Register the type so it can be created by the string 'component' in an anonymous config object
-	ComponentManager.registerType( 'component', Component );
+	// NOTE: Due to circular dependency issues with RequireJS, ComponentManager automatically registers this class with
+	// the type string 'component'. Leaving below line commented as a reminder. Even if we add an async require() call here,
+	// it is possible that the Component class is still not registered in time for use.
+	//ComponentManager.registerType( 'component', Component );   -- leave as reminder
 
 	return Component;
 	
