@@ -162,7 +162,7 @@ define( [
 		 * Handler for when the anchor is clicked.
 		 *
 		 * @protected
-		 * @param {Ext.EventObject} evt
+		 * @param {jQuery.Event} evt
 		 */
 		onClick : function( evt ) {
 			// If the Anchor has a 'beforeclick' handler that returns false, prevent the default browser behavior
