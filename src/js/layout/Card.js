@@ -9,6 +9,7 @@ define( [
 	/**
 	 * @class jqc.layout.Card
 	 * @extends jqc.layout.Layout
+	 * @alias layout.card
 	 * 
 	 * A layout that renders a {@link jqc.Container Container's} child components where only one child (card) can be shown 
 	 * at a time (such as showing only the top card in a deck of cards).  Methods are available in this class to control

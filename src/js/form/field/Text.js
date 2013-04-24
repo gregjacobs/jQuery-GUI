@@ -12,6 +12,7 @@ define( [
 	/**
 	 * @class jqc.form.field.Text
 	 * @extends jqc.form.field.Field
+	 * @alias type.textfield
 	 * 
 	 * Text (string) field component for the editor.
 	 */
@@ -402,7 +403,6 @@ define( [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'textfield'
 	ComponentManager.registerType( 'textfield', TextField );
 
 	return TextField;

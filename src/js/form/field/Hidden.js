@@ -9,6 +9,8 @@ define( [
 	/**
 	 * @class jqc.form.field.Hidden
 	 * @extends jqc.form.field.Field
+	 * @alias type.hidden
+	 * @alias type.hiddenfield
 	 * 
 	 * A hidden input. This class does not have any visible display.
 	 */
@@ -88,7 +90,7 @@ define( [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'hiddenfield'
+	ComponentManager.registerType( 'hidden', HiddenField );
 	ComponentManager.registerType( 'hiddenfield', HiddenField );
 	
 	return HiddenField;

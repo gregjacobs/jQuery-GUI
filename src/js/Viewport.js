@@ -9,6 +9,7 @@ define( [
 	/**
 	 * @class jqc.Viewport
 	 * @extends jqc.Container
+	 * @alias type.viewport
 	 *  
 	 * A special {@link jqc.Container Container} which keeps itself at the size of its parent element, and responds to window resizes
 	 * to re-layout its child {@link jqc.Component Components}.
@@ -124,8 +125,8 @@ define( [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'Viewport'
-	ComponentManager.registerType( 'Viewport', Viewport );
+	// Register the class so it can be created by the type string 'viewport'
+	ComponentManager.registerType( 'viewport', Viewport );
 	
 	return Viewport;
 	

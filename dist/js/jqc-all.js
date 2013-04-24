@@ -1467,6 +1467,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 	/**
 	 * @class jqc.Component
 	 * @extends Observable
+	 * @alias type.component
 	 * 
 	 * Generalized component that defines a displayable item that can be placed onto a page. Provides a base element (by default, a div),
 	 * and a framework for the instantiation, rendering, and (eventually) the destruction process, with events that can be listened to
@@ -3542,7 +3543,6 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 	} );
 	
 	
-	// Register the type so it can be created by the string 'component' in an anonymous config object
 	ComponentManager.registerType( 'component', Component );
 
 	return Component;
@@ -3933,6 +3933,7 @@ define('jqc/layout/Auto', [
 	/**
 	 * @class jqc.layout.Auto
 	 * @extends jqc.layout.Layout
+	 * @alias layout.auto
 	 * 
 	 * The default layout that is used for a {@link jqc.Container Container}, which simply
 	 * renders each child component into their own div element, and does no further sizing or formatting.
@@ -3985,6 +3986,7 @@ define('jqc/Container', [
 	/**
 	 * @class jqc.Container
 	 * @extends jqc.Component
+	 * @alias type.container
 	 *
 	 * Base class for a component that holds other child components. Provides a default
 	 * container layout that just adds child components directly into it with no layout.
@@ -4911,7 +4913,6 @@ define('jqc/Container', [
 	} );
 	
 	
-	// Register the type so it can be created by the string 'container'
 	ComponentManager.registerType( 'container', Container );
 	
 	
@@ -4928,8 +4929,9 @@ define('jqc/Image', [
 	/**
 	 * @class jqc.Image
 	 * @extends jqc.Component
+	 * @alias type.image
 	 *
-	 * A simple component which is an image.
+	 * A simple image component.
 	 */
 	var Image = Class.extend( Component, {
 		
@@ -5110,7 +5112,6 @@ define('jqc/Image', [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'Image'
 	ComponentManager.registerType( 'image', Image );
 	
 	return Image;
@@ -5124,6 +5125,7 @@ define('jqc/Label', [
 	/**
 	 * @class jqc.Label
 	 * @extends jqc.Component
+	 * @alias type.label
 	 * 
 	 * Creates a label (piece of text).
 	 */
@@ -5204,6 +5206,7 @@ define('jqc/button/Button', [
 	/**
 	 * @class jqc.button.Button
 	 * @extends jqc.Component
+	 * @alias type.button
 	 * 
 	 * A generic button that calls its {@link #handler} when clicked.
 	 */
@@ -5504,7 +5507,6 @@ define('jqc/button/Button', [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'button'
 	ComponentManager.registerType( 'button', Button );
 	
 	return Button;
@@ -5520,6 +5522,7 @@ define('jqc/panel/ToolButton', [
 	/**
 	 * @class jqc.panel.ToolButton
 	 * @extends jqc.button.Button
+	 * @alias type.toolbutton
 	 * 
 	 * Small utility class for a button that can be used in a {@link jqc.panel.Panel Panel's} header.
 	 */
@@ -5565,7 +5568,6 @@ define('jqc/panel/ToolButton', [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'toolbutton'
 	ComponentManager.registerType( 'toolbutton', ToolButton );
 	
 	return ToolButton;
@@ -5586,6 +5588,7 @@ define('jqc/panel/Panel', [
 	/**
 	 * @class jqc.panel.Panel
 	 * @extends jqc.Container
+	 * @alias type.panel
 	 *
 	 * An application-oriented {@link jqc.Container} subclass which supports adding a {@link #title} bar and 
 	 * {@link #toolButtons}.
@@ -5861,7 +5864,6 @@ define('jqc/panel/Panel', [
 		
 	} );
 	
-	// Register the type so it can be created by the type string 'panel'
 	ComponentManager.registerType( 'panel', Panel );
 	
 	return Panel;
@@ -6332,6 +6334,7 @@ define('jqc/Viewport', [
 	/**
 	 * @class jqc.Viewport
 	 * @extends jqc.Container
+	 * @alias type.viewport
 	 *  
 	 * A special {@link jqc.Container Container} which keeps itself at the size of its parent element, and responds to window resizes
 	 * to re-layout its child {@link jqc.Component Components}.
@@ -6447,8 +6450,8 @@ define('jqc/Viewport', [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'Viewport'
-	ComponentManager.registerType( 'Viewport', Viewport );
+	// Register the class so it can be created by the type string 'viewport'
+	ComponentManager.registerType( 'viewport', Viewport );
 	
 	return Viewport;
 	
@@ -6906,6 +6909,8 @@ define('jqc/form/field/Checkbox', [
 	/**
 	 * @class jqc.form.field.Checkbox
 	 * @extends jqc.form.field.Field
+	 * @alias type.checkbox
+	 * @alias type.checkboxfield
 	 *  
 	 * Checkbox field component.
 	 */
@@ -6991,7 +6996,7 @@ define('jqc/form/field/Checkbox', [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'checkboxfield'
+	ComponentManager.registerType( 'checkbox', CheckboxField );
 	ComponentManager.registerType( 'checkboxfield', CheckboxField );
 	
 	return CheckboxField;
@@ -7268,6 +7273,8 @@ define('jqc/form/field/Dropdown', [
 	/**
 	 * @class jqc.form.field.Dropdown
 	 * @extends jqc.form.field.Field
+	 * @alias type.dropdown
+	 * @alias type.dropdownfield
 	 * 
 	 * Dropdown list where only one item may be selected.
 	 */
@@ -7925,7 +7932,7 @@ define('jqc/form/field/Dropdown', [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'dropdownfield'
+	ComponentManager.registerType( 'dropdown', DropdownField );
 	ComponentManager.registerType( 'dropdownfield', DropdownField );
 	
 	return DropdownField;
@@ -7942,6 +7949,8 @@ define('jqc/form/field/Hidden', [
 	/**
 	 * @class jqc.form.field.Hidden
 	 * @extends jqc.form.field.Field
+	 * @alias type.hidden
+	 * @alias type.hiddenfield
 	 * 
 	 * A hidden input. This class does not have any visible display.
 	 */
@@ -8021,7 +8030,7 @@ define('jqc/form/field/Hidden', [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'hiddenfield'
+	ComponentManager.registerType( 'hidden', HiddenField );
 	ComponentManager.registerType( 'hiddenfield', HiddenField );
 	
 	return HiddenField;
@@ -8040,6 +8049,8 @@ define('jqc/form/field/Radio', [
 	/**
 	 * @class jqc.form.field.Radio
 	 * @extends jqc.form.field.Field
+	 * @alias type.radio
+	 * @alias type.radiofield
 	 * 
 	 * Set of radio buttons (buttons where only one selection can be made at a time).
 	 */
@@ -8224,7 +8235,7 @@ define('jqc/form/field/Radio', [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'radiofield'
+	ComponentManager.registerType( 'radio', RadioField );
 	ComponentManager.registerType( 'radiofield', RadioField );
 	
 	return RadioField;
@@ -8613,6 +8624,7 @@ define('jqc/form/field/Text', [
 	/**
 	 * @class jqc.form.field.Text
 	 * @extends jqc.form.field.Field
+	 * @alias type.textfield
 	 * 
 	 * Text (string) field component for the editor.
 	 */
@@ -9003,7 +9015,6 @@ define('jqc/form/field/Text', [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'textfield'
 	ComponentManager.registerType( 'textfield', TextField );
 
 	return TextField;
@@ -9021,6 +9032,8 @@ define('jqc/form/field/TextArea', [
 	/**
 	 * @class jqc.form.field.TextArea
 	 * @extends jqc.form.field.Text
+	 * @alias type.textarea
+	 * @alias type.textareafield
 	 * 
 	 * TextArea field component.
 	 */
@@ -9330,7 +9343,7 @@ define('jqc/form/field/TextArea', [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'textareafield'
+	ComponentManager.registerType( 'textarea', TextAreaField );
 	ComponentManager.registerType( 'textareafield', TextAreaField );
 	
 	return TextAreaField;
@@ -9443,6 +9456,7 @@ define('jqc/layout/Card', [
 	/**
 	 * @class jqc.layout.Card
 	 * @extends jqc.layout.Layout
+	 * @alias layout.card
 	 * 
 	 * A layout that renders a {@link jqc.Container Container's} child components where only one child (card) can be shown 
 	 * at a time (such as showing only the top card in a deck of cards).  Methods are available in this class to control
@@ -9724,6 +9738,7 @@ define('jqc/layout/Column', [
 	/**
 	 * @class jqc.layout.Column
 	 * @extends jqc.layout.Layout
+	 * @alias layout.column
 	 * 
 	 * A layout that renders a {@link jqc.Container Container's} child components into columns. Each child component
 	 * in the Container should have a special property named `columnWidth`, that determines how wide the column
@@ -9861,6 +9876,7 @@ define('jqc/layout/Fit', [
 	/**
 	 * @class jqc.layout.Fit
 	 * @extends jqc.layout.Layout
+	 * @alias layout.fit
 	 * 
 	 * A layout that renders a {@link jqc.Container Container's} child component to full height and width of the container. 
 	 * A FitLayout only renders the first {@link jqc.Container#items child component} of a {@link jqc.Container Container}.
@@ -9968,6 +9984,7 @@ define('jqc/layout/HBox', [
 	/**
 	 * @class jqc.layout.HBox
 	 * @extends jqc.layout.Layout
+	 * @alias layout.hbox
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
 	 * in the Container that should have a flexible width that proportionally should take up the remaining area of its parent
@@ -10136,6 +10153,7 @@ define('jqc/layout/VBox', [
 	/**
 	 * @class jqc.layout.VBox
 	 * @extends jqc.layout.Layout
+	 * @alias layout.vbox
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
 	 * in the Container that should have a flexible height that proportionally should take up the remaining area of its parent
@@ -10266,12 +10284,14 @@ define('jqc/layout/VBox', [
 define('jqc/view/Collection', [
 	'jquery',
 	'lodash',
+	'jqc/ComponentManager',
 	'jqc/Component'
-], function( jQuery, _, Component ) {
+], function( jQuery, _, ComponentManager, Component ) {
 	
 	/**
 	 * @class jqc.view.Collection
 	 * @extends jqc.Component
+	 * @alias type.collectionview
 	 * 
 	 * A view of the {@link data.Model Models} in a {@link data.Collection}. The view uses the {@link #tpl} config, which 
 	 * is automatically passed the {@link #collection collection's} models to populate the template. When the 
@@ -10737,6 +10757,9 @@ define('jqc/view/Collection', [
 		
 	} );
 	
+	
+	ComponentManager.registerType( 'collectionview', CollectionView );
+	
 	return CollectionView;
 	
 } );
@@ -10744,12 +10767,14 @@ define('jqc/view/Collection', [
 define('jqc/view/Model', [
 	'jquery',
 	'lodash',
+	'jqc/ComponentManager',
 	'jqc/Component'
-], function( jQuery, _, Component ) {
+], function( jQuery, _, ComponentManager, Component ) {
 	
 	/**
 	 * @class jqc.view.Model
 	 * @extends jqc.Component
+	 * @alias type.modelview
 	 * 
 	 * A view of the data in a single {@link data.Model}. The view uses the {@link #tpl} config, which 
 	 * is automatically passed the {@link #model} to populate the template. When any of the {@link #model model's} 
@@ -11051,6 +11076,9 @@ define('jqc/view/Model', [
 		
 	} );
 	
+	
+	ComponentManager.registerType( 'modelview', ModelView );
+	
 	return ModelView;
 	
 } );
@@ -11063,6 +11091,7 @@ define('jqc/window/Window', [
 	/**
 	 * @class jqc.window.Window
 	 * @extends jqc.Overlay
+	 * @alias type.window
 	 * 
 	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link jqc.panel.Panel Panel}, the Window
 	 * may accept a {@link #title}, and it also adds a {@link #closeButton close button} to the top right  
@@ -11172,7 +11201,6 @@ define('jqc/window/Window', [
 	} );
 	
 	
-	// Register the type so that it can be created by the type string 'window'
 	ComponentManager.registerType( 'window', Window );
 	
 	return Window;

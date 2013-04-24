@@ -13,6 +13,7 @@ define( [
 	/**
 	 * @class jqc.Container
 	 * @extends jqc.Component
+	 * @alias type.container
 	 *
 	 * Base class for a component that holds other child components. Provides a default
 	 * container layout that just adds child components directly into it with no layout.
@@ -939,7 +940,6 @@ define( [
 	} );
 	
 	
-	// Register the type so it can be created by the string 'container'
 	ComponentManager.registerType( 'container', Container );
 	
 	

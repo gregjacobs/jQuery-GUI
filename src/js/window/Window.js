@@ -7,6 +7,7 @@ define( [
 	/**
 	 * @class jqc.window.Window
 	 * @extends jqc.Overlay
+	 * @alias type.window
 	 * 
 	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link jqc.panel.Panel Panel}, the Window
 	 * may accept a {@link #title}, and it also adds a {@link #closeButton close button} to the top right  
@@ -116,7 +117,6 @@ define( [
 	} );
 	
 	
-	// Register the type so that it can be created by the type string 'window'
 	ComponentManager.registerType( 'window', Window );
 	
 	return Window;

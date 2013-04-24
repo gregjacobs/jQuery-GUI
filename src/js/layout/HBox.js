@@ -9,6 +9,7 @@ define( [
 	/**
 	 * @class jqc.layout.HBox
 	 * @extends jqc.layout.Layout
+	 * @alias layout.hbox
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
 	 * in the Container that should have a flexible width that proportionally should take up the remaining area of its parent

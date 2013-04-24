@@ -10,6 +10,7 @@ define( [
 	/**
 	 * @class jqc.button.Button
 	 * @extends jqc.Component
+	 * @alias type.button
 	 * 
 	 * A generic button that calls its {@link #handler} when clicked.
 	 */
@@ -310,7 +311,6 @@ define( [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'button'
 	ComponentManager.registerType( 'button', Button );
 	
 	return Button;

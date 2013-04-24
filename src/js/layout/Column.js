@@ -9,6 +9,7 @@ define( [
 	/**
 	 * @class jqc.layout.Column
 	 * @extends jqc.layout.Layout
+	 * @alias layout.column
 	 * 
 	 * A layout that renders a {@link jqc.Container Container's} child components into columns. Each child component
 	 * in the Container should have a special property named `columnWidth`, that determines how wide the column

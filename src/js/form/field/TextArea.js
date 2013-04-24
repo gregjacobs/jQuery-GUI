@@ -10,6 +10,8 @@ define( [
 	/**
 	 * @class jqc.form.field.TextArea
 	 * @extends jqc.form.field.Text
+	 * @alias type.textarea
+	 * @alias type.textareafield
 	 * 
 	 * TextArea field component.
 	 */
@@ -319,7 +321,7 @@ define( [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'textareafield'
+	ComponentManager.registerType( 'textarea', TextAreaField );
 	ComponentManager.registerType( 'textareafield', TextAreaField );
 	
 	return TextAreaField;

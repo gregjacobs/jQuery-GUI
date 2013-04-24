@@ -19,6 +19,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 	/**
 	 * @class jqc.Component
 	 * @extends Observable
+	 * @alias type.component
 	 * 
 	 * Generalized component that defines a displayable item that can be placed onto a page. Provides a base element (by default, a div),
 	 * and a framework for the instantiation, rendering, and (eventually) the destruction process, with events that can be listened to
@@ -2094,7 +2095,6 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 	} );
 	
 	
-	// Register the type so it can be created by the string 'component' in an anonymous config object
 	ComponentManager.registerType( 'component', Component );
 
 	return Component;

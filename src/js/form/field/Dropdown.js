@@ -12,6 +12,8 @@ define( [
 	/**
 	 * @class jqc.form.field.Dropdown
 	 * @extends jqc.form.field.Field
+	 * @alias type.dropdown
+	 * @alias type.dropdownfield
 	 * 
 	 * Dropdown list where only one item may be selected.
 	 */
@@ -669,7 +671,7 @@ define( [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'dropdownfield'
+	ComponentManager.registerType( 'dropdown', DropdownField );
 	ComponentManager.registerType( 'dropdownfield', DropdownField );
 	
 	return DropdownField;

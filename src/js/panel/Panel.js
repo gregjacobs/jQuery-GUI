@@ -13,6 +13,7 @@ define( [
 	/**
 	 * @class jqc.panel.Panel
 	 * @extends jqc.Container
+	 * @alias type.panel
 	 *
 	 * An application-oriented {@link jqc.Container} subclass which supports adding a {@link #title} bar and 
 	 * {@link #toolButtons}.
@@ -288,7 +289,6 @@ define( [
 		
 	} );
 	
-	// Register the type so it can be created by the type string 'panel'
 	ComponentManager.registerType( 'panel', Panel );
 	
 	return Panel;

@@ -9,6 +9,8 @@ define( [
 	/**
 	 * @class jqc.form.field.Checkbox
 	 * @extends jqc.form.field.Field
+	 * @alias type.checkbox
+	 * @alias type.checkboxfield
 	 *  
 	 * Checkbox field component.
 	 */
@@ -94,7 +96,7 @@ define( [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'checkboxfield'
+	ComponentManager.registerType( 'checkbox', CheckboxField );
 	ComponentManager.registerType( 'checkboxfield', CheckboxField );
 	
 	return CheckboxField;
