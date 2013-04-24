@@ -9,3 +9,7 @@
 .jqc-form-TextAreaField-input {
 	resize: none;  // don't allow resizing for Chrome. Layout system can't update when resized by user.
 }
+
+.jqc-form-TextAreaField-emptyText {
+	@extend .jqc-form-TextField-emptyText;
+}

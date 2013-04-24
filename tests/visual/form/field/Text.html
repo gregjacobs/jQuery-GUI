@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Text Field Test</title>
+
+	<link rel="stylesheet" href="../../../../dist/css/base/base.css" />
+	<link rel="stylesheet" href="../../../../dist/css/theme/basic/basic.css" />
+
+	<script type="text/javascript" src="../../../../vendor/require/require.js"></script>
+	<script type="text/javascript">
+		require.config( {
+			baseUrl : '../../../../',
+			
+			paths : {
+				// General dependencies
+				'jquery'             : 'vendor/jquery/jquery',
+				'jquery-ui.position' : 'vendor/jquery-ui.position/jquery-ui.position',
+				'lodash'             : 'vendor/lodash/lodash',
+				'Class'              : 'vendor/class/Class',
+				'Observable'         : 'vendor/observable/Observable',
+				'data'               : 'vendor/data',
+				
+				// jQuery-Component Library
+				'jqc' : 'src/js'
+			},
+			
+			shim : {
+				'jquery-ui.position' : [ 'jquery' ]   // jQuery UI's 'position' plugin
+			}
+		} );
+		
+		var win;
+		require( [
+			'jquery',
+			'jqc/form/field/Text'
+		], function( $, TextField ) {
+			$( document ).ready( function() {
+				
+				var noLabelTextField = new TextField( {
+					renderTo : 'body',
+					value    : "No Label Text Field"
+				} );
+				jQuery( '<br><br>' ).appendTo( 'body' );
+				
+				var leftLabelTextField = new TextField( {
+					renderTo   : 'body',
+					label      : "My Field:",
+					labelWidth : 100,
+					value      : "Left Label Text Field"
+				} );
+				jQuery( '<br><br>' ).appendTo( 'body' );
+				
+				var topLabelTextField = new TextField( {
+					renderTo   : 'body',
+					label      : "My Field:",
+					labelAlign : 'top',
+					value      : "Top Label Text Field"
+				} );
+				jQuery( '<br><br>' ).appendTo( 'body' );
+				
+				var emptyTextTextField = new TextField( {
+					renderTo  : 'body',
+					emptyText : "Test Empty Text"
+				} );
+				jQuery( '<br><br>' ).appendTo( 'body' );
+				
+			} );
+		} );
+	</script>
+
+</head>
+
+<body>
+</body>
+</html>

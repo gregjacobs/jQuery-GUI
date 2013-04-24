@@ -26,6 +26,17 @@
   padding: .1em .4em;
 }
 
+/* line 3, ../../../../src/css/theme/basic/form/field/_Text.scss */
+.jqc-form-TextField .jqc-form-Field-inputContainer {
+  border: 1px solid #CCC;
+}
+
+/* line 9, ../../../../src/css/theme/basic/form/field/_Text.scss */
+.jqc-form-TextField-emptyText, .jqc-form-TextAreaField-emptyText {
+  font-size: 14px;
+  color: #AAA;
+}
+
 /* line 3, ../../../../src/css/theme/basic/form/field/_TextArea.scss */
 .jqc-form-TextAreaField .jqc-form-Field-inputContainer {
   border: 1px solid #C6C6C6;

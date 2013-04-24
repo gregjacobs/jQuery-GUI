@@ -1011,6 +1011,14 @@ button.jqc-Button::-moz-focus-inner {
   margin: 0;
   padding: 0;
 }
+/* line 9, ../../../src/css/base/form/field/_Field.scss */
+.jqc-form-Field.jqc-form-Field-leftLabel {
+  table-layout: fixed;
+}
+/* line 10, ../../../src/css/base/form/field/_Field.scss */
+.jqc-form-Field.jqc-form-Field-topLabel {
+  table-layout: auto;
+}
 
 /* line 14, ../../../src/css/base/form/field/_Field.scss */
 .jqc-form-Field-leftLabelCell {
@@ -1022,6 +1030,12 @@ button.jqc-Button::-moz-focus-inner {
 /* line 18, ../../../src/css/base/form/field/_Field.scss */
 .jqc-form-Field-inputCell {
   vertical-align: top;
+  width: 100%;
+}
+
+/* line 19, ../../../src/css/base/form/field/_Field.scss */
+.jqc-form-Field-inputContainer {
+  position: relative;
 }
 
 /* This is for the custom implementation of dropdowns, which don't use the html <select> element 
@@ -1091,6 +1105,14 @@ iframe.jqc-form-DropdownField-shim {
 .jqc-form-TextField-input:focus, .jqc-form-TextAreaField-input:focus {
   outline: 0;
   /* Override some user agent style sheets, like Chrome which has a 5px outline */
+}
+
+/* line 15, ../../../src/css/base/form/field/_Text.scss */
+.jqc-form-TextField-emptyText, .jqc-form-TextAreaField-emptyText {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
 }
 
 /* line 2, ../../../src/css/base/layout/_Hbox.scss */

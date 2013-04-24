@@ -4,59 +4,41 @@ define( [
 	'lodash',
 	'jqc/util/Html',
 	'jqc/ComponentManager',
-	'jqc/form/field/Field',
-	'jqc/form/field/Text.EmptyTextBehavior',
-	'jqc/form/field/Text.InfieldLabelBehavior'
-], function( jQuery, _, Html, ComponentManager, Field, EmptyTextBehavior, InfieldLabelBehavior ) {
+	'jqc/form/field/Field'
+], function( jQuery, _, Html, ComponentManager, Field ) {
 	
 	/**
 	 * @class jqc.form.field.Text
 	 * @extends jqc.form.field.Field
 	 * @alias type.textfield
 	 * 
-	 * Text (string) field component for the editor.
+	 * Text field component.
 	 */
 	var TextField = Field.extend( {
 		
 		/**
 		 * @cfg {Boolean} selectOnFocus
+		 * 
 		 * True to have the field's text automatically selected when the field is focused. Defaults to false. 
 		 */
 		selectOnFocus : false,
 		
 		/**
-		 * @cfg {String} labelAlign
-		 * A string that specifies where the field's label should be placed. Valid values are: "left", "top", 
-		 * and "infield". The "infield" label position places the label inside the text field itself, which 
-		 * is then hidden when the user starts typing into the field. Defaults to 'left'.
-		 * 
-		 * Note that a labelAlign set to "infield" is not compatible with the {@link #emptyText} 
-		 * config. The provided {@link #emptyText} will not be used in this case. 
-		 */
-		
-		/**
 		 * @cfg {String} emptyText
-		 * The text to show in the field when the field is empty. When the user focuses the field, this text
-		 * will be removed, allowing the user to type their value. If provided, and no {@link #value} is provided,
-		 * the {@link #value} will be set to this.
 		 * 
-		 * Note that this is not compatible with the {@link #labelAlign} config set to "infield". See the description of {@link #labelAlign}.
-		 */
-		
-		/**
-		 * @cfg {Boolean} restoreEmptyText
-		 * True to enable the restoration of the {@link #emptyText} (if any) when the field loses focus (is blurred), and is empty.
-		 * If this is true, the {@link #emptyText} will be re-applied to the field when it has no value (i.e. it's an
-		 * empty string).  If this is false, the {@link #emptyText} will not be re-applied to the field when it loses 
-		 * focus. Defaults to true.
+		 * The text to show in the field when the field is empty. When the user enters something into the field, this 
+		 * text will be removed. If the field becomes empty again, this text will be re-shown.
 		 * 
-		 * Note: This only applies when the {@link #labelAlign} config is not "infield". Infield labels cannot have
-		 * an {@link #emptyText} value.
+		 * The implementation of the emptyText itself is an element that is placed over the field when the field is empty.
+		 * This is done instead of putting in "placeholder" text so that the emptyText can easily be styled, and so that
+		 * on older browsers that don't support the HTML5 "placeholder" attribute (IE8), the field doesn't need to have a
+		 * value of the {@link #emptyText}.
 		 */
-		restoreEmptyText : true,
+		emptyText : "",
 		
 		/**
 		 * @cfg {String} value
+		 * 
 		 * The initial value for the field, if any.
 		 */
 		
@@ -81,12 +63,19 @@ define( [
 		 */
 		
 		/**
-		 * @private
-		 * @property {jqc.form.field.Text.Behavior} behaviorState
+		 * @protected
+		 * @property {Boolean} focused
 		 * 
-		 * The {@link jqc.form.field.Text.Behavior} object that governs the TextField's behavior.
-		 * This currently applies to either the TextField having an {@link #emptyText} value, 
-		 * or the TextField having an "infield" {@link #labelAlign}.
+		 * Flag which is set to `true` while the TextField is focused.
+		 */
+		focused : false,
+		
+		/**
+		 * @protected
+		 * @property {jQuery} $emptyTextEl
+		 * 
+		 * The element that holds the {@link #emptyText}, which is shown over the {@link #$inputEl}
+		 * when the field is empty.
 		 */
 		
 		
@@ -125,23 +114,8 @@ define( [
 				'keypress'
 			);
 			
-			// Set the TextField's behavior "state", based on if it is set to have an "infield" label or not.
-			// "infield" labels are incompatible with having a regular default value (i.e. the default showing on top
-			// of the "infield" label does not look right), and thus are mutually exclusive behaviors.
-			if( this.labelAlign === 'infield' ) {
-				this.behaviorState = new InfieldLabelBehavior();
-			} else {
-				this.behaviorState = new EmptyTextBehavior();
-			}
-			
 			// If a value was provided, and it is not a string, convert it to one now. normalizeValue handles all datatypes.
 			this.value = this.normalizeValue( this.value );
-			
-			// If the value is an empty string, and there was emptyText provided, initialize it to the emptyText.
-			// That is what will be displayed in the field (with the appropriate CSS class to make it look like the emptyText).
-			if( this.value === "" && this.emptyText ) {
-				this.value = this.emptyText;
-			}
 		},
 		
 		
@@ -165,8 +139,12 @@ define( [
 				keypress : _.bind( this.onKeyPress, this )
 			} );
 			
-			// Call state object's onRender to allow it to implement whatever processing is necessary
-			this.behaviorState.onRender( this );
+			// Set up the empty text element. This element is absolutely positioned in the inputContainer, and is initially hidden.
+			this.$emptyTextEl = jQuery( '<div class="' + this.componentCls + '-emptyText">' + this.emptyText + '</div>' )
+				.on( 'click', function() { $inputEl.focus(); } )  // when the emptyText itself is clicked, focus the text field
+				.appendTo( this.$inputContainerEl );
+			
+			this.handleEmptyText();
 		},
 		
 		
@@ -240,9 +218,6 @@ define( [
 				
 			} else {
 				this.$inputEl.val( value );
-				
-				// Allow the TextField's behaviorState to handle the value being set
-				this.behaviorState.onSetValue( this, value );
 			}
 			
 			// Run onchange, to notify listeners of a change
@@ -273,6 +248,10 @@ define( [
 		 */
 		setEmptyText : function( emptyText ) {
 			this.emptyText = emptyText;
+			
+			if( this.rendered ) {
+				this.$emptyTextEl.html( emptyText );
+			}
 		},
 		
 		
@@ -295,14 +274,12 @@ define( [
 		
 		
 		/**
-		 * Extension of onChange template method used to allow the {@link #behaviorState} to handle
-		 * the change event.
+		 * Extension of onChange template method used to handle the {@link #emptyText}.
 		 *
 		 * @protected
 		 */
 		onChange : function() {
-			// Allow the TextField's behaviorState to handle the change event
-			this.behaviorState.onChange( this );
+			this.handleEmptyText();
 			
 			this._super( arguments );
 		},
@@ -336,8 +313,8 @@ define( [
 		 * @inheritdoc
 		 */
 		onFocus : function() {
-			// Allow the TextField's behaviorState to handle the focus event
-			this.behaviorState.onFocus( this );
+			this.focused = true;
+			this.handleEmptyText();
 			
 			// If the selectOnFocus config is true, select the text
 			if( this.selectOnFocus ) {
@@ -352,10 +329,20 @@ define( [
 		 * @inheritdoc
 		 */
 		onBlur : function() {
-			// Allow the TextField's behaviorState to handle the blur event
-			this.behaviorState.onBlur( this );
+			this.focused = false;
+			this.handleEmptyText();
 			
 			this._super( arguments );
+		},
+		
+		
+		/**
+		 * Determines if the TextField is currently focused.
+		 * 
+		 * @return {Boolean} `true` if the TextField is currently focused, false otherwise.
+		 */
+		isFocused : function() {
+			return this.focused;
 		},
 		
 		
@@ -366,9 +353,6 @@ define( [
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyDown : function( evt ) {
-			// Allow the TextField's behaviorState to handle the keydown event
-			this.behaviorState.onKeyDown( this, evt );
-			
 			this.fireEvent( 'keydown', this, evt ); 
 		},
 		
@@ -380,9 +364,6 @@ define( [
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyUp : function( evt ) {
-			// Allow the TextField's behaviorState to handle the keyup event
-			this.behaviorState.onKeyUp( this, evt );
-			
 			this.fireEvent( 'keyup', this, evt );
 		},
 		
@@ -394,10 +375,24 @@ define( [
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyPress : function( evt ) {
-			// Allow the TextField's behaviorState to handle the keypress event
-			this.behaviorState.onKeyPress( this, evt );
-			
 			this.fireEvent( 'keypress', this, evt ); 
+		},
+		
+		
+		// ---------------------------------------
+		
+		// Empty Text Handling Utility Methods
+		
+		/**
+		 * Checks the TextField to see if it's empty, and if so shows the {@link #emptyText}.
+		 * 
+		 * @protected
+		 */
+		handleEmptyText : function() {
+			if( this.rendered ) {
+				// Field is not focused and its value is empty, show the empty text. Otherwise, hide it.
+				this.$emptyTextEl[ ( !this.focused && this.getValue() === "" ) ? 'show' : 'hide' ]();
+			}
 		}
 		
 	} );

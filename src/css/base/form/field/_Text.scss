@@ -11,3 +11,10 @@
 .jqc-form-TextField-input:focus {
 	outline: 0;   /* Override some user agent style sheets, like Chrome which has a 5px outline */
 }
+
+.jqc-form-TextField-emptyText {
+	position: absolute;  // absolutely positioned within the Field's input container
+	top: 0;
+	left: 0;
+	display: none; // initially hidden
+}
