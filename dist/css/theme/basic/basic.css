@@ -48,12 +48,13 @@
   border-color: #000;
   border-style: solid;
   border-width: 1px 0 0 0;
-  background-color: #C2EBFF;
+  background-color: #2383B3;
 }
 
 /* line 4, ../../../../src/css/theme/basic/panel/_Panel.scss */
 .jqc-Panel-header-title {
   font-weight: bold;
+  color: #FFF;
 }
 
 /* line 5, ../../../../src/css/theme/basic/panel/_Panel.scss */
@@ -98,12 +99,13 @@
   border-color: #000;
   border-style: solid;
   border-width: 1px 0 0 0;
-  background-color: #C2EBFF;
+  background-color: #2383B3;
 }
 
 /* line 4, ../../../../src/css/theme/basic/window/_Window.scss */
 .jqc-Window-header-title {
   font-weight: bold;
+  color: #FFF;
 }
 
 /* line 9, ../../../../src/css/theme/basic/window/_Window.scss */
