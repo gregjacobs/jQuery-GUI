@@ -3,7 +3,8 @@ define( [
 	'jquery',
 	'lodash',
 	'jqc/ComponentManager',
-	'jqc/Container'
+	'jqc/Container',
+	'jqc/layout/Fit'  // used by layout 'type'
 ], function( jQuery, _, ComponentManager, Container ) {
 
 	/**
@@ -45,6 +46,12 @@ define( [
 		initComponent : function() {
 			this._super( arguments );
 			
+			this.setStyle( {
+				'position'   : 'relative',
+				'overflow-x' : 'hidden',
+				'overflow-y' : 'auto'
+			} );
+			
 			this.onWindowResizeDelegate = _.debounce( _.bind( this.onWindowResize, this ), 150 );
 			jQuery( window ).bind( 'resize', this.onWindowResizeDelegate );
 		},
@@ -55,12 +62,6 @@ define( [
 		 */
 		onRender : function() {
 			this._super( arguments );
-			
-			this.$el.css( {
-				position     : 'relative',
-				'overflow-x' : 'hidden',
-				'overflow-y' : 'auto'
-			} );
 			
 			this.recalcDimensions();
 		},
@@ -77,7 +78,7 @@ define( [
 				    $parent = $el.parent();
 				    
 				$el.css( {
-					width: $parent.width(),
+					//width: $parent.width(),  -- let width be handled by the browser
 					height: $parent.height()
 				} );
 			}
