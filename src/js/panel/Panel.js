@@ -37,6 +37,7 @@ define( [
 		 * 
 		 * The title of the Panel.
 		 */
+		title : "",
 		
 		/**
 		 * @cfg {Object/Object[]/jqc.panel.ToolButton/jqc.panel.ToolButton[]} toolButtons
