@@ -18,7 +18,13 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		defaultType : 'tab'
+		defaultType : 'tab',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'jqc-TabPanel-Bar'
 		
 	} );
 	

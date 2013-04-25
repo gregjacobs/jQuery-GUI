@@ -16,6 +16,34 @@ define( [
 	 */
 	var Tab = Button.extend( {
 		
+		/**
+		 * @cfg {jqc.panel.Panel} correspondingPanel (required)
+		 * 
+		 * The Panel that this tab has been created for, and corresponds to. The Panel is a child item of the parent
+		 * {@link jqc.tab.Panel Tab Panel}, and is needed to map the Tab to the Panel it shows.
+		 */
+		
+		/**
+		 * @inheritdoc
+		 */
+		initComponent : function() {
+			// <debug>
+			if( !this.correspondingPanel ) throw new Error( "`correspondingPanel` cfg required" );
+			// </debug>
+			
+			this._super( arguments );
+		},
+		
+		
+		/**
+		 * Retrieves the {@link #panel} that this Tab corresponds to in the parent {@link jqc.tab.Panel Tab Panel}.
+		 * 
+		 * @return {jqc.panel.Panel}
+		 */
+		getCorrespondingPanel : function() {
+			return this.correspondingPanel;
+		}
+		
 	} );
 	
 	

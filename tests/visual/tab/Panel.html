@@ -38,7 +38,14 @@
 				
 				var tabPanel = new TabPanel( {
 					renderTo : 'body',
-					html: "Test"
+					layout : {
+						type: 'card',
+						autoSize: true
+					},
+					items : [
+						{ type : 'panel', title: "Panel 1", html: "Test 1" },
+						{ type : 'panel', title: "Panel 2", html: "Test 2" }
+					]
 				} );
 				
 			} );
