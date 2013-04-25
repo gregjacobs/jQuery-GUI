@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Tab Panel Visual Tests</title>
+
+	<link rel="stylesheet" href="../../../dist/css/base/base.css" />
+	<link rel="stylesheet" href="../../../dist/css/theme/basic/basic.css" />
+
+	<script type="text/javascript" src="../../../vendor/require/require.js"></script>
+	<script type="text/javascript">
+		require.config( {
+			baseUrl : '../../../',
+			
+			paths : {
+				// General dependencies
+				'jquery'             : 'vendor/jquery/jquery',
+				'jquery-ui.position' : 'vendor/jquery-ui.position/jquery-ui.position',
+				'lodash'             : 'vendor/lodash/lodash',
+				'Class'              : 'vendor/class/Class',
+				'Observable'         : 'vendor/observable/Observable',
+				'data'               : 'vendor/data',
+				
+				// jQuery-Component Library
+				'jqc' : 'src/js'
+			},
+			
+			shim : {
+				'jquery-ui.position' : [ 'jquery' ]   // jQuery UI's 'position' plugin
+			}
+		} );
+		
+		var win;
+		require( [
+			'jquery',
+			'jqc/panel/Panel'
+		], function( $, Panel ) {
+			$( document ).ready( function() {
+				
+				var noHeaderPanel = new Panel( {
+					renderTo : 'body',
+					html: "No Header Panel Body"
+				} );
+				jQuery( '<br>' ).appendTo( 'body' );
+				
+				
+				var hiddenHeaderPanel = new Panel( {
+					renderTo : 'body',
+					title: "Hidden Header Panel",
+					html: "Hidden Header Panel Body",
+					
+					headerHidden: true
+				} );
+				jQuery( '<br>' ).appendTo( 'body' );
+				
+				
+				var hiddenHeaderPanel2 = new Panel( {
+					renderTo : 'body',
+					title: "Hidden Header Panel #2",
+					html: "Hidden Header Panel #2 Body"
+				} );
+				hiddenHeaderPanel2.hideHeader();
+				jQuery( '<br>' ).appendTo( 'body' );
+				
+				
+				var shownHeaderPanel = new Panel( {
+					renderTo : 'body',
+					title: "Shown Header Panel",
+					html: "Shown Header Panel Body"
+				} );
+				jQuery( '<br>' ).appendTo( 'body' );
+				
+				
+				var shownHeaderPanel2 = new Panel( {
+					renderTo : 'body',
+					
+					title: "Shown Header Panel w/ Tool Buttons",
+					toolButtons : { toolType: 'close' },
+					
+					html: "Shown Header Panel w/ Tool Buttons Body"
+				} );
+				jQuery( '<br>' ).appendTo( 'body' );
+			} );
+		} );
+	</script>
+
+</head>
+
+<body>
+</body>
+</html>

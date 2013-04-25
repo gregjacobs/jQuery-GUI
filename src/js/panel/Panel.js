@@ -5,10 +5,10 @@ define( [
 	'jqc/util/Css',
 	'jqc/ComponentManager',
 	'jqc/Container',
-	'jqc/Label',
+	'jqc/panel/Header',
 	'jqc/template/LoDash',
 	'jqc/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
-], function( jQuery, _, Css, ComponentManager, Container, Label, LoDashTpl ) {
+], function( jQuery, _, Css, ComponentManager, Container, PanelHeader, LoDashTpl ) {
 
 	/**
 	 * @class jqc.panel.Panel
@@ -53,6 +53,12 @@ define( [
 		 * (i.e. bottom right of the Panel).
 		 */
 		
+		/**
+		 * @cfg {Boolean} headerHidden
+		 * 
+		 * `true` to initially hide the Panel's {@link #header}. Can be shown using {@link #showHeader}. 
+		 */
+		
 		
 		/**
 		 * @cfg
@@ -65,18 +71,9 @@ define( [
 		 * @inheritdoc
 		 */
 		renderTpl : new LoDashTpl( [
-			'<div id="<%= elId %>-header" class="<%= baseCls %>-header"><div class="jqc-clear" /></div>',
-			'<div id="<%= elId %>-body" class="<%= baseCls %>-body" <% if( bodyStyle ) { %>style="<%= bodyStyle %>"<% } %>></div>',
-			'<div id="<%= elId %>-footer" class="<%= baseCls %>-footer"><div class="jqc-clear" /></div>'
+			'<div id="<%= elId %>-body" class="<%= baseCls %>-body" <% if( bodyStyle ) { %>style="<%= bodyStyle %>"<% } %>></div>'
 		] ),
 		
-		
-		/**
-		 * @protected
-		 * @property {jQuery} $headerEl
-		 * 
-		 * A reference to the Panel's header container element. This will be available after the Panel is rendered.
-		 */
 		
 		/**
 		 * @protected
@@ -87,19 +84,12 @@ define( [
 		
 		/**
 		 * @protected
-		 * @property {jQuery} $footerEl
-		 * 
-		 * A reference to the Panel's footer container element. This will be available after the Panel is rendered.
-		 */
-		
-		/**
-		 * @protected
 		 * @property {jqc.Container} header
 		 * 
-		 * The Container which acts as the Panel's header. The header holds the title, and any  {@link #toolButtons} 
+		 * The Container which acts as the Panel's header. The header holds the {@link #title}, and any {@link #toolButtons} 
 		 * specified. 
 		 * 
-		 * Note that this Container is only created if a {@link #title} or tool buttons have been specified.
+		 * Note that this Container is only created if a {@link #title} or {@link #toolButtons} have been specified.
 		 */
 		
 		/**
@@ -115,16 +105,15 @@ define( [
 		/**
 		 * @inheritdoc
 		 */
-		initComponent : function() {			
-			if( this.title || this.toolButtons ) {
-				this.header = this.createHeader();
-			}
-			
-			if( this.buttons ) {
-				this.footer = this.createFooter();
-			}
-			
+		initComponent : function() {		
 			this._super( arguments );
+			
+			if( this.title || this.toolButtons ) {
+				this.doCreateHeader();
+			}
+			if( this.buttons ) {
+				this.doCreateFooter();
+			}
 		},
 		
 		
@@ -134,16 +123,13 @@ define( [
 		onRender : function() {
 			this._super( arguments );
 			
-			var elId = this.elId;
-			this.$headerEl = jQuery( '#' + elId + '-header' );
-			this.$bodyEl = jQuery( '#' + elId + '-body' );
-			this.$footerEl = jQuery( '#' + elId + '-footer' );
+			this.$bodyEl = jQuery( '#' + this.elId + '-body' );
 			
 			if( this.header ) {
-				this.header.render( this.$headerEl, /* prepend */ 0 );  // prepend before the "clear" el
+				this.header.render( this.$el, 0 );  // prepend before the body
 			}
 			if( this.footer ) {
-				this.footer.render( this.$footerEl, /* prepend */ 0 );  // prepend before the "clear" el
+				this.footer.render( this.$el );  // append after the body
 			}
 		},
 		
@@ -175,67 +161,56 @@ define( [
 		
 		
 		/**
-		 * Creates the {@link #header} Container, which contains the {@link #title} and any
-		 * {@link #toolButtons} configured.
+		 * Performs the creation of the {@link #header}, by calling {@link #createHeader}, and then applying 
+		 * any post-processing required (which includes rendering it as the first element in the Panel
+		 * itself if it is already rendered).
+		 * 
+		 * To create a different {@link #header} in a subclass, override {@link #createHeader} instead of this 
+		 * method.
 		 * 
 		 * @protected
-		 * @return {jqc.Container}
+		 */
+		doCreateHeader : function() {
+			this.header = this.createHeader();
+			this.header.setVisible( !this.headerHidden );
+			delete this.headerHidden;
+			
+			if( this.rendered ) {
+				this.header.render( this.$el, /* prepend */ 0 );  // prepend to make it the first element (i.e. before the body)
+			}
+		},
+		
+		
+		/**
+		 * Creates the {@link #header}, which contains the {@link #title} and any {@link #toolButtons} configured.
+		 * 
+		 * @protected
+		 * @return {jqc.panel.Header}
 		 */
 		createHeader : function() {
-			this.titleCmp = this.createTitleCmp();
-			this.toolButtonsCt = this.createToolButtonsCt();
+			return new PanelHeader( {
+				title       : this.title,
+				toolButtons : this.toolButtons
+			} );
+		},
+		
+		
+		/**
+		 * Performs the creation of the {@link #footer}, by calling {@link #createFooter}, and then applying 
+		 * any post-processing required (which includes rendering it as the last element in the Panel
+		 * itself if it is already rendered).
+		 * 
+		 * To create a different {@link #header} in a subclass, override {@link #createHeader} instead of this 
+		 * method.
+		 * 
+		 * @protected
+		 */
+		doCreateFooter : function() {
+			this.footer = this.createFooter();
 			
-			return new Container( {
-				cls   : this.baseCls + '-header-innerCt',
-				items : this.buildHeaderItems( this.titleCmp, this.toolButtonsCt )
-			} );
-		},
-		
-		
-		/**
-		 * Creates the title component. This is the component that the {@link #title}
-		 * config will be applied to, by default.
-		 * 
-		 * @protected
-		 * @return {jqc.Label}
-		 */
-		createTitleCmp : function() {
-			return new Label( {
-				cls  : this.baseCls + '-header-title',
-				text : this.title
-			} );
-		},
-		
-		
-		/**
-		 * Creates the tool buttons container.
-		 * 
-		 * @protected
-		 * @return {jqc.Container}
-		 */
-		createToolButtonsCt : function() {
-			return new Container( {
-				cls         : this.baseCls + '-header-toolButtons',
-				defaultType : 'toolbutton',   // jqc.panel.ToolButton
-				items       : this.toolButtons
-			} );
-		},
-		
-		
-		/**
-		 * Builds the array of the {@link #header header's} child items. The arguments are provided so they can be 
-		 * used to insert the components different positions in the items array in an override of this method.
-		 * 
-		 * @protected
-		 * @param {jqc.Label} titleCmp The title component, created by {@link #createTitleCmp}.
-		 * @param {jqc.Container} toolButtonsCt The tool buttons {@link jqc.Container Container}.
-		 * @return {Object[]}
-		 */
-		buildHeaderItems : function( titleCmp, toolButtonsCt ) {
-			return [
-				titleCmp,
-				toolButtonsCt
-			];
+			if( this.rendered ) {
+				this.footer.render( this.$el );  // append to make it the last element (i.e. after the body)
+			}
 		},
 		
 		
@@ -249,6 +224,7 @@ define( [
 			return new Container( {
 				cls    : this.baseCls + '-footer-innerCt',
 				layout : 'hbox',
+				
 				items  : [
 					{ type: 'component', flex: 1 },  // to push the buttons to the right
 					{
@@ -274,20 +250,59 @@ define( [
 		 */
 		setTitle : function( title ) {
 			if( !this.header ) {
-				this.header = this.createHeader();
-				
-				if( this.rendered ) {
-					this.header.render( this.$headerEl, /* prepend */ 0 );
-				}
+				this.doCreateHeader();
 			}
 			
 			this.title = title;
-			this.titleCmp.setText( title );
+			this.header.setTitle( title );
+			
+			return this;
+		},
+		
+		
+		/**
+		 * Retrieves the {@link #title} of the Panel.
+		 * 
+		 * @return {String} The title of the Panel.
+		 */
+		getTitle : function() {
+			return this.title;
+		},
+		
+		
+		/**
+		 * Shows the Panel's {@link #header}, if it is currently hidden.
+		 * 
+		 * @chainable
+		 */
+		showHeader : function() {
+			if( this.header ) {
+				this.header.show();
+			} else {
+				this.headerHidden = false;  // in case the header hasn't been created yet, we'll use this for when it is
+			}
+			
+			return this;
+		},
+		
+		
+		/**
+		 * Hides the Panel's {@link #header}, if it is currently visible.
+		 * 
+		 * @chainable
+		 */
+		hideHeader : function() {
+			if( this.header ) {
+				this.header.hide();
+			} else {
+				this.headerHidden = true;  // in case the header hasn't been created yet, we'll use this for when it is
+			}
 			
 			return this;
 		}
 		
 	} );
+	
 	
 	ComponentManager.registerType( 'panel', Panel );
 	

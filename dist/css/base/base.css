@@ -1104,16 +1104,6 @@ iframe.jqc-form-DropdownField-shim {
   clear: both;
 }
 
-/* line 6, ../../../src/css/base/panel/_Panel.scss */
-.jqc-Panel-header-title {
-  float: left;
-}
-
-/* line 7, ../../../src/css/base/panel/_Panel.scss */
-.jqc-Panel-header-toolButtons {
-  float: right;
-}
-
 /* line 3, ../../../src/css/base/panel/_ToolButton.scss */
 .jqc-ToolButton .jqc-Button-text {
   padding: 0;
@@ -1131,7 +1121,7 @@ iframe.jqc-form-DropdownField-shim {
 }
 
 /* General Styles */
-/* line 18, ../../../src/css/base/base.scss */
+/* line 19, ../../../src/css/base/base.scss */
 .jqc-clear {
   clear: both;
 }
