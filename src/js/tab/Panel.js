@@ -106,7 +106,7 @@ define( [
 			
 			this._super( arguments );
 			
-			this.layout.setActiveItem( this.activeTab );
+			this.setActiveTab( this.activeTab );
 			this.layout.on( 'cardchange', this.onTabChange, this );
 		},
 		
@@ -202,8 +202,11 @@ define( [
 				panel = this.getItemAt( panel );
 			}
 			
-			if( this.fireEvent( 'beforetabchange', this, panel, this.getActiveTab() ) !== false ) {
+			var previousActiveTab = this.getActiveTab();
+			if( this.fireEvent( 'beforetabchange', this, panel, previousActiveTab ) !== false ) {
 				this.layout.setActiveItem( panel );
+				
+				this.tabBar.setActiveTab( panel );  // set the active tab based on the corresponding active Panel
 			}
 		},
 		

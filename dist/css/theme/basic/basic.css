@@ -90,6 +90,11 @@
   background-image: url("../../../../resources/img/icons/ui-icons_222222_256x240.png");
 }
 
+/* line 2, ../../../../src/css/theme/basic/tab/_Tab.scss */
+.jqc-TabPanel-Tab-active {
+  background-color: #DDD;
+}
+
 /* line 1, ../../../../src/css/theme/basic/window/_Window.scss */
 .jqc-Window {
   border-color: #000;
