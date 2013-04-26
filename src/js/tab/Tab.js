@@ -24,6 +24,13 @@ define( [
 		 */
 		
 		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'jqc-TabPanel-Tab',
+		
+		
+		/**
 		 * @inheritdoc
 		 */
 		initComponent : function() {
