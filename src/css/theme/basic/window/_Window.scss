@@ -3,7 +3,7 @@
 .jqc-Window-header { border-color: #000; border-style: solid; border-width: 1px 0 0 0; background-color: #2383B3; }
 .jqc-Window-header-title { font-weight: bold; color: #FFF; }
 .jqc-Window-header-toolButtons { 
-	@extend .jqc-Panel-header-toolButtons
+	@extend .jqc-Panel-Header-toolButtons
 }
 
 .jqc-Window-body { border-color: #000; border-style: solid; border-width: 1px 0 0 0; background-color: #FFF; }
