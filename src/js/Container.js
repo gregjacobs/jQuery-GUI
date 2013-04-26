@@ -414,7 +414,7 @@ define( [
 		/**
 		 * Removes one or more child {@link jqc.Component Component(s)} from this Container.  
 		 * 
-		 * Removed {@link jqc.Component Components} will automatically have their {@link jqc.Component#destroy} method called if 
+		 * Removed {@link jqc.Component Components} will automatically have their {@link jqc.Component#method-destroy} method called if 
 		 * the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is explicitly set to true. 
 		 * If the Component is not destroyed, its main {@link jqc.Component#$el element} is detached from this Container.  When all 
 		 * Components are removed, this method automatically calls {@link #doLayout} to refresh the layout.
@@ -460,7 +460,7 @@ define( [
 		 * Removes the child Component at the given `idx`, and returns the removed component. If there is no component 
 		 * at the given `idx`, then this method has no effect and returns `null`.
 		 * 
-		 * Note that the removed {@link jqc.Component Component} will automatically have its {@link jqc.Component#destroy destroy} 
+		 * Note that the removed {@link jqc.Component Component} will automatically have its {@link jqc.Component#method-destroy destroy} 
 		 * method called if the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is 
 		 * explicitly set to true. If the Component is not destroyed, its main {@link jqc.Component#$el element} is detached from 
 		 * this Container.  

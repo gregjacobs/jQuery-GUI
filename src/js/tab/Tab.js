@@ -53,7 +53,7 @@ define( [
 		
 		
 		/**
-		 * Retrieves the {@link #panel} that this Tab corresponds to in the parent {@link jqc.tab.Panel TabPanel}.
+		 * Retrieves the {@link jqc.panel.Panel Panel} that this Tab corresponds to in the parent {@link jqc.tab.Panel TabPanel}.
 		 * 
 		 * @return {jqc.panel.Panel}
 		 */
