@@ -200,115 +200,6 @@ define('jqc/Jqc', [
 	
 } );
 /*global define */
-define('jqc/ComponentManager', [
-	'require'
-], function( require ) {
-	
-	/**
-	 * @class jqc.ComponentManager
-	 *
-	 * Object used to manage {@link jqc.Component} "types", and handles instantiating them based on the string that is specified
-	 * for them in the manifest.  
-	 *
-	 * @singleton
-	 */
-	var ComponentManager = {
-		
-		/**
-		 * @private
-		 * @property {Object} componentClasses
-		 * 
-		 * An Object (map) of the {@link jqc.Component} classes which have been {@link #registerType registered}, 
-		 * keyed by their type name. 
-		 */
-		componentClasses : {},
-	   
-	   
-		/**
-		 * Registers a given class with a `type` name. This is used to map the type names specified in Bit manifests
-		 * to the class that should be instantiated.  Note that type names are case-insensitive.
-		 * 
-		 * This method will throw an error if a type name is already registered, to assist in making sure that we don't get
-		 * unexpected behavior from a type name being overwritten.
-		 * 
-		 * @method registerType
-		 * @param {String} type The type name of registered class.
-		 * @param {Function} jsClass The class (constructor function) to register.
-		 */
-		registerType : function( type, jsClass ) {
-			type = type.toLowerCase();
-			
-			if( !this.componentClasses[ type ] ) { 
-				this.componentClasses[ type ] = jsClass;
-			} else {
-				throw new Error( "Error: jqc.ComponentManager already has a type '" + type + "'" );
-			}
-		},
-		
-		
-		/**
-		 * Retrieves the Component class (constructor function) that has been registered by the supplied `type` name. 
-		 * 
-		 * @method getType
-		 * @param {String} type The type name of the registered class.
-		 * @return {Function} The class (constructor function) that has been registered under the given type name.
-		 */
-		getType : function( type ) {
-			return this.componentClasses[ type.toLowerCase() ];
-		},
-		
-		
-		/**
-		 * Determines if the ComponentManager has (i.e. can instantiate) a given `type`.
-		 * 
-		 * @method hasType
-		 * @param {String} type
-		 * @return {Boolean} True if the ComponentManager has the given type.
-		 */
-		hasType : function( type ) {
-			if( !type ) {  // any falsy type value given, return false
-				return false;
-			} else {
-				return !!this.componentClasses[ type.toLowerCase() ];
-			}
-		},
-		
-		
-		/**
-		 * Creates (instantiates) a {@link jqc.Component Component} based on its type name, given
-		 * a configuration object that has a `type` property. If an already-instantiated 
-		 * {@link jqc.Component Component} is provided, it will simply be returned unchanged.
-		 * 
-		 * @method create
-		 * @param {Object} config The configuration object for the Component. Config objects should have the property `type`, 
-		 *   which determines which type of {@link jqc.Component Component} will be instantiated. If the object does not
-		 *   have a `type` property, it will default to "container", which makes it simple to create things like tab containers. 
-		 *   Note that already-instantiated {@link jqc.Component Components} will simply be returned unchanged. 
-		 * @return {jqc.Component} The instantiated Component.
-		 */
-		create : function( config ) {
-			var type = config.type ? config.type.toLowerCase() : undefined,
-			    Component = require( 'jqc/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (jqc.Component depends on jqc.ComponentManager)
-			
-			if( config instanceof Component ) {
-				// Already a Component instance, return it
-				return config;
-				
-			} else if( this.hasType( type || "container" ) ) {
-				return new this.componentClasses[ type || "container" ]( config );
-				
-			} else {
-				// No registered type with the given type, throw an error
-				throw new Error( "ComponentManager.create(): Unknown type: '" + type + "'" );
-			}
-		}
-		
-	};
-	
-	return ComponentManager;
-	
-} );
-/*global define */
 define('jqc/util/Css', [
 	'jquery',
 	'lodash',
@@ -1447,22 +1338,136 @@ define('jqc/template/LoDash', [
 	
 } );
 /*global define */
+define('jqc/ComponentManager', [
+	'require',
+	'jqc/Component'  // loaded via require() call in the code below, as it is a circular dependency
+], function( require ) {
+	
+	/**
+	 * @class jqc.ComponentManager
+	 *
+	 * Object used to manage {@link jqc.Component} "types", and handles instantiating them based on the string that is specified
+	 * for them in the manifest.  
+	 *
+	 * @singleton
+	 */
+	var ComponentManager = {
+		
+		/**
+		 * @private
+		 * @property {Object} componentClasses
+		 * 
+		 * An Object (map) of the {@link jqc.Component} classes which have been {@link #registerType registered}, 
+		 * keyed by their type name. 
+		 */
+		componentClasses : {},
+	   
+	   
+		/**
+		 * Registers a given class with a `type` name. This is used to map the type names specified in Bit manifests
+		 * to the class that should be instantiated.  Note that type names are case-insensitive.
+		 * 
+		 * This method will throw an error if a type name is already registered, to assist in making sure that we don't get
+		 * unexpected behavior from a type name being overwritten.
+		 * 
+		 * @method registerType
+		 * @param {String} type The type name of registered class.
+		 * @param {Function} jsClass The class (constructor function) to register.
+		 */
+		registerType : function( type, jsClass ) {
+			type = type.toLowerCase();
+			
+			if( !this.componentClasses[ type ] ) { 
+				this.componentClasses[ type ] = jsClass;
+			} else {
+				throw new Error( "Error: jqc.ComponentManager already has a type '" + type + "'" );
+			}
+		},
+		
+		
+		/**
+		 * Retrieves the Component class (constructor function) that has been registered by the supplied `type` name. 
+		 * 
+		 * @method getType
+		 * @param {String} type The type name of the registered class.
+		 * @return {Function} The class (constructor function) that has been registered under the given type name.
+		 */
+		getType : function( type ) {
+			return this.componentClasses[ type.toLowerCase() ];
+		},
+		
+		
+		/**
+		 * Determines if the ComponentManager has (i.e. can instantiate) a given `type`.
+		 * 
+		 * @method hasType
+		 * @param {String} type
+		 * @return {Boolean} True if the ComponentManager has the given type.
+		 */
+		hasType : function( type ) {
+			if( !type ) {  // any falsy type value given, return false
+				return false;
+			} else {
+				return !!this.componentClasses[ type.toLowerCase() ];
+			}
+		},
+		
+		
+		/**
+		 * Creates (instantiates) a {@link jqc.Component Component} based on its type name, given
+		 * a configuration object that has a `type` property. If an already-instantiated 
+		 * {@link jqc.Component Component} is provided, it will simply be returned unchanged.
+		 * 
+		 * @method create
+		 * @param {Object} config The configuration object for the Component. Config objects should have the property `type`, 
+		 *   which determines which type of {@link jqc.Component Component} will be instantiated. If the object does not
+		 *   have a `type` property, it will default to "container", which makes it simple to create things like tab containers. 
+		 *   Note that already-instantiated {@link jqc.Component Components} will simply be returned unchanged. 
+		 * @return {jqc.Component} The instantiated Component.
+		 */
+		create : function( config ) {
+			var type = config.type ? config.type.toLowerCase() : undefined,
+			    Component = require( 'jqc/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (jqc.Component depends on jqc.ComponentManager)
+			
+			if( config instanceof Component ) {
+				// Already a Component instance, return it
+				return config;
+				
+			} else if( type === 'component' ) {  // special case, added to get around the RequireJS circular dependency issue where Component can't register itself with the ComponentManager
+				return new Component( config );
+				
+			} else if( this.hasType( type || "container" ) ) {
+				return new this.componentClasses[ type || "container" ]( config );
+				
+			} else {
+				// No registered type with the given type, throw an error
+				throw new Error( "ComponentManager.create(): Unknown type: '" + type + "'" );
+			}
+		}
+		
+	};
+	
+	return ComponentManager;
+	
+} );
+/*global define */
 define('jqc/Component', [
+	'require',
 	'jquery',
 	'lodash',
 	'Class',
 	'jqc/Jqc',
 	'Observable',
-	'jqc/ComponentManager',
 	'jqc/util/Css',
 	'jqc/util/Html',
 	'jqc/Mask',
 	'jqc/anim/Animation',
 	'jqc/plugin/Plugin',
 	'jqc/template/Template',
-	'jqc/template/LoDash'
+	'jqc/template/LoDash',
+	'jqc/ComponentManager'   // circular dependency. used via require() call in code below
 ],
-function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
+function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
 
 	/**
 	 * @class jqc.Component
@@ -1490,15 +1495,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		/**
 		 * @cfg {String} id
 		 *  
-		 * The id that identifies this Component instance. Defaults to a unique id, and may be retrieved by {@link #getId}. 
-		 * This component is retrievable from a {@link jqc.Container} via {@link jqc.Container#findById}.
-		 */
-		 
-		/**
-		 * @cfg {String} elId
-		 * 
-		 * The id that should be used for the Component's element. Defaults to a unique id.
-		 * If this config is not provided, the unique id is generated when the Component is {@link #method-render rendered}.
+		 * The id that identifies this Component instance. Defaults to a unique id, and may be retrieved by {@link #getId}.
 		 */
 		
 		/**
@@ -1600,7 +1597,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * that should be the target of the {@link #html}, {@link #contentEl}, and {@link #tpl} configs. For example:
 		 * 
 		 *     renderTpl : new LoDashTpl( [
-		 *         '<div id="<%= elId %>-titlebar">',  // `elId` var is automatically provided in the {@link #renderTplData}, from the {@link #elId} config - See {@link #renderTplData}
+		 *         '<div id="<%= elId %>-titlebar">',  // `elId` var is automatically provided in the {@link #renderTplData}, from the unique {@link #elId} property - See {@link #renderTplData}
 		 *             '<%= title %>',                 // `title` var would need to be provided in the {@link #renderTplData} by subclass
 		 *         '</div>',
 		 *         '<div id="<%= elId %>-body"></div>'
@@ -1645,7 +1642,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * A set of common properties will always be available on this object for the {@link #renderTpl} (which are supplied by the 
 		 * {@link #getRenderTplData} method), including:
 		 * 
-		 * - **elId**: The value of the {@link #elId} config, or its auto-generated value.
+		 * - **elId**: The value of the {@link #elId} property (an auto-generated, unique value).
 		 * - **baseCls**: The {@link #baseCls} config, which is the base CSS class to prefix descendent elements' CSS
 		 *   classes with. Ex: a {@link #baseCls} of 'jqc-Panel' is used to prefix a {@link jqc.panel.Panel Panel's} body
 		 *   element to become 'jqc-Panel-body', but when a {@link jqc.window.Window Window} is created, the value is
@@ -1768,9 +1765,23 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		
 		/**
 		 * @private
-		 * @property {Number} uuid
+		 * @property {String} uuid (readonly)
 		 * 
-		 * A globally unique identifier for the Component, which is different between all {@link jqc.Container} heirarchies.
+		 * A unique identifier for the Component, which is unique among all Components on a given page. Can be
+		 * retrieved with {@link #getUuid}.
+		 */
+		 
+		/**
+		 * @protected
+		 * @property {String} elId (readonly)
+		 * 
+		 * The unique id that is generated for the Component's {@link #$el element}. This is different than {@link #id} so that 
+		 * each Component is always guaranteed to have a unique ID for its {@link #$el element}. 
+		 * 
+		 * Component subclasses often query the DOM for the elements that they create in a {@link #renderTpl} based on this elId. 
+		 * If we only used {@link #id} to uniquely identify elements, then there would be the possibility that the user could
+		 * accidentally create two components with the same {@link #id}, in which case the second Component would actually 
+		 * query and be operating on the DOM elements created for the first Component by mistake.
 		 */
 		
 		/**
@@ -2047,13 +2058,11 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 			);
 			
 			
-			// Generate a globally unique identifier for the Component, which is unique between all Container hierarchies on the page
-			this.uuid = _.uniqueId();
+			// Generate a globally unique identifier for the Component, which is unique for all Components on the page.
+			// This will also be used as the `elId`, and the default value for the `id` config if one was not provided.
+			this.uuid = this.elId = 'jqc-cmp-' + _.uniqueId();
+			this.id = this.id || this.uuid;  // default the Component's id to the uuid if not provided
 			
-			
-			// Generate a unique ID for this component (which is the ID for a component in a given Container hierarchy). A unique element 
-			// ID for the component's div element will be created (if not provided) in render().
-			this.id = this.id || 'jqc-cmp-' + _.uniqueId();
 			
 			// Normalize the 'plugins' config into an array before calling initComponent, so that subclasses may just push any
 			// plugins that they wish directly onto the array without extra processing.
@@ -2174,9 +2183,6 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 				}
 				
 			} else {
-				// First, generate an element ID for the component's element, if one has not been provided as a config
-				this.elId = this.elId || 'jqc-cmp-' + _.uniqueId();
-				
 				// Handle any additional attributes (the `attr` config) that were specified to add (or any attributes
 				// added by subclass implementations of getRenderAttributes())
 				var attr = Html.attrMapToString( this.getRenderAttributes() );
@@ -2657,8 +2663,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		/**
 		 * Returns the globally unique {@link #uuid} of this Component.
 		 * 
-		 * @method getUuid
-		 * @return {Number}
+		 * @return {String}
 		 */
 		getUuid : function() {
 			return this.uuid;
@@ -3460,7 +3465,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 */
 		findParentByType : function( type ) {
 			if( typeof type === 'string' ) {
-				type = ComponentManager.getType( type );
+				type = require( 'jqc/ComponentManager' ).getType( type );
 				
 				// No type found for the given type name, return null immediately
 				if( !type ) {
@@ -3543,11 +3548,15 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 	} );
 	
 	
-	ComponentManager.registerType( 'component', Component );
+	// NOTE: Due to circular dependency issues with RequireJS, ComponentManager automatically registers this class with
+	// the type string 'component'. Leaving below line commented as a reminder. Even if we add an async require() call here,
+	// it is possible that the Component class is still not registered in time for use.
+	//ComponentManager.registerType( 'component', Component );   -- leave as reminder
 
 	return Component;
 	
 } );
+
 /*global define */
 define('jqc/layout/Layout', [
 	'lodash',
@@ -4385,17 +4394,19 @@ define('jqc/Container', [
 	
 	
 		/**
-		 * Removes child {@link jqc.Component Component(s)} from this Container.  Removed {@link jqc.Component Components} will automatically have
-		 * their destroy() method called if the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is explicitly set to true.
-		 * If the Component is not destroyed, its main {@link jqc.Component#$el element} is detached from this Container.  When all Components are removed,
-		 * this method automatically calls {@link #doLayout} to refresh the layout.
+		 * Removes one or more child {@link jqc.Component Component(s)} from this Container.  
+		 * 
+		 * Removed {@link jqc.Component Components} will automatically have their {@link jqc.Component#destroy} method called if 
+		 * the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is explicitly set to true. 
+		 * If the Component is not destroyed, its main {@link jqc.Component#$el element} is detached from this Container.  When all 
+		 * Components are removed, this method automatically calls {@link #doLayout} to refresh the layout.
 		 *
 		 * Note that if multiple Components are being removed, it is recommended that they all be provided to this method
 		 * in one call, using the array form of the `cmp` argument.  A call to {@link #doLayout} will only be done
-		 * after all Components have been removed (and not once for each Component that is removed).
+		 * after all Components have been removed (as opposed to once for each Component that is removed).
 		 *
-		 * The 'remove' event will be fired for each Component that is successfully removed (i.e. the Component was found in the Container, and a
-		 * {@link #beforeremove} event handler did not return false for it).
+		 * The 'remove' event will be fired for each Component that is successfully removed (i.e. the Component was found in the 
+		 * Container, and a {@link #beforeremove} event handler did not return false for it).
 		 *
 		 * @method remove
 		 * @param {jqc.Component/jqc.Component[]} cmp A single child {@link jqc.Component Component}, or an array of child Components.
@@ -4425,12 +4436,33 @@ define('jqc/Container', [
 	
 			return returnVal;
 		},
+		
+		
+		/**
+		 * Removes the child Component at the given `idx`, and returns the removed component. If there is no component 
+		 * at the given `idx`, then this method has no effect and returns `null`.
+		 * 
+		 * Note that the removed {@link jqc.Component Component} will automatically have its {@link jqc.Component#destroy destroy} 
+		 * method called if the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is 
+		 * explicitly set to true. If the Component is not destroyed, its main {@link jqc.Component#$el element} is detached from 
+		 * this Container.  
+		 * 
+		 * When the Component is removed, this method automatically calls {@link #doLayout} to refresh the layout.
+		 * 
+		 * The 'remove' event will be fired for each Component that is successfully removed (i.e. the Component was found in the 
+		 * Container, and a {@link #beforeremove} event handler did not return false for it).
+		 * 
+		 * @param {Number} idx The index of the child component to remove.
+		 * @return {jqc.Component} Returns the Component that was removed, or `null` if there was no Component at the given `idx`.
+		 */
+		removeAt : function( idx ) {
+			return this.remove( this.getItemAt( idx ) );
+		},
 	
 	
 		/**
 		 * Removes all child Component(s) from this Container.
 		 *
-		 * @method removeAll
 		 * @param {Boolean} destroyRemoved (optional) True to automatically destroy the removed components. Defaults to the value of this Container's {@link #destroyRemoved} config.
 		 */
 		removeAll : function( destroyRemoved ) {
@@ -5195,6 +5227,310 @@ define('jqc/Label', [
 	
 } );
 /*global define */
+define('jqc/layout/HBox', [
+	'jquery',
+	'jqc/Component',
+	'jqc/Container',
+	'jqc/layout/Layout'
+], function( jQuery, Component, Container, Layout ) {
+
+	/**
+	 * @class jqc.layout.HBox
+	 * @extends jqc.layout.Layout
+	 * @alias layout.hbox
+	 * 
+	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
+	 * in the Container that should have a flexible width that proportionally should take up the remaining area of its parent
+	 * element should have a special property named {@link #flex}, that determines how wide the box should be in relation to the
+	 * available area.  This property is a number, relative to other children. If a {@link #flex} not provided, the layout uses 
+	 * the component's width instead.
+	 */
+	var HBoxLayout = Layout.extend( {
+		
+		/**
+		 * @cfg {Number} flex
+		 * This config is to be placed on **child components** of the {@link #container}. The number is a ratio
+		 * of how much space the child component should take up in relation to the remaining space in the target
+		 * element, and based on other child components' flex values.
+		 * 
+		 * For example, the following configuration would make component #1 have ~33% width, and component #2 have
+		 * ~67% width.
+		 * 
+		 *     layout : 'hbox',
+		 *     items : [
+		 *         {
+		 *             flex : 1,
+		 *             html : "I'm at 33% width"
+		 *         },
+		 *         {
+		 *             flex : 2,
+		 *             html : "I'm at 67% width"
+		 *         }
+		 *     ]
+		 * 
+		 * Other components may also exist in the {@link #container} that do not have a {@link #flex} value. These will be sized,
+		 * and components *with* a {@link #flex} value will be flexed into the *remaining* space that is not taken up by the other
+		 * components. Example:
+		 * 
+		 *     width : 100,    // not necessary, but just for example purposes
+		 *     layout : 'hbox',
+		 *     
+		 *     items : [
+		 *         {
+		 *             html : "I will be sized based on my content. Let's say my width is 20px though, for argument's sake"
+		 *         },
+		 *         {
+		 *             flex : 1,
+		 *             html : "Since the previous component is 20px wide, I will take up the remaining 80px of space"
+		 *         }
+		 *     ]
+		 */
+		
+		/**
+		 * @protected
+		 * @property {jQuery} $clearEl
+		 * 
+		 * The element used to clear the floats created by the layout routine.
+		 */
+		
+		
+		/**
+		 * Hook method for subclasses to override to implement their layout strategy. Implements the HBoxLayout algorithm.
+		 * 
+		 * @protected
+		 * @template
+		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
+		 */
+		onLayout : function( childComponents, $targetEl ) {
+			this._super( arguments );
+			
+			
+			//debugger;
+			var flexedComponents = [],
+			    totalFlex = 0,
+			    totalUnflexedWidth = 0,
+			    i, len, childComponent, numChildComponents = childComponents.length;
+			
+			// First, render and lay out each of the child components that don't have a 'flex' value.
+			// While we're at it, we'll add up the total flex that components which *do* have a flex value have.
+			for( i = 0; i < numChildComponents; i++ ) {
+				childComponent = childComponents[ i ];
+				
+				// Add the CSS class to components to be able to place them in an HBox layout. This adds `float:left;`,
+				// and a few other fixing styles.
+				childComponent.addCls( 'jqc-layout-HBox-component' );
+				
+				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
+				this.renderComponent( childComponent, $targetEl, { position: i } );
+				
+				// Only process the child component if it is not hidden
+				if( !childComponent.isHidden() ) {
+					if( !childComponent.flex ) {
+						// Not a flexed component, do its layout
+						childComponent.doLayout();
+						
+						// Sadly, the element being measured may have a sub-pixel width, but jQuery returns the floor value of 
+						// it. And in this case, we would get float wrapping because the sum of the actual widths would be greater 
+						// than the container width after flex values are computed. So simply adding one pixel as a workaround
+						// at this point. May have to do something different in the future, with a table layout.
+						totalUnflexedWidth += Math.floor( 1 + childComponent.getOuterWidth( /* includeMargin */ true ) );
+						
+					} else {
+						// Flexed component: push it onto the flexed components processing array for the next step
+						flexedComponents.push( childComponent );
+						totalFlex += childComponent.flex;
+					}
+				}
+			}
+			
+			// Now go through and size the other child components based on their flex values and the remaining space.
+			if( totalFlex > 0 ) {
+				var targetWidth = $targetEl.width(),
+				    targetHeight = $targetEl.height(),
+				    remainingTargetWidth = targetWidth - totalUnflexedWidth,
+				    trimmedPixels = 0;  // Stores the decimal values resulting in the division of the remainingTargetWidth divided by the flex value. 
+				                        // The pixels that are trimmed off of each of the child components is added to the last item to fill the extra space.
+				
+				for( i = 0, len = flexedComponents.length; i < len; i++ ) {
+					childComponent = flexedComponents[ i ];
+					
+					// Now size the flexed component based on the flex value
+					var newChildWidth = ( childComponent.flex / totalFlex ) * remainingTargetWidth;
+					trimmedPixels += newChildWidth % 1;            // take the decimal value from the child height. Ex: 3.25 % 1 == 0.25  (We'll use this later).
+					newChildWidth = Math.floor( newChildWidth );  // and do the actual trimming off of the decimal for the new child height
+					
+					// If sizing the last component, add in (the smallest whole number of) the decimal value pixels that were trimmed from previous components
+					if( i === len - 1 ) {
+						newChildWidth += Math.floor( trimmedPixels );
+					}
+					
+					this.sizeComponent( childComponent, newChildWidth, undefined );
+				}
+			}
+			
+			if( !this.$clearEl ) {
+				this.$clearEl = jQuery( '<div class="jqc-layout-HBox-clear" />' );  // to clear the floats
+			}
+			$targetEl.append( this.$clearEl );
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onDestroy : function() {
+			if( this.$clearEl ) {
+				this.$clearEl.remove();
+			}
+			
+			this._super( arguments );
+		}
+		
+	} );
+	
+	
+	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
+	Container.registerLayout( 'hbox', HBoxLayout );
+	
+	return HBoxLayout;
+	
+} );
+
+/*global define */
+define('jqc/panel/Header', [
+	'jqc/Container',
+	'jqc/Label',
+	'jqc/layout/HBox'
+], function( Container, Label ) {
+	
+	/**
+	 * @class jqc.panel.Header
+	 * @extends jqc.Container
+	 * 
+	 * Specialized Container subclass which is used as a {@link jqc.panel.Panel Panel's} header.
+	 */
+	var PanelHeader = Container.extend( {
+		
+		/**
+		 * @cfg {String} title
+		 * 
+		 * The title of the Panel, which is placed in the {@link #titleLabel}.
+		 */
+		
+		/**
+		 * @cfg {Object/Object[]/jqc.panel.ToolButton/jqc.panel.ToolButton[]} toolButtons
+		 * 
+		 * One or more {@link jqc.panel.ToolButton ToolButtons} or ToolButton config objects. These will
+		 * be placed on the right side of the header.
+		 */
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		layout : 'hbox',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'jqc-Panel-Header',
+		
+		
+		/**
+		 * @protected
+		 * @property {jqc.Label} titleLabel
+		 * 
+		 * The label component for the title.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {jqc.Container} toolButtonsCt
+		 * 
+		 * The Container that holds the {@link #toolButtons}.
+		 */
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		initComponent : function() {
+			this.titleLabel = this.createTitleLabel();
+			this.toolButtonsCt = this.createToolButtonsCt();
+			
+			this.items = this.buildItems();
+			
+			this._super( arguments );
+		},
+		
+		
+		/**
+		 * Builds the array of the header's child items.
+		 * 
+		 * @protected
+		 * @return {Object/Object[]} The child item(s).
+		 */
+		buildItems : function() {
+			return [
+				this.titleLabel,
+				
+				{ type: 'component', flex: 1 },  // take up the middle space, to effectively right-align the tool buttons
+				
+				this.toolButtonsCt
+			];
+		},
+			
+			
+		/**
+		 * Creates the title component. This is the component that the {@link #title}
+		 * config will be applied to, by default.
+		 * 
+		 * @protected
+		 * @return {jqc.Label}
+		 */
+		createTitleLabel : function() {
+			return new Label( {
+				cls  : this.componentCls + '-title',
+				text : this.title
+			} );
+		},
+		
+		
+		/**
+		 * Creates the tool buttons container.
+		 * 
+		 * @protected
+		 * @return {jqc.Container}
+		 */
+		createToolButtonsCt : function() {
+			return new Container( {
+				cls         : this.componentCls + '-toolButtons',
+				defaultType : 'toolbutton',   // jqc.panel.ToolButton
+				items       : this.toolButtons
+			} );
+		},
+		
+		
+		// ------------------------------------
+		
+		
+		/**
+		 * Sets the text in the {@link #titleLabel}.
+		 * 
+		 * @param {String} title
+		 */
+		setTitle : function( title ) {
+			this.titleLabel.setText( title );
+		}
+		
+	} );
+	
+	return PanelHeader;
+	
+} );
+/*global define */
 define('jqc/button/Button', [
 	'jquery',
 	'lodash',
@@ -5263,12 +5599,6 @@ define('jqc/button/Button', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		elType : 'button',
-		
-		/**
-		 * @cfg
-		 * @inheritdoc
-		 */
 		baseCls : 'jqc-Button',
 		
 		/**
@@ -5277,7 +5607,9 @@ define('jqc/button/Button', [
 		 */
 		renderTpl : new LoDashTpl( [
 			'<span class="<%= baseCls %>-icon <%= baseCls %>-icon-left <%= leftIconElCls %>"></span>',
-			'<span id="<%= elId %>-text" class="<%= baseCls %>-text <%= textElCls %>" title="<%= tooltip %>"><%= text %></span>',
+			'<a id="<%= elId %>-text" class="<%= baseCls %>-text <%= textElCls %>" href="javascript:;" title="<%= tooltip %>">',
+				'<%= text %>',
+			'</a>',
 			'<span class="<%= baseCls %>-icon <%= baseCls %>-icon-right <%= rightIconElCls %>"></span>'
 		] ),
 		
@@ -5580,10 +5912,10 @@ define('jqc/panel/Panel', [
 	'jqc/util/Css',
 	'jqc/ComponentManager',
 	'jqc/Container',
-	'jqc/Label',
+	'jqc/panel/Header',
 	'jqc/template/LoDash',
 	'jqc/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
-], function( jQuery, _, Css, ComponentManager, Container, Label, LoDashTpl ) {
+], function( jQuery, _, Css, ComponentManager, Container, PanelHeader, LoDashTpl ) {
 
 	/**
 	 * @class jqc.panel.Panel
@@ -5612,6 +5944,7 @@ define('jqc/panel/Panel', [
 		 * 
 		 * The title of the Panel.
 		 */
+		title : "",
 		
 		/**
 		 * @cfg {Object/Object[]/jqc.panel.ToolButton/jqc.panel.ToolButton[]} toolButtons
@@ -5628,6 +5961,12 @@ define('jqc/panel/Panel', [
 		 * (i.e. bottom right of the Panel).
 		 */
 		
+		/**
+		 * @cfg {Boolean} headerHidden
+		 * 
+		 * `true` to initially hide the Panel's {@link #header}. Can be shown using {@link #showHeader}. 
+		 */
+		
 		
 		/**
 		 * @cfg
@@ -5640,18 +5979,9 @@ define('jqc/panel/Panel', [
 		 * @inheritdoc
 		 */
 		renderTpl : new LoDashTpl( [
-			'<div id="<%= elId %>-header" class="<%= baseCls %>-header"><div class="jqc-clear" /></div>',
-			'<div id="<%= elId %>-body" class="<%= baseCls %>-body" <% if( bodyStyle ) { %>style="<%= bodyStyle %>"<% } %>></div>',
-			'<div id="<%= elId %>-footer" class="<%= baseCls %>-footer"><div class="jqc-clear" /></div>'
+			'<div id="<%= elId %>-body" class="<%= baseCls %>-body" <% if( bodyStyle ) { %>style="<%= bodyStyle %>"<% } %>></div>'
 		] ),
 		
-		
-		/**
-		 * @protected
-		 * @property {jQuery} $headerEl
-		 * 
-		 * A reference to the Panel's header container element. This will be available after the Panel is rendered.
-		 */
 		
 		/**
 		 * @protected
@@ -5662,19 +5992,12 @@ define('jqc/panel/Panel', [
 		
 		/**
 		 * @protected
-		 * @property {jQuery} $footerEl
-		 * 
-		 * A reference to the Panel's footer container element. This will be available after the Panel is rendered.
-		 */
-		
-		/**
-		 * @protected
 		 * @property {jqc.Container} header
 		 * 
-		 * The Container which acts as the Panel's header. The header holds the title, and any  {@link #toolButtons} 
+		 * The Container which acts as the Panel's header. The header holds the {@link #title}, and any {@link #toolButtons} 
 		 * specified. 
 		 * 
-		 * Note that this Container is only created if a {@link #title} or tool buttons have been specified.
+		 * Note that this Container is only created if a {@link #title} or {@link #toolButtons} have been specified.
 		 */
 		
 		/**
@@ -5690,16 +6013,15 @@ define('jqc/panel/Panel', [
 		/**
 		 * @inheritdoc
 		 */
-		initComponent : function() {			
-			if( this.title || this.toolButtons ) {
-				this.header = this.createHeader();
-			}
-			
-			if( this.buttons ) {
-				this.footer = this.createFooter();
-			}
-			
+		initComponent : function() {		
 			this._super( arguments );
+			
+			if( this.title || this.toolButtons ) {
+				this.doCreateHeader();
+			}
+			if( this.buttons ) {
+				this.doCreateFooter();
+			}
 		},
 		
 		
@@ -5709,16 +6031,13 @@ define('jqc/panel/Panel', [
 		onRender : function() {
 			this._super( arguments );
 			
-			var elId = this.elId;
-			this.$headerEl = jQuery( '#' + elId + '-header' );
-			this.$bodyEl = jQuery( '#' + elId + '-body' );
-			this.$footerEl = jQuery( '#' + elId + '-footer' );
+			this.$bodyEl = jQuery( '#' + this.elId + '-body' );
 			
 			if( this.header ) {
-				this.header.render( this.$headerEl, /* prepend */ 0 );  // prepend before the "clear" el
+				this.header.render( this.$el, 0 );  // prepend before the body
 			}
 			if( this.footer ) {
-				this.footer.render( this.$footerEl, /* prepend */ 0 );  // prepend before the "clear" el
+				this.footer.render( this.$el );  // append after the body
 			}
 		},
 		
@@ -5750,67 +6069,56 @@ define('jqc/panel/Panel', [
 		
 		
 		/**
-		 * Creates the {@link #header} Container, which contains the {@link #title} and any
-		 * {@link #toolButtons} configured.
+		 * Performs the creation of the {@link #header}, by calling {@link #createHeader}, and then applying 
+		 * any post-processing required (which includes rendering it as the first element in the Panel
+		 * itself if it is already rendered).
+		 * 
+		 * To create a different {@link #header} in a subclass, override {@link #createHeader} instead of this 
+		 * method.
 		 * 
 		 * @protected
-		 * @return {jqc.Container}
+		 */
+		doCreateHeader : function() {
+			this.header = this.createHeader();
+			this.header.setVisible( !this.headerHidden );
+			delete this.headerHidden;
+			
+			if( this.rendered ) {
+				this.header.render( this.$el, /* prepend */ 0 );  // prepend to make it the first element (i.e. before the body)
+			}
+		},
+		
+		
+		/**
+		 * Creates the {@link #header}, which contains the {@link #title} and any {@link #toolButtons} configured.
+		 * 
+		 * @protected
+		 * @return {jqc.panel.Header}
 		 */
 		createHeader : function() {
-			this.titleCmp = this.createTitleCmp();
-			this.toolButtonsCt = this.createToolButtonsCt();
+			return new PanelHeader( {
+				title       : this.title,
+				toolButtons : this.toolButtons
+			} );
+		},
+		
+		
+		/**
+		 * Performs the creation of the {@link #footer}, by calling {@link #createFooter}, and then applying 
+		 * any post-processing required (which includes rendering it as the last element in the Panel
+		 * itself if it is already rendered).
+		 * 
+		 * To create a different {@link #header} in a subclass, override {@link #createHeader} instead of this 
+		 * method.
+		 * 
+		 * @protected
+		 */
+		doCreateFooter : function() {
+			this.footer = this.createFooter();
 			
-			return new Container( {
-				cls   : this.baseCls + '-header-innerCt',
-				items : this.buildHeaderItems( this.titleCmp, this.toolButtonsCt )
-			} );
-		},
-		
-		
-		/**
-		 * Creates the title component. This is the component that the {@link #title}
-		 * config will be applied to, by default.
-		 * 
-		 * @protected
-		 * @return {jqc.Label}
-		 */
-		createTitleCmp : function() {
-			return new Label( {
-				cls  : this.baseCls + '-header-title',
-				text : this.title
-			} );
-		},
-		
-		
-		/**
-		 * Creates the tool buttons container.
-		 * 
-		 * @protected
-		 * @return {jqc.Container}
-		 */
-		createToolButtonsCt : function() {
-			return new Container( {
-				cls         : this.baseCls + '-header-toolButtons',
-				defaultType : 'toolbutton',   // jqc.panel.ToolButton
-				items       : this.toolButtons
-			} );
-		},
-		
-		
-		/**
-		 * Builds the array of the {@link #header header's} child items. The arguments are provided so they can be 
-		 * used to insert the components different positions in the items array in an override of this method.
-		 * 
-		 * @protected
-		 * @param {jqc.Label} titleCmp The title component, created by {@link #createTitleCmp}.
-		 * @param {jqc.Container} toolButtonsCt The tool buttons {@link jqc.Container Container}.
-		 * @return {Object[]}
-		 */
-		buildHeaderItems : function( titleCmp, toolButtonsCt ) {
-			return [
-				titleCmp,
-				toolButtonsCt
-			];
+			if( this.rendered ) {
+				this.footer.render( this.$el );  // append to make it the last element (i.e. after the body)
+			}
 		},
 		
 		
@@ -5822,13 +6130,14 @@ define('jqc/panel/Panel', [
 		 */
 		createFooter : function() {
 			return new Container( {
-				cls    : this.baseCls + '-footer-innerCt',
+				cls    : this.baseCls + '-Footer',
 				layout : 'hbox',
+				
 				items  : [
 					{ type: 'component', flex: 1 },  // to push the buttons to the right
 					{
 						type : 'container',
-						cls  : this.baseCls + '-footer-buttons',
+						cls  : this.baseCls + '-Footer-buttons',
 						
 						defaultType : 'button',   // jqc.button.Button
 						items       : this.buttons
@@ -5849,20 +6158,59 @@ define('jqc/panel/Panel', [
 		 */
 		setTitle : function( title ) {
 			if( !this.header ) {
-				this.header = this.createHeader();
-				
-				if( this.rendered ) {
-					this.header.render( this.$headerEl, /* prepend */ 0 );
-				}
+				this.doCreateHeader();
 			}
 			
 			this.title = title;
-			this.titleCmp.setText( title );
+			this.header.setTitle( title );
+			
+			return this;
+		},
+		
+		
+		/**
+		 * Retrieves the {@link #title} of the Panel.
+		 * 
+		 * @return {String} The title of the Panel.
+		 */
+		getTitle : function() {
+			return this.title;
+		},
+		
+		
+		/**
+		 * Shows the Panel's {@link #header}, if it is currently hidden.
+		 * 
+		 * @chainable
+		 */
+		showHeader : function() {
+			if( this.header ) {
+				this.header.show();
+			} else {
+				this.headerHidden = false;  // in case the header hasn't been created yet, we'll use this for when it is
+			}
+			
+			return this;
+		},
+		
+		
+		/**
+		 * Hides the Panel's {@link #header}, if it is currently visible.
+		 * 
+		 * @chainable
+		 */
+		hideHeader : function() {
+			if( this.header ) {
+				this.header.hide();
+			} else {
+				this.headerHidden = true;  // in case the header hasn't been created yet, we'll use this for when it is
+			}
 			
 			return this;
 		}
 		
 	} );
+	
 	
 	ComponentManager.registerType( 'panel', Panel );
 	
@@ -6324,11 +6672,120 @@ define('jqc/Overlay', [
 
 } );
 /*global define */
+define('jqc/layout/Fit', [
+	'Class',
+	'jqc/Component',
+	'jqc/Container',
+	'jqc/layout/Layout'
+], function( Class, Component, Container, Layout ) {
+
+	/**
+	 * @class jqc.layout.Fit
+	 * @extends jqc.layout.Layout
+	 * @alias layout.fit
+	 * 
+	 * A layout that renders a {@link jqc.Container Container's} child component to full height and width of the container. 
+	 * A FitLayout only renders the first {@link jqc.Container#items child component} of a {@link jqc.Container Container}.
+	 * 
+	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'fit'.
+	 */
+	var FitLayout = Layout.extend( {
+		
+		/**
+		 * @cfg {Boolean} browserManagedWidth
+		 * True to have the FitLayout simply set width: 100% to size the width, false to use the exact pixel
+		 * size of the $targetEl element.
+		 */
+		browserManagedWidth : false,
+		
+		/**
+		 * @cfg {Boolean} browserManagedHeight
+		 * True to have the FitLayout simply set height: 100% to size the height, false to use the exact pixel
+		 * size of the $targetEl element.
+		 */
+		browserManagedHeight : false,
+		
+		
+		/**
+		 * @protected
+		 * @property {jqc.Component} lastRenderedComponent
+		 * 
+		 * Keeps track of the last component that was rendered by the FitLayout. This has to do with caching
+		 * the size (stored by {@link #lastRenderedSize}). We don't want to cache the size of another component
+		 * that is no longer being shown by the FitLayout. 
+		 */
+		lastRenderedComponent : null,
+		
+		/**
+		 * @protected
+		 * @property {Object} lastRenderedSize
+		 * 
+		 * A hashmap of `width` and `height` properties that holds the last size that the {@link #lastRenderedComponent}
+		 * was set to.
+		 */
+		
+	
+		/**
+		 * Implementation of the FitLayout, which sizes the {@link #container container's} first {@link jqc.Container#items child component}
+		 * to be the full height and width of the {@link #container container's} element.
+		 * 
+		 * @protected
+		 * @method onLayout
+		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
+		 */
+		onLayout : function( childComponents, $targetEl ) {
+			this._super( arguments );
+			
+			var numChildComponents = childComponents.length;
+			
+			// Now render the child Component
+			if( numChildComponents > 0 ) {
+				var childComponent = childComponents[ 0 ],
+				    targetWidth = ( this.browserManagedWidth ) ? '100%' : $targetEl.width(),
+				    targetHeight = ( this.browserManagedHeight ) ? '100%' : $targetEl.height();
+				
+				// Detach all other child Components in the Container, just in case they are rendered into the $targetEl from another layout run,
+				// or the components have been reordered in the container
+				for( var i = 1; i < numChildComponents; i++ ) {
+					childComponents[ i ].detach();
+				}
+				
+				// Render the component (note: it will only be rendered if it is not yet rendered, or is not a child of the $targetEl)
+				this.renderComponent( childComponent, $targetEl );
+				
+				if( childComponent !== this.lastRenderedComponent ) {
+					this.lastRenderedSize = {};  // clear the results of the last rendered size, from any other component that was rendered by the layout, now that we have a new component being rendered / laid out
+					this.lastRenderedComponent = childComponent;
+				}
+				
+				// We can now size it, since it has been rendered. (sizeComponent needs to calculate the margin/padding/border on the child component)
+				// Only size it if need be, however.
+				var lastRenderedSize = this.lastRenderedSize;
+				if( targetWidth !== lastRenderedSize.width || targetHeight !== lastRenderedSize.height ) {
+					this.sizeComponent( childComponent, targetWidth, targetHeight );
+					
+					this.lastRenderedSize = { width: targetWidth, height: targetHeight };
+				}
+			}
+		}
+		
+	} );
+	
+	
+	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
+	Container.registerLayout( 'fit', FitLayout );
+
+	return FitLayout;
+	
+} );
+/*global define */
 define('jqc/Viewport', [
 	'jquery',
 	'lodash',
 	'jqc/ComponentManager',
-	'jqc/Container'
+	'jqc/Container',
+	'jqc/layout/Fit'  // used by layout 'type'
 ], function( jQuery, _, ComponentManager, Container ) {
 
 	/**
@@ -6370,6 +6827,12 @@ define('jqc/Viewport', [
 		initComponent : function() {
 			this._super( arguments );
 			
+			this.setStyle( {
+				'position'   : 'relative',
+				'overflow-x' : 'hidden',
+				'overflow-y' : 'auto'
+			} );
+			
 			this.onWindowResizeDelegate = _.debounce( _.bind( this.onWindowResize, this ), 150 );
 			jQuery( window ).bind( 'resize', this.onWindowResizeDelegate );
 		},
@@ -6380,12 +6843,6 @@ define('jqc/Viewport', [
 		 */
 		onRender : function() {
 			this._super( arguments );
-			
-			this.$el.css( {
-				position     : 'relative',
-				'overflow-x' : 'hidden',
-				'overflow-y' : 'auto'
-			} );
 			
 			this.recalcDimensions();
 		},
@@ -6402,7 +6859,7 @@ define('jqc/Viewport', [
 				    $parent = $el.parent();
 				    
 				$el.css( {
-					width: $parent.width(),
+					//width: $parent.width(),  -- let width be handled by the browser
 					height: $parent.height()
 				} );
 			}
@@ -8321,14 +8778,6 @@ define('jqc/form/field/Text', [
 		 * when the field is empty.
 		 */
 		
-		/**
-		 * @protected
-		 * @property {Boolean} emptyTextShown
-		 * 
-		 * Flag to store whether the {@link #$emptyTextEl} is currently shown or not.
-		 */
-		emptyTextShown : false,
-		
 		
 		/**
 		 * @inheritdoc
@@ -8530,9 +8979,7 @@ define('jqc/form/field/Text', [
 		 * @protected
 		 */
 		onChange : function() {
-			if( this.rendered ) {
-				this.handleEmptyText();
-			}
+			this.handleEmptyText();
 			
 			this._super( arguments );
 		},
@@ -8642,14 +9089,9 @@ define('jqc/form/field/Text', [
 		 * @protected
 		 */
 		handleEmptyText : function() {
-			if( !this.focused && this.getValue() === "" ) {
-				if( !this.emptyTextShown ) {
-					this.$emptyTextEl.show();
-					this.emptyTextShown = true;
-				}
-			} else {
-				this.$emptyTextEl.hide();
-				this.emptyTextShown = false;
+			if( this.rendered ) {
+				// Field is not focused and its value is empty, show the empty text. Otherwise, hide it.
+				this.$emptyTextEl[ ( !this.focused && this.getValue() === "" ) ? 'show' : 'hide' ]();
 			}
 		}
 		
@@ -9047,8 +9489,9 @@ define('jqc/layout/Card.Transition', [
 } );
 /*global define */
 define('jqc/layout/Card.SwitchTransition', [
+	'jqc/Container',
 	'jqc/layout/Card.Transition'
-], function( CardTransition ) {
+], function( Container, CardTransition ) {
 	
 	/**
 	 * @class jqc.layout.Card.SwitchTransition
@@ -9078,6 +9521,10 @@ define('jqc/layout/Card.SwitchTransition', [
 			// Now show the newly active item (if it is not null)
 			if( newItem ) {
 				newItem.show();
+				
+				if( newItem instanceof Container ) {
+					newItem.doLayout();
+				}
 			}
 		}
 		
@@ -9103,7 +9550,7 @@ define('jqc/layout/Card', [
 	 * at a time (such as showing only the top card in a deck of cards).  Methods are available in this class to control
 	 * which card is shown.
 	 * 
-	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'cards'.
+	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'card'.
 	 */
 	var CardLayout = Layout.extend( {
 		
@@ -9111,17 +9558,18 @@ define('jqc/layout/Card', [
 		 * @cfg {Number/jqc.Component} activeItem
 		 * 
 		 * The item number or {@link jqc.Component} reference to set as the initially active item. Defaults to 0 (for the first item). 
-		 * If this is a {@link jqc.Component}, it should be a {@link jqc.Component Component} that exists in the {@link jqc.Container Container}.
+		 * If this is a {@link jqc.Component}, it should be a {@link jqc.Component Component} that exists in the {@link #container}.
 		 */
 		activeItem : 0,
 		
 		/**
-		 * @cfg {Boolean} autoSize
+		 * @cfg {Boolean} fit
 		 * 
-		 * By default, the CardsLayout tries to make each child component of the {@link #container} take up the available space in the target
-		 * element (much like the {@link jqc.layout.Fit}, but this may be set to true to simply allow the child components to determine their own size.
+		 * By default, the CardLayout lets each child component determine its own size ("auto" or "content" sizing), but this 
+		 * config may be set to `true` to have the width/height of the child component be sized to take up the available space 
+		 * in the target element (much like the {@link jqc.layout.Fit Fit} layout would do).
 		 */
-		autoSize : false,
+		fit : false,
 		
 		/**
 		 * @cfg {jqc.layout.Card.AbstractTransition} transition The {@link jqc.layout.Card.AbstractTransition AbstractTransition} subclass to use
@@ -9144,21 +9592,26 @@ define('jqc/layout/Card', [
 		 * @property {Object} componentSizeCache
 		 * 
 		 * A hashmap of component's uuid's (retrieved with {@link jqc.Component#getUuid}) and an inner hashmap
-		 * with width and height properties, which stores the last set width/height for each component in the CardsLayout.
+		 * with width and height properties, which stores the last set width/height for each component in the CardLayout.
 		 */
 		
 		
 		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		initLayout : function() {
 			this.addEvents(
 				/**
 				 * Fires when the active item has been changed.
 				 * 
 				 * @event cardchange
+				 * @param {jqc.layout.Card} cardLayout This CardLayout instance.
 				 * @param {jqc.Component} card The {@link jqc.Component} instance of the card that was activated. If no card has
 				 *   been activated (either by a null argument to {@link #setActiveItem}, or an index out of range), then this
 				 *   will be null.
+				 * @param {jqc.Component} previousCard The previously active card ({@link jqc.Component}), if there was one.
+				 *   If there was no previously active card, then this will be `null`.
 				 */
 				'cardchange'
 			);
@@ -9176,12 +9629,11 @@ define('jqc/layout/Card', [
 		
 		
 		/**
-		 * Layout implementation for CardsLayout, which renders each child component into the Container's content target 
+		 * Layout implementation for CardLayout, which renders each child component into the Container's content target 
 		 * (see {@link jqc.Component#getContentTarget}), and then hides them.  The one given by the {@link #activeItem}
 		 * config is then shown.
 		 * 
 		 * @protected
-		 * @method onLayout
 		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
@@ -9209,7 +9661,7 @@ define('jqc/layout/Card', [
 					this.renderAndSizeCard( childComponents[ i ], $targetEl, targetWidth, targetHeight );
 					
 					// Hide the child Component if it is not the activeItem.
-					// This sets the initial state of the CardsLayout to show the activeItem, while all others are hidden.
+					// This sets the initial state of the CardLayout to show the activeItem, while all others are hidden.
 					if( this.activeItem !== childComponents[ i ] ) {
 						childComponents[ i ].hide();
 					}
@@ -9222,28 +9674,32 @@ define('jqc/layout/Card', [
 		 * Renders (if need be) and sizes the given `component` to the size of the `targetWidth` and `targetHeight`.
 		 * 
 		 * @protected
-		 * @method renderAndSizeCard
 		 * @param {jqc.Component} component The card ({@link jqc.Component}) which is to be rendered and sized.
 		 * @param {jQuery} $targetEl The target element where the component is to be rendered.
-		 * @param {Number} targetWidth The width to size the card component to (if the {@link #autoSize} config is false).
-		 * @param {Number} targetHeight The height to size the card component to (if the {@link #autoSize} config is false).
+		 * @param {Number} targetWidth The width to size the card component to (if the {@link #fit} config is `true`).
+		 * @param {Number} targetHeight The height to size the card component to (if the {@link #fit} config is `true`).
 		 */
 		renderAndSizeCard : function( component, $targetEl, targetWidth, targetHeight ) {
 			// Render the component (note: this will only be done if the component is not yet rendered, or needs to be moved into the $targetEl)
 			this.renderComponent( component, $targetEl );
 			
-			// Size the child component to the full size of the target width and height (unless autoSize has been set to true, or it's the same size)
-			// Can only do this now that the component has been rendered, as the sizeComponent() method needs to account for the component's padding/borderWidth/margin.
-			var componentUuid = component.getUuid(),
-			    lastComponentSize = this.componentSizeCache[ componentUuid ] || {};
-			 
-			if( !this.autoSize && ( /*targetWidth !== lastComponentSize.width ||*/ targetHeight !== lastComponentSize.height ) ) {
-				this.sizeComponent( component, /*targetWidth*/ undefined, targetHeight );
+			// Size the child component to the full size of the target width and height if the `fit` config has been set 
+			// to true (and it's not currently the same size). Can only do this now that the component has been rendered, 
+			// as the sizeComponent() method needs to account for the component's padding/border/margin.
+			if( this.fit ) {
+				var componentUuid = component.getUuid(),
+				    componentSizeCache = this.componentSizeCache,
+				    lastComponentSize = componentSizeCache[ componentUuid ] || {};
 				
-				this.componentSizeCache[ componentUuid ] = {
-					//width  : targetWidth,
-					height : targetHeight
-				};
+				// Note: letting the browser manage widths at this point. Components take up full widths by default.
+				if( /*targetWidth !== lastComponentSize.width ||*/ targetHeight !== lastComponentSize.height ) {
+					this.sizeComponent( component, /*targetWidth*/ undefined, targetHeight );
+					
+					componentSizeCache[ componentUuid ] = {
+						//width  : targetWidth,  -- letting widths be managed by the browser
+						height : targetHeight
+					};
+				}
 			}
 		},
 		
@@ -9254,10 +9710,9 @@ define('jqc/layout/Card', [
 		/**
 		 * Sets the active item.
 		 * 
-		 * @method setActiveItem
 		 * @param {jqc.Component/Number} item The jqc.Component to set as the active item, or the item index to set as the active item (0 for the first item).
 		 *   Note that if a jqc.Component is provided, it must be an *instantiated* jqc.Component, and not the anonymous config object used to create the jqc.Component.
-		 * @param {Object} options (optional) An object which will be passed along as options to the CardsLayout {@link #transition}. See the setActiveItem method in the
+		 * @param {Object} options (optional) An object which will be passed along as options to the CardLayout {@link #transition}. See the setActiveItem method in the
 		 *   {jqc.layout.Card.AbstractTransition AbstractTransition} subclass that you are using for a list of valid options (if any).
 		 */
 		setActiveItem : function( item, options ) {
@@ -9269,10 +9724,17 @@ define('jqc/layout/Card', [
 				item = null;  // if the item is not in the Container, set to null. Shouldn't switch to a Component that is not in the Container.
 			}
 			
+			var previousActiveItem;
+			
 			if( !this.container.isRendered() ) {
 				// The Container that this layout belongs to is not rendered, just set the activeItem config to the requested item.
 				// This method will be run again as soon as the Container is rendered, and its layout is done.
-				this.activeItem = item;
+				if( this.activeItem !== item ) {
+					previousActiveItem = this.activeItem;
+					
+					this.activeItem = item;
+					this.fireEvent( 'cardchange', this, item, previousActiveItem );
+				}
 				
 			} else {
 				// Make a change to the cards if:
@@ -9283,23 +9745,23 @@ define('jqc/layout/Card', [
 					
 					// Delegate to the transition strategy for the change in cards (active item)
 					// Make sure the activeItem is passed in only if it is an instantiated jqc.Component (i.e. not null, and not the numbered config)
-					var activeItem = this.activeItem;
-					if( !( activeItem instanceof Component ) ) {
-						activeItem = null;
+					previousActiveItem = this.activeItem;
+					if( !( previousActiveItem instanceof Component ) ) {
+						previousActiveItem = null;
 					}
 					
-					// Render the card (component) if it is not yet rendered (and of course, it exists!)
+					// Render the card (Component) if it is not yet rendered (and of course, exists)
 					if( item !== null ) {
 						var $targetEl = this.container.getContentTarget();
 						this.renderAndSizeCard( item, $targetEl, $targetEl.width(), $targetEl.height() );
 					}
 					
 					// Then delegate to the transition to make the change
-					this.transition.setActiveItem( this, activeItem, item, options );
+					this.transition.setActiveItem( this, previousActiveItem, item, options );
 					
 					// store the new currently active item (even if it is null), and fire the event
 					this.activeItem = item;
-					this.fireEvent( 'cardchange', item );
+					this.fireEvent( 'cardchange', this, item, previousActiveItem );
 				}
 			}
 		},
@@ -9308,7 +9770,6 @@ define('jqc/layout/Card', [
 		/**
 		 * Gets the currently active item. Returns null if there is no active item. 
 		 * 
-		 * @method getActiveItem
 		 * @return {jqc.Component} The Component that is currently shown as the active item. Returns null if there is no active item.
 		 */
 		getActiveItem : function() {
@@ -9326,7 +9787,6 @@ define('jqc/layout/Card', [
 		 * Gets the active item index (i.e. the 0-based tab number that is currently selected). If there is no currently active item, returns -1.
 		 * If the layout has not yet executed, this will return the value of the activeItem config if it is a number.
 		 * 
-		 * @method getActiveItemIndex
 		 * @return {Number} The index of the item that is currently shown as the active item. Returns -1
 		 *   if there is no active item.
 		 */
@@ -9347,10 +9807,9 @@ define('jqc/layout/Card', [
 		
 		
 		/**
-		 * Extended onDestroy method for the CardsLayout to destroy its CardsLayout {@link jqc.layout.Card.AbstractTransition} object.
+		 * Extended onDestroy method for the CardLayout to destroy its CardLayout {@link jqc.layout.Card.AbstractTransition} object.
 		 * 
 		 * @protected
-		 * @method onDestroy
 		 */
 		onDestroy : function() {
 			// Destroy the transition strategy object
@@ -9385,7 +9844,7 @@ define('jqc/layout/Column', [
 	 * in the Container should have a special property named `columnWidth`, that determines how wide the column
 	 * should be.  This property can either be a number, or any css width value.
 	 * 
-	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'columns'.
+	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'column'.
 	 */
 	var ColumnLayout = Layout.extend( {
 		
@@ -9506,285 +9965,6 @@ define('jqc/layout/Column', [
 	return ColumnLayout;
 	
 } );
-/*global define */
-define('jqc/layout/Fit', [
-	'Class',
-	'jqc/Component',
-	'jqc/Container',
-	'jqc/layout/Layout'
-], function( Class, Component, Container, Layout ) {
-
-	/**
-	 * @class jqc.layout.Fit
-	 * @extends jqc.layout.Layout
-	 * @alias layout.fit
-	 * 
-	 * A layout that renders a {@link jqc.Container Container's} child component to full height and width of the container. 
-	 * A FitLayout only renders the first {@link jqc.Container#items child component} of a {@link jqc.Container Container}.
-	 * 
-	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'fit'.
-	 */
-	var FitLayout = Layout.extend( {
-		
-		/**
-		 * @cfg {Boolean} browserManagedWidth
-		 * True to have the FitLayout simply set width: 100% to size the width, false to use the exact pixel
-		 * size of the $targetEl element.
-		 */
-		browserManagedWidth : false,
-		
-		/**
-		 * @cfg {Boolean} browserManagedHeight
-		 * True to have the FitLayout simply set height: 100% to size the height, false to use the exact pixel
-		 * size of the $targetEl element.
-		 */
-		browserManagedHeight : false,
-		
-		
-		/**
-		 * @protected
-		 * @property {jqc.Component} lastRenderedComponent
-		 * 
-		 * Keeps track of the last component that was rendered by the FitLayout. This has to do with caching
-		 * the size (stored by {@link #lastRenderedSize}). We don't want to cache the size of another component
-		 * that is no longer being shown by the FitLayout. 
-		 */
-		lastRenderedComponent : null,
-		
-		/**
-		 * @protected
-		 * @property {Object} lastRenderedSize
-		 * 
-		 * A hashmap of `width` and `height` properties that holds the last size that the {@link #lastRenderedComponent}
-		 * was set to.
-		 */
-		
-	
-		/**
-		 * Implementation of the FitLayout, which sizes the {@link #container container's} first {@link jqc.Container#items child component}
-		 * to be the full height and width of the {@link #container container's} element.
-		 * 
-		 * @protected
-		 * @method onLayout
-		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
-		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
-		 */
-		onLayout : function( childComponents, $targetEl ) {
-			this._super( arguments );
-			
-			var numChildComponents = childComponents.length;
-			
-			// Now render the child Component
-			if( numChildComponents > 0 ) {
-				var childComponent = childComponents[ 0 ],
-				    targetWidth = ( this.browserManagedWidth ) ? '100%' : $targetEl.width(),
-				    targetHeight = ( this.browserManagedHeight ) ? '100%' : $targetEl.height();
-				
-				// Detach all other child Components in the Container, just in case they are rendered into the $targetEl from another layout run,
-				// or the components have been reordered in the container
-				for( var i = 1; i < numChildComponents; i++ ) {
-					childComponents[ i ].detach();
-				}
-				
-				// Render the component (note: it will only be rendered if it is not yet rendered, or is not a child of the $targetEl)
-				this.renderComponent( childComponent, $targetEl );
-				
-				if( childComponent !== this.lastRenderedComponent ) {
-					this.lastRenderedSize = {};  // clear the results of the last rendered size, from any other component that was rendered by the layout, now that we have a new component being rendered / laid out
-					this.lastRenderedComponent = childComponent;
-				}
-				
-				// We can now size it, since it has been rendered. (sizeComponent needs to calculate the margin/padding/border on the child component)
-				// Only size it if need be, however.
-				var lastRenderedSize = this.lastRenderedSize;
-				if( targetWidth !== lastRenderedSize.width || targetHeight !== lastRenderedSize.height ) {
-					this.sizeComponent( childComponent, targetWidth, targetHeight );
-					
-					this.lastRenderedSize = { width: targetWidth, height: targetHeight };
-				}
-			}
-		}
-		
-	} );
-	
-	
-	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'fit', FitLayout );
-
-	return FitLayout;
-	
-} );
-/*global define */
-define('jqc/layout/HBox', [
-	'jquery',
-	'jqc/Component',
-	'jqc/Container',
-	'jqc/layout/Layout'
-], function( jQuery, Component, Container, Layout ) {
-
-	/**
-	 * @class jqc.layout.HBox
-	 * @extends jqc.layout.Layout
-	 * @alias layout.hbox
-	 * 
-	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
-	 * in the Container that should have a flexible width that proportionally should take up the remaining area of its parent
-	 * element should have a special property named {@link #flex}, that determines how wide the box should be in relation to the
-	 * available area.  This property is a number, relative to other children. If a {@link #flex} not provided, the layout uses 
-	 * the component's width instead.
-	 */
-	var HBoxLayout = Layout.extend( {
-		
-		/**
-		 * @cfg {Number} flex
-		 * This config is to be placed on **child components** of the {@link #container}. The number is a ratio
-		 * of how much space the child component should take up in relation to the remaining space in the target
-		 * element, and based on other child components' flex values.
-		 * 
-		 * For example, the following configuration would make component #1 have ~33% width, and component #2 have
-		 * ~67% width.
-		 * 
-		 *     layout : 'hbox',
-		 *     items : [
-		 *         {
-		 *             flex : 1,
-		 *             html : "I'm at 33% width"
-		 *         },
-		 *         {
-		 *             flex : 2,
-		 *             html : "I'm at 67% width"
-		 *         }
-		 *     ]
-		 * 
-		 * Other components may also exist in the {@link #container} that do not have a {@link #flex} value. These will be sized,
-		 * and components *with* a {@link #flex} value will be flexed into the *remaining* space that is not taken up by the other
-		 * components. Example:
-		 * 
-		 *     width : 100,    // not necessary, but just for example purposes
-		 *     layout : 'hbox',
-		 *     
-		 *     items : [
-		 *         {
-		 *             html : "I will be sized based on my content. Let's say my width is 20px though, for argument's sake"
-		 *         },
-		 *         {
-		 *             flex : 1,
-		 *             html : "Since the previous component is 20px wide, I will take up the remaining 80px of space"
-		 *         }
-		 *     ]
-		 */
-		
-		/**
-		 * @protected
-		 * @property {jQuery} $clearEl
-		 * 
-		 * The element used to clear the floats created by the layout routine.
-		 */
-		
-		
-		/**
-		 * Hook method for subclasses to override to implement their layout strategy. Implements the HBoxLayout algorithm.
-		 * 
-		 * @protected
-		 * @template
-		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
-		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
-		 */
-		onLayout : function( childComponents, $targetEl ) {
-			this._super( arguments );
-			
-			
-			//debugger;
-			var flexedComponents = [],
-			    totalFlex = 0,
-			    totalUnflexedWidth = 0,
-			    i, len, childComponent, numChildComponents = childComponents.length;
-			
-			// First, render and lay out each of the child components that don't have a 'flex' value.
-			// While we're at it, we'll add up the total flex that components which *do* have a flex value have.
-			for( i = 0; i < numChildComponents; i++ ) {
-				childComponent = childComponents[ i ];
-				
-				// Add the CSS class to components to be able to place them in an HBox layout. This adds `float:left;`,
-				// and a few other fixing styles.
-				childComponent.addCls( 'jqc-layout-HBox-component' );
-				
-				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
-				this.renderComponent( childComponent, $targetEl, { position: i } );
-				
-				// Only process the child component if it is not hidden
-				if( !childComponent.isHidden() ) {
-					if( !childComponent.flex ) {
-						// Not a flexed component, do its layout
-						childComponent.doLayout();
-						
-						// Sadly, the element being measured may have a sub-pixel width, but jQuery returns the floor value of 
-						// it. And in this case, we would get float wrapping because the sum of the actual widths would be greater 
-						// than the container width after flex values are computed. So simply adding one pixel as a workaround
-						// at this point. May have to do something different in the future, with a table layout.
-						totalUnflexedWidth += Math.floor( 1 + childComponent.getOuterWidth( /* includeMargin */ true ) );
-						
-					} else {
-						// Flexed component: push it onto the flexed components processing array for the next step
-						flexedComponents.push( childComponent );
-						totalFlex += childComponent.flex;
-					}
-				}
-			}
-			
-			// Now go through and size the other child components based on their flex values and the remaining space.
-			if( totalFlex > 0 ) {
-				var targetWidth = $targetEl.width(),
-				    targetHeight = $targetEl.height(),
-				    remainingTargetWidth = targetWidth - totalUnflexedWidth,
-				    trimmedPixels = 0;  // Stores the decimal values resulting in the division of the remainingTargetWidth divided by the flex value. 
-				                        // The pixels that are trimmed off of each of the child components is added to the last item to fill the extra space.
-				
-				for( i = 0, len = flexedComponents.length; i < len; i++ ) {
-					childComponent = flexedComponents[ i ];
-					
-					// Now size the flexed component based on the flex value
-					var newChildWidth = ( childComponent.flex / totalFlex ) * remainingTargetWidth;
-					trimmedPixels += newChildWidth % 1;            // take the decimal value from the child height. Ex: 3.25 % 1 == 0.25  (We'll use this later).
-					newChildWidth = Math.floor( newChildWidth );  // and do the actual trimming off of the decimal for the new child height
-					
-					// If sizing the last component, add in (the smallest whole number of) the decimal value pixels that were trimmed from previous components
-					if( i === len - 1 ) {
-						newChildWidth += Math.floor( trimmedPixels );
-					}
-					
-					this.sizeComponent( childComponent, newChildWidth, undefined );
-				}
-			}
-			
-			if( !this.$clearEl ) {
-				this.$clearEl = jQuery( '<div class="jqc-layout-HBox-clear" />' );  // to clear the floats
-			}
-			$targetEl.append( this.$clearEl );
-		},
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		onDestroy : function() {
-			if( this.$clearEl ) {
-				this.$clearEl.remove();
-			}
-			
-			this._super( arguments );
-		}
-		
-	} );
-	
-	
-	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'hbox', HBoxLayout );
-	
-	return HBoxLayout;
-	
-} );
-
 /*global define */
 define('jqc/layout/VBox', [
 	'jqc/Container',
@@ -10495,7 +10675,7 @@ define('jqc/view/Model', [
 		 * True to automatically mask the Model View while the backing {@link #model} is loading. The mask that is shown
 		 * can be configured with the {@link #maskConfig} configuration option, or defaults to showing the message "Loading..."
 		 * 
-		 * This really only applies to a {@link data.Model Model} that is being {@link data.Model#reload reloaded} from 
+		 * This really only applies to a {@link data.Model Model} that is being {@link data.Model#method-load reloaded} from 
 		 * its backing data source (ex: a web server).
 		 */
 		maskOnLoad : true,

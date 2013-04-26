@@ -43,15 +43,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * @cfg {String} id
 		 *  
-		 * The id that identifies this Component instance. Defaults to a unique id, and may be retrieved by {@link #getId}. 
-		 * This component is retrievable from a {@link jqc.Container} via {@link jqc.Container#findById}.
-		 */
-		 
-		/**
-		 * @cfg {String} elId
-		 * 
-		 * The id that should be used for the Component's element. Defaults to a unique id.
-		 * If this config is not provided, the unique id is generated when the Component is {@link #method-render rendered}.
+		 * The id that identifies this Component instance. Defaults to a unique id, and may be retrieved by {@link #getId}.
 		 */
 		
 		/**
@@ -153,7 +145,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * that should be the target of the {@link #html}, {@link #contentEl}, and {@link #tpl} configs. For example:
 		 * 
 		 *     renderTpl : new LoDashTpl( [
-		 *         '<div id="<%= elId %>-titlebar">',  // `elId` var is automatically provided in the {@link #renderTplData}, from the {@link #elId} config - See {@link #renderTplData}
+		 *         '<div id="<%= elId %>-titlebar">',  // `elId` var is automatically provided in the {@link #renderTplData}, from the unique {@link #elId} property - See {@link #renderTplData}
 		 *             '<%= title %>',                 // `title` var would need to be provided in the {@link #renderTplData} by subclass
 		 *         '</div>',
 		 *         '<div id="<%= elId %>-body"></div>'
@@ -198,7 +190,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * A set of common properties will always be available on this object for the {@link #renderTpl} (which are supplied by the 
 		 * {@link #getRenderTplData} method), including:
 		 * 
-		 * - **elId**: The value of the {@link #elId} config, or its auto-generated value.
+		 * - **elId**: The value of the {@link #elId} property (an auto-generated, unique value).
 		 * - **baseCls**: The {@link #baseCls} config, which is the base CSS class to prefix descendent elements' CSS
 		 *   classes with. Ex: a {@link #baseCls} of 'jqc-Panel' is used to prefix a {@link jqc.panel.Panel Panel's} body
 		 *   element to become 'jqc-Panel-body', but when a {@link jqc.window.Window Window} is created, the value is
@@ -321,9 +313,23 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		
 		/**
 		 * @private
-		 * @property {Number} uuid
+		 * @property {String} uuid (readonly)
 		 * 
-		 * A globally unique identifier for the Component, which is different between all {@link jqc.Container} heirarchies.
+		 * A unique identifier for the Component, which is unique among all Components on a given page. Can be
+		 * retrieved with {@link #getUuid}.
+		 */
+		 
+		/**
+		 * @protected
+		 * @property {String} elId (readonly)
+		 * 
+		 * The unique id that is generated for the Component's {@link #$el element}. This is different than {@link #id} so that 
+		 * each Component is always guaranteed to have a unique ID for its {@link #$el element}. 
+		 * 
+		 * Component subclasses often query the DOM for the elements that they create in a {@link #renderTpl} based on this elId. 
+		 * If we only used {@link #id} to uniquely identify elements, then there would be the possibility that the user could
+		 * accidentally create two components with the same {@link #id}, in which case the second Component would actually 
+		 * query and be operating on the DOM elements created for the first Component by mistake.
 		 */
 		
 		/**
@@ -600,13 +606,11 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 			);
 			
 			
-			// Generate a globally unique identifier for the Component, which is unique between all Container hierarchies on the page
-			this.uuid = _.uniqueId();
+			// Generate a globally unique identifier for the Component, which is unique for all Components on the page.
+			// This will also be used as the `elId`, and the default value for the `id` config if one was not provided.
+			this.uuid = this.elId = 'jqc-cmp-' + _.uniqueId();
+			this.id = this.id || this.uuid;  // default the Component's id to the uuid if not provided
 			
-			
-			// Generate a unique ID for this component (which is the ID for a component in a given Container hierarchy). A unique element 
-			// ID for the component's div element will be created (if not provided) in render().
-			this.id = this.id || 'jqc-cmp-' + _.uniqueId();
 			
 			// Normalize the 'plugins' config into an array before calling initComponent, so that subclasses may just push any
 			// plugins that they wish directly onto the array without extra processing.
@@ -727,9 +731,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 				}
 				
 			} else {
-				// First, generate an element ID for the component's element, if one has not been provided as a config
-				this.elId = this.elId || 'jqc-cmp-' + _.uniqueId();
-				
 				// Handle any additional attributes (the `attr` config) that were specified to add (or any attributes
 				// added by subclass implementations of getRenderAttributes())
 				var attr = Html.attrMapToString( this.getRenderAttributes() );
@@ -1210,8 +1211,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Returns the globally unique {@link #uuid} of this Component.
 		 * 
-		 * @method getUuid
-		 * @return {Number}
+		 * @return {String}
 		 */
 		getUuid : function() {
 			return this.uuid;

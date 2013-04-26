@@ -296,12 +296,11 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 					var TestComponent = Component.extend( {
 						baseCls : 'testCls',
 						componentCls : 'testCls2',
-						elId : "123",
 						renderTpl : "Testing <%= elId %>, w/ baseCls: <%= baseCls %>, w/ componentCls: <%= componentCls %>"
 					} );
 					
 					var component = new TestComponent( { renderTo: 'body' } );
-					expect( component.getEl().html() ).toBe( "Testing 123, w/ baseCls: testCls, w/ componentCls: testCls2" );
+					expect( component.getEl().html() ).toBe( "Testing " + component.elId + ", w/ baseCls: testCls, w/ componentCls: testCls2" );
 					
 					component.destroy();  // clean up
 				} );
@@ -1986,7 +1985,6 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			
 			it( "detach() should detach the element from the DOM if it is rendered", function() {
 				var cmp = new Component( {
-					elId : "__ComponentTest_detachMethod_el",
 					renderTo: 'body'
 				} );
 				
@@ -1994,16 +1992,16 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var clickCount = 0;
 				cmp.getEl().bind( 'click', function() { clickCount++; } );
 				
-				expect( jQuery( '#__ComponentTest_detachMethod_el' ).length ).toBe( 1 );  // Initial condition: The element should be in the DOM
+				expect( jQuery( '#' + cmp.elId ).length ).toBe( 1 );  // Initial condition: The element should be in the DOM
 				expect( clickCount ).toBe( 0 );  // Initial condition: the click count should be 0
 				
 				// Now detach
 				cmp.detach();
-				expect( jQuery( '#__ComponentTest_detachMethod_el' ).length ).toBe( 0 );  // The element should no longer be in the DOM
+				expect( jQuery( '#' + cmp.elId ).length ).toBe( 0 );  // The element should no longer be in the DOM
 				
 				// And re-attach via render()
 				cmp.render( 'body' );
-				expect( jQuery( '#__ComponentTest_detachMethod_el' ).length ).toBe( 1 );  // The element should be in the DOM again after being re-attached
+				expect( jQuery( '#' + cmp.elId ).length ).toBe( 1 );  // The element should be in the DOM again after being re-attached
 				
 				// Should still be able to "click" the component (as it was only detached, not removed)
 				cmp.getEl().trigger( 'click' );
