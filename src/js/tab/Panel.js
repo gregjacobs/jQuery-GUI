@@ -50,6 +50,12 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
+		defaultType : 'panel',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
 		layout : 'card',
 		
 		/**
