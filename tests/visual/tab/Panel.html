@@ -36,8 +36,23 @@
 		], function( $, TabPanel ) {
 			$( document ).ready( function() {
 				
-				var tabPanel = new TabPanel( {
+				var noTitleTabPanel = new TabPanel( {
 					renderTo : 'body',
+					layout : {
+						type: 'card',
+						autoSize: true
+					},
+					items : [
+						{ type : 'panel', title: "Panel 1", html: "Test 1" },
+						{ type : 'panel', title: "Panel 2", html: "Test 2" }
+					]
+				} );
+				jQuery( '<br />' ).appendTo( 'body' );
+				
+				
+				var titledTabPanel = new TabPanel( {
+					renderTo : 'body',
+					title  : "Titled Tab Panel",
 					layout : {
 						type: 'card',
 						autoSize: true
