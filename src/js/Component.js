@@ -1,5 +1,6 @@
 /*global define */
 define( [
+	'require',
 	'jquery',
 	'lodash',
 	'Class',
@@ -14,7 +15,7 @@ define( [
 	'jqc/template/LoDash',
 	'jqc/ComponentManager'   // circular dependency. used via require() call in code below
 ],
-function( jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
+function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
 
 	/**
 	 * @class jqc.Component
