@@ -223,14 +223,14 @@ define( [
 		 */
 		createFooter : function() {
 			return new Container( {
-				cls    : this.baseCls + '-footer-innerCt',
+				cls    : this.baseCls + '-Footer',
 				layout : 'hbox',
 				
 				items  : [
 					{ type: 'component', flex: 1 },  // to push the buttons to the right
 					{
 						type : 'container',
-						cls  : this.baseCls + '-footer-buttons',
+						cls  : this.baseCls + '-Footer-buttons',
 						
 						defaultType : 'button',   // jqc.button.Button
 						items       : this.buttons

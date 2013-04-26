@@ -62,13 +62,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Panel',
-		
-		/**
-		 * @cfg
-		 * @inheritdoc
-		 */
-		componentCls : 'jqc-TabPanel',
+		baseCls : 'jqc-TabPanel',
 		
 		
 		/**
