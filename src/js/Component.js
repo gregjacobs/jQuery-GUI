@@ -310,6 +310,15 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		
 		
+		/**
+		 * @protected
+		 * @cfg {jqc.Container} parentContainer
+		 * 
+		 * The parent {@link jqc.Container Container} of this Component (if any), which this Component is a child of. This is set 
+		 * by the {@link jqc.Container Container} that is adding this Component as a child, and should not be supplied directly.
+		 */
+		parentContainer: null,
+		
 		
 		/**
 		 * @private
@@ -333,15 +342,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		
 		/**
-		 * @private
-		 * @cfg {jqc.Container} parentContainer
-		 * 
-		 * The parent {@link jqc.Container Container} of this Component (if any). This is set by the {@link jqc.Container} that is adding this Component
-		 * as a child, and should not be supplied directly.
-		 */
-		parentContainer: null,
-	 
-		/**
 		 * @protected
 		 * @property {Boolean} rendered
 		 * 
@@ -350,8 +350,13 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		rendered: false,
 		
-		
-		
+		/**
+		 * @protected
+		 * @property {jQuery} $el
+		 * 
+		 * The main element that is created for the Component (determined by the {@link #elType} config). 
+		 * This will be available after the Component is rendered, and may be retrieved using {@link #getEl}
+		 */
 		
 		/**
 		 * @private
@@ -430,6 +435,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * for when the mask does in fact get shown.
 		 */
 		
+		
 		/**
 		 * @protected
 		 * @property {Boolean} updateCalledWithContent
@@ -448,14 +454,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * Initially false, and will be set to true after the {@link #method-destroy} method executes.
 		 */
 		destroyed: false,
-		
-		/**
-		 * @protected
-		 * @property {jQuery} $el
-		 * 
-		 * The main element that is created for the Component (determined by the {@link #elType} config). 
-		 * This will be available after the Component is rendered, and may be retrieved using {@link #getEl}
-		 */	
 		
 		
 		/**
