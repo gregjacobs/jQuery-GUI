@@ -1,7 +1,8 @@
 /*global define */
 define( [
+	'jqc/Container',
 	'jqc/layout/Card.Transition'
-], function( CardTransition ) {
+], function( Container, CardTransition ) {
 	
 	/**
 	 * @class jqc.layout.Card.SwitchTransition
@@ -31,6 +32,10 @@ define( [
 			// Now show the newly active item (if it is not null)
 			if( newItem ) {
 				newItem.show();
+				
+				if( newItem instanceof Container ) {
+					newItem.doLayout();
+				}
 			}
 		}
 		
