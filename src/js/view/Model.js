@@ -89,7 +89,7 @@ define( [
 		 * True to automatically mask the Model View while the backing {@link #model} is loading. The mask that is shown
 		 * can be configured with the {@link #maskConfig} configuration option, or defaults to showing the message "Loading..."
 		 * 
-		 * This really only applies to a {@link data.Model Model} that is being {@link data.Model#reload reloaded} from 
+		 * This really only applies to a {@link data.Model Model} that is being {@link data.Model#method-load reloaded} from 
 		 * its backing data source (ex: a web server).
 		 */
 		maskOnLoad : true,
