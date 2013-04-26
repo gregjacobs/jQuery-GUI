@@ -268,14 +268,14 @@ define( [
 		
 		describe( "Test the emptyText functionality", function() {
 			
-			it( "A TextField with emptyText and no initial value should initially have the value of the emptyText", function() {
+			it( "A TextField with emptyText and no initial value should initially have no value (i.e. not the value of the emptyText)", function() {
 				for( var rendered = 0; rendered <= 1; rendered++ ) {
 					var textField = new TextField( {
 						renderTo: ( rendered ) ? document.body : undefined,
 						emptyText : "test empty text"
 					} );
 					
-					expect( textField.getValue() ).toBe( "test empty text" );  // orig YUI Test err msg: "rendered = " + !!rendered
+					expect( textField.getValue() ).toBe( "" );  // orig YUI Test err msg: "rendered = " + !!rendered
 					
 					textField.destroy();  // clean up
 				}
