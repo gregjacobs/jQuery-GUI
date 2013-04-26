@@ -1,11 +1,12 @@
 /*global define, describe, beforeEach, afterEach, it, expect, spyOn */
 /*jshint loopfunc:true */
 define( [
+	'jqc/Component',
 	'jqc/panel/Panel',
 	'jqc/tab/Panel',
 	'jqc/tab/Bar',
 	'jqc/tab/Tab'
-], function( Panel, TabPanel, TabBar, Tab ) {
+], function( Component, Panel, TabPanel, TabBar, Tab ) {
 	
 	describe( 'jqc.tab.Panel', function() {
 		var tabBar, tabs, panels;
@@ -62,10 +63,10 @@ define( [
 			
 			describe( 'activeTab', function() {
 				
-				for( var rendered = 0; rendered <= 1; rendered++ ) {
-					it( "should be able to specify the active tab by index (number). isRendered = " + !!rendered, function() {
+				for( var render = 0; render <= 1; render++ ) {
+					it( "should be able to specify the active tab by index (number). isRendered = " + !!render, function() {
 						var tabPanel = new TestTabPanel( {
-							renderTo : ( rendered ) ? 'body' : undefined,
+							renderTo : ( render ) ? 'body' : undefined,
 							activeTab: 1,
 							items : panels
 						} );
@@ -76,9 +77,9 @@ define( [
 					} );
 					
 					
-					it( "should make no tab active when given an index that is out of bounds. isRendered = " + !!rendered, function() {
+					it( "should make no tab active when given an index that is out of bounds. isRendered = " + !!render, function() {
 						var tabPanel = new TestTabPanel( {
-							renderTo : ( rendered ) ? 'body' : undefined,
+							renderTo : ( render ) ? 'body' : undefined,
 							activeTab: 99,
 							items : panels
 						} );
@@ -89,9 +90,9 @@ define( [
 					} );
 					
 					
-					it( "should be able to specify the active tab by component (Panel) reference. isRendered = " + !!rendered, function() {
+					it( "should be able to specify the active tab by component (Panel) reference. isRendered = " + !!render, function() {
 						var tabPanel = new TestTabPanel( {
-							renderTo : ( rendered ) ? 'body' : undefined,
+							renderTo : ( render ) ? 'body' : undefined,
 							activeTab: panels[ 2 ],
 							items : panels
 						} );
@@ -102,9 +103,9 @@ define( [
 					} );
 					
 					
-					it( "should make no tab active when given a reference to a Panel that does not exist within the TabPanel, or given null. isRendered = " + !!rendered, function() {
+					it( "should make no tab active when given a reference to a Panel that does not exist within the TabPanel, or given null. isRendered = " + !!render, function() {
 						var tabPanel = new TestTabPanel( {
-							renderTo : ( rendered ) ? 'body' : undefined,
+							renderTo : ( render ) ? 'body' : undefined,
 							activeTab: new Panel( { title: "Some other panel which doesn't exist in the TabPanel" } ),
 							items : panels
 						} );
@@ -140,9 +141,9 @@ define( [
 				} );
 				
 				
-				for( var rendered = 0; rendered <= 1; rendered++ ) {
-					it( "should fire when the active tab is changed programatically, before the actual tab is changed. isRendered = " + !!rendered, function() {
-						if( rendered ) tabPanel.render( 'body' );
+				for( var render = 0; render <= 1; render++ ) {
+					it( "should fire when the active tab is changed programatically, before the actual tab is changed. isRendered = " + !!render, function() {
+						if( render ) tabPanel.render( 'body' );
 						
 						tabPanel.on( 'beforetabchange', function( tp, newTab, oldTab ) {
 							beforetabchangeFireCount++;
@@ -156,12 +157,10 @@ define( [
 						tabPanel.setActiveTab( panels[ 1 ] );
 						expect( beforetabchangeFireCount ).toBe( 1 );  // make sure the event was fired
 						expect( tabPanel.getActiveTab() ).toBe( panels[ 1 ] );  // make sure that the tab change actually took effect
-						
-						tabPanel.destroy();  // clean up
 					} );
 					
-					it( "should cancel the tab change if a handler returns false. isRendered = " + !!rendered, function() {
-						if( rendered ) tabPanel.render( 'body' );
+					it( "should cancel the tab change if a handler returns false. isRendered = " + !!render, function() {
+						if( render ) tabPanel.render( 'body' );
 						
 						tabPanel.on( 'beforetabchange', function( tp, newTab, oldTab ) {
 							beforetabchangeFireCount++;
@@ -171,14 +170,12 @@ define( [
 						tabPanel.setActiveTab( panels[ 1 ] );
 						expect( beforetabchangeFireCount ).toBe( 1 );  // make sure the event was fired
 						expect( tabPanel.getActiveTab() ).toBe( panels[ 0 ] );  // make sure that the tab change did *not* take effect
-						
-						tabPanel.destroy();  // clean up
 					} );
 				}
 				
 				
-				// This test can only be run when the TabPanel is rendered	
-				it( "should fire when the active tab is changed by the user, before the actual tab is changed. isRendered = " + !!rendered, function() {
+				// This test can only be run when the TabPanel is render	
+				it( "should fire when the active tab is changed by the user, before the actual tab is changed. isRendered = " + !!render, function() {
 					// Render the TabPanel so that we have elements to simulate clicks on
 					tabPanel.render( 'body' );
 					
@@ -220,9 +217,9 @@ define( [
 				} );
 				
 				
-				for( var rendered = 0; rendered <= 1; rendered++ ) {
-					it( "should fire when the active tab is changed programatically. isRendered = " + !!rendered, function() {
-						if( rendered ) tabPanel.render( 'body' );
+				for( var render = 0; render <= 1; render++ ) {
+					it( "should fire when the active tab is changed programatically. isRendered = " + !!render, function() {
+						if( render ) tabPanel.render( 'body' );
 						
 						tabPanel.on( 'tabchange', function( tp, newTab, oldTab ) {
 							tabchangeFireCount++;
@@ -237,13 +234,11 @@ define( [
 						
 						expect( tabchangeFireCount ).toBe( 1 );  // make sure the event was fired
 						expect( tabPanel.getActiveTab() ).toBe( panels[ 1 ] );  // make sure that the tab change actually took effect
-						
-						tabPanel.destroy();  // clean up
 					} );
 				}
 				
 				
-				// This test can only be run when the TabPanel is rendered
+				// This test can only be run when the TabPanel is render
 				it( "should fire when the active tab is changed by the user (by clicking on a Tab)", function() {
 					// Render the TabPanel so that we have elements to simulate clicks on
 					tabPanel.render( 'body' );
@@ -262,8 +257,6 @@ define( [
 					
 					expect( tabchangeFireCount ).toBe( 1 );  // make sure the event was fired
 					expect( tabPanel.getActiveTab() ).toBe( panels[ 1 ] );  // make sure that the tab change actually took effect
-						
-					tabPanel.destroy();  // clean up
 				} );
 				
 			} );
@@ -271,12 +264,154 @@ define( [
 		} );
 		
 		
+		describe( 'onAdd()', function() {
+			var tabPanel;
+				
+			beforeEach( function() {
+				tabPanel = new TestTabPanel( {
+					activeTab: 0
+				} );
+			} );
+			
+			afterEach( function() {
+				tabPanel.destroy();  // clean up
+			} );
+			
+			
+			for( var render = 0; render <= 1; render++ ) {
+				it( "should add a corresponding Tab in the TabBar for the Panel that was added, at the correct index of the insertion. isRendered = " + !!render, function() {
+					if( render ) tabPanel.render( 'body' );
+					
+					expect( tabBar.getItems().length ).toBe( 0 );  // initial condition
+					
+					tabPanel.add( panels[ 0 ] );
+					expect( tabBar.getItems().length ).toBe( 1 );
+					expect( tabBar.getItems()[ 0 ].getCorrespondingPanel() ).toBe( panels[ 0 ] );
+					
+					tabPanel.insert( panels[ 1 ], 0 );  // prepend it
+					expect( tabBar.getItems().length ).toBe( 2 );
+					expect( tabBar.getItems()[ 0 ].getCorrespondingPanel() ).toBe( panels[ 1 ] );
+					expect( tabBar.getItems()[ 1 ].getCorrespondingPanel() ).toBe( panels[ 0 ] );
+					
+					tabPanel.add( panels[ 2 ] );
+					expect( tabBar.getItems().length ).toBe( 3 );
+					expect( tabBar.getItems()[ 0 ].getCorrespondingPanel() ).toBe( panels[ 1 ] );
+					expect( tabBar.getItems()[ 1 ].getCorrespondingPanel() ).toBe( panels[ 0 ] );
+					expect( tabBar.getItems()[ 2 ].getCorrespondingPanel() ).toBe( panels[ 2 ] );
+				} );
+				
+				
+				it( "should throw an Error if a non-Panel instance or Panel subclass was added to the TabPanel. isRendered = " + !!render, function() {
+					if( render ) tabPanel.render( 'body' );
+					
+					expect( function() {
+						tabPanel.add( { type: 'component' } );  // test with config object
+					} ).toThrow( "Child components added to the TabPanel must be a jqc.panel.Panel instance, or subclass" );
+					
+					expect( function() {
+						tabPanel.add( new Component() );        // test with instance
+					} ).toThrow( "Child components added to the TabPanel must be a jqc.panel.Panel instance, or subclass" );
+				} );
+			}
+			
+		} );
+		
+		
+		describe( 'onRemove()', function() {
+			var tabPanel;
+				
+			beforeEach( function() {
+				tabPanel = new TestTabPanel( {
+					activeTab: 0,
+					items : panels
+				} );
+			} );
+			
+			afterEach( function() {
+				tabPanel.destroy();  // clean up
+			} );
+			
+			
+			for( var render = 0; render <= 1; render++ ) {
+				
+				it( "should remove the corresponding Tab in the TabBar for the Panel that was removed, from the correct index of the removal. isRendered = " + !!render, function() {
+					if( render ) tabPanel.render( 'body' );
+					
+					// Check initial condition
+					expect( tabBar.getItems().length ).toBe( 3 );
+					expect( tabBar.getItems()[ 0 ].getCorrespondingPanel() ).toBe( panels[ 0 ] );
+					expect( tabBar.getItems()[ 1 ].getCorrespondingPanel() ).toBe( panels[ 1 ] );
+					expect( tabBar.getItems()[ 2 ].getCorrespondingPanel() ).toBe( panels[ 2 ] );
+					
+					// Now remove
+					tabPanel.remove( panels[ 1 ] );
+					expect( tabBar.getItems().length ).toBe( 2 );
+					expect( tabBar.getItems()[ 0 ].getCorrespondingPanel() ).toBe( panels[ 0 ] );
+					expect( tabBar.getItems()[ 1 ].getCorrespondingPanel() ).toBe( panels[ 2 ] );
+					
+					tabPanel.remove( panels[ 2 ] );
+					expect( tabBar.getItems().length ).toBe( 1 );
+					expect( tabBar.getItems()[ 0 ].getCorrespondingPanel() ).toBe( panels[ 0 ] );
+					
+					tabPanel.remove( panels[ 0 ] );
+					expect( tabBar.getItems().length ).toBe( 0 );					
+				} );
+				
+			}
+			
+		} );
+		
+		
+		describe( 'onReorder()', function() {
+			var tabPanel;
+				
+			beforeEach( function() {
+				tabPanel = new TestTabPanel( {
+					activeTab: 0,
+					items : panels
+				} );
+			} );
+			
+			afterEach( function() {
+				tabPanel.destroy();  // clean up
+			} );
+			
+			for( var render = 0; render <= 1; render++ ) {
+				
+				it( "should move the coresponding Tab in the TabBar for the Panel that was reordered, to the correct new index. isRendered = " + !!render, function() {
+					if( render ) tabPanel.render( 'body' );
+					
+					// Check initial condition
+					expect( tabBar.getItems().length ).toBe( 3 );
+					expect( tabBar.getItems()[ 0 ].getCorrespondingPanel() ).toBe( panels[ 0 ] );
+					expect( tabBar.getItems()[ 1 ].getCorrespondingPanel() ).toBe( panels[ 1 ] );
+					expect( tabBar.getItems()[ 2 ].getCorrespondingPanel() ).toBe( panels[ 2 ] );
+					
+					// Now reorder
+					tabPanel.insert( panels[ 0 ], 2 );
+					expect( tabBar.getItems().length ).toBe( 3 );
+					expect( tabBar.getItems()[ 0 ].getCorrespondingPanel() ).toBe( panels[ 1 ] );
+					expect( tabBar.getItems()[ 1 ].getCorrespondingPanel() ).toBe( panels[ 2 ] );
+					expect( tabBar.getItems()[ 2 ].getCorrespondingPanel() ).toBe( panels[ 0 ] );
+					
+					tabPanel.insert( panels[ 2 ], 0 );
+					expect( tabBar.getItems().length ).toBe( 3 );
+					expect( tabBar.getItems()[ 0 ].getCorrespondingPanel() ).toBe( panels[ 2 ] );
+					expect( tabBar.getItems()[ 1 ].getCorrespondingPanel() ).toBe( panels[ 1 ] );
+					expect( tabBar.getItems()[ 2 ].getCorrespondingPanel() ).toBe( panels[ 0 ] );
+				} );
+				
+			}
+			
+		} );
+		
+		
 		describe( 'setActiveTab()', function() {
 			
-			for( var rendered = 0; rendered <= 1; rendered++ ) {
-				it( "should set the active tab by Panel index. isRendered = " + !!rendered, function() {
+			for( var render = 0; render <= 1; render++ ) {
+				it( "should set the active tab by Panel index. isRendered = " + !!render, function() {
 					var tabPanel = new TestTabPanel( {
-						renderTo : ( rendered ) ? 'body' : undefined,
+						renderTo : ( render ) ? 'body' : undefined,
 						activeTab : 0,
 						items : panels
 					} );
@@ -290,9 +425,9 @@ define( [
 				} );
 				
 				
-				it( "should make no tab active if given an index that is out of bounds. isRendered = " + !!rendered, function() {
+				it( "should make no tab active if given an index that is out of bounds. isRendered = " + !!render, function() {
 					var tabPanel = new TestTabPanel( {
-						renderTo : ( rendered ) ? 'body' : undefined,
+						renderTo : ( render ) ? 'body' : undefined,
 						activeTab : 0,
 						items : panels
 					} );
@@ -306,9 +441,9 @@ define( [
 				} );
 				
 				
-				it( "should set the active tab by Panel reference. isRendered = " + !!rendered, function() {
+				it( "should set the active tab by Panel reference. isRendered = " + !!render, function() {
 					var tabPanel = new TestTabPanel( {
-						renderTo : ( rendered ) ? 'body' : undefined,
+						renderTo : ( render ) ? 'body' : undefined,
 						activeTab : 0,
 						items : panels
 					} );
@@ -322,9 +457,9 @@ define( [
 				} );
 				
 				
-				it( "should make no tab active if given an invalid Panel reference. isRendered = " + !!rendered, function() {
+				it( "should make no tab active if given an invalid Panel reference. isRendered = " + !!render, function() {
 					var tabPanel = new TestTabPanel( {
-						renderTo : ( rendered ) ? 'body' : undefined,
+						renderTo : ( render ) ? 'body' : undefined,
 						activeTab : 0,
 						items : panels
 					} );
@@ -342,10 +477,10 @@ define( [
 		
 		describe( 'getActiveTab()', function() {
 			
-			for( var rendered = 0; rendered <= 1; rendered++ ) {
-				it( "should retrieve the active tab when the `activeTab` config is a number. isRendered = " + !!rendered, function() {
+			for( var render = 0; render <= 1; render++ ) {
+				it( "should retrieve the active tab when the `activeTab` config is a number. isRendered = " + !!render, function() {
 					var tabPanel = new TestTabPanel( {
-						renderTo : ( rendered ) ? 'body' : undefined,
+						renderTo : ( render ) ? 'body' : undefined,
 						activeTab : 1,
 						items : panels
 					} );
@@ -356,9 +491,9 @@ define( [
 				} );
 				
 				
-				it( "should retrieve the active tab when the `activeTab` config is a Panel reference. isRendered = " + !!rendered, function() {
+				it( "should retrieve the active tab when the `activeTab` config is a Panel reference. isRendered = " + !!render, function() {
 					var tabPanel = new TestTabPanel( {
-						renderTo : ( rendered ) ? 'body' : undefined,
+						renderTo : ( render ) ? 'body' : undefined,
 						activeTab : panels[ 1 ],
 						items : panels
 					} );
@@ -369,9 +504,9 @@ define( [
 				} );
 				
 				
-				it( "should return `null` when there is no active tab. isRendered = " + !!rendered, function() {
+				it( "should return `null` when there is no active tab. isRendered = " + !!render, function() {
 					var tabPanel = new TestTabPanel( {
-						renderTo : ( rendered ) ? 'body' : undefined,
+						renderTo : ( render ) ? 'body' : undefined,
 						activeTab : null,
 						items : panels
 					} );
@@ -387,10 +522,10 @@ define( [
 		
 		describe( 'getActiveTabIndex()', function() {
 			
-			for( var rendered = 0; rendered <= 1; rendered++ ) {
-				it( "should retrieve the active tab index when the `activeTab` config is a number. isRendered = " + !!rendered, function() {
+			for( var render = 0; render <= 1; render++ ) {
+				it( "should retrieve the active tab index when the `activeTab` config is a number. isRendered = " + !!render, function() {
 					var tabPanel = new TestTabPanel( {
-						renderTo : ( rendered ) ? 'body' : undefined,
+						renderTo : ( render ) ? 'body' : undefined,
 						activeTab : 1,
 						items : panels
 					} );
@@ -401,9 +536,9 @@ define( [
 				} );
 				
 				
-				it( "should retrieve the active tab index when the `activeTab` config is a Panel reference. isRendered = " + !!rendered, function() {
+				it( "should retrieve the active tab index when the `activeTab` config is a Panel reference. isRendered = " + !!render, function() {
 					var tabPanel = new TestTabPanel( {
-						renderTo : ( rendered ) ? 'body' : undefined,
+						renderTo : ( render ) ? 'body' : undefined,
 						activeTab : panels[ 1 ],
 						items : panels
 					} );
@@ -414,9 +549,9 @@ define( [
 				} );
 				
 				
-				it( "should return -1 when there is no active tab. isRendered = " + !!rendered, function() {
+				it( "should return -1 when there is no active tab. isRendered = " + !!render, function() {
 					var tabPanel = new TestTabPanel( {
-						renderTo : ( rendered ) ? 'body' : undefined,
+						renderTo : ( render ) ? 'body' : undefined,
 						activeTab : null,
 						items : panels
 					} );
@@ -433,10 +568,10 @@ define( [
 		
 		describe( 'onDestroy()', function() {
 			
-			for( var rendered = 0; rendered <= 1; rendered++ ) {
-				it( "should destroy its inner TabBar when the TabPanel destroyed. isRendered = " + !!rendered, function() {
+			for( var render = 0; render <= 1; render++ ) {
+				it( "should destroy its inner TabBar when the TabPanel destroyed. isRendered = " + !!render, function() {
 					var tabPanel = new TestTabPanel( {
-						renderTo : ( rendered ) ? 'body' : undefined
+						renderTo : ( render ) ? 'body' : undefined
 					} );
 					expect( tabBar.destroy ).not.toHaveBeenCalled();  // initial condition
 					
