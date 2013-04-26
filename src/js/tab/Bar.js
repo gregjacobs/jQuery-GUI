@@ -29,9 +29,11 @@ define( [
 		
 		/**
 		 * Sets the "active" tab based on the given activated {@link jqc.panel.Panel Panel} which corresponds
-		 * to it.
+		 * to it. All other tabs will be set to "inactive".
 		 * 
 		 * @param {jqc.panel.Panel} panel The Panel that corresponds to the Tab that should be made active.
+		 *   If `null` is provided, or a Panel that does not have a corresponding Tab, then all tabs will
+		 *   be set to their "inactive" state.
 		 * @chainable
 		 */
 		setActiveTab : function( panel ) {
