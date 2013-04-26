@@ -9,8 +9,9 @@ define( [
 	/**
 	 * @class jqc.Image
 	 * @extends jqc.Component
+	 * @alias type.image
 	 *
-	 * A simple component which is an image.
+	 * A simple image component.
 	 */
 	var Image = Class.extend( Component, {
 		
@@ -191,7 +192,6 @@ define( [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'Image'
 	ComponentManager.registerType( 'image', Image );
 	
 	return Image;

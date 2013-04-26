@@ -9,12 +9,13 @@ define( [
 	/**
 	 * @class jqc.layout.Column
 	 * @extends jqc.layout.Layout
+	 * @alias layout.column
 	 * 
 	 * A layout that renders a {@link jqc.Container Container's} child components into columns. Each child component
 	 * in the Container should have a special property named `columnWidth`, that determines how wide the column
 	 * should be.  This property can either be a number, or any css width value.
 	 * 
-	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'columns'.
+	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'column'.
 	 */
 	var ColumnLayout = Layout.extend( {
 		

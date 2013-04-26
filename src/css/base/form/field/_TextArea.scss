@@ -3,3 +3,7 @@
 .jqc-form-TextAreaField-input {
 	@extend .jqc-form-TextField-input;
 }
+
+.jqc-form-TextAreaField-emptyText {
+	@extend .jqc-form-TextField-emptyText;
+}

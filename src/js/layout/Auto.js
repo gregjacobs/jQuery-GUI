@@ -8,6 +8,7 @@ define( [
 	/**
 	 * @class jqc.layout.Auto
 	 * @extends jqc.layout.Layout
+	 * @alias layout.auto
 	 * 
 	 * The default layout that is used for a {@link jqc.Container Container}, which simply
 	 * renders each child component into their own div element, and does no further sizing or formatting.

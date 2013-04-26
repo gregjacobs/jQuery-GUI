@@ -2,12 +2,14 @@
 define( [
 	'jquery',
 	'lodash',
+	'jqc/ComponentManager',
 	'jqc/Component'
-], function( jQuery, _, Component ) {
+], function( jQuery, _, ComponentManager, Component ) {
 	
 	/**
 	 * @class jqc.view.Collection
 	 * @extends jqc.Component
+	 * @alias type.collectionview
 	 * 
 	 * A view of the {@link data.Model Models} in a {@link data.Collection}. The view uses the {@link #tpl} config, which 
 	 * is automatically passed the {@link #collection collection's} models to populate the template. When the 
@@ -472,6 +474,9 @@ define( [
 		}
 		
 	} );
+	
+	
+	ComponentManager.registerType( 'collectionview', CollectionView );
 	
 	return CollectionView;
 	

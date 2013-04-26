@@ -9,6 +9,7 @@ define( [
 	/**
 	 * @class jqc.layout.Fit
 	 * @extends jqc.layout.Layout
+	 * @alias layout.fit
 	 * 
 	 * A layout that renders a {@link jqc.Container Container's} child component to full height and width of the container. 
 	 * A FitLayout only renders the first {@link jqc.Container#items child component} of a {@link jqc.Container Container}.

@@ -26,6 +26,17 @@
   padding: .1em .4em;
 }
 
+/* line 3, ../../../../src/css/theme/basic/form/field/_Text.scss */
+.jqc-form-TextField .jqc-form-Field-inputContainer {
+  border: 1px solid #CCC;
+}
+
+/* line 9, ../../../../src/css/theme/basic/form/field/_Text.scss */
+.jqc-form-TextField-emptyText, .jqc-form-TextAreaField-emptyText {
+  font-size: 14px;
+  color: #AAA;
+}
+
 /* line 3, ../../../../src/css/theme/basic/form/field/_TextArea.scss */
 .jqc-form-TextAreaField .jqc-form-Field-inputContainer {
   border: 1px solid #C6C6C6;
@@ -36,37 +47,29 @@
   resize: none;
 }
 
-/* line 1, ../../../../src/css/theme/basic/panel/_Panel.scss */
-.jqc-Panel {
-  border-color: #000;
-  border-style: solid;
-  border-width: 0 1px 1px 1px;
+/* line 1, ../../../../src/css/theme/basic/panel/_Header.scss */
+.jqc-Panel-Header {
+  border: 1px solid #000;
+  border-width: 0 0 1px 0;
+  background-color: #2383B3;
+  padding: 2px;
 }
 
-/* line 3, ../../../../src/css/theme/basic/panel/_Panel.scss */
-.jqc-Panel-header {
-  border-color: #000;
-  border-style: solid;
-  border-width: 1px 0 0 0;
-  background-color: #C2EBFF;
-}
-
-/* line 4, ../../../../src/css/theme/basic/panel/_Panel.scss */
-.jqc-Panel-header-title {
+/* line 2, ../../../../src/css/theme/basic/panel/_Header.scss */
+.jqc-Panel-Header-title {
   font-weight: bold;
+  color: #FFF;
 }
 
-/* line 5, ../../../../src/css/theme/basic/panel/_Panel.scss */
-.jqc-Panel-header-toolButtons, .jqc-Window-header-toolButtons {
+/* line 3, ../../../../src/css/theme/basic/panel/_Header.scss */
+.jqc-Panel-Header-toolButtons {
   margin-top: 2px;
   margin-right: 2px;
 }
 
-/* line 7, ../../../../src/css/theme/basic/panel/_Panel.scss */
-.jqc-Panel-body {
-  border-color: #000;
-  border-style: solid;
-  border-width: 1px 0 0 0;
+/* line 1, ../../../../src/css/theme/basic/panel/_Panel.scss */
+.jqc-Panel {
+  border: 1px solid #000;
 }
 
 /* line 1, ../../../../src/css/theme/basic/panel/_ToolButton.scss */
@@ -98,12 +101,13 @@
   border-color: #000;
   border-style: solid;
   border-width: 1px 0 0 0;
-  background-color: #C2EBFF;
+  background-color: #2383B3;
 }
 
 /* line 4, ../../../../src/css/theme/basic/window/_Window.scss */
 .jqc-Window-header-title {
   font-weight: bold;
+  color: #FFF;
 }
 
 /* line 9, ../../../../src/css/theme/basic/window/_Window.scss */

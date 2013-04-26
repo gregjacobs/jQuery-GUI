@@ -7,6 +7,7 @@ define( [
 	/**
 	 * @class jqc.Label
 	 * @extends jqc.Component
+	 * @alias type.label
 	 * 
 	 * Creates a label (piece of text).
 	 */

@@ -1,6 +1,6 @@
 /* UI Icons from jQuery UI. http://jqueryui.com */
 /*
- * These icon CSS classes are to be used with the background images found in /images/icons/. 
+ * These icon CSS classes are to be used with the background images found in resources/img/icons/. 
  * 
  * For example, background-image: url( '../../resources/img/icons/ui-icons_222222_256x240.png' )
  */
@@ -1011,6 +1011,14 @@ button.jqc-Button::-moz-focus-inner {
   margin: 0;
   padding: 0;
 }
+/* line 9, ../../../src/css/base/form/field/_Field.scss */
+.jqc-form-Field.jqc-form-Field-leftLabel {
+  table-layout: fixed;
+}
+/* line 10, ../../../src/css/base/form/field/_Field.scss */
+.jqc-form-Field.jqc-form-Field-topLabel {
+  table-layout: auto;
+}
 
 /* line 14, ../../../src/css/base/form/field/_Field.scss */
 .jqc-form-Field-leftLabelCell {
@@ -1022,6 +1030,12 @@ button.jqc-Button::-moz-focus-inner {
 /* line 18, ../../../src/css/base/form/field/_Field.scss */
 .jqc-form-Field-inputCell {
   vertical-align: top;
+  width: 100%;
+}
+
+/* line 19, ../../../src/css/base/form/field/_Field.scss */
+.jqc-form-Field-inputContainer {
+  position: relative;
 }
 
 /* This is for the custom implementation of dropdowns, which don't use the html <select> element 
@@ -1093,6 +1107,14 @@ iframe.jqc-form-DropdownField-shim {
   /* Override some user agent style sheets, like Chrome which has a 5px outline */
 }
 
+/* line 15, ../../../src/css/base/form/field/_Text.scss */
+.jqc-form-TextField-emptyText, .jqc-form-TextAreaField-emptyText {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+}
+
 /* line 2, ../../../src/css/base/layout/_Hbox.scss */
 .jqc-layout-HBox-component {
   float: left;
@@ -1102,16 +1124,6 @@ iframe.jqc-form-DropdownField-shim {
 /* line 8, ../../../src/css/base/layout/_Hbox.scss */
 .jqc-layout-HBox-clear {
   clear: both;
-}
-
-/* line 6, ../../../src/css/base/panel/_Panel.scss */
-.jqc-Panel-header-title {
-  float: left;
-}
-
-/* line 7, ../../../src/css/base/panel/_Panel.scss */
-.jqc-Panel-header-toolButtons {
-  float: right;
 }
 
 /* line 3, ../../../src/css/base/panel/_ToolButton.scss */
@@ -1131,7 +1143,7 @@ iframe.jqc-form-DropdownField-shim {
 }
 
 /* General Styles */
-/* line 18, ../../../src/css/base/base.scss */
+/* line 19, ../../../src/css/base/base.scss */
 .jqc-clear {
   clear: both;
 }

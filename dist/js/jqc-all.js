@@ -1467,6 +1467,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 	/**
 	 * @class jqc.Component
 	 * @extends Observable
+	 * @alias type.component
 	 * 
 	 * Generalized component that defines a displayable item that can be placed onto a page. Provides a base element (by default, a div),
 	 * and a framework for the instantiation, rendering, and (eventually) the destruction process, with events that can be listened to
@@ -3542,7 +3543,6 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 	} );
 	
 	
-	// Register the type so it can be created by the string 'component' in an anonymous config object
 	ComponentManager.registerType( 'component', Component );
 
 	return Component;
@@ -3933,6 +3933,7 @@ define('jqc/layout/Auto', [
 	/**
 	 * @class jqc.layout.Auto
 	 * @extends jqc.layout.Layout
+	 * @alias layout.auto
 	 * 
 	 * The default layout that is used for a {@link jqc.Container Container}, which simply
 	 * renders each child component into their own div element, and does no further sizing or formatting.
@@ -3985,6 +3986,7 @@ define('jqc/Container', [
 	/**
 	 * @class jqc.Container
 	 * @extends jqc.Component
+	 * @alias type.container
 	 *
 	 * Base class for a component that holds other child components. Provides a default
 	 * container layout that just adds child components directly into it with no layout.
@@ -4911,7 +4913,6 @@ define('jqc/Container', [
 	} );
 	
 	
-	// Register the type so it can be created by the string 'container'
 	ComponentManager.registerType( 'container', Container );
 	
 	
@@ -4928,8 +4929,9 @@ define('jqc/Image', [
 	/**
 	 * @class jqc.Image
 	 * @extends jqc.Component
+	 * @alias type.image
 	 *
-	 * A simple component which is an image.
+	 * A simple image component.
 	 */
 	var Image = Class.extend( Component, {
 		
@@ -5110,7 +5112,6 @@ define('jqc/Image', [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'Image'
 	ComponentManager.registerType( 'image', Image );
 	
 	return Image;
@@ -5124,6 +5125,7 @@ define('jqc/Label', [
 	/**
 	 * @class jqc.Label
 	 * @extends jqc.Component
+	 * @alias type.label
 	 * 
 	 * Creates a label (piece of text).
 	 */
@@ -5204,6 +5206,7 @@ define('jqc/button/Button', [
 	/**
 	 * @class jqc.button.Button
 	 * @extends jqc.Component
+	 * @alias type.button
 	 * 
 	 * A generic button that calls its {@link #handler} when clicked.
 	 */
@@ -5504,7 +5507,6 @@ define('jqc/button/Button', [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'button'
 	ComponentManager.registerType( 'button', Button );
 	
 	return Button;
@@ -5520,6 +5522,7 @@ define('jqc/panel/ToolButton', [
 	/**
 	 * @class jqc.panel.ToolButton
 	 * @extends jqc.button.Button
+	 * @alias type.toolbutton
 	 * 
 	 * Small utility class for a button that can be used in a {@link jqc.panel.Panel Panel's} header.
 	 */
@@ -5565,7 +5568,6 @@ define('jqc/panel/ToolButton', [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'toolbutton'
 	ComponentManager.registerType( 'toolbutton', ToolButton );
 	
 	return ToolButton;
@@ -5586,6 +5588,7 @@ define('jqc/panel/Panel', [
 	/**
 	 * @class jqc.panel.Panel
 	 * @extends jqc.Container
+	 * @alias type.panel
 	 *
 	 * An application-oriented {@link jqc.Container} subclass which supports adding a {@link #title} bar and 
 	 * {@link #toolButtons}.
@@ -5861,7 +5864,6 @@ define('jqc/panel/Panel', [
 		
 	} );
 	
-	// Register the type so it can be created by the type string 'panel'
 	ComponentManager.registerType( 'panel', Panel );
 	
 	return Panel;
@@ -6332,6 +6334,7 @@ define('jqc/Viewport', [
 	/**
 	 * @class jqc.Viewport
 	 * @extends jqc.Container
+	 * @alias type.viewport
 	 *  
 	 * A special {@link jqc.Container Container} which keeps itself at the size of its parent element, and responds to window resizes
 	 * to re-layout its child {@link jqc.Component Components}.
@@ -6447,8 +6450,8 @@ define('jqc/Viewport', [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'Viewport'
-	ComponentManager.registerType( 'Viewport', Viewport );
+	// Register the class so it can be created by the type string 'viewport'
+	ComponentManager.registerType( 'viewport', Viewport );
 	
 	return Viewport;
 	
@@ -6513,10 +6516,10 @@ define('jqc/form/field/Field', [
 		/**
 		 * @cfg {String} labelWidth
 		 * 
-		 * A string specifying how wide the label should be. This is only valid if the {@link #labelAlign} config is set 
-		 * to 'left'.
+		 * A number specifying how wide the label should be. This is only valid if the {@link #labelAlign} config 
+		 * is set to 'left'.
 		 */
-		labelWidth : '75',
+		labelWidth : 75,
 		
 		/**
 		 * @cfg {String} extraMsg 
@@ -6606,12 +6609,12 @@ define('jqc/form/field/Field', [
 				'</tr>',
 			'<% } %>',
 			'<tr>',
-				'<td id="<%= elId %>-leftLabelCell" class="<%= baseCls %>-leftLabelCell" width="<%= leftLabelWidth %>">',
+				'<td id="<%= elId %>-leftLabelCell" class="<%= baseCls %>-leftLabelCell" width="<%= labelWidth %>">',
 					'<% if( labelAlign === "left" ) { %>',
 						'<%= labelMarkup %>',
 					'<% } %>',
 				'</td>',
-				'<td id="<%= elId %>-inputCell" class="<%= baseCls %>-inputCell">',
+				'<td id="<%= elId %>-inputCell" class="<%= baseCls %>-inputCell" width="100%">',
 					'<div id="<%= elId %>-inputContainer" class="<%= baseCls %>-inputContainer" style="position: relative;"></div>',
 				'</td>',
 			'</tr>',
@@ -6679,7 +6682,7 @@ define('jqc/form/field/Field', [
 		 */
 		getRenderTplData : function() {
 			var labelAlign = this.labelAlign,
-			    labelRenderTpl = ( labelRenderTpl instanceof Template ) ? this.labelRenderTpl : new LoDashTpl( this.labelRenderTpl ),
+			    labelRenderTpl = ( this.labelRenderTpl instanceof Template ) ? this.labelRenderTpl : new LoDashTpl( this.labelRenderTpl ),
 			    labelMarkup = labelRenderTpl.apply( this.getLabelRenderTplData() );
 			
 			// Add properties to the object provided by the superclass, and return
@@ -6687,10 +6690,10 @@ define('jqc/form/field/Field', [
 				inputId   : this.inputId,
 				inputName : this.inputName,
 				
-				labelAlign     : labelAlign,
-				leftLabelWidth : ( this.label && labelAlign === 'left' ) ? this.labelWidth : 0,
-				labelMarkup    : labelMarkup,
-				extraMsg       : this.extraMsg || ""
+				labelAlign  : labelAlign,
+				labelWidth  : ( this.label && labelAlign === 'left' ) ? this.labelWidth : 0,  // labelWidth only valid when using a "left" side label (as opposed to "top")
+				labelMarkup : labelMarkup,
+				extraMsg    : this.extraMsg || ""
 			} );
 		},
 		
@@ -6906,6 +6909,8 @@ define('jqc/form/field/Checkbox', [
 	/**
 	 * @class jqc.form.field.Checkbox
 	 * @extends jqc.form.field.Field
+	 * @alias type.checkbox
+	 * @alias type.checkboxfield
 	 *  
 	 * Checkbox field component.
 	 */
@@ -6991,7 +6996,7 @@ define('jqc/form/field/Checkbox', [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'checkboxfield'
+	ComponentManager.registerType( 'checkbox', CheckboxField );
 	ComponentManager.registerType( 'checkboxfield', CheckboxField );
 	
 	return CheckboxField;
@@ -7268,6 +7273,8 @@ define('jqc/form/field/Dropdown', [
 	/**
 	 * @class jqc.form.field.Dropdown
 	 * @extends jqc.form.field.Field
+	 * @alias type.dropdown
+	 * @alias type.dropdownfield
 	 * 
 	 * Dropdown list where only one item may be selected.
 	 */
@@ -7925,7 +7932,7 @@ define('jqc/form/field/Dropdown', [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'dropdownfield'
+	ComponentManager.registerType( 'dropdown', DropdownField );
 	ComponentManager.registerType( 'dropdownfield', DropdownField );
 	
 	return DropdownField;
@@ -7942,6 +7949,8 @@ define('jqc/form/field/Hidden', [
 	/**
 	 * @class jqc.form.field.Hidden
 	 * @extends jqc.form.field.Field
+	 * @alias type.hidden
+	 * @alias type.hiddenfield
 	 * 
 	 * A hidden input. This class does not have any visible display.
 	 */
@@ -8021,7 +8030,7 @@ define('jqc/form/field/Hidden', [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'hiddenfield'
+	ComponentManager.registerType( 'hidden', HiddenField );
 	ComponentManager.registerType( 'hiddenfield', HiddenField );
 	
 	return HiddenField;
@@ -8040,6 +8049,8 @@ define('jqc/form/field/Radio', [
 	/**
 	 * @class jqc.form.field.Radio
 	 * @extends jqc.form.field.Field
+	 * @alias type.radio
+	 * @alias type.radiofield
 	 * 
 	 * Set of radio buttons (buttons where only one selection can be made at a time).
 	 */
@@ -8224,439 +8235,53 @@ define('jqc/form/field/Radio', [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'radiofield'
+	ComponentManager.registerType( 'radio', RadioField );
 	ComponentManager.registerType( 'radiofield', RadioField );
 	
 	return RadioField;
 	
 } );
 /*global define */
-define('jqc/form/field/Text.Behavior', [
-	'jquery',
-	'lodash',
-	'Class',
-	'jqc/Jqc'
-], function( jQuery, _, Class, Jqc ) {
-	
-	/**
-	 * @class jqc.form.field.Text.Behavior
-	 * @extends Object
-	 * 
-	 * Defines the interface for the strategy TextField behavior pattern implementation in {@link jqc.form.field.Text}.
-	 */
-	var TextFieldBehavior = Class.extend( Object, {
-			
-		/**
-		 * Called when the TextField is rendered.
-		 * 
-		 * @abstract
-		 * @method onRender
-		 * @param {jqc.form.field.Text} textField
-		 */
-		onRender : Jqc.emptyFn,
-		
-			
-		/**
-		 * Called when the TextField's setValue() method is called (if the TextField is rendered)
-		 * 
-		 * @abstract
-		 * @method onSetValue
-		 * @param {jqc.form.field.Text} textField
-		 * @param {String} value
-		 */
-		onSetValue : Jqc.emptyFn,
-		
-		
-		/**
-		 * Called when the TextField has been changed.
-		 * 
-		 * @abstract
-		 * @method onChange
-		 * @param {jqc.form.field.Text} textField
-		 */
-		onChange : Jqc.emptyFn,
-		
-		
-		/**
-		 * Called when the TextField has been focused.
-		 * 
-		 * @abstract
-		 * @method onFocus
-		 * @param {jqc.form.field.Text} textField
-		 */
-		onFocus : Jqc.emptyFn,
-		
-		
-		/**
-		 * Called when the TextField has been blurred.
-		 * 
-		 * @abstract
-		 * @method onBlur
-		 * @param {jqc.form.field.Text} textField
-		 */
-		onBlur : Jqc.emptyFn,
-		
-		
-		/**
-		 * Called when the TextField gets a keydown event.
-		 * 
-		 * @abstract
-		 * @method onKeyDown
-		 * @param {jqc.form.field.Text} textField
-		 * @param {jQuery.Event} evt The jQuery event object for the event.
-		 */
-		onKeyDown : Jqc.emptyFn,
-		
-		
-		/**
-		 * Called when the TextField gets a keyup event.
-		 * 
-		 * @abstract
-		 * @method onKeyUp
-		 * @param {jqc.form.field.Text} textField
-		 * @param {jQuery.Event} evt The jQuery event object for the event.
-		 */
-		onKeyUp : Jqc.emptyFn,
-		
-		
-		/**
-		 * Called when the TextField gets a keypress event.
-		 * 
-		 * @abstract
-		 * @method onKeyPress
-		 * @param {jqc.form.field.Text} textField
-		 * @param {jQuery.Event} evt The jQuery event object for the event.
-		 */
-		onKeyPress : Jqc.emptyFn
-		
-	} );
-
-	return TextFieldBehavior;
-	
-} );
-/*global define */
-define('jqc/form/field/Text.EmptyTextBehavior', [
-	'jquery',
-	'lodash',
-	'jqc/form/field/Text.Behavior'
-], function( jQuery, _, TextFieldBehavior ) {
-	
-	/**
-	 * @class jqc.form.field.Text.EmptyTextBehavior
-	 * @extends jqc.form.field.Text.Behavior
-	 * 
-	 * Handles a {jqc.form.field.Text TextField} when it is in the "default" state (i.e. it is displaying a default value
-	 * when empty).  This is opposed to when it is using the {@link jqc.form.field.Text.InfieldLabelBehavior InfieldLabelBehavior}, 
-	 * which is incompatible with the field having emptyText.
-	 */
-	var EmptyTextBehavior = TextFieldBehavior.extend( {
-		
-		/**
-		 * @private
-		 * @property emptyTextCls
-		 * The CSS class that should be applied when showing the {@link jqc.form.field.Text#emptyText emptyText}.
-		 * @type String
-		 */
-		emptyTextCls : 'jqc-hint-text',
-		
-		
-		/**
-		 * Called when the TextField's setValue() method is called (if the TextField is rendered), which handles
-		 * the {@link jqc.form.field.Text#emptyText emptyText}.
-		 * 
-		 * @param {jqc.form.field.Text} textField
-		 * @param {String} value
-		 */
-		onSetValue : function( textField, value ) {
-			// If the value being set is the emptyText, add the jqc-hint-text class.  Not sure if this should definitely be like this, but it should work 
-			// for most cases (i.e. every case except when the user sets actual data that is the emptyText). Otherwise, make sure that the jqc-hint-text class 
-			// is removed on set.
-			if( value === textField.getEmptyText() ) {
-				textField.getInputEl().addClass( this.emptyTextCls );
-			} else {
-				textField.getInputEl().removeClass( this.emptyTextCls );
-			}
-		},
-		
-		
-		/**
-		 * Called when the TextField has been focused, which removes the {@link jqc.form.field.Text#emptyText emptyText} in the TextField
-		 * if that is what is currently set.
-		 * 
-		 * @param {jqc.form.field.Text} textField
-		 */
-		onFocus : function( textField ) {		
-			// make sure the "empty text" css class is removed
-			textField.getInputEl().removeClass( this.emptyTextCls );
-			
-			// If the current value is the emptyText value, clear the field.
-			if( textField.getValue() === textField.getEmptyText() ) {
-				textField.setValue( "" );
-			}
-		},
-		
-		
-		/**
-		 * Called when the TextField has been blurred, to set the {@link jqc.form.field.Text#emptyText emptyText} 
-		 * back into the field if the field has been left empty. This action is only performed however if the 
-		 * {@link jqc.form.field.Text#restoreEmptyText restoreEmptyText} config is true on the 
-		 * {@link jqc.form.field.Text TextField}.
-		 * 
-		 * @param {jqc.form.field.Text} textField
-		 */
-		onBlur : function( textField ) {
-			// If the field is empty when blurred, and its restoreEmptyText config is true, then put in the 
-			// emptyText back in (which will add the appropriate css class).
-			if( textField.restoreEmptyText && textField.getValue() === "" ) {
-				textField.setValue( textField.getEmptyText() || "" );
-			}
-		}
-		
-	} );
-
-	return EmptyTextBehavior;
-	
-} );
-/*global define */
-define('jqc/form/field/Text.InfieldLabelBehavior', [
-	'jquery',
-	'lodash',
-	'jqc/form/field/Text.Behavior'
-], function( jQuery, _, TextFieldBehavior ) {
-	
-	/**
-	 * @class jqc.form.field.Text.InfieldLabelBehavior
-	 * @extends jqc.form.field.Text.Behavior
-	 * 
-	 * Handles a {@link jqc.form.field.Text TextField} when it is in the "infield label" state (i.e. it is displaying a label that
-	 * is shown inside the field itself).  This is opposed to when it is using the {@link jqc.form.field.Text.EmptyTextBehavior EmptyTextBehavior}, 
-	 * which is incompatible with the field having an "infield" label.
-	 * 
-	 * This implementation is based off of the jquery.infield labels plugin. http://fuelyourcoding.com/scripts/infield/
-	 */
-	var InfieldLabelBehavior = TextFieldBehavior.extend( {
-		
-		/**
-		 * @cfg {Number} fadeOpacity
-		 * Once the field has focus, how transparent should the label be.
-		 * Should be a number between 0 and 1. Defaults to 0.5.
-		 */
-		fadeOpacity : 0.5, 
-		
-		/**
-		 * @cfg {Number} fadeDuration
-		 * The duration (in milliseconds) to fade the label element. Defaults to 300.
-		 */
-		fadeDuration : 300,
-		
-		
-		/**
-		 * Flag to store whether the label is currently shown or not.
-		 *
-		 * @private 
-		 * @property labelShown
-		 * @type Boolean
-		 */
-		labelShown : true,
-		
-		
-		/**
-		 * Called when the TextField is rendered.
-		 * 
-		 * @param {jqc.form.field.Text} textField
-		 */
-		onRender : function( textField ) {
-			// "infield" labels move the label element into the input container. It is absolutely positioned from there.
-			var $labelEl = textField.getLabelEl();
-			$labelEl.bind( 'click', function() { textField.focus(); } );  // when clicked, we want to focus the text field
-			textField.getInputContainerEl().append( $labelEl );
-			
-			textField.getInputEl().attr( 'autocomplete', 'false' );  // set autocomplete="false" on the field to fix issues with browser autocomplete and "infield" labels
-			
-			this.checkForEmpty( textField );
-		},
-		
-		
-		/**
-		 * Called when the TextField's setValue() method is called (if the TextField is rendered)
-		 * 
-		 * @param {jqc.form.field.Text} textField
-		 * @param {String} value
-		 */
-		onSetValue : function( textField, value ) {
-			if( textField.rendered ) {
-				this.checkForEmpty( textField );
-			}
-		},
-		
-		
-		/**
-		 * Called when the TextField has been changed.
-		 * 
-		 * @param {jqc.form.field.Text} textField
-		 */
-		onChange : function( textField ) {
-			if( textField.rendered ) {
-				this.checkForEmpty( textField );
-			}
-		},
-		
-		
-		/**
-		 * Called when the TextField has been focused.
-		 * 
-		 * @param {jqc.form.field.Text} textField
-		 */
-		onFocus : function( textField ) {
-			// If the label is currently shown, fade it to the fadeOpacity config
-			if( textField.rendered && this.labelShown ) {
-				this.setLabelOpacity( textField.getLabelEl(), this.fadeOpacity ); 
-			}
-		},
-		
-		
-		/**
-		 * Called when the TextField has been blurred.
-		 * 
-		 * @param {jqc.form.field.Text} textField
-		 */
-		onBlur : function( textField ) {
-			if( textField.rendered ) {
-				this.checkForEmpty( textField );
-			}
-		},
-		
-		
-		/**
-		 * Called when the TextField gets a keydown event.
-		 * 
-		 * @param {jqc.form.field.Text} textField
-		 * @param {jQuery.Event} evt The jQuery event object for the event.
-		 */
-		onKeyDown : function( textField, evt ) {
-			if( textField.rendered ) {
-				// Skip Shift and Tab keydowns
-				if( evt.keyCode === 16 || evt.keyCode === 9 ) {
-					return;
-				}
-				
-				if( this.labelShown ) {
-					textField.getLabelEl().hide();
-					this.labelShown = false;
-				}
-			}
-		},
-		
-		
-		// ------------------------------
-		
-		
-		/**
-		 * Animates the label element's opacity of the TextField to the provided `opacity`.
-		 * 
-		 * @private
-		 * @param {jQuery} $labelEl The label element.
-		 * @param {Number} opacity
-		 */
-		setLabelOpacity : function( $labelEl, opacity ) {
-			$labelEl.stop().animate( { opacity: opacity }, this.fadeDuration );
-			this.labelShown = ( opacity > 0.0 );
-		},
-		
-		
-		/**
-		 * @private
-		 * @param {jQuery} $labelEl The label element.
-		 */
-		prepLabelForShow : function( $labelEl ) {
-			if( !this.labelShown ) {
-				$labelEl.css( { opacity: 0.0 } ).show();
-			}
-		},
-		
-		
-		/**
-		 * Checks the TextField to see if it's empty, and if so shows the infield label.
-		 * If it's not empty, 
-		 * 
-		 * @private
-		 * @param {jqc.form.field.Text} textField
-		 */
-		checkForEmpty : function( textField ) {
-			var $labelEl = textField.getLabelEl();
-			
-			if( textField.getValue() === "" ) {
-				this.prepLabelForShow( $labelEl );
-				this.setLabelOpacity( $labelEl, 1.0 );
-			} else {
-				this.setLabelOpacity( $labelEl, 0.0 );
-			}
-		}
-	
-	} );
-	
-	return InfieldLabelBehavior;
-	
-} );
-
-/*global define */
 define('jqc/form/field/Text', [
 	'jquery',
 	'lodash',
 	'jqc/util/Html',
 	'jqc/ComponentManager',
-	'jqc/form/field/Field',
-	'jqc/form/field/Text.EmptyTextBehavior',
-	'jqc/form/field/Text.InfieldLabelBehavior'
-], function( jQuery, _, Html, ComponentManager, Field, EmptyTextBehavior, InfieldLabelBehavior ) {
+	'jqc/form/field/Field'
+], function( jQuery, _, Html, ComponentManager, Field ) {
 	
 	/**
 	 * @class jqc.form.field.Text
 	 * @extends jqc.form.field.Field
+	 * @alias type.textfield
 	 * 
-	 * Text (string) field component for the editor.
+	 * Text field component.
 	 */
 	var TextField = Field.extend( {
 		
 		/**
 		 * @cfg {Boolean} selectOnFocus
+		 * 
 		 * True to have the field's text automatically selected when the field is focused. Defaults to false. 
 		 */
 		selectOnFocus : false,
 		
 		/**
-		 * @cfg {String} labelAlign
-		 * A string that specifies where the field's label should be placed. Valid values are: "left", "top", 
-		 * and "infield". The "infield" label position places the label inside the text field itself, which 
-		 * is then hidden when the user starts typing into the field. Defaults to 'left'.
-		 * 
-		 * Note that a labelAlign set to "infield" is not compatible with the {@link #emptyText} 
-		 * config. The provided {@link #emptyText} will not be used in this case. 
-		 */
-		
-		/**
 		 * @cfg {String} emptyText
-		 * The text to show in the field when the field is empty. When the user focuses the field, this text
-		 * will be removed, allowing the user to type their value. If provided, and no {@link #value} is provided,
-		 * the {@link #value} will be set to this.
 		 * 
-		 * Note that this is not compatible with the {@link #labelAlign} config set to "infield". See the description of {@link #labelAlign}.
-		 */
-		
-		/**
-		 * @cfg {Boolean} restoreEmptyText
-		 * True to enable the restoration of the {@link #emptyText} (if any) when the field loses focus (is blurred), and is empty.
-		 * If this is true, the {@link #emptyText} will be re-applied to the field when it has no value (i.e. it's an
-		 * empty string).  If this is false, the {@link #emptyText} will not be re-applied to the field when it loses 
-		 * focus. Defaults to true.
+		 * The text to show in the field when the field is empty. When the user enters something into the field, this 
+		 * text will be removed. If the field becomes empty again, this text will be re-shown.
 		 * 
-		 * Note: This only applies when the {@link #labelAlign} config is not "infield". Infield labels cannot have
-		 * an {@link #emptyText} value.
+		 * The implementation of the emptyText itself is an element that is placed over the field when the field is empty.
+		 * This is done instead of putting in "placeholder" text so that the emptyText can easily be styled, and so that
+		 * on older browsers that don't support the HTML5 "placeholder" attribute (IE8), the field doesn't need to have a
+		 * value of the {@link #emptyText}.
 		 */
-		restoreEmptyText : true,
+		emptyText : "",
 		
 		/**
 		 * @cfg {String} value
+		 * 
 		 * The initial value for the field, if any.
 		 */
 		
@@ -8681,13 +8306,28 @@ define('jqc/form/field/Text', [
 		 */
 		
 		/**
-		 * @private
-		 * @property {jqc.form.field.Text.Behavior} behaviorState
+		 * @protected
+		 * @property {Boolean} focused
 		 * 
-		 * The {@link jqc.form.field.Text.Behavior} object that governs the TextField's behavior.
-		 * This currently applies to either the TextField having an {@link #emptyText} value, 
-		 * or the TextField having an "infield" {@link #labelAlign}.
+		 * Flag which is set to `true` while the TextField is focused.
 		 */
+		focused : false,
+		
+		/**
+		 * @protected
+		 * @property {jQuery} $emptyTextEl
+		 * 
+		 * The element that holds the {@link #emptyText}, which is shown over the {@link #$inputEl}
+		 * when the field is empty.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {Boolean} emptyTextShown
+		 * 
+		 * Flag to store whether the {@link #$emptyTextEl} is currently shown or not.
+		 */
+		emptyTextShown : false,
 		
 		
 		/**
@@ -8725,23 +8365,8 @@ define('jqc/form/field/Text', [
 				'keypress'
 			);
 			
-			// Set the TextField's behavior "state", based on if it is set to have an "infield" label or not.
-			// "infield" labels are incompatible with having a regular default value (i.e. the default showing on top
-			// of the "infield" label does not look right), and thus are mutually exclusive behaviors.
-			if( this.labelAlign === 'infield' ) {
-				this.behaviorState = new InfieldLabelBehavior();
-			} else {
-				this.behaviorState = new EmptyTextBehavior();
-			}
-			
 			// If a value was provided, and it is not a string, convert it to one now. normalizeValue handles all datatypes.
 			this.value = this.normalizeValue( this.value );
-			
-			// If the value is an empty string, and there was emptyText provided, initialize it to the emptyText.
-			// That is what will be displayed in the field (with the appropriate CSS class to make it look like the emptyText).
-			if( this.value === "" && this.emptyText ) {
-				this.value = this.emptyText;
-			}
 		},
 		
 		
@@ -8765,8 +8390,12 @@ define('jqc/form/field/Text', [
 				keypress : _.bind( this.onKeyPress, this )
 			} );
 			
-			// Call state object's onRender to allow it to implement whatever processing is necessary
-			this.behaviorState.onRender( this );
+			// Set up the empty text element. This element is absolutely positioned in the inputContainer, and is initially hidden.
+			this.$emptyTextEl = jQuery( '<div class="' + this.componentCls + '-emptyText">' + this.emptyText + '</div>' )
+				.on( 'click', function() { $inputEl.focus(); } )  // when the emptyText itself is clicked, focus the text field
+				.appendTo( this.$inputContainerEl );
+			
+			this.handleEmptyText();
 		},
 		
 		
@@ -8840,9 +8469,6 @@ define('jqc/form/field/Text', [
 				
 			} else {
 				this.$inputEl.val( value );
-				
-				// Allow the TextField's behaviorState to handle the value being set
-				this.behaviorState.onSetValue( this, value );
 			}
 			
 			// Run onchange, to notify listeners of a change
@@ -8873,6 +8499,10 @@ define('jqc/form/field/Text', [
 		 */
 		setEmptyText : function( emptyText ) {
 			this.emptyText = emptyText;
+			
+			if( this.rendered ) {
+				this.$emptyTextEl.html( emptyText );
+			}
 		},
 		
 		
@@ -8895,14 +8525,14 @@ define('jqc/form/field/Text', [
 		
 		
 		/**
-		 * Extension of onChange template method used to allow the {@link #behaviorState} to handle
-		 * the change event.
+		 * Extension of onChange template method used to handle the {@link #emptyText}.
 		 *
 		 * @protected
 		 */
 		onChange : function() {
-			// Allow the TextField's behaviorState to handle the change event
-			this.behaviorState.onChange( this );
+			if( this.rendered ) {
+				this.handleEmptyText();
+			}
 			
 			this._super( arguments );
 		},
@@ -8936,8 +8566,8 @@ define('jqc/form/field/Text', [
 		 * @inheritdoc
 		 */
 		onFocus : function() {
-			// Allow the TextField's behaviorState to handle the focus event
-			this.behaviorState.onFocus( this );
+			this.focused = true;
+			this.handleEmptyText();
 			
 			// If the selectOnFocus config is true, select the text
 			if( this.selectOnFocus ) {
@@ -8952,10 +8582,20 @@ define('jqc/form/field/Text', [
 		 * @inheritdoc
 		 */
 		onBlur : function() {
-			// Allow the TextField's behaviorState to handle the blur event
-			this.behaviorState.onBlur( this );
+			this.focused = false;
+			this.handleEmptyText();
 			
 			this._super( arguments );
+		},
+		
+		
+		/**
+		 * Determines if the TextField is currently focused.
+		 * 
+		 * @return {Boolean} `true` if the TextField is currently focused, false otherwise.
+		 */
+		isFocused : function() {
+			return this.focused;
 		},
 		
 		
@@ -8966,9 +8606,6 @@ define('jqc/form/field/Text', [
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyDown : function( evt ) {
-			// Allow the TextField's behaviorState to handle the keydown event
-			this.behaviorState.onKeyDown( this, evt );
-			
 			this.fireEvent( 'keydown', this, evt ); 
 		},
 		
@@ -8980,9 +8617,6 @@ define('jqc/form/field/Text', [
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyUp : function( evt ) {
-			// Allow the TextField's behaviorState to handle the keyup event
-			this.behaviorState.onKeyUp( this, evt );
-			
 			this.fireEvent( 'keyup', this, evt );
 		},
 		
@@ -8994,16 +8628,34 @@ define('jqc/form/field/Text', [
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyPress : function( evt ) {
-			// Allow the TextField's behaviorState to handle the keypress event
-			this.behaviorState.onKeyPress( this, evt );
-			
 			this.fireEvent( 'keypress', this, evt ); 
+		},
+		
+		
+		// ---------------------------------------
+		
+		// Empty Text Handling Utility Methods
+		
+		/**
+		 * Checks the TextField to see if it's empty, and if so shows the {@link #emptyText}.
+		 * 
+		 * @protected
+		 */
+		handleEmptyText : function() {
+			if( !this.focused && this.getValue() === "" ) {
+				if( !this.emptyTextShown ) {
+					this.$emptyTextEl.show();
+					this.emptyTextShown = true;
+				}
+			} else {
+				this.$emptyTextEl.hide();
+				this.emptyTextShown = false;
+			}
 		}
 		
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'textfield'
 	ComponentManager.registerType( 'textfield', TextField );
 
 	return TextField;
@@ -9021,6 +8673,8 @@ define('jqc/form/field/TextArea', [
 	/**
 	 * @class jqc.form.field.TextArea
 	 * @extends jqc.form.field.Text
+	 * @alias type.textarea
+	 * @alias type.textareafield
 	 * 
 	 * TextArea field component.
 	 */
@@ -9330,7 +8984,7 @@ define('jqc/form/field/TextArea', [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'textareafield'
+	ComponentManager.registerType( 'textarea', TextAreaField );
 	ComponentManager.registerType( 'textareafield', TextAreaField );
 	
 	return TextAreaField;
@@ -9443,6 +9097,7 @@ define('jqc/layout/Card', [
 	/**
 	 * @class jqc.layout.Card
 	 * @extends jqc.layout.Layout
+	 * @alias layout.card
 	 * 
 	 * A layout that renders a {@link jqc.Container Container's} child components where only one child (card) can be shown 
 	 * at a time (such as showing only the top card in a deck of cards).  Methods are available in this class to control
@@ -9724,6 +9379,7 @@ define('jqc/layout/Column', [
 	/**
 	 * @class jqc.layout.Column
 	 * @extends jqc.layout.Layout
+	 * @alias layout.column
 	 * 
 	 * A layout that renders a {@link jqc.Container Container's} child components into columns. Each child component
 	 * in the Container should have a special property named `columnWidth`, that determines how wide the column
@@ -9861,6 +9517,7 @@ define('jqc/layout/Fit', [
 	/**
 	 * @class jqc.layout.Fit
 	 * @extends jqc.layout.Layout
+	 * @alias layout.fit
 	 * 
 	 * A layout that renders a {@link jqc.Container Container's} child component to full height and width of the container. 
 	 * A FitLayout only renders the first {@link jqc.Container#items child component} of a {@link jqc.Container Container}.
@@ -9968,6 +9625,7 @@ define('jqc/layout/HBox', [
 	/**
 	 * @class jqc.layout.HBox
 	 * @extends jqc.layout.Layout
+	 * @alias layout.hbox
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
 	 * in the Container that should have a flexible width that proportionally should take up the remaining area of its parent
@@ -10136,6 +9794,7 @@ define('jqc/layout/VBox', [
 	/**
 	 * @class jqc.layout.VBox
 	 * @extends jqc.layout.Layout
+	 * @alias layout.vbox
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
 	 * in the Container that should have a flexible height that proportionally should take up the remaining area of its parent
@@ -10266,12 +9925,14 @@ define('jqc/layout/VBox', [
 define('jqc/view/Collection', [
 	'jquery',
 	'lodash',
+	'jqc/ComponentManager',
 	'jqc/Component'
-], function( jQuery, _, Component ) {
+], function( jQuery, _, ComponentManager, Component ) {
 	
 	/**
 	 * @class jqc.view.Collection
 	 * @extends jqc.Component
+	 * @alias type.collectionview
 	 * 
 	 * A view of the {@link data.Model Models} in a {@link data.Collection}. The view uses the {@link #tpl} config, which 
 	 * is automatically passed the {@link #collection collection's} models to populate the template. When the 
@@ -10737,6 +10398,9 @@ define('jqc/view/Collection', [
 		
 	} );
 	
+	
+	ComponentManager.registerType( 'collectionview', CollectionView );
+	
 	return CollectionView;
 	
 } );
@@ -10744,12 +10408,14 @@ define('jqc/view/Collection', [
 define('jqc/view/Model', [
 	'jquery',
 	'lodash',
+	'jqc/ComponentManager',
 	'jqc/Component'
-], function( jQuery, _, Component ) {
+], function( jQuery, _, ComponentManager, Component ) {
 	
 	/**
 	 * @class jqc.view.Model
 	 * @extends jqc.Component
+	 * @alias type.modelview
 	 * 
 	 * A view of the data in a single {@link data.Model}. The view uses the {@link #tpl} config, which 
 	 * is automatically passed the {@link #model} to populate the template. When any of the {@link #model model's} 
@@ -11051,6 +10717,9 @@ define('jqc/view/Model', [
 		
 	} );
 	
+	
+	ComponentManager.registerType( 'modelview', ModelView );
+	
 	return ModelView;
 	
 } );
@@ -11063,6 +10732,7 @@ define('jqc/window/Window', [
 	/**
 	 * @class jqc.window.Window
 	 * @extends jqc.Overlay
+	 * @alias type.window
 	 * 
 	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link jqc.panel.Panel Panel}, the Window
 	 * may accept a {@link #title}, and it also adds a {@link #closeButton close button} to the top right  
@@ -11172,10 +10842,9 @@ define('jqc/window/Window', [
 	} );
 	
 	
-	// Register the type so that it can be created by the type string 'window'
 	ComponentManager.registerType( 'window', Window );
 	
 	return Window;
 	
 } );
-require(["jqc/Component", "jqc/ComponentManager", "jqc/Container", "jqc/Image", "jqc/Jqc", "jqc/Label", "jqc/Mask", "jqc/Overlay", "jqc/Viewport", "jqc/anim/Animation", "jqc/button/Button", "jqc/form/field/Checkbox", "jqc/form/field/Dropdown", "jqc/form/field/Field", "jqc/form/field/Hidden", "jqc/form/field/Radio", "jqc/form/field/Text.Behavior", "jqc/form/field/Text.EmptyTextBehavior", "jqc/form/field/Text.InfieldLabelBehavior", "jqc/form/field/Text", "jqc/form/field/TextArea", "jqc/layout/Auto", "jqc/layout/Card", "jqc/layout/Card.SwitchTransition", "jqc/layout/Card.Transition", "jqc/layout/Column", "jqc/layout/Fit", "jqc/layout/HBox", "jqc/layout/Layout", "jqc/layout/VBox", "jqc/panel/Panel", "jqc/panel/ToolButton", "jqc/plugin/Plugin", "jqc/template/LoDash", "jqc/template/Template", "jqc/util/Css", "jqc/util/Html", "jqc/util/OptionsStore", "jqc/view/Collection", "jqc/view/Model", "jqc/window/Window"]);
+require(["jqc/Component", "jqc/ComponentManager", "jqc/Container", "jqc/Image", "jqc/Jqc", "jqc/Label", "jqc/Mask", "jqc/Overlay", "jqc/Viewport", "jqc/anim/Animation", "jqc/button/Button", "jqc/form/field/Checkbox", "jqc/form/field/Dropdown", "jqc/form/field/Field", "jqc/form/field/Hidden", "jqc/form/field/Radio", "jqc/form/field/Text", "jqc/form/field/TextArea", "jqc/layout/Auto", "jqc/layout/Card", "jqc/layout/Card.SwitchTransition", "jqc/layout/Card.Transition", "jqc/layout/Column", "jqc/layout/Fit", "jqc/layout/HBox", "jqc/layout/Layout", "jqc/layout/VBox", "jqc/panel/Panel", "jqc/panel/ToolButton", "jqc/plugin/Plugin", "jqc/template/LoDash", "jqc/template/Template", "jqc/util/Css", "jqc/util/Html", "jqc/util/OptionsStore", "jqc/view/Collection", "jqc/view/Model", "jqc/window/Window"]);

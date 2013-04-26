@@ -58,10 +58,10 @@ define( [
 		/**
 		 * @cfg {String} labelWidth
 		 * 
-		 * A string specifying how wide the label should be. This is only valid if the {@link #labelAlign} config is set 
-		 * to 'left'.
+		 * A number specifying how wide the label should be. This is only valid if the {@link #labelAlign} config 
+		 * is set to 'left'.
 		 */
-		labelWidth : '75',
+		labelWidth : 75,
 		
 		/**
 		 * @cfg {String} extraMsg 
@@ -151,12 +151,12 @@ define( [
 				'</tr>',
 			'<% } %>',
 			'<tr>',
-				'<td id="<%= elId %>-leftLabelCell" class="<%= baseCls %>-leftLabelCell" width="<%= leftLabelWidth %>">',
+				'<td id="<%= elId %>-leftLabelCell" class="<%= baseCls %>-leftLabelCell" width="<%= labelWidth %>">',
 					'<% if( labelAlign === "left" ) { %>',
 						'<%= labelMarkup %>',
 					'<% } %>',
 				'</td>',
-				'<td id="<%= elId %>-inputCell" class="<%= baseCls %>-inputCell">',
+				'<td id="<%= elId %>-inputCell" class="<%= baseCls %>-inputCell" width="100%">',
 					'<div id="<%= elId %>-inputContainer" class="<%= baseCls %>-inputContainer" style="position: relative;"></div>',
 				'</td>',
 			'</tr>',
@@ -224,7 +224,7 @@ define( [
 		 */
 		getRenderTplData : function() {
 			var labelAlign = this.labelAlign,
-			    labelRenderTpl = ( labelRenderTpl instanceof Template ) ? this.labelRenderTpl : new LoDashTpl( this.labelRenderTpl ),
+			    labelRenderTpl = ( this.labelRenderTpl instanceof Template ) ? this.labelRenderTpl : new LoDashTpl( this.labelRenderTpl ),
 			    labelMarkup = labelRenderTpl.apply( this.getLabelRenderTplData() );
 			
 			// Add properties to the object provided by the superclass, and return
@@ -232,10 +232,10 @@ define( [
 				inputId   : this.inputId,
 				inputName : this.inputName,
 				
-				labelAlign     : labelAlign,
-				leftLabelWidth : ( this.label && labelAlign === 'left' ) ? this.labelWidth : 0,
-				labelMarkup    : labelMarkup,
-				extraMsg       : this.extraMsg || ""
+				labelAlign  : labelAlign,
+				labelWidth  : ( this.label && labelAlign === 'left' ) ? this.labelWidth : 0,  // labelWidth only valid when using a "left" side label (as opposed to "top")
+				labelMarkup : labelMarkup,
+				extraMsg    : this.extraMsg || ""
 			} );
 		},
 		

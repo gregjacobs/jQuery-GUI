@@ -11,6 +11,8 @@ define( [
 	/**
 	 * @class jqc.form.field.Radio
 	 * @extends jqc.form.field.Field
+	 * @alias type.radio
+	 * @alias type.radiofield
 	 * 
 	 * Set of radio buttons (buttons where only one selection can be made at a time).
 	 */
@@ -195,7 +197,7 @@ define( [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'radiofield'
+	ComponentManager.registerType( 'radio', RadioField );
 	ComponentManager.registerType( 'radiofield', RadioField );
 	
 	return RadioField;

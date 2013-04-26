@@ -1,4 +1,4 @@
-/*global define, describe, it, xit, expect, JsMockito */
+/*global define, describe, beforeEach, afterEach, it, xit, expect, JsMockito */
 define( [
 	'jquery',
 	'Class',
@@ -500,10 +500,7 @@ define( [
 		
 		
 		
-		/*
-		 * Test the remove() method
-		 */
-		describe( "Test the remove() method", function() {
+		describe( 'remove()', function() {
 			
 			it( "remove", function() {
 				// Test removing a single item at a time
@@ -750,6 +747,69 @@ define( [
 				container.remove( cmp1 );
 				expect( cmp1.getParentContainer() ).toBe( null );  // The parentContainer reference should have been set back to null on the component after removal from the container
 			} );
+		} );
+		
+		
+		describe( 'removeAt()', function() {
+			var cmp0,
+			    cmp1,
+			    cmp2,
+			    container;
+			
+			beforeEach( function() {
+				cmp0 = new Component();
+				cmp1 = new Component();
+				cmp2 = new Component();
+				
+				container = new Container( {
+					items : [ cmp0, cmp1, cmp2 ]
+				} );
+			} );
+			
+			
+			it( "should remove an item at a given index, and return the removed Component", function() {
+				var returnedCmp;
+				
+				// Initial condition
+				expect( container.getItems().length ).toBe( 3 );
+				expect( container.getItems()[ 0 ] ).toBe( cmp0 );
+				expect( container.getItems()[ 1 ] ).toBe( cmp1 );
+				expect( container.getItems()[ 2 ] ).toBe( cmp2 );
+				
+				returnedCmp = container.removeAt( 2 );
+				expect( container.getItems().length ).toBe( 2 );
+				expect( container.getItems()[ 0 ] ).toBe( cmp0 );
+				expect( container.getItems()[ 1 ] ).toBe( cmp1 );
+				expect( returnedCmp ).toBe( cmp2 );
+				
+				returnedCmp = container.removeAt( 0 );
+				expect( container.getItems().length ).toBe( 1 );
+				expect( container.getItems()[ 0 ] ).toBe( cmp1 );
+				expect( returnedCmp ).toBe( cmp0 );
+				
+				returnedCmp = container.removeAt( 0 );
+				expect( container.getItems().length ).toBe( 0 );
+				expect( returnedCmp ).toBe( cmp1 );
+			} );
+			
+			
+			it( "should have no effect and return null if there is no child Component at the given `idx`", function() {
+				var returnedCmp;
+				
+				// Initial condition
+				expect( container.getItems().length ).toBe( 3 );
+				expect( container.getItems()[ 0 ] ).toBe( cmp0 );
+				expect( container.getItems()[ 1 ] ).toBe( cmp1 );
+				expect( container.getItems()[ 2 ] ).toBe( cmp2 );
+				
+				returnedCmp = container.removeAt( 3 );  // out of bounds - should have no effect
+				expect( container.getItems().length ).toBe( 3 );
+				expect( container.getItems()[ 0 ] ).toBe( cmp0 );
+				expect( container.getItems()[ 1 ] ).toBe( cmp1 );
+				expect( container.getItems()[ 2 ] ).toBe( cmp2 );
+				expect( returnedCmp ).toBe( null );
+			} );
+			
 		} );
 	
 		

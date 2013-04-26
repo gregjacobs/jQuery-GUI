@@ -7,6 +7,7 @@ define( [
 	/**
 	 * @class jqc.panel.ToolButton
 	 * @extends jqc.button.Button
+	 * @alias type.toolbutton
 	 * 
 	 * Small utility class for a button that can be used in a {@link jqc.panel.Panel Panel's} header.
 	 */
@@ -52,7 +53,6 @@ define( [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'toolbutton'
 	ComponentManager.registerType( 'toolbutton', ToolButton );
 	
 	return ToolButton;

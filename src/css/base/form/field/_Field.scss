@@ -6,8 +6,8 @@
 	border-collapse: collapse;
 	tbody, tr, th { margin: 0; padding: 0; }
 	
-	&.jqc-form-Field-leftLabel {}
-	&.jqc-form-Field-topLabel {}
+	&.jqc-form-Field-leftLabel { table-layout: fixed; }
+	&.jqc-form-Field-topLabel { table-layout: auto; }
 	&.jqc-form-Field-focused {}
 }
 
@@ -15,8 +15,8 @@
 .jqc-form-Field-topLabelCell {}
 .jqc-form-Field-label {}
 
-.jqc-form-Field-inputCell { vertical-align: top; }
-.jqc-form-Field-inputContainer {}
+.jqc-form-Field-inputCell { vertical-align: top; width: 100%; }  // width=100% to always take up as much space as possible
+.jqc-form-Field-inputContainer { position: relative; }  // give positioning context. Things like TextField's empty text is absolutely positioned to it.
 
 .jqc-form-Field-extraMsgCell {}
 .jqc-form-Field-extraMsg {}

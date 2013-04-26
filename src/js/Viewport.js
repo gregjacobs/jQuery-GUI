@@ -3,12 +3,14 @@ define( [
 	'jquery',
 	'lodash',
 	'jqc/ComponentManager',
-	'jqc/Container'
+	'jqc/Container',
+	'jqc/layout/Fit'  // used by layout 'type'
 ], function( jQuery, _, ComponentManager, Container ) {
 
 	/**
 	 * @class jqc.Viewport
 	 * @extends jqc.Container
+	 * @alias type.viewport
 	 *  
 	 * A special {@link jqc.Container Container} which keeps itself at the size of its parent element, and responds to window resizes
 	 * to re-layout its child {@link jqc.Component Components}.
@@ -44,6 +46,12 @@ define( [
 		initComponent : function() {
 			this._super( arguments );
 			
+			this.setStyle( {
+				'position'   : 'relative',
+				'overflow-x' : 'hidden',
+				'overflow-y' : 'auto'
+			} );
+			
 			this.onWindowResizeDelegate = _.debounce( _.bind( this.onWindowResize, this ), 150 );
 			jQuery( window ).bind( 'resize', this.onWindowResizeDelegate );
 		},
@@ -54,12 +62,6 @@ define( [
 		 */
 		onRender : function() {
 			this._super( arguments );
-			
-			this.$el.css( {
-				position     : 'relative',
-				'overflow-x' : 'hidden',
-				'overflow-y' : 'auto'
-			} );
 			
 			this.recalcDimensions();
 		},
@@ -76,7 +78,7 @@ define( [
 				    $parent = $el.parent();
 				    
 				$el.css( {
-					width: $parent.width(),
+					//width: $parent.width(),  -- let width be handled by the browser
 					height: $parent.height()
 				} );
 			}
@@ -124,8 +126,8 @@ define( [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'Viewport'
-	ComponentManager.registerType( 'Viewport', Viewport );
+	// Register the class so it can be created by the type string 'viewport'
+	ComponentManager.registerType( 'viewport', Viewport );
 	
 	return Viewport;
 	

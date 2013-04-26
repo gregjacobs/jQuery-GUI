@@ -2,12 +2,14 @@
 define( [
 	'jquery',
 	'lodash',
+	'jqc/ComponentManager',
 	'jqc/Component'
-], function( jQuery, _, Component ) {
+], function( jQuery, _, ComponentManager, Component ) {
 	
 	/**
 	 * @class jqc.view.Model
 	 * @extends jqc.Component
+	 * @alias type.modelview
 	 * 
 	 * A view of the data in a single {@link data.Model}. The view uses the {@link #tpl} config, which 
 	 * is automatically passed the {@link #model} to populate the template. When any of the {@link #model model's} 
@@ -308,6 +310,9 @@ define( [
 		}
 		
 	} );
+	
+	
+	ComponentManager.registerType( 'modelview', ModelView );
 	
 	return ModelView;
 	

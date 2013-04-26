@@ -179,7 +179,6 @@ define( [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'anchor'
 	ComponentManager.registerType( 'anchor', Anchor );
 	
 	return Anchor;

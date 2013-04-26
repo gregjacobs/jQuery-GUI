@@ -13,6 +13,7 @@ define( [
 	/**
 	 * @class jqc.Container
 	 * @extends jqc.Component
+	 * @alias type.container
 	 *
 	 * Base class for a component that holds other child components. Provides a default
 	 * container layout that just adds child components directly into it with no layout.
@@ -411,17 +412,19 @@ define( [
 	
 	
 		/**
-		 * Removes child {@link jqc.Component Component(s)} from this Container.  Removed {@link jqc.Component Components} will automatically have
-		 * their destroy() method called if the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is explicitly set to true.
-		 * If the Component is not destroyed, its main {@link jqc.Component#$el element} is detached from this Container.  When all Components are removed,
-		 * this method automatically calls {@link #doLayout} to refresh the layout.
+		 * Removes one or more child {@link jqc.Component Component(s)} from this Container.  
+		 * 
+		 * Removed {@link jqc.Component Components} will automatically have their {@link jqc.Component#destroy} method called if 
+		 * the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is explicitly set to true. 
+		 * If the Component is not destroyed, its main {@link jqc.Component#$el element} is detached from this Container.  When all 
+		 * Components are removed, this method automatically calls {@link #doLayout} to refresh the layout.
 		 *
 		 * Note that if multiple Components are being removed, it is recommended that they all be provided to this method
 		 * in one call, using the array form of the `cmp` argument.  A call to {@link #doLayout} will only be done
-		 * after all Components have been removed (and not once for each Component that is removed).
+		 * after all Components have been removed (as opposed to once for each Component that is removed).
 		 *
-		 * The 'remove' event will be fired for each Component that is successfully removed (i.e. the Component was found in the Container, and a
-		 * {@link #beforeremove} event handler did not return false for it).
+		 * The 'remove' event will be fired for each Component that is successfully removed (i.e. the Component was found in the 
+		 * Container, and a {@link #beforeremove} event handler did not return false for it).
 		 *
 		 * @method remove
 		 * @param {jqc.Component/jqc.Component[]} cmp A single child {@link jqc.Component Component}, or an array of child Components.
@@ -451,12 +454,33 @@ define( [
 	
 			return returnVal;
 		},
+		
+		
+		/**
+		 * Removes the child Component at the given `idx`, and returns the removed component. If there is no component 
+		 * at the given `idx`, then this method has no effect and returns `null`.
+		 * 
+		 * Note that the removed {@link jqc.Component Component} will automatically have its {@link jqc.Component#destroy destroy} 
+		 * method called if the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is 
+		 * explicitly set to true. If the Component is not destroyed, its main {@link jqc.Component#$el element} is detached from 
+		 * this Container.  
+		 * 
+		 * When the Component is removed, this method automatically calls {@link #doLayout} to refresh the layout.
+		 * 
+		 * The 'remove' event will be fired for each Component that is successfully removed (i.e. the Component was found in the 
+		 * Container, and a {@link #beforeremove} event handler did not return false for it).
+		 * 
+		 * @param {Number} idx The index of the child component to remove.
+		 * @return {jqc.Component} Returns the Component that was removed, or `null` if there was no Component at the given `idx`.
+		 */
+		removeAt : function( idx ) {
+			return this.remove( this.getItemAt( idx ) );
+		},
 	
 	
 		/**
 		 * Removes all child Component(s) from this Container.
 		 *
-		 * @method removeAll
 		 * @param {Boolean} destroyRemoved (optional) True to automatically destroy the removed components. Defaults to the value of this Container's {@link #destroyRemoved} config.
 		 */
 		removeAll : function( destroyRemoved ) {
@@ -939,7 +963,6 @@ define( [
 	} );
 	
 	
-	// Register the type so it can be created by the string 'container'
 	ComponentManager.registerType( 'container', Container );
 	
 	

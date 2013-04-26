@@ -7,6 +7,7 @@ define( [
 	/**
 	 * @class jqc.layout.VBox
 	 * @extends jqc.layout.Layout
+	 * @alias layout.vbox
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
 	 * in the Container that should have a flexible height that proportionally should take up the remaining area of its parent
