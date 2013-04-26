@@ -886,48 +886,6 @@
   background-position: -80px -224px;
 }
 
-/* line 1, ../../../src/css/base/_Button.scss */
-.jqc-Button {
-  display: inline-block;
-  position: relative;
-  margin: 0;
-  padding: 0;
-  line-height: normal;
-  cursor: pointer;
-  vertical-align: middle;
-  text-align: center;
-  overflow: visible;
-  /* removes extra width in IE */
-  border: none;
-}
-
-/* General Button Styles */
-/* line 15, ../../../src/css/base/_Button.scss */
-.jqc-Button-hiddenEl {
-  display: none !important;
-}
-
-/* Icons */
-/* line 18, ../../../src/css/base/_Button.scss */
-.jqc-Button-icon {
-  display: inline-block;
-}
-
-/* button text element */
-/* line 23, ../../../src/css/base/_Button.scss */
-.jqc-Button-text {
-  display: inline-block;
-  line-height: normal;
-}
-
-/* workarounds */
-/* reset extra padding in Firefox, see h5bp.com/l */
-/* line 31, ../../../src/css/base/_Button.scss */
-button.jqc-Button::-moz-focus-inner {
-  border: 0;
-  padding: 0;
-}
-
 /* line 1, ../../../src/css/base/_Overlay.scss */
 .jqc-Overlay, .jqc-Window {
   position: absolute;
@@ -997,6 +955,48 @@ button.jqc-Button::-moz-focus-inner {
 /* line 20, ../../../src/css/base/_Mask.scss */
 .jqc-masked-relative {
   position: relative !important;
+}
+
+/* line 1, ../../../src/css/base/button/_Button.scss */
+.jqc-Button {
+  display: inline-block;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  line-height: normal;
+  cursor: pointer;
+  vertical-align: middle;
+  text-align: center;
+  overflow: visible;
+  /* removes extra width in IE */
+  border: none;
+}
+
+/* General Button Styles */
+/* line 15, ../../../src/css/base/button/_Button.scss */
+.jqc-Button-hiddenEl {
+  display: none !important;
+}
+
+/* Icons */
+/* line 18, ../../../src/css/base/button/_Button.scss */
+.jqc-Button-icon {
+  display: inline-block;
+}
+
+/* button text element */
+/* line 23, ../../../src/css/base/button/_Button.scss */
+.jqc-Button-text {
+  display: inline-block;
+  line-height: normal;
+}
+
+/* workarounds */
+/* reset extra padding in Firefox, see h5bp.com/l */
+/* line 31, ../../../src/css/base/button/_Button.scss */
+button.jqc-Button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
 }
 
 /* line 1, ../../../src/css/base/form/field/_Field.scss */

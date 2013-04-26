@@ -1,19 +1,19 @@
-/* line 1, ../../../../src/css/theme/basic/_Button.scss */
+/* line 1, ../../../../src/css/theme/basic/button/_Button.scss */
 .jqc-Button {
   border: 1px solid #D3D3D3;
 }
 
-/* line 5, ../../../../src/css/theme/basic/_Button.scss */
+/* line 5, ../../../../src/css/theme/basic/button/_Button.scss */
 .jqc-Button-hover {
   border: 1px outset #999;
 }
 
-/* line 8, ../../../../src/css/theme/basic/_Button.scss */
+/* line 8, ../../../../src/css/theme/basic/button/_Button.scss */
 .jqc-Button-active {
   border: 1px inset #AAA;
 }
 
-/* line 13, ../../../../src/css/theme/basic/_Button.scss */
+/* line 13, ../../../../src/css/theme/basic/button/_Button.scss */
 .jqc-Button-icon {
   position: relative;
   top: 2px;
@@ -21,9 +21,10 @@
   height: 16px;
 }
 
-/* line 21, ../../../../src/css/theme/basic/_Button.scss */
+/* line 21, ../../../../src/css/theme/basic/button/_Button.scss */
 .jqc-Button-text {
-  padding: .1em .4em;
+  padding: 2px 6px;
+  text-decoration: none;
 }
 
 /* line 3, ../../../../src/css/theme/basic/form/field/_Text.scss */
@@ -62,7 +63,7 @@
 }
 
 /* line 3, ../../../../src/css/theme/basic/panel/_Header.scss */
-.jqc-Panel-Header-toolButtons {
+.jqc-Panel-Header-toolButtons, .jqc-Window-header-toolButtons {
   margin-top: 2px;
   margin-right: 2px;
 }

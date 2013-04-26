@@ -67,12 +67,6 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		elType : 'button',
-		
-		/**
-		 * @cfg
-		 * @inheritdoc
-		 */
 		baseCls : 'jqc-Button',
 		
 		/**
@@ -81,7 +75,9 @@ define( [
 		 */
 		renderTpl : new LoDashTpl( [
 			'<span class="<%= baseCls %>-icon <%= baseCls %>-icon-left <%= leftIconElCls %>"></span>',
-			'<span id="<%= elId %>-text" class="<%= baseCls %>-text <%= textElCls %>" title="<%= tooltip %>"><%= text %></span>',
+			'<a id="<%= elId %>-text" class="<%= baseCls %>-text <%= textElCls %>" href="javascript:;" title="<%= tooltip %>">',
+				'<%= text %>',
+			'</a>',
 			'<span class="<%= baseCls %>-icon <%= baseCls %>-icon-right <%= rightIconElCls %>"></span>'
 		] ),
 		
