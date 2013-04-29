@@ -29,7 +29,8 @@ define( [
 	 * - {@link #onLayout} and {@link #afterLayout} will be executed each time the {@link #container container's} 
 	 *   {@link jqc.Container#doLayout} method is executed. This means that {@link #onLayout} and {@link #afterLayout}
 	 *   may be called multiple times during the lifetime of the Layout, and this should be handled. Some layouts choose
-	 *   to have completely separate "first run" and "update layout" methods.
+	 *   to have completely separate "first run" and "update layout" methods, in which the layout sets a flag to know
+	 *   when its initial layout run has been done, and to do updates from there on in.
 	 * - Use the helper methods in this Layout class to {@link #renderComponent render} and {link #sizeComponent size}
 	 *   child components of the {@link #container}. They take into account details of the Layout system, and sizing details
 	 *   (such as accounting for child component padding/margin/border) that aren't handled elsewhere. See the 
