@@ -108,7 +108,7 @@ function( jQuery, _, Jqc ) {
 		 * @return {Number} The width of the padding for the given `sides`.
 		 */
 		getPadding : function( element, sides ) {
-			return this.sumSides( jQuery( element ), 'padding', sides );
+			return this.sumSides( element, 'padding', sides );
 		},
 		
 		
@@ -124,7 +124,7 @@ function( jQuery, _, Jqc ) {
 		 * @return {Number} The width of the margin for the given `sides`.
 		 */
 		getMargin : function( element, sides ) {
-			return this.sumSides( jQuery( element ), 'margin', sides );
+			return this.sumSides( element, 'margin', sides );
 		},
 		
 		
@@ -140,7 +140,7 @@ function( jQuery, _, Jqc ) {
 		 * @return {Number} The width of the border for the given `sides`.
 		 */
 		getBorderWidth : function( element, sides ) {
-			return this.sumSides( jQuery( element ), 'border', sides, 'width' );
+			return this.sumSides( element, 'border', sides, 'width' );
 		},
 		
 		
@@ -182,7 +182,14 @@ function( jQuery, _, Jqc ) {
 			propertyNameSuffix = ( propertyNameSuffix ) ? '-' + propertyNameSuffix : "";
 			
 			for( var i = 0, len = sides.length; i < len; i++ ) {
-				total += parseInt( $element.css( propertyName + '-' + SIDES_MAP[ sides.charAt( i ) ] + propertyNameSuffix ), 10 );
+				var style = $element.css( propertyName + '-' + SIDES_MAP[ sides.charAt( i ) ] + propertyNameSuffix ),
+				    intValue = parseInt( style, 10 );
+				
+				// Ignore the property if IE8< returned "auto", "thin", "medium", "thick", etc. May need better method for checking 
+				// sizes in the future for when jQuery doesn't return a px value.
+				if( !isNaN( intValue ) ) {
+					total += intValue;
+				}
 			}
 			return total;
 		}
