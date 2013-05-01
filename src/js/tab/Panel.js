@@ -158,7 +158,7 @@ define( [
 			
 			// <debug>
 			if( !( panel instanceof Panel ) ) {
-				throw new Error( "Components added to the TabPanel must be an instance of jqc.panel.Panel or a subclass of it" );
+				throw new Error( "Child components added to the TabPanel must be a jqc.panel.Panel instance, or subclass" );
 			}
 			// </debug>
 			
@@ -184,6 +184,19 @@ define( [
 			var tab = this.tabBar.removeAt( idx );
 			
 			this._super( arguments );
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onReorder : function( panel, newIdx, oldIdx ) {
+			this._super( arguments );
+			
+			// Reorder the Tab in the TabBar to correspond to the Panel reordering
+			var tabBar = this.tabBar,
+			    tab = tabBar.getItemAt( oldIdx );
+			tabBar.insert( tab, newIdx );
 		},
 		
 		

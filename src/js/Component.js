@@ -43,15 +43,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * @cfg {String} id
 		 *  
-		 * The id that identifies this Component instance. Defaults to a unique id, and may be retrieved by {@link #getId}. 
-		 * This component is retrievable from a {@link jqc.Container} via {@link jqc.Container#findById}.
-		 */
-		 
-		/**
-		 * @cfg {String} elId
-		 * 
-		 * The id that should be used for the Component's element. Defaults to a unique id.
-		 * If this config is not provided, the unique id is generated when the Component is {@link #method-render rendered}.
+		 * The id that identifies this Component instance. Defaults to a unique id, and may be retrieved by {@link #getId}.
 		 */
 		
 		/**
@@ -153,7 +145,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * that should be the target of the {@link #html}, {@link #contentEl}, and {@link #tpl} configs. For example:
 		 * 
 		 *     renderTpl : new LoDashTpl( [
-		 *         '<div id="<%= elId %>-titlebar">',  // `elId` var is automatically provided in the {@link #renderTplData}, from the {@link #elId} config - See {@link #renderTplData}
+		 *         '<div id="<%= elId %>-titlebar">',  // `elId` var is automatically provided in the {@link #renderTplData}, from the unique {@link #elId} property - See {@link #renderTplData}
 		 *             '<%= title %>',                 // `title` var would need to be provided in the {@link #renderTplData} by subclass
 		 *         '</div>',
 		 *         '<div id="<%= elId %>-body"></div>'
@@ -198,7 +190,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * A set of common properties will always be available on this object for the {@link #renderTpl} (which are supplied by the 
 		 * {@link #getRenderTplData} method), including:
 		 * 
-		 * - **elId**: The value of the {@link #elId} config, or its auto-generated value.
+		 * - **elId**: The value of the {@link #elId} property (an auto-generated, unique value).
 		 * - **baseCls**: The {@link #baseCls} config, which is the base CSS class to prefix descendent elements' CSS
 		 *   classes with. Ex: a {@link #baseCls} of 'jqc-Panel' is used to prefix a {@link jqc.panel.Panel Panel's} body
 		 *   element to become 'jqc-Panel-body', but when a {@link jqc.window.Window Window} is created, the value is
@@ -318,23 +310,37 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		
 		
-		
 		/**
-		 * @private
-		 * @property {Number} uuid
-		 * 
-		 * A globally unique identifier for the Component, which is different between all {@link jqc.Container} heirarchies.
-		 */
-		
-		/**
-		 * @private
+		 * @protected
 		 * @cfg {jqc.Container} parentContainer
 		 * 
-		 * The parent {@link jqc.Container Container} of this Component (if any). This is set by the {@link jqc.Container} that is adding this Component
-		 * as a child, and should not be supplied directly.
+		 * The parent {@link jqc.Container Container} of this Component (if any), which this Component is a child of. This is set 
+		 * by the {@link jqc.Container Container} that is adding this Component as a child, and should not be supplied directly.
 		 */
 		parentContainer: null,
-	 
+		
+		
+		/**
+		 * @private
+		 * @property {String} uuid (readonly)
+		 * 
+		 * A unique identifier for the Component, which is unique among all Components on a given page. Can be
+		 * retrieved with {@link #getUuid}.
+		 */
+		 
+		/**
+		 * @protected
+		 * @property {String} elId (readonly)
+		 * 
+		 * The unique id that is generated for the Component's {@link #$el element}. This is different than {@link #id} so that 
+		 * each Component is always guaranteed to have a unique ID for its {@link #$el element}. 
+		 * 
+		 * Component subclasses often query the DOM for the elements that they create in a {@link #renderTpl} based on this elId. 
+		 * If we only used {@link #id} to uniquely identify elements, then there would be the possibility that the user could
+		 * accidentally create two components with the same {@link #id}, in which case the second Component would actually 
+		 * query and be operating on the DOM elements created for the first Component by mistake.
+		 */
+		
 		/**
 		 * @protected
 		 * @property {Boolean} rendered
@@ -344,8 +350,13 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		rendered: false,
 		
-		
-		
+		/**
+		 * @protected
+		 * @property {jQuery} $el
+		 * 
+		 * The main element that is created for the Component (determined by the {@link #elType} config). 
+		 * This will be available after the Component is rendered, and may be retrieved using {@link #getEl}
+		 */
 		
 		/**
 		 * @private
@@ -424,6 +435,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * for when the mask does in fact get shown.
 		 */
 		
+		
 		/**
 		 * @protected
 		 * @property {Boolean} updateCalledWithContent
@@ -442,14 +454,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * Initially false, and will be set to true after the {@link #method-destroy} method executes.
 		 */
 		destroyed: false,
-		
-		/**
-		 * @protected
-		 * @property {jQuery} $el
-		 * 
-		 * The main element that is created for the Component (determined by the {@link #elType} config). 
-		 * This will be available after the Component is rendered, and may be retrieved using {@link #getEl}
-		 */	
 		
 		
 		/**
@@ -600,13 +604,11 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 			);
 			
 			
-			// Generate a globally unique identifier for the Component, which is unique between all Container hierarchies on the page
-			this.uuid = _.uniqueId();
+			// Generate a globally unique identifier for the Component, which is unique for all Components on the page.
+			// This will also be used as the `elId`, and the default value for the `id` config if one was not provided.
+			this.uuid = this.elId = 'jqc-cmp-' + _.uniqueId();
+			this.id = this.id || this.uuid;  // default the Component's id to the uuid if not provided
 			
-			
-			// Generate a unique ID for this component (which is the ID for a component in a given Container hierarchy). A unique element 
-			// ID for the component's div element will be created (if not provided) in render().
-			this.id = this.id || 'jqc-cmp-' + _.uniqueId();
 			
 			// Normalize the 'plugins' config into an array before calling initComponent, so that subclasses may just push any
 			// plugins that they wish directly onto the array without extra processing.
@@ -647,7 +649,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * Initializes the plugins for the Component.
 		 * 
 		 * @private
-		 * @method initPlugins
 		 * @param {jqc.plugin.Plugin/jqc.plugin.Plugin[]} plugin A single plugin, or array of plugins to initialize.
 		 */
 		initPlugins : function( plugin ) {
@@ -673,7 +674,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * When fully complete, the {@link #event-render render event is fired}, and then {@link #doLayout} is executed (if the `deferLayout` 
 		 * option is not provided as `true`).
 		 *
-		 * @method render
 		 * @param {HTMLElement/jQuery} containerEl The HTML element to render this component into.
 		 * @param {Object} [options] Any of the following options. (Note: for backward compatibility, this argument may be the `position` option below.)
 		 * @param {String/Number/HTMLElement/jQuery} [options.position] The index, element id, or element that the component should be inserted before.
@@ -727,9 +727,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 				}
 				
 			} else {
-				// First, generate an element ID for the component's element, if one has not been provided as a config
-				this.elId = this.elId || 'jqc-cmp-' + _.uniqueId();
-				
 				// Handle any additional attributes (the `attr` config) that were specified to add (or any attributes
 				// added by subclass implementations of getRenderAttributes())
 				var attr = Html.attrMapToString( this.getRenderAttributes() );
@@ -898,7 +895,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Determines if the Component is currently {@link #rendered}.
 		 * 
-		 * @method isRendered
 		 * @return {Boolean} True if the Component is rendered, false otherwise.
 		 */
 		isRendered : function() {
@@ -987,8 +983,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * 
 		 * So, bottom line, if you wish for your Component to do something when it is laid out by its {@link #parentContainer},
 		 * implement the {@link #onComponentLayout} method. See {@link #onComponentLayout} for details.
-		 * 
-		 * @method doLayout
 		 */
 		doLayout : function() {
 			// Note: this method is extended in the jqc.Container subclass. Keep this in mind if ever implementing Component
@@ -1025,8 +1019,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * in that particular hierarchy. As such, this may be an expensive operation; use with care. This may be useful however for components
 		 * that are sized based on their content, and when their content size changes, they should force a layout to adjust for the new
 		 * content size.
-		 * 
-		 * @method updateLayout
 		 */
 		updateLayout : function() {
 			// Bubble up to the top level parent container of this Component's hierarchy, and then call doLayout() on it
@@ -1045,7 +1037,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Sets an attribute on the Component's {@link #$el element}.
 		 * 
-		 * @method setAttr
 		 * @param {String/Object} name The attribute name. This first argument may also be provided as an Object of key/value
 		 *   pairs for attribute names/values to apply to the Component's {@link #$el element}.
 		 * @param {String} value The value for the attribute. Optional if the first argument is an Object.
@@ -1071,7 +1062,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Adds a CSS class to the Component's {@link #$el element}.
 		 * 
-		 * @method addCls
 		 * @param {String} cssClass One or more CSS classes to add to the Component's element. If specifying multiple CSS classes,
 		 *   they should be separated with a space. Ex: "class1 class2"
 		 * @return {jqc.Component} This Component, to allow method chaining.
@@ -1099,7 +1089,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Removes a CSS class from the Component's {@link #$el element}.
 		 * 
-		 * @method removeCls
 		 * @param {String} cssClass One or more CSS classes to remove from the Component's element. If specifying multiple CSS classes,
 		 *   they should be separated with a space. Ex: "class1 class2"
 		 * @return {jqc.Component} This Component, to allow method chaining.
@@ -1129,7 +1118,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * Adds or removes a CSS class from the Component's {@link #$el element}, based on if the CSS class already exists on the element
 		 * or not. If providing the `flag` argument, the `cssClass` will be added or removed based on if `flag` is true or false.
 		 * 
-		 * @method toggleCls
 		 * @param {String} cssClass One or more CSS classes to remove from the Component's element. If specifying multiple CSS classes,
 		 *   they should be separated with a space. Ex: "class1 class2"
 		 * @param {Boolean} [flag] True if the class(es) should be added, false if they should be removed. This argument is optional,
@@ -1149,7 +1137,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Determines if the Component's {@link #$el element} has the given `cssClass`.
 		 * 
-		 * @method hasCls
 		 * @param {String} cssClass The CSS class to test for.
 		 * @return {Boolean} True if the {@link #$el element} has the given `cssClass`, false otherwise.
 		 */
@@ -1167,7 +1154,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Sets a CSS style property on the Component's {@link #$el element}.
 		 * 
-		 * @method setStyle
 		 * @param {String/Object} name The CSS property name. This first argument may also be provided as an Object of key/value
 		 *   pairs for CSS property names/values to apply to the Component's {@link #$el element}.
 		 * @param {String} value The value for the CSS property. Optional if the first argument is an Object.
@@ -1198,7 +1184,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * base element (see {@link #$el}), but this method can be overridden in subclasses that define a more complex structure, where their
 		 * content should be placed elsewhere. 
 		 * 
-		 * @method getContentTarget
+		 * @protected
 		 * @return {jQuery} The element (jQuery wrapped set) where HTML content should be placed. The {@link #html} and {@link #contentEl} 
 		 *   configs will be attached to this element.
 		 */
@@ -1210,8 +1196,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Returns the globally unique {@link #uuid} of this Component.
 		 * 
-		 * @method getUuid
-		 * @return {Number}
+		 * @return {String}
 		 */
 		getUuid : function() {
 			return this.uuid;
@@ -1221,7 +1206,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Returns the {@link #id} of this Component.
 		 * 
-		 * @method getId
 		 * @return {String}
 		 */
 		getId : function() {
@@ -1235,7 +1219,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * will be the one created for the Component in the {@link #method-render} method, and its type is dependent on the
 		 * {@link #elType} config.
 		 * 
-		 * @method getEl
 		 * @return {jQuery}
 		 */
 		getEl : function() {
@@ -1246,7 +1229,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Sets the size of the element.
 		 * 
-		 * @method setSize
 		 * @param {Number} width The width, in pixels, for the Component. If undefined, no width will be set.
 		 * @param {Number} height The height, in pixels, for the Component. If undefined, no height will be set.
 		 */
@@ -1271,7 +1253,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Sets the width of the element.
 		 *
-		 * @method setWidth
 		 * @param {Number/String} width The width. If a number, assumes pixels, otherwise uses the exact string.
 		 */
 		setWidth : function( width ) {
@@ -1284,7 +1265,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * 
 		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 *
-		 * @method getWidth
 		 * @return {Number}
 		 */
 		getWidth : function() {
@@ -1298,7 +1278,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * 
 		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 * 
-		 * @method getInnerWidth
 		 * @return {Number}
 		 */
 		getInnerWidth : function() {
@@ -1313,7 +1292,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * 
 		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 * 
-		 * @method getOuterWidth
 		 * @param {Boolean} [includeMargin=false]
 		 * @return {Number}
 		 */
@@ -1325,7 +1303,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Sets the height of the element.
 		 *
-		 * @method setHeight
 		 * @param {Number/String} height The height. If a number, assumes pixels, otherwise uses the exact string.
 		 */
 		setHeight : function( height ) {
@@ -1338,7 +1315,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * 
 		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 *
-		 * @method getHeight
 		 * @return {Number}
 		 */
 		getHeight : function() {
@@ -1352,7 +1328,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * 
 		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 * 
-		 * @method getInnerHeight
 		 * @return {Number}
 		 */
 		getInnerHeight : function() {
@@ -1367,7 +1342,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * 
 		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 * 
-		 * @method getOuterHeight
 		 * @param {Boolean} [includeMargin=false]
 		 * @return {Number}
 		 */
@@ -1379,7 +1353,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Returns the configured width of the component.
 		 *
-		 * @method getConfiguredWidth
 		 * @return {Number}
 		 */
 		getConfiguredWidth : function() {
@@ -1390,7 +1363,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Returns the configured height of the component.
 		 *
-		 * @method getConfiguredHeight
 		 * @return {Number}
 		 */
 		getConfiguredHeight : function() {
@@ -1406,7 +1378,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * 
 		 * Note: This method can only be run after the Component has been {@link #rendered}.
 		 * 
-		 * @method getPadding
 		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
 		 *   See the description in this method.
 		 * @return {Number} The width of the padding for the given `sides`.
@@ -1424,7 +1395,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * 
 		 * Note: This method can only be run after the Component has been {@link #rendered}.
 		 * 
-		 * @method getMargin
 		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
 		 *   See the description in this method.
 		 * @return {Number} The width of the margin for the given `sides`.
@@ -1442,7 +1412,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * 
 		 * Note: This method can only be run after the Component has been {@link #rendered}.
 		 * 
-		 * @method getBorderWidth
 		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
 		 *   See the description in this method.
 		 * @return {Number} The width of the border for the given `sides`.
@@ -1458,7 +1427,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * it can be a combination of more than one to add the padding widths together. Ex: 'rl' would add the right and left padding/border/margin 
 		 * together and return that number.
 		 * 
-		 * @method getFrameSize
 		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
 		 *   See the description in this method.
 		 * @return {Number} The sum total of the width of the border, plus padding, plus margin, for the given `sides`.
@@ -1474,7 +1442,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Convenience method to show or hide the Component using a boolean.
 		 * 
-		 * @method setVisible
 		 * @param {Boolean} visible True to show the Component, false to hide it.
 		 * @return {jqc.Component} This Component, to allow method chaining.
 		 */
@@ -1486,7 +1453,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Shows the Component. 
 		 *
-		 * @method show
 		 * @param {Object} [options] An object which may contain the following options:
 		 * @param {Object} [options.anim] An {@link jqc.anim.Animation Animation} config object (minus the 
 		 *   {@link jqc.anim.Animation#target target} property) for animating the showing of the Component. 
@@ -1555,7 +1521,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 *
 		 * @private
 		 * @template
-		 * @method onShowComplete
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
 		onShowComplete : function( options ) {
@@ -1607,7 +1572,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Hides the Component.
 		 *
-		 * @method hide
 		 * @param {Object} [options] An object which may contain the following options:
 		 * @param {Object} [options.anim] An {@link jqc.anim.Animation Animation} config object (minus the 
 		 *   {@link jqc.anim.Animation#target target) property) for animating the showing of the Component. 
@@ -1822,9 +1786,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * Component to be in it.
 		 * 
 		 * The Component may be re-attached to the DOM by calling {@link #method-render} again on it (with the new container
-		 * element to append/insert it into). 
-		 * 
-		 * @method detach
+		 * element to append/insert it into).
 		 */
 		detach : function() {
 			if( this.rendered ) {
@@ -1840,7 +1802,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * Masks the component with a {@link jqc.Mask}. Uses the default mask configuration provided by the {@link #maskConfig} configuration object,
 		 * or optionally, the provided `maskConfig` argument.
 		 * 
-		 * @method mask
 		 * @param {Object} maskConfig (optional) The explicit configuration options to set the {@link jqc.Mask} that will mask over the Component.
 		 *   If not provided, will use the default options provided by the {@link #maskConfig} configuration option.
 		 */
@@ -1883,8 +1844,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		
 		/**
 		 * Hides the mask (shown with the {@link #mask} method) from the Component's element.
-		 * 
-		 * @method unMask
 		 */
 		unMask : function() {
 			this.masked = false;
@@ -1902,7 +1861,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Determines if the Component is currently masked.  See the {@link #mask} method for details on showing the Component's mask.
 		 * 
-		 * @method isMasked
 		 * @return {Boolean}
 		 */
 		isMasked : function() {
@@ -1915,7 +1873,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * this is the Component's base {@link #$el element}, but this may be redefined by subclasses.
 		 * 
 		 * @protected
-		 * @method getMaskTarget
 		 * @return {jQuery}
 		 */
 		getMaskTarget : function() {
@@ -1929,7 +1886,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Sets the Container that owns (i.e. is a parent of) this Component.
 		 * 
-		 * @method setParentContainer
 		 * @param {jqc.Container} container
 		 */
 		setParentContainer : function( container ) {
@@ -1940,7 +1896,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		/**
 		 * Gets the Container that owns (i.e. is a parent of) this Component.
 		 * 
-		 * @method getParentContainer
 		 * @return {jqc.Container} The Container that owns this Component, or null if there is none.
 		 */
 		getParentContainer : function() {
@@ -1957,7 +1912,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * to the function will be the `args` provided or the current component. If the function returns false at any point,
 		 * the bubble is stopped.
 		 * 
-		 * @method bubble
 		 * @param {Function} fn The function to call.
 		 * @param {Object} scope (optional) The scope of the function (defaults to current node)
 		 * @param {Array} args (optional) The args to call the function with (default to passing the current component)
@@ -1977,7 +1931,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * Finds a {@link jqc.Container Container} above this Component at any level by a custom function. If the passed function returns
 		 * true, the {@link jqc.Container Container} will be returned.
 		 * 
-		 * @method findParentBy
 		 * @param {Function} fn The custom function to call with the arguments (Container, this Component).
 		 * @return {jqc.Container} The first Container for which the custom function returns true.
 		 */
@@ -1991,7 +1944,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * Finds a {@link jqc.Container Container} above this Component at any level by {@link #id}.  If there is no parent Container
 		 * with the supplied `id`, this method returns null.
 		 * 
-		 * @method findParentById
 		 * @param {String} id The {@link #id} of the parent Container to look for.
 		 * @return {jqc.Container} The first Container which matches the supplied {@link #id}.
 		 *   If no Container for the supplied {@link #id} is found, this method returns null.
@@ -2007,7 +1959,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * the type name that is registered to the {@link jqc.ComponentManager ComponentManager} (see the description of this class), or the JavaScript
 		 * class (constructor function) of the Container.
 		 * 
-		 * @method findParentByType
 		 * @param {Function} type The type name registered with the {@link jqc.ComponentManager ComponentManager}, or the constructor function (class) of the Container.
 		 * @return {jqc.Container} The first Container which is an instance of the supplied type. 
 		 */
@@ -2038,8 +1989,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 *
 		 * Fires the {@link #beforedestroy} event, which a handler can return false from to cancel the destruction process,
 		 * and the {@link #event-destroy} event.
-		 * 
-		 * @method destroy
 		 */
 		destroy : function() {
 			if( !this.destroyed ) {
