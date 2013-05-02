@@ -1,8 +1,9 @@
 /*global define */
 define( [
+	'lodash',
 	'Class',
 	'jqc/Jqc'
-], function( Class, Jqc ) {
+], function( _, Class, Jqc ) {
 	
 	/**
 	 * @class jqc.util.CollectionBindable
@@ -10,7 +11,8 @@ define( [
 	 * 
 	 * This class is intended to be used as a mixin. It allows any class that it is mixed into (the "target" class in these docs) to have 
 	 * a {@link data.Collection} bound to it by providing the common functionality to allow a collection's events to be listened to and handled.
-	 * These same event listeners are also removed when the collection is unbound.
+	 * These same event listeners are also removed when the collection is unbound, and the class provides the functionality to make sure that
+	 * the same collection isn't bound over itself.
 	 * 
 	 * This mixin provides the basic method to {@link #bindCollection bind a collection}, which automatically unbinds any previously-bound 
 	 * {@link data.Collection Collection} in the process. Classes using this mixin should implement the {@link #getCollectionListeners} method, 
@@ -19,7 +21,7 @@ define( [
 	 * The target class may also implement the {@link #onCollectionBind} method, to detect and handle when a new {@link data.Collection} has
 	 * been bound, and/or when the currently-bound collection has been unbound.
 	 * 
-	 * Here is an example of mixing this class into a {@link jqc.Component Component}, to make the Component data-bound:
+	 * Here is an example of mixing this class into a {@link jqc.Component Component}, to make the Component data-bound to a Collection:
 	 * 
 	 *     define( [
 	 *         'jqc/Component',
@@ -41,6 +43,8 @@ define( [
 	 *             
 	 *             // ...
 	 *             
+	 *             
+	 *             // Specifies the listeners that will be added to the collection
 	 *             getCollectionListeners : function( collection ) {
 	 *                 return {
 	 *                     'load'   : this.onLoad,          // listen to `load` and `change`
@@ -50,11 +54,11 @@ define( [
 	 *             },
 	 *             
 	 *             
-	 *             onLoad : function() {
+	 *             onLoad : function( collection ) {
 	 *                 // handle the collection's `load` event here
 	 *             },
 	 *             
-	 *             onModelChange : function() {
+	 *             onModelChange : function( collection ) {
 	 *                 // handle a model in the bound collection changing here
 	 *             },
 	 *             
@@ -101,9 +105,9 @@ define( [
 		
 		/**
 		 * @private
-		 * @property {Boolean} firstBindComplete
+		 * @property {Boolean} firstCollectionBindComplete
 		 * 
-		 * Property which is set to true after an initial bind has been made.
+		 * Property which is set to true after an initial collection bind has been made.
 		 */
 		
 		
@@ -116,13 +120,15 @@ define( [
 		 */
 		bindCollection : function( collection ) {
 			var collectionProp = this.collectionProp,
-			    currentCollection = this[ collectionProp ];
+			    currentCollection = this[ collectionProp ] || null;  // normalize `undefined` to `null`, for the comparison against the `collection` arg (should the `collection` arg be null)
 			
 			// Only bind a new collection if it is different than the currently-bound collection. However, always accept the 
 			// collection if no collection has been bound yet. This covers if the class has a config option that matches the 
 			// `collectionProp` name (for instance, "collection"), in which case that initial collection should be bound. This
 			// would be the case if a class calls bindCollection() with that initial collection from its constructor function.
-			if( currentCollection !== collection || !this.firstBindComplete ) {
+			// The 'first bind' functionality should only happen if there is actually a collection to bind however. Don't 
+			// accept `null` in this case.
+			if( currentCollection !== collection || ( !this.firstCollectionBindComplete && collection ) ) {
 				// If there is a current collection, and there have been listeners bound to it (i.e. it is not the initial bind
 				// call from having a `collection` config), then unbind its listeners in preparation to bind a new Collection
 				if( currentCollection ) {
@@ -133,9 +139,13 @@ define( [
 				if( collection ) {
 					this.bindCollectionListeners();
 				}
-				this.firstBindComplete = true;
+				this.firstCollectionBindComplete = true;
 				
-				this.onCollectionBind( collection, /* the old collection */ currentCollection || null );
+				// Figure out the correct "old" (previously-bound) collection. If the new collection is the same as the old 
+				// collection (for the case of binding a pre-configured collection), then set that to `null` for the method
+				// call (as there really was no previously-bound collection).
+				var oldCollection = ( currentCollection === collection ) ? null : currentCollection || null;
+				this.onCollectionBind( collection, oldCollection );
 			}
 		},
 		
@@ -167,7 +177,7 @@ define( [
 		 * @template
 		 * @method onCollectionBind
 		 * @param {data.Collection} collection The newly bound collection. Will be `null` if the previous collection was
-		 *   simply unbound (i.e. `null` was passed to {@link #bindCollection}. 
+		 *   simply unbound (i.e. `null` was passed to {@link #bindCollection}, or {@link #unbindCollection} was called). 
 		 * @param {data.Collection} oldCollection The collection that was just unbound. Will be `null` if there was no
 		 *   previously-bound collection.
 		 */
@@ -224,6 +234,10 @@ define( [
 		 *         } );
 		 *         
 		 *     } );
+		 * 
+		 * Note that the handler functions should always be references to functions defined in the class, not anonymous
+		 * functions. The same function references are needed to unbind the collection later, and providing an anonymous
+		 * function as a handler for an event will not allow the event listener to be removed.
 		 * 
 		 * @protected
 		 * @param {data.Collection} collection The Collection being bound. Note that listeners should not be attached here,
