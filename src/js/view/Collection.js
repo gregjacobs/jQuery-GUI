@@ -3,12 +3,14 @@ define( [
 	'jquery',
 	'lodash',
 	'jqc/ComponentManager',
-	'jqc/Component'
-], function( jQuery, _, ComponentManager, Component ) {
+	'jqc/Component',
+	'jqc/util/CollectionBindable'
+], function( jQuery, _, ComponentManager, Component, CollectionBindable ) {
 	
 	/**
 	 * @class jqc.view.Collection
 	 * @extends jqc.Component
+	 * @mixins jqc.util.CollectionBindable
 	 * @alias type.collectionview
 	 * 
 	 * A view of the {@link data.Model Models} in a {@link data.Collection}. The view uses the {@link #tpl} config, which 
@@ -20,6 +22,8 @@ define( [
 	 * it shows a {@link data.Collection Collection} of them.
 	 */
 	var CollectionView = Component.extend( {
+		mixins : [ CollectionBindable ],
+		
 		
 		/**
 		 * @cfg {data.Collection} collection (required)
@@ -141,22 +145,6 @@ define( [
 		maskOnLoad : true,
 		
 		
-		
-		/**
-		 * @private
-		 * @property {Boolean} firstBindComplete
-		 * 
-		 * Property which is set to true when the initial bind (called from {@link #initComponent} is complete.
-		 */
-		
-		/**
-		 * @private
-		 * @property {Object} collectionListeners
-		 * 
-		 * The listeners that were bound to the current {@link #collection} in the {@link #bindCollectionListeners} method. 
-		 * If there has been no Collection bound to this view yet, this will be `undefined`.
-		 */
-		
 		/**
 		 * @protected
 		 * @property {Object} modelElCache
@@ -186,7 +174,11 @@ define( [
 			// </debug>
 			
 			this.modelElCache = {};
-			this.bindCollection( this.collection || null );
+			if( this.collection ) {
+				this.bindCollection( this.collection );
+			} else {
+				this.refresh();  // do an initial refresh if no collection, which simply sets up the CollectionView to not show anything (and not run the template, since we don't have models to run it with)
+			}
 			
 			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
 			// while the collection is loading.
@@ -214,58 +206,12 @@ define( [
 		
 		// -----------------------------------
 		
-		// Collection binding methods
-		
-		
-		/**
-		 * Binds a {@link data.Collection} to the view. The Collection will be used to populate the {@link #tpl},
-		 * and will also be monitored for changes to refresh the view as well.
-		 * 
-		 * Any previous {@link #collection} will be unbound from the view.
-		 * 
-		 * @param {data.Collection} collection The Collection to bind. To unbind the currently-bound Collection,
-		 *   pass `null`.
-		 */
-		bindCollection : function( collection ) {
-			if( this.collection !== collection || !this.firstBindComplete ) {
-				// If there is a current collection, and there have been listeners bound to it (i.e. it is not the initial bind
-				// call from having a `collection` config), then unbind its listeners in preparation to bind a new Collection
-				if( this.collection ) {
-					this.unbindCollectionListeners();
-				}
-				
-				this.collection = collection;
-				if( collection ) {
-					this.bindCollectionListeners();
-				}
-				this.firstBindComplete = true;
-				
-				this.refresh();
-			}
-		},
-		
+		// Implementation of CollectionBindable mixin methods
 		
 		/**
-		 * Binds listeners to the current {@link #collection}, so that the view can refresh itself upon
-		 * changes. The listeners that are set up are created by the {@link #getCollectionListeners} method,
-		 * which may be overridden to listen to other events that a particular {@link data.Collection} subclass
-		 * may fire.
-		 * 
-		 * @private
-		 */
-		bindCollectionListeners : function() {
-			var collection = this.collection,
-			    listeners = _.clone( this.getCollectionListeners( collection ) );  // shallow copy of the listeners
-			
-			collection.on( listeners );
-			this.collectionListeners = listeners;
-		},
-		
-		
-		/**
-		 * Retrieves an Object (map) of the listeners that should be set up on the {@link #collection}, when 
-		 * a {@link data.Collection} is bound to the view. This method may be overridden in a subclass to add 
-		 * events that should be listened for.
+		 * Implementation of {@link jqc.util.CollectionBindable} mixin method used to retrieve the Object (map) of the listeners 
+		 * that should be set up on the {@link #collection}, when a {@link data.Collection} is bound to the view. This method may 
+		 * be overridden in a subclass to add events that should be listened for.
 		 * 
 		 * @protected
 		 * @param {data.Collection} collection The Collection being bound.
@@ -285,15 +231,17 @@ define( [
 		
 		
 		/**
-		 * Unbinds the current {@link #collection collection's} listeners, which were bound by
-		 * {@link #bindCollectionListeners}.
+		 * Implementation of {@link jqc.util.CollectionBindable} mixin method. Handles when a new {@link #collection} has been 
+		 * bound to the view.
 		 * 
-		 * @private
+		 * @protected
+		 * @param {data.Collection} collection The newly bound collection. Will be `null` if the previous collection was
+		 *   simply unbound (i.e. `null` was passed to {@link #bindCollection}, or {@link #unbindCollection} was called). 
+		 * @param {data.Collection} oldCollection The collection that was just unbound. Will be `null` if there was no
+		 *   previously-bound collection.
 		 */
-		unbindCollectionListeners : function() {
-			if( this.collection && this.collectionListeners ) {
-				this.collection.un( this.collectionListeners );  // the Collection listener's set up in bindCollectionListeners()
-			}
+		onCollectionBind : function( collection ) {
+			this.refresh();
 		},
 		
 		
@@ -336,7 +284,7 @@ define( [
 		 */
 		refresh : function() {
 			if( !this.collection ) {
-				this.update( "" );  // don't display anything
+				this.update( "" );  // don't display anything (and don't run the template which uses a variable we don't have, i.e. the collection's models)
 				
 			} else {
 				var models = this.collectModels();
@@ -465,10 +413,7 @@ define( [
 		 * @inheritdoc
 		 */
 		onDestroy : function() {
-			if( this.collection ) {
-				this.unbindCollectionListeners();
-				delete this.collection;
-			}
+			this.unbindCollection();  // unbind any bound collection
 			
 			this._super( arguments );
 		}
