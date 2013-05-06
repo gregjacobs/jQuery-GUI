@@ -445,13 +445,27 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * value of `true` tells the {@link #method-render} method to skip rendering the {@link #tpl}, and instead use the direct 
 		 * {@link #html} content that was provided to the call to {@link #update}.
 		 */
+
 		
+		/**
+		 * @protected
+		 * @property {Boolean} destroying
+		 * 
+		 * Property which is set to `true` while the {@link #method-destroy} method executes. This is mainly for the
+		 * {@link #onDestroy} hook method, which may call other methods that may want to determine if the Component is 
+		 * destroying itself, in order to avoid doing unnecessary work.
+		 * 
+		 * An example of this would be a method that resets the Component's element to an "empty" state due to unbinding
+		 * itself from a data entity, but really shouldn't do so when the Component's element is just going to be removed 
+		 * from the DOM anyway. 
+		 */
+		destroying: false,
 		
 		/**
 		 * @protected
 		 * @property {Boolean} destroyed
 		 * 
-		 * Initially false, and will be set to true after the {@link #method-destroy} method executes.
+		 * Initially `false`, and will be set to `true` after the {@link #method-destroy} method executes.
 		 */
 		destroyed: false,
 		
@@ -1991,45 +2005,46 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * and the {@link #event-destroy} event.
 		 */
 		destroy : function() {
-			if( !this.destroyed ) {
-				if( this.fireEvent( 'beforedestroy', this ) !== false ) {
-					// Run template method for subclasses first, to allow them to handle their processing
-					// before the Component's element is removed
-					this.onDestroy();
-					
-					// If the Component is currently animating, end it
-					if( this.currentAnimation ) {
-						this.currentAnimation.end();
-					}
-					
-					// Destroy the mask, if it is an instantiated jqc.Mask object (it may not be if the mask was never used)
-					if( this._mask instanceof Mask ) {
-						this._mask.destroy();
-					}
-					
-					// Remove any HTMLElement or jQuery wrapped sets used by the Component from the DOM, and free 
-					// the references so that we prevent memory leaks.
-					// Note: This includes the Component's $el reference (if it has been created by the Component being rendered).
-					for( var prop in this ) {
-						if( this.hasOwnProperty( prop ) ) {
-							var propValue = this[ prop ];
-							
-							if( _.isElement( propValue ) ) {
-								// First, wrap the raw HTMLElement in a jQuery object, for easy removal. Then delete the reference.
-								jQuery( propValue ).remove();
-								delete this[ prop ];
-							} else if( propValue instanceof jQuery ) {
-								propValue.remove();
-								delete this[ prop ];
-							}
+			if( !this.destroyed && this.fireEvent( 'beforedestroy', this ) !== false ) {
+				this.destroying = true;
+				
+				// Run template method for subclasses first, to allow them to handle their processing
+				// before the Component's element is removed
+				this.onDestroy();
+				
+				// If the Component is currently animating, end it
+				if( this.currentAnimation ) {
+					this.currentAnimation.end();
+				}
+				
+				// Destroy the mask, if it is an instantiated jqc.Mask object (it may not be if the mask was never used)
+				if( this._mask instanceof Mask ) {
+					this._mask.destroy();
+				}
+				
+				// Remove any HTMLElement or jQuery wrapped sets used by the Component from the DOM, and free 
+				// the references so that we prevent memory leaks.
+				// Note: This includes the Component's $el reference (if it has been created by the Component being rendered).
+				for( var prop in this ) {
+					if( this.hasOwnProperty( prop ) ) {
+						var propValue = this[ prop ];
+						
+						if( _.isElement( propValue ) ) {
+							// First, wrap the raw HTMLElement in a jQuery object, for easy removal. Then delete the reference.
+							jQuery( propValue ).remove();
+							delete this[ prop ];
+						} else if( propValue instanceof jQuery ) {
+							propValue.remove();
+							delete this[ prop ];
 						}
 					}
-					
-					this.rendered = false;  // the Component is no longer rendered; it's $el has been removed (above)
-					this.destroyed = true;
-					this.fireEvent( 'destroy', this );
-					this.purgeListeners();  // Note: Purge listeners must be called after 'destroy' event fires!
 				}
+				
+				this.rendered = false;  // the Component is no longer rendered; it's $el has been removed (above)
+				this.destroying = false;
+				this.destroyed = true;
+				this.fireEvent( 'destroy', this );
+				this.purgeListeners();  // Note: Purge listeners must be called after 'destroy' event fires!
 			}
 		},
 		

@@ -2364,14 +2364,9 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 		
 		
 		
-		
-		
-		/*
-		 * Test Component.destroy() 
-		 */
-		describe( "Test Component.destroy()", function() {
+		describe( 'destroy()', function() {
 			
-			it( "destroy() should remove all event handlers", function() {
+			it( "should remove all event handlers from the component", function() {
 				var component = new Component( {
 					listeners : {
 						'render'        : function() {},
@@ -2390,7 +2385,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "destroy() should set the 'destroyed' flag to true after destruction", function() {
+			it( "should set the `destroyed` flag to true after destruction", function() {
 				var component = new Component();
 				expect( component.destroyed ).toBe( false );  // failed on initial condition. destroyed flag should be false.
 				
@@ -2399,7 +2394,32 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "destroy() should set the 'rendered' flag back to false after destruction", function() {
+			it( "should call the onDestroy() hook method, and set the `destroying` flag to true while the onDestroy() method is executing", function() {
+				var onDestroyCallCount = 0;
+				
+				var TestComponent = Component.extend( {
+					onDestroy : function() {
+						onDestroyCallCount++;
+						
+						expect( this.destroying ).toBe( true );
+						expect( this.destroyed ).toBe( false );  // not destroyed yet
+						
+						this._super( arguments );
+					}
+				} );
+				
+				var component = new TestComponent();
+				expect( component.destroying ).toBe( false );
+				expect( component.destroyed ).toBe( false );
+
+				component.destroy();
+				expect( onDestroyCallCount ).toBe( 1 );       // make sure the onDestroy() hook method was called
+				expect( component.destroying ).toBe( false ); // no longer destroying, it's destroyed
+				expect( component.destroyed ).toBe( true );   // destroyed flag should now be true.
+			} );
+			
+			
+			it( "should set the `rendered` flag back to false after destruction", function() {
 				var component = new Component( {
 					renderTo: jQuery( 'body' )
 				} );
@@ -2410,7 +2430,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "A beforedestroy handler should be able to cancel the destruction process", function() {
+			it( "A 'beforedestroy' handler should be able to cancel the destruction process by returning false", function() {
 				var component = new Component( {
 					listeners : {
 						'beforedestroy' : function() {
@@ -2423,7 +2443,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "destroy() should not destroy the component more than once", function() {
+			it( "should not destroy the component more than once", function() {
 				var destroyCount = 0;
 				var component = new Component( {
 					// template method override
@@ -2442,7 +2462,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "destroy() should remove the Component's element from the DOM (if the Component is rendered)", function() {
+			it( "should remove the Component's element from the DOM (if the Component is rendered)", function() {
 				var component = new Component( {
 					renderTo: jQuery( 'body' )
 				} );
@@ -2456,7 +2476,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "destroy() should remove all HTMLElement and jQuery references held by a Component upon destruction", function() {
+			it( "should remove all HTMLElement and jQuery references held by a Component upon destruction", function() {
 				// Create a Component subclass that creates an HTML element and a jQuery wrapped set
 				var ComponentSubClass = Class.extend( Component, {
 					initComponent : function() {
@@ -2478,7 +2498,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "destroy() should remove all HTMLElement and jQuery references held by a Component from the DOM upon destruction", function() {
+			it( "should remove all HTMLElement and jQuery references held by a Component from the DOM upon destruction", function() {
 				// Create a Component subclass that creates an HTML element and a jQuery wrapped set
 				var ComponentSubClass = Class.extend( Component, {
 					initComponent : function() {
