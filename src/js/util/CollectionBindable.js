@@ -251,8 +251,7 @@ define( [
 		
 		
 		/**
-		 * Unbinds the current {@link #collection collection's} listeners, which were bound by
-		 * {@link #bindCollectionListeners}.
+		 * Unbinds the currently-bound collection's listeners, which were set up in {@link #bindCollectionListeners}.
 		 * 
 		 * @private
 		 */
