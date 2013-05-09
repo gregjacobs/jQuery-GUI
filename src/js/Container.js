@@ -839,18 +839,16 @@ define( [
 	
 	
 		/**
-		 * Cascades down the Component/Container heirarchy from this Container (called first), calling the specified
-		 * function with each Component. The scope (`this` reference) of the function call will be the scope provided,
-		 * or the current Component that is being processed.  The arguments to the function will be the `args` provided,
-		 * or the current Component.
+		 * Cascades down the {@link jqc.Component Component}/Container heirarchy from this Container (called first), calling the specified
+		 * function for each Component. The scope (`this` reference) of the function call will be the scope provided,
+		 * or the current Component that is being processed.
 		 *
 		 * If the function returns false at any point, the cascade does not continue down that branch. However, siblings of the Container
 		 * that was being processed when the function returned false are still processed.
 		 *
-		 * @method cascade
 		 * @param {Function} fn The function to call
-		 * @param {Object} scope (optional) The scope of the function (defaults to current {@link jqc.Component Component})
-		 * @param {Array} args (optional) The args to call the function with (defaults to passing in the current {@link jqc.Component Component} as the only argument)
+		 * @param {Object} [scope] The scope of the function. Defaults to the {@link jqc.Component Component} that is currently being
+		 *   processed.
 		 */
 		cascade : function( fn, scope, args ) {
 			if( fn.apply( scope || this, args || [this] ) !== false ) {
@@ -870,9 +868,8 @@ define( [
 		/**
 		 * Finds a Component under this container at any level by {@link jqc.Component#id id}.
 		 *
-		 * @method findById
 		 * @param {String} id The ID of the Component to search for.
-		 * @return {jqc.Component} The component with the given `id`, or null if none was found.
+		 * @return {jqc.Component} The component with the given `id`, or `null` if none was found.
 		 */
 		findById : function( id ) {
 			var returnVal = null,
@@ -889,12 +886,13 @@ define( [
 	
 	
 		/**
-		 * Finds a Component under this container at any level by a custom function. If the passed function returns
-		 * true, the component will be included in the results.
+		 * Finds the {@link jqc.Component Components} under this Container at any level by a custom function. If the passed function 
+		 * returns true for a given Component, then that Component will be included in the results.
 		 *
-		 * @method findBy
-		 * @param {Function} fn The function to call. The function will be called with the arguments: (component, this container)
-		 * @param {Object} scope (optional) The scope to call the function in.
+		 * @param {Function} fn The function to call. The function will be called with the following arguments:
+		 * @param {jqc.Component} fn.component The Component that is being inspected.
+		 * @param {jqc.Container} fn.thisContainer This Container instance.
+		 * @param {Object} [scope] The scope to call the function in. Defaults to the Component being inspected.
 		 * @return {jqc.Component[]} Array of {@link jqc.Component Components}
 		 */
 		findBy : function( fn, scope ) {
@@ -911,11 +909,10 @@ define( [
 	
 	
 		/**
-		 * Finds a {@link jqc.Component} under this container at any level by Component `type`. The Container type can be either the 
-		 * type name that is registered to the {@link jqc.ComponentManager} (see the description of the {@link jqc.Component} class), 
-		 * or the JavaScript class (constructor function) of the {@link jqc.Component}.
+		 * Finds the {@link jqc.Component Components} under this Container at any level by Component `type`. The Component `type` can be either 
+		 * the type name that is registered to the {@link jqc.ComponentManager} (see the description of the {@link jqc.Component} class), 
+		 * or the JavaScript class (constructor function) of the {@link jqc.Component Component}.
 		 *
-		 * @method findByType
 		 * @param {Function} type The type name registered with the {@link jqc.ComponentManager}, or the constructor function (class) of the Component.
 		 * @return {jqc.Component[]} Array of {@link jqc.Component Components} which match the `type`.
 		 */
