@@ -10,13 +10,12 @@ define( [
 		
 		describe( "rendering", function() {
 			
-			it( "should create the inputEl with the id of the `inputId` config", function() {
+			it( "should create the inputEl with the id of the `inputId` property", function() {
 				var textField = new TextField( {
-					renderTo : 'body',
-					inputId  : '__ui_form_field_Text_inputIdTest'
+					renderTo : 'body'
 				} );
 				
-				expect( textField.getInputEl().attr( 'id' ) ).toBe( "__ui_form_field_Text_inputIdTest" );
+				expect( textField.getInputEl().attr( 'id' ) ).toBe( textField.inputId );
 				
 				textField.destroy();
 			} );
@@ -303,10 +302,9 @@ define( [
 		
 		describe( "Test setting the 'inputName' config", function() {
 			
-			it( "The 'for' of the label and the 'name' of the field should match the 'inputId' when set", function() {
+			it( "The 'for' of the label and the 'name' of the field should match the `inputId` property of the field", function() {
 				var textField = new TextField( {
-					renderTo: document.body,
-					inputId: '__TextSpec_inputNameTestId'
+					renderTo: document.body
 				} );
 				
 				var $labelEl = textField.$labelEl,
@@ -314,8 +312,8 @@ define( [
 				
 				expect( $labelEl.length ).toEqual( 1 );  // make sure the element exists
 				expect( $inputEl.length ).toEqual( 1 );  // make sure the element exists
-				expect( $labelEl.attr( 'for' ) ).toEqual( '__TextSpec_inputNameTestId' );
-				expect( $inputEl.attr( 'id' ) ).toEqual( '__TextSpec_inputNameTestId' );
+				expect( $labelEl.attr( 'for' ) ).toEqual( textField.inputId );
+				expect( $inputEl.attr( 'id' ) ).toEqual( textField.inputId );
 				
 				textField.destroy();  // clean up
 			} );

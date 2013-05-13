@@ -9,13 +9,12 @@ define( [
 		
 		describe( "rendering", function() {
 			
-			it( "should create the inputEl with the id of the `inputId` config", function() {
+			it( "should create the inputEl with the id of the `inputId` property", function() {
 				var textAreaField = new TextAreaField( {
-					renderTo : 'body',
-					inputId  : '__ui_form_field_TextArea_inputIdTest'
+					renderTo : 'body'
 				} );
 				
-				expect( textAreaField.getInputEl().attr( 'id' ) ).toBe( "__ui_form_field_TextArea_inputIdTest" );
+				expect( textAreaField.getInputEl().attr( 'id' ) ).toBe( textAreaField.inputId );
 				
 				textAreaField.destroy();
 			} );

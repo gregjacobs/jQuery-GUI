@@ -22,18 +22,12 @@ define( [
 		abstractClass : true,
 		
 		/**
-		 * @cfg {String} inputId
-		 * 
-		 * The id that should be used for the Component's input element. The label element (if {@link #label} is specified) 
-		 * will be created with a `for` attribute with this id. Defaults to a uniquely generated id.
-		 */
-		
-		/**
 		 * @cfg {String} inputName
 		 * 
 		 * The name to give the input. This will be set as the input's "name" attribute. This is really only useful if
-		 * the form that the component exists in is going to be submitted by a standard form submission (as opposed to just
-		 * having its values retrieved, which are handled elsewhere). Defaults to the value of the {@link #inputId} config.
+		 * the form that the component exists under is going to be submitted using a standard form submission (as opposed 
+		 * to simply having its value retrieved, and handling it elsewhere). Defaults to the value of the 
+		 * {@link #inputId} property.
 		 */
 		
 		/**
@@ -76,6 +70,15 @@ define( [
 		 * The initial value for the Field, if any.
 		 */
 		 
+		
+		/**
+		 * @protected
+		 * @property {String} inputId
+		 * 
+		 * The ID that will be used for the Component's input element. This is a combination of the Component's
+		 * {@link jqc.Component#elId elId} and, the suffix "-input". The label element (if {@link #label} is specified) 
+		 * will be created with a `for` attribute with this id.
+		 */
 		
 		/**
 		 * @protected
@@ -170,8 +173,9 @@ define( [
 		
 		
 		
-		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		initComponent : function() {
 			this.addEvents(
 				/**
@@ -200,6 +204,8 @@ define( [
 				'blur'
 			);
 			
+			// Create the inputId based on the Component's element id
+			this.inputId = this.elId + '-input';
 			
 			// Fix labelAlign to be lowercase for use with setting the class name (just in case),
 			// and apply the appropriate CSS class for the label state
@@ -207,8 +213,6 @@ define( [
 			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'jqc-form-Field-noLabel' if there is no label, or 'jqc-form-Field-leftLabel' or 'jqc-form-Field-topLabel' if there is one
 			this.addCls( labelCls );
 			
-			// Give the input a unique ID, if one was not provided
-			this.inputId = this.inputId || 'jqc-cmp-input-' + _.uniqueId();
 			
 			// Default the inputName to the inputId, if not provided.
 			this.inputName = ( typeof this.inputName !== 'undefined' ) ? this.inputName : this.inputId;  // allowing for the possibility of providing an empty string for inputName here (so the field isn't submitted), so not using the || operator

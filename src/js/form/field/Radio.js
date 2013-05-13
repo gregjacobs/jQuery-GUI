@@ -46,11 +46,11 @@ define( [
 		 * The name to give the input. This will be set as the input's "name" attribute.  This is really only useful if
 		 * the form that the component exists in is going to be submitted by a standard form submission (as opposed to just
 		 * having its values retrieved, which are handled elsewhere). Defaults to the value of the 
-		 * {@link jqc.form.field.Field#inputId} config.
+		 * {@link #inputId} property.
 		 * 
 		 * Note that because radio fields rely on their "name" attributes being the same, this should not be set to an
 		 * empty string (or another non-unique string).  If an explicit name is not needed, let this config default to the
-		 * {@link jqc.form.field.Field#inputId} config.
+		 * {@link #inputId} property.
 		 */
 		
 		/**
@@ -109,7 +109,7 @@ define( [
 			// but this will make sure just in case.
 			// <debug>
 			if( !this.inputName ) {
-				throw new Error( "Error: RadioField must have a valid inputName. Make sure that the inputName and inputId configs have not been set to an empty string or other falsy value." );
+				throw new Error( "Error: RadioField must have a valid `inputName`. Make sure that the `inputName` has not been set to an empty string or other falsy value." );
 			}
 			// </debug>
 		},
