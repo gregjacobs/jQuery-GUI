@@ -309,7 +309,7 @@ function( jQuery, _, Jqc ) {
 		 * @return {Number} The width of the padding for the given `sides`.
 		 */
 		getPadding : function( element, sides ) {
-			return this.sumSides( jQuery( element ), 'padding', sides );
+			return this.sumSides( element, 'padding', sides );
 		},
 		
 		
@@ -325,7 +325,7 @@ function( jQuery, _, Jqc ) {
 		 * @return {Number} The width of the margin for the given `sides`.
 		 */
 		getMargin : function( element, sides ) {
-			return this.sumSides( jQuery( element ), 'margin', sides );
+			return this.sumSides( element, 'margin', sides );
 		},
 		
 		
@@ -341,7 +341,7 @@ function( jQuery, _, Jqc ) {
 		 * @return {Number} The width of the border for the given `sides`.
 		 */
 		getBorderWidth : function( element, sides ) {
-			return this.sumSides( jQuery( element ), 'border', sides, 'width' );
+			return this.sumSides( element, 'border', sides, 'width' );
 		},
 		
 		
@@ -383,7 +383,14 @@ function( jQuery, _, Jqc ) {
 			propertyNameSuffix = ( propertyNameSuffix ) ? '-' + propertyNameSuffix : "";
 			
 			for( var i = 0, len = sides.length; i < len; i++ ) {
-				total += parseInt( $element.css( propertyName + '-' + SIDES_MAP[ sides.charAt( i ) ] + propertyNameSuffix ), 10 );
+				var style = $element.css( propertyName + '-' + SIDES_MAP[ sides.charAt( i ) ] + propertyNameSuffix ),
+				    intValue = parseInt( style, 10 );
+				
+				// Ignore the property if IE8< returned "auto", "thin", "medium", "thick", etc. May need better method for checking 
+				// sizes in the future for when jQuery doesn't return a px value.
+				if( !isNaN( intValue ) ) {
+					total += intValue;
+				}
 			}
 			return total;
 		}
@@ -1345,11 +1352,10 @@ define('jqc/ComponentManager', [
 	
 	/**
 	 * @class jqc.ComponentManager
+	 * @singleton
 	 *
 	 * Object used to manage {@link jqc.Component} "types", and handles instantiating them based on the string that is specified
-	 * for them in the manifest.  
-	 *
-	 * @singleton
+	 * for them in the manifest.
 	 */
 	var ComponentManager = {
 		
@@ -1370,7 +1376,6 @@ define('jqc/ComponentManager', [
 		 * This method will throw an error if a type name is already registered, to assist in making sure that we don't get
 		 * unexpected behavior from a type name being overwritten.
 		 * 
-		 * @method registerType
 		 * @param {String} type The type name of registered class.
 		 * @param {Function} jsClass The class (constructor function) to register.
 		 */
@@ -1379,8 +1384,10 @@ define('jqc/ComponentManager', [
 			
 			if( !this.componentClasses[ type ] ) { 
 				this.componentClasses[ type ] = jsClass;
+			// <debug>
 			} else {
 				throw new Error( "Error: jqc.ComponentManager already has a type '" + type + "'" );
+			// </debug>
 			}
 		},
 		
@@ -1388,27 +1395,41 @@ define('jqc/ComponentManager', [
 		/**
 		 * Retrieves the Component class (constructor function) that has been registered by the supplied `type` name. 
 		 * 
-		 * @method getType
 		 * @param {String} type The type name of the registered class.
-		 * @return {Function} The class (constructor function) that has been registered under the given type name.
+		 * @return {Function} The class (constructor function) that has been registered under the given `type` name.
 		 */
 		getType : function( type ) {
-			return this.componentClasses[ type.toLowerCase() ];
+			type = type.toLowerCase();
+			
+			// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
+			// jqc.Component can't register itself with the ComponentManager
+			var jsClass = ( type === 'component' ) ? require( 'jqc/Component' ) : this.componentClasses[ type ];
+			
+			// <debug>
+			if( !jsClass ) 
+				throw new Error( "The class with type name '" + type + "' has not been registered. Make sure that the component " +
+				                 "exists, and has been 'required' by a RequireJS require() or define() call" );
+			// </debug>
+			
+			return jsClass;
 		},
 		
 		
 		/**
 		 * Determines if the ComponentManager has (i.e. can instantiate) a given `type`.
 		 * 
-		 * @method hasType
-		 * @param {String} type
-		 * @return {Boolean} True if the ComponentManager has the given type.
+		 * @param {String} type The type name to check for.
+		 * @return {Boolean} `true` if the ComponentManager has the given type, `false` otherwise.
 		 */
 		hasType : function( type ) {
 			if( !type ) {  // any falsy type value given, return false
 				return false;
 			} else {
-				return !!this.componentClasses[ type.toLowerCase() ];
+				type = type.toLowerCase();
+				
+				// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
+				// Component can't register itself with the ComponentManager
+				return ( type === 'component' ) ? true : !!this.componentClasses[ type ];
 			}
 		},
 		
@@ -1418,7 +1439,6 @@ define('jqc/ComponentManager', [
 		 * a configuration object that has a `type` property. If an already-instantiated 
 		 * {@link jqc.Component Component} is provided, it will simply be returned unchanged.
 		 * 
-		 * @method create
 		 * @param {Object} config The configuration object for the Component. Config objects should have the property `type`, 
 		 *   which determines which type of {@link jqc.Component Component} will be instantiated. If the object does not
 		 *   have a `type` property, it will default to "container", which makes it simple to create things like tab containers. 
@@ -1762,6 +1782,15 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		
 		
+		/**
+		 * @protected
+		 * @cfg {jqc.Container} parentContainer
+		 * 
+		 * The parent {@link jqc.Container Container} of this Component (if any), which this Component is a child of. This is set 
+		 * by the {@link jqc.Container Container} that is adding this Component as a child, and should not be supplied directly.
+		 */
+		parentContainer: null,
+		
 		
 		/**
 		 * @private
@@ -1785,15 +1814,6 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		
 		/**
-		 * @private
-		 * @cfg {jqc.Container} parentContainer
-		 * 
-		 * The parent {@link jqc.Container Container} of this Component (if any). This is set by the {@link jqc.Container} that is adding this Component
-		 * as a child, and should not be supplied directly.
-		 */
-		parentContainer: null,
-	 
-		/**
 		 * @protected
 		 * @property {Boolean} rendered
 		 * 
@@ -1802,8 +1822,13 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		rendered: false,
 		
-		
-		
+		/**
+		 * @protected
+		 * @property {jQuery} $el
+		 * 
+		 * The main element that is created for the Component (determined by the {@link #elType} config). 
+		 * This will be available after the Component is rendered, and may be retrieved using {@link #getEl}
+		 */
 		
 		/**
 		 * @private
@@ -1882,6 +1907,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * for when the mask does in fact get shown.
 		 */
 		
+		
 		/**
 		 * @protected
 		 * @property {Boolean} updateCalledWithContent
@@ -1891,23 +1917,29 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * value of `true` tells the {@link #method-render} method to skip rendering the {@link #tpl}, and instead use the direct 
 		 * {@link #html} content that was provided to the call to {@link #update}.
 		 */
+
 		
+		/**
+		 * @protected
+		 * @property {Boolean} destroying
+		 * 
+		 * Property which is set to `true` while the {@link #method-destroy} method executes. This is mainly for the
+		 * {@link #onDestroy} hook method, which may call other methods that may want to determine if the Component is 
+		 * destroying itself, in order to avoid doing unnecessary work.
+		 * 
+		 * An example of this would be a method that resets the Component's element to an "empty" state due to unbinding
+		 * itself from a data entity, but really shouldn't do so when the Component's element is just going to be removed 
+		 * from the DOM anyway. 
+		 */
+		destroying: false,
 		
 		/**
 		 * @protected
 		 * @property {Boolean} destroyed
 		 * 
-		 * Initially false, and will be set to true after the {@link #method-destroy} method executes.
+		 * Initially `false`, and will be set to `true` after the {@link #method-destroy} method executes.
 		 */
 		destroyed: false,
-		
-		/**
-		 * @protected
-		 * @property {jQuery} $el
-		 * 
-		 * The main element that is created for the Component (determined by the {@link #elType} config). 
-		 * This will be available after the Component is rendered, and may be retrieved using {@link #getEl}
-		 */	
 		
 		
 		/**
@@ -3445,45 +3477,46 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * and the {@link #event-destroy} event.
 		 */
 		destroy : function() {
-			if( !this.destroyed ) {
-				if( this.fireEvent( 'beforedestroy', this ) !== false ) {
-					// Run template method for subclasses first, to allow them to handle their processing
-					// before the Component's element is removed
-					this.onDestroy();
-					
-					// If the Component is currently animating, end it
-					if( this.currentAnimation ) {
-						this.currentAnimation.end();
-					}
-					
-					// Destroy the mask, if it is an instantiated jqc.Mask object (it may not be if the mask was never used)
-					if( this._mask instanceof Mask ) {
-						this._mask.destroy();
-					}
-					
-					// Remove any HTMLElement or jQuery wrapped sets used by the Component from the DOM, and free 
-					// the references so that we prevent memory leaks.
-					// Note: This includes the Component's $el reference (if it has been created by the Component being rendered).
-					for( var prop in this ) {
-						if( this.hasOwnProperty( prop ) ) {
-							var propValue = this[ prop ];
-							
-							if( _.isElement( propValue ) ) {
-								// First, wrap the raw HTMLElement in a jQuery object, for easy removal. Then delete the reference.
-								jQuery( propValue ).remove();
-								delete this[ prop ];
-							} else if( propValue instanceof jQuery ) {
-								propValue.remove();
-								delete this[ prop ];
-							}
+			if( !this.destroyed && this.fireEvent( 'beforedestroy', this ) !== false ) {
+				this.destroying = true;
+				
+				// Run template method for subclasses first, to allow them to handle their processing
+				// before the Component's element is removed
+				this.onDestroy();
+				
+				// If the Component is currently animating, end it
+				if( this.currentAnimation ) {
+					this.currentAnimation.end();
+				}
+				
+				// Destroy the mask, if it is an instantiated jqc.Mask object (it may not be if the mask was never used)
+				if( this._mask instanceof Mask ) {
+					this._mask.destroy();
+				}
+				
+				// Remove any HTMLElement or jQuery wrapped sets used by the Component from the DOM, and free 
+				// the references so that we prevent memory leaks.
+				// Note: This includes the Component's $el reference (if it has been created by the Component being rendered).
+				for( var prop in this ) {
+					if( this.hasOwnProperty( prop ) ) {
+						var propValue = this[ prop ];
+						
+						if( _.isElement( propValue ) ) {
+							// First, wrap the raw HTMLElement in a jQuery object, for easy removal. Then delete the reference.
+							jQuery( propValue ).remove();
+							delete this[ prop ];
+						} else if( propValue instanceof jQuery ) {
+							propValue.remove();
+							delete this[ prop ];
 						}
 					}
-					
-					this.rendered = false;  // the Component is no longer rendered; it's $el has been removed (above)
-					this.destroyed = true;
-					this.fireEvent( 'destroy', this );
-					this.purgeListeners();  // Note: Purge listeners must be called after 'destroy' event fires!
 				}
+				
+				this.rendered = false;  // the Component is no longer rendered; it's $el has been removed (above)
+				this.destroying = false;
+				this.destroyed = true;
+				this.fireEvent( 'destroy', this );
+				this.purgeListeners();  // Note: Purge listeners must be called after 'destroy' event fires!
 			}
 		},
 		
@@ -4347,7 +4380,7 @@ define('jqc/Container', [
 		/**
 		 * Removes one or more child {@link jqc.Component Component(s)} from this Container.  
 		 * 
-		 * Removed {@link jqc.Component Components} will automatically have their {@link jqc.Component#destroy} method called if 
+		 * Removed {@link jqc.Component Components} will automatically have their {@link jqc.Component#method-destroy} method called if 
 		 * the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is explicitly set to true. 
 		 * If the Component is not destroyed, its main {@link jqc.Component#$el element} is detached from this Container.  When all 
 		 * Components are removed, this method automatically calls {@link #doLayout} to refresh the layout.
@@ -4393,7 +4426,7 @@ define('jqc/Container', [
 		 * Removes the child Component at the given `idx`, and returns the removed component. If there is no component 
 		 * at the given `idx`, then this method has no effect and returns `null`.
 		 * 
-		 * Note that the removed {@link jqc.Component Component} will automatically have its {@link jqc.Component#destroy destroy} 
+		 * Note that the removed {@link jqc.Component Component} will automatically have its {@link jqc.Component#method-destroy destroy} 
 		 * method called if the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is 
 		 * explicitly set to true. If the Component is not destroyed, its main {@link jqc.Component#$el element} is detached from 
 		 * this Container.  
@@ -4772,18 +4805,16 @@ define('jqc/Container', [
 	
 	
 		/**
-		 * Cascades down the Component/Container heirarchy from this Container (called first), calling the specified
-		 * function with each Component. The scope (`this` reference) of the function call will be the scope provided,
-		 * or the current Component that is being processed.  The arguments to the function will be the `args` provided,
-		 * or the current Component.
+		 * Cascades down the {@link jqc.Component Component}/Container heirarchy from this Container (called first), calling the specified
+		 * function for each Component. The scope (`this` reference) of the function call will be the scope provided,
+		 * or the current Component that is being processed.
 		 *
 		 * If the function returns false at any point, the cascade does not continue down that branch. However, siblings of the Container
 		 * that was being processed when the function returned false are still processed.
 		 *
-		 * @method cascade
 		 * @param {Function} fn The function to call
-		 * @param {Object} scope (optional) The scope of the function (defaults to current {@link jqc.Component Component})
-		 * @param {Array} args (optional) The args to call the function with (defaults to passing in the current {@link jqc.Component Component} as the only argument)
+		 * @param {Object} [scope] The scope of the function. Defaults to the {@link jqc.Component Component} that is currently being
+		 *   processed.
 		 */
 		cascade : function( fn, scope, args ) {
 			if( fn.apply( scope || this, args || [this] ) !== false ) {
@@ -4803,9 +4834,8 @@ define('jqc/Container', [
 		/**
 		 * Finds a Component under this container at any level by {@link jqc.Component#id id}.
 		 *
-		 * @method findById
 		 * @param {String} id The ID of the Component to search for.
-		 * @return {jqc.Component} The component with the given `id`, or null if none was found.
+		 * @return {jqc.Component} The component with the given `id`, or `null` if none was found.
 		 */
 		findById : function( id ) {
 			var returnVal = null,
@@ -4822,12 +4852,13 @@ define('jqc/Container', [
 	
 	
 		/**
-		 * Finds a Component under this container at any level by a custom function. If the passed function returns
-		 * true, the component will be included in the results.
+		 * Finds the {@link jqc.Component Components} under this Container at any level by a custom function. If the passed function 
+		 * returns true for a given Component, then that Component will be included in the results.
 		 *
-		 * @method findBy
-		 * @param {Function} fn The function to call. The function will be called with the arguments: (component, this container)
-		 * @param {Object} scope (optional) The scope to call the function in.
+		 * @param {Function} fn The function to call. The function will be called with the following arguments:
+		 * @param {jqc.Component} fn.component The Component that is being inspected.
+		 * @param {jqc.Container} fn.thisContainer This Container instance.
+		 * @param {Object} [scope] The scope to call the function in. Defaults to the Component being inspected.
 		 * @return {jqc.Component[]} Array of {@link jqc.Component Components}
 		 */
 		findBy : function( fn, scope ) {
@@ -4844,11 +4875,10 @@ define('jqc/Container', [
 	
 	
 		/**
-		 * Finds a {@link jqc.Component} under this container at any level by Component `type`. The Container type can be either the 
-		 * type name that is registered to the {@link jqc.ComponentManager} (see the description of the {@link jqc.Component} class), 
-		 * or the JavaScript class (constructor function) of the {@link jqc.Component}.
+		 * Finds the {@link jqc.Component Components} under this Container at any level by Component `type`. The Component `type` can be either 
+		 * the type name that is registered to the {@link jqc.ComponentManager} (see the description of the {@link jqc.Component} class), 
+		 * or the JavaScript class (constructor function) of the {@link jqc.Component Component}.
 		 *
-		 * @method findByType
 		 * @param {Function} type The type name registered with the {@link jqc.ComponentManager}, or the constructor function (class) of the Component.
 		 * @return {jqc.Component[]} Array of {@link jqc.Component Components} which match the `type`.
 		 */
@@ -5257,7 +5287,6 @@ define('jqc/layout/HBox', [
 			this._super( arguments );
 			
 			
-			//debugger;
 			var flexedComponents = [],
 			    totalFlex = 0,
 			    totalUnflexedWidth = 0,
@@ -6888,18 +6917,12 @@ define('jqc/form/field/Field', [
 		abstractClass : true,
 		
 		/**
-		 * @cfg {String} inputId
-		 * 
-		 * The id that should be used for the Component's input element. The label element (if {@link #label} is specified) 
-		 * will be created with a `for` attribute with this id. Defaults to a uniquely generated id.
-		 */
-		
-		/**
 		 * @cfg {String} inputName
 		 * 
 		 * The name to give the input. This will be set as the input's "name" attribute. This is really only useful if
-		 * the form that the component exists in is going to be submitted by a standard form submission (as opposed to just
-		 * having its values retrieved, which are handled elsewhere). Defaults to the value of the {@link #inputId} config.
+		 * the form that the component exists under is going to be submitted using a standard form submission (as opposed 
+		 * to simply having its value retrieved, and handling it elsewhere). Defaults to the value of the 
+		 * {@link #inputId} property.
 		 */
 		
 		/**
@@ -6942,6 +6965,15 @@ define('jqc/form/field/Field', [
 		 * The initial value for the Field, if any.
 		 */
 		 
+		
+		/**
+		 * @protected
+		 * @property {String} inputId
+		 * 
+		 * The ID that will be used for the Component's input element. This is a combination of the Component's
+		 * {@link jqc.Component#elId elId} and, the suffix "-input". The label element (if {@link #label} is specified) 
+		 * will be created with a `for` attribute with this id.
+		 */
 		
 		/**
 		 * @protected
@@ -7036,8 +7068,9 @@ define('jqc/form/field/Field', [
 		
 		
 		
-		
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		initComponent : function() {
 			this.addEvents(
 				/**
@@ -7066,6 +7099,8 @@ define('jqc/form/field/Field', [
 				'blur'
 			);
 			
+			// Create the inputId based on the Component's element id
+			this.inputId = this.elId + '-input';
 			
 			// Fix labelAlign to be lowercase for use with setting the class name (just in case),
 			// and apply the appropriate CSS class for the label state
@@ -7073,8 +7108,6 @@ define('jqc/form/field/Field', [
 			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'jqc-form-Field-noLabel' if there is no label, or 'jqc-form-Field-leftLabel' or 'jqc-form-Field-topLabel' if there is one
 			this.addCls( labelCls );
 			
-			// Give the input a unique ID, if one was not provided
-			this.inputId = this.inputId || 'jqc-cmp-input-' + _.uniqueId();
 			
 			// Default the inputName to the inputId, if not provided.
 			this.inputName = ( typeof this.inputName !== 'undefined' ) ? this.inputName : this.inputId;  // allowing for the possibility of providing an empty string for inputName here (so the field isn't submitted), so not using the || operator
@@ -7412,18 +7445,17 @@ define('jqc/form/field/Checkbox', [
 } );
 /*global define */
 define('jqc/util/OptionsStore', [
-	'jquery',
 	'lodash',
 	'Class'
-], function( jQuery, _, Class ) {
+], function( _, Class ) {
 	
 	/**
 	 * @class jqc.util.OptionsStore
 	 * @extends Object
 	 * 
-	 * Helper utility class used for making the management of 'options' data easy, for any classes that use this format of data.
-	 * "Options data" in this context simply means "text/value" pairs, such as used by dropdowns. The purpose of this class 
-	 * was to not duplicate functionality for classes that use this format of data.
+	 * Helper utility class used for making the management of text/value "options" data easy, for any classes that rely on this format 
+	 * of data. This is used as used, for example, by {@link jqc.form.field.Dropdown Dropdowns}. The purpose of this class 
+	 * was to not duplicate functionality for the classes that use this format of data.
 	 * 
 	 * This class is currently used by {@link jqc.form.field.Dropdown} and {@link jqc.form.field.Radio}, which use it for 
 	 * managing the options that they provide.
@@ -7431,7 +7463,7 @@ define('jqc/util/OptionsStore', [
 	var OptionsStore = Class.extend( Object, {
 		
 		/**
-		 * @private
+		 * @protected
 		 * @property {Object[]} options
 		 * 
 		 * The internal array of options held by the OptionsStore.
@@ -7442,7 +7474,7 @@ define('jqc/util/OptionsStore', [
 		 * Instantiates an OptionsStore.
 		 * 
 		 * @constructor
-		 * @param {Array/Function} options The initial set of options to provide to the OptionsStore. 
+		 * @param {String[]/Object[]} [options] The initial set of options to provide to the OptionsStore, if any. 
 		 *   See the `options` parameter in {@link #setOptions} for accepted formats of this parameter.
 		 */
 		constructor : function( options ) {
@@ -7453,84 +7485,72 @@ define('jqc/util/OptionsStore', [
 		/**
 		 * Normalizes the given array of options into text/value options.
 		 * 
-		 * @private
-		 * @method normalizeOptions
-		 * @param {Object[]} options See the `options` argument of {@link #setOptions}.
-		 * @return {Object[]} The options normalized to objects with 'text' and 'value' properties.
+		 * @protected
+		 * @param {String[]/Object[]} options See the `options` argument of {@link #setOptions}.
+		 * @return {Object[]} The options normalized to objects with `text` and `value` properties.
 		 */
 		normalizeOptions : function( options ) {
-			var normalizedOptions = [];
-			
-			for( var i = 0, len = options.length; i < len; i++ ) {
-				normalizedOptions.push( this.normalizeOption( options[ i ] ) );
-			}
-			
-			return normalizedOptions;
+			return _.map( options, function( opt ) { return this.normalizeOption( opt ); }, this );
 		},
 		
 		
 		/**
-		 * Normalizes a single option into an object with `text` and `value` properties. If a string is provided as the argument,
-		 * that string will be used as both the `text` and `value` properties. If an object is provided, it must at least have a 
-		 * `text` property, which will also be used for the `value` property should no `value` of its own exist.
+		 * Normalizes a single option into an object with `text` and `value` properties. 
 		 * 
-		 * @private
-		 * @method normalizeOption
+		 * - If a String is provided as the argument, that string will be used as both the `text` and `value` properties. 
+		 * - If an Object is provided, it must at least have a `text` property, which will also be used for the `value` 
+		 *   property should no `value` of its own exist.
+		 * 
+		 * @protected
 		 * @param {String/Object} option
 		 * @return {Object} A normalized object with `text` and `value` properties.
 		 */
 		normalizeOption : function( option ) {
-			var normalizedOption = {};
-			
 			if( typeof option === 'object' ) {
-				normalizedOption.text = option.text;
-				normalizedOption.value = ( typeof option.value !== 'undefined' ) ? option.value : option.text;  // If no value is specified, use the text as the value.
+				option = _.clone( option );  // make a shallow copy, as to not affect the original
 				
-				// Add any extra properties that may have been provided to the normalizedOption object.
-				for( var prop in option ) {
-					// Filter out the 'text' and 'value' properties (they have been handled above), and filter out any prototype properties as well
-					if( prop !== 'text' && prop !== 'value' && option.hasOwnProperty( prop ) ) {
-						normalizedOption[ prop ] = option[ prop ];
-					}
+				// If no value is specified, use the `text` property as the value.
+				if( option.value === undefined ) {
+					option.value = option.text;
 				}
 				
+				return option;
+				
 			} else {
-				// String option: use it for both text and value 
-				normalizedOption.text = option;
-				normalizedOption.value = option;
+				// String `option` arg: use it for both `text` and `value` properties on the returned object
+				return { text: option, value: option };
 			}
-			
-			return normalizedOption;
 		},
 		
 		
 		/**
-		 * Sets the options for the store. Normalizes the options into an array of objects, where each object
-		 * has the properties 'text' and 'value'.  Extra properties may be added however, when following the recommended format (an
-		 * array of objects).
+		 * Sets the options for the store. 
 		 * 
-		 * @method setOptions
-		 * @param {Array/Function} options The options for the OptionsStore. If this is a flat array, the values will be used as both the 'value' and 'text'
-		 *   of the options.  Ex: `[ "Option 1", "Option 2", "Option 3" ]`
+		 * Normalizes the options into an Array of Objects, where each Object has the properties `text` and `value`. Any extra 
+		 * properties on the objects are left unchanged.
 		 * 
-		 *   If you want to customize the value and text separately for each option (recommended), provide an array of objects, where the object has two
-		 *   properties: `text` and `value`. 
-		 *   Ex: `[ { "text": "Option 1", "value": 1 }, { "text": "Option 2", "value": 2 } ]`
+		 * @param {String[]/Object[]} options The options for the OptionsStore. If this is a flat array of strings, the values will be 
+		 *   used as both the `text` and `value` properties of the options.  Ex: 
+		 *   
+		 *       [ "Option 1", "Option 2", "Option 3" ]
+		 * 
+		 *   If you want to customize the value and text separately for each option, provide an Array of Objects, where the Object 
+		 *   has two properties: `text` and `value`. Ex: 
+		 *   
+		 *       [ 
+		 *           { "text": "Option 1", "value": 1 },
+		 *           { "text": "Option 2", "value": 2 }
+		 *       ]
 		 *   
 		 *   Extra properties may also be added if needed in this form, and will not be affected by the OptionsStore.  These properties
-		 *   may be used by whichever implementation is using the OptionsStore.
-		 *   Ex: `[ { "text": "Option 1", "value": 1, "cls" : "myCssClass" }, { "text": "Option 2", "value": 2, "cls" : "myCssClass2" } ]`
-		 * 
-		 *   If this config is specified as a function, the function will be executed, and its return will be used as the options. Its return should match one of
-		 *   the forms defined above.
+		 *   may be used by whichever implementation is using the OptionsStore. Ex: 
+		 *   
+		 *       [
+		 *           { "text": "Option 1", "value": 1, "cls" : "myCssClass" },
+		 *           { "text": "Option 2", "value": 2, "cls" : "myCssClass2" }
+		 *       ]
 		 */
 		setOptions : function( options ) {
-			// If the options were provided as a function, execute the function and use its return as the options array
-			if( typeof options === 'function' ) {
-				options = options();
-			}
-			
-			// Store the normalized options
 			this.options = this.normalizeOptions( options );
 		},
 		
@@ -7538,7 +7558,6 @@ define('jqc/util/OptionsStore', [
 		/**
 		 * Adds an option to the OptionsStore.
 		 * 
-		 * @method addOption
 		 * @param {String/Object} A string, which will be used for both the text/value, or an object with `text` and `value` properties.
 		 * @param {Number} [index] The index to add the option at. Defaults to appending the option.
 		 */
@@ -7554,35 +7573,31 @@ define('jqc/util/OptionsStore', [
 		
 		
 		/**
-		 * Removes an option from the OptionsStore by its value.
+		 * Removes an option from the OptionsStore by its text.
 		 * 
-		 * @method removeOptionByValue
-		 * @param {Mixed} value The value of the option to remove.
+		 * @param {Mixed} text The text of the option to remove.
 		 */
-		removeOptionByValue : function( value ) {
-			var options = this.options;
-			for( var i = 0, len = options.length; i < len; i++ ) {
-				if( options[ i ].value === value ) {
-					options.splice( i, 1 );  // Remove the option
-					return;
-				}
+		removeOptionByText : function( text ) {
+			var options = this.options,
+			    idx = _.findIndex( options, { text: text } );
+			
+			if( idx !== -1 ) {
+				options.splice( idx, 1 );  // remove the option
 			}
 		},
 		
 		
 		/**
-		 * Removes an option from the OptionsStore by its text.
+		 * Removes an option from the OptionsStore by its value.
 		 * 
-		 * @method removeOptionByText
-		 * @param {Mixed} text The text of the option to remove.
+		 * @param {Mixed} value The value of the option to remove.
 		 */
-		removeOptionByText : function( text ) {
-			var options = this.options;
-			for( var i = 0, len = options.length; i < len; i++ ) {
-				if( options[ i ].text === text ) {
-					options.splice( i, 1 );  // Remove the option
-					return;
-				}
+		removeOptionByValue : function( value ) {
+			var options = this.options,
+			    idx = _.findIndex( this.options, { value: value } );
+			
+			if( idx !== -1 ) {
+				options.splice( idx, 1 );  // remove the option
 			}
 		},
 		
@@ -7592,10 +7607,9 @@ define('jqc/util/OptionsStore', [
 		// Retrieval methods
 		
 		/**
-		 * Retrives all of the options objects held by the OptionsStore. Each options object has properties: 'text' and 'value'.
+		 * Retrives all of the options objects held by the OptionsStore. Each options object has properties: `text` and `value`.
 		 * 
-		 * @method getOptions
-		 * @return {Object[]} An array of the options objects, each of which has properties 'text' and 'value'.
+		 * @return {Object[]} An array of the options objects, each of which has properties `text` and `value`.
 		 */
 		getOptions : function() {
 			return this.options;
@@ -7605,7 +7619,6 @@ define('jqc/util/OptionsStore', [
 		/**
 		 * Retrieves the number of options held by the OptionsStore.
 		 * 
-		 * @method getCount
 		 * @return {Number} The number of options currently held by the OptionsStore.
 		 */
 		getCount : function() {
@@ -7616,9 +7629,8 @@ define('jqc/util/OptionsStore', [
 		/**
 		 * Retrieves an option based on its index position (0-based).
 		 * 
-		 * @method getAtIndex
 		 * @param {Number} index
-		 * @return {Object} The option object with properties 'text' and 'value', or null if the index was out of range.
+		 * @return {Object} The option object with properties `text` and `value`, or `null` if the index was out of range.
 		 */
 		getAtIndex : function( index ) {
 			return this.options[ index ] || null;
@@ -7626,40 +7638,24 @@ define('jqc/util/OptionsStore', [
 		
 		
 		/**
-		 * Retrieves an option based on its `value`. An option object has properties 'text' and 'value'.
+		 * Retrieves an option based on its `text`. An option object has properties `text` and `value`.
 		 * 
-		 * @method getByValue
-		 * @param {Mixed} value
-		 * @return {Object} The option object with properties 'text' and 'value', or null if no option was found.
+		 * @param {String} text
+		 * @return {Object} The option object with properties `text` and `value`, or `null` if no option was found.
 		 */
-		getByValue : function( value ) {
-			var options = this.options;
-				
-			for( var i = 0, len = options.length; i < len; i++ ) {
-				if( options[ i ].value === value ) {
-					return options[ i ];
-				}
-			}
-			return null;  // return null if no option was found
+		getByText : function( text ) {
+			return _.find( this.options, { text: text } ) || null;
 		},
 		
 		
 		/**
-		 * Retrieves an option based on its `text`. An option object has properties 'text' and 'value'.
+		 * Retrieves an option based on its `value`. An option object has properties `text` and `value`.
 		 * 
-		 * @method getByText
-		 * @param {String} text
-		 * @return {Object} The option object with properties 'text' and 'value', or null if no option was found.
+		 * @param {Mixed} value
+		 * @return {Object} The option object with properties `text` and `value`, or `null` if no option was found.
 		 */
-		getByText : function( text ) {
-			var options = this.options;
-				
-			for( var i = 0, len = options.length; i < len; i++ ) {
-				if( options[ i ].text === text ) {
-					return options[ i ];
-				}
-			}
-			return null;  // return null if no option was found
+		getByValue : function( value ) {
+			return _.find( this.options, { value: value } ) || null;
 		}
 	
 	} );
@@ -8492,11 +8488,11 @@ define('jqc/form/field/Radio', [
 		 * The name to give the input. This will be set as the input's "name" attribute.  This is really only useful if
 		 * the form that the component exists in is going to be submitted by a standard form submission (as opposed to just
 		 * having its values retrieved, which are handled elsewhere). Defaults to the value of the 
-		 * {@link jqc.form.field.Field#inputId} config.
+		 * {@link #inputId} property.
 		 * 
 		 * Note that because radio fields rely on their "name" attributes being the same, this should not be set to an
 		 * empty string (or another non-unique string).  If an explicit name is not needed, let this config default to the
-		 * {@link jqc.form.field.Field#inputId} config.
+		 * {@link #inputId} property.
 		 */
 		
 		/**
@@ -8555,7 +8551,7 @@ define('jqc/form/field/Radio', [
 			// but this will make sure just in case.
 			// <debug>
 			if( !this.inputName ) {
-				throw new Error( "Error: RadioField must have a valid inputName. Make sure that the inputName and inputId configs have not been set to an empty string or other falsy value." );
+				throw new Error( "Error: RadioField must have a valid `inputName`. Make sure that the `inputName` has not been set to an empty string or other falsy value." );
 			}
 			// </debug>
 		},
@@ -10053,16 +10049,287 @@ define('jqc/layout/VBox', [
 } );
 
 /*global define */
+define('jqc/util/CollectionBindable', [
+	'lodash',
+	'Class',
+	'jqc/Jqc'
+], function( _, Class, Jqc ) {
+	
+	/**
+	 * @class jqc.util.CollectionBindable
+	 * @extends Object
+	 * 
+	 * This class is intended to be used as a mixin. It allows any class that it is mixed into (the "target" class in these docs) to have 
+	 * a {@link data.Collection} bound to it by providing the common functionality to allow a collection's events to be listened to and handled.
+	 * These same event listeners are also removed when the collection is unbound, and the class provides the functionality to make sure that
+	 * the same collection isn't bound over itself.
+	 * 
+	 * This mixin provides the basic method to {@link #bindCollection bind a collection}, which automatically unbinds any previously-bound 
+	 * {@link data.Collection Collection} in the process. Classes using this mixin should implement the {@link #getCollectionListeners} method, 
+	 * to specify which listeners should automatically be attached when a collection is bound, and unattached when the collection is unbound.
+	 * 
+	 * The target class may also implement the {@link #onCollectionBind} method, to detect and handle when a new {@link data.Collection} has
+	 * been bound, and/or when the currently-bound collection has been unbound.
+	 * 
+	 * Here is an example of mixing this class into a {@link jqc.Component Component}, to make the Component data-bound to a Collection:
+	 * 
+	 *     define( [
+	 *         'jqc/Component',
+	 *         'jqc/util/CollectionBindable'
+	 *     ], function( Component, CollectionBindable ) {
+	 *         
+	 *         var MyBindableComponent = Component.extend( {
+	 *             mixins : [ CollectionBindable ],
+	 *             
+	 *             
+	 *             initComponent : function() {
+	 *                 this._super( arguments );
+	 *                 
+	 *                 // Call CollectionBindable's constructor, in the scope of this object.
+	 *                 // Even though there is no implementation in the CollectionBindable constructor 
+	 *                 // at this time, it is a good idea in case an implementation is added in the future.
+	 *                 CollectionBindable.call( this );
+	 *             }
+	 *             
+	 *             // ...
+	 *             
+	 *             
+	 *             // Specifies the listeners that will be added to the collection
+	 *             getCollectionListeners : function( collection ) {
+	 *                 return {
+	 *                     'load'   : this.onLoad,          // listen to `load` and `change`
+	 *                     'change' : this.onModelChange,   // events of the bound collection
+	 *                     scope    : this
+	 *                 };
+	 *             },
+	 *             
+	 *             
+	 *             onLoad : function( collection ) {
+	 *                 // handle the collection's `load` event here
+	 *             },
+	 *             
+	 *             onModelChange : function( collection ) {
+	 *                 // handle a model in the bound collection changing here
+	 *             },
+	 *             
+	 *             
+	 *             // ...
+	 *             
+	 *             
+	 *             onDestroy : function() {
+	 *                 // Don't forget to unbind any currently-bound collection when the Component 
+	 *                 // is destroyed!
+	 *                 this.unbindCollection();
+	 *                 
+	 *                 this._super( arguments );
+	 *             }
+	 *             
+	 *         } );
+	 *         
+	 *         return MyBindableComponent;
+	 *         
+	 *     } );
+	 */
+	var CollectionBindable = new Class( {
+		
+		/**
+		 * @protected
+		 * @cfg {String} collectionProp
+		 * 
+		 * The name of the property which stores the {@link data.Collection} that is bound to this object
+		 * (i.e. the object that this class is mixed into).
+		 * 
+		 * This property can be specified by the mixed-into class, to change the property name that it stores
+		 * the collection under.
+		 */
+		collectionProp : 'collection',
+		
+		
+		/**
+		 * @private
+		 * @property {Object} collectionListeners
+		 * 
+		 * The listeners that were bound to the currently stored {@link data.Collection}, in the {@link #bindCollectionListeners}
+		 * method. If there has been no Collection bound to this view yet, this will be `undefined`.
+		 */
+		
+		/**
+		 * @private
+		 * @property {Boolean} firstCollectionBindComplete
+		 * 
+		 * Property which is set to true after an initial collection bind has been made.
+		 */
+		
+		
+		/**
+		 * Binds a {@link data.Collection} to this object. The collection will be set to the property specified by
+		 * the {@link #collectionProp}. Any previous collection will be unbound.
+		 * 
+		 * @param {data.Collection} collection The Collection to bind. To unbind the currently-bound collection,
+		 *   either pass `null`, or call {@link #unbindCollection} instead.
+		 */
+		bindCollection : function( collection ) {
+			var collectionProp = this.collectionProp,
+			    currentCollection = this[ collectionProp ] || null;  // normalize `undefined` to `null`, for the comparison against the `collection` arg (should the `collection` arg be null)
+			
+			// Only bind a new collection if it is different than the currently-bound collection. However, always accept the 
+			// collection if no collection has been bound yet. This covers if the class has a config option that matches the 
+			// `collectionProp` name (for instance, "collection"), in which case that initial collection should be bound. This
+			// would be the case if a class calls bindCollection() with that initial collection from its constructor function.
+			// The 'first bind' functionality should only happen if there is actually a collection to bind however. Don't 
+			// accept `null` in this case.
+			if( currentCollection !== collection || ( !this.firstCollectionBindComplete && collection ) ) {
+				// If there is a current collection, and there have been listeners bound to it (i.e. it is not the initial bind
+				// call from having a `collection` config), then unbind its listeners in preparation to bind a new Collection
+				if( currentCollection ) {
+					this.unbindCollectionListeners();
+				}
+				
+				this[ collectionProp ] = collection;  // store the new collection
+				if( collection ) {
+					this.bindCollectionListeners();
+				}
+				this.firstCollectionBindComplete = true;
+				
+				// Figure out the correct "old" (previously-bound) collection. If the new collection is the same as the old 
+				// collection (for the case of binding a pre-configured collection), then set that to `null` for the method
+				// call (as there really was no previously-bound collection).
+				var oldCollection = ( currentCollection === collection ) ? null : currentCollection || null;
+				this.onCollectionBind( collection, oldCollection );
+			}
+		},
+		
+		
+		/**
+		 * Unbinds the currently-bound {@link data.Collection}, if there is one. Removes its event listeners (which are
+		 * specified by the {@link #getCollectionListeners} method), and then sets the reference to the collection (governed 
+		 * by the {@link #collectionProp} config) to `null`.
+		 */
+		unbindCollection : function() {
+			var collectionProp = this.collectionProp,
+			    currentCollection = this[ collectionProp ];
+			
+			if( currentCollection ) {
+				this.unbindCollectionListeners();
+				this[ collectionProp ] = null;
+				
+				this.onCollectionBind( null, /* the old collection */ currentCollection );
+			}
+		},
+		
+		
+		/**
+		 * Hook method which is called when a new {@link data.Collection} has been bound to this object using 
+		 * {@link #bindCollection}. Also called when a {@link data.Collection} is unbound from this object, either
+		 * by `null` being passed to {@link #bindCollection}, or {@link #unbindCollection} being called.
+		 * 
+		 * @protected
+		 * @template
+		 * @method onCollectionBind
+		 * @param {data.Collection} collection The newly bound collection. Will be `null` if the previous collection was
+		 *   simply unbound (i.e. `null` was passed to {@link #bindCollection}, or {@link #unbindCollection} was called). 
+		 * @param {data.Collection} oldCollection The collection that was just unbound. Will be `null` if there was no
+		 *   previously-bound collection.
+		 */
+		onCollectionBind : Jqc.emptyFn,
+		
+		
+		/**
+		 * Binds listeners to the current collection, so that the view can refresh itself upon changes. The listeners 
+		 * that are set up are defined by the {@link #getCollectionListeners} method, which should be overridden by 
+		 * the target class to listen for the events that are needed.
+		 * 
+		 * @private
+		 */
+		bindCollectionListeners : function() {
+			var collection = this[ this.collectionProp ],
+			    listeners = _.clone( this.getCollectionListeners( collection ) );  // shallow copy of the listeners
+			
+			collection.on( listeners );
+			this.collectionListeners = listeners;
+		},
+		
+		
+		/**
+		 * Retrieves an Object (map) of the listeners that should be set up on the collection when one is bound to this object. 
+		 * This method should be overridden by the target class to add the events that should be listened for. Example:
+		 * 
+		 *     require( [
+		 *         'Class',
+		 *         'jqc/util/CollectionBindable'
+		 *     ], function( Class, CollectionBindable ) {
+		 *         
+		 *         var MyBindableClass = new Class( {
+		 *             mixins : [ CollectionBindable ],
+		 *             
+		 *             // ...
+		 *             
+		 *             getCollectionListeners : function( collection ) {
+		 *                 return {
+		 *                     'load'   : this.onLoad,
+		 *                     'change' : this.onModelChange,
+		 *                     scope    : this
+		 *                 };
+		 *             },
+		 *             
+		 *             
+		 *             onLoad : function() {
+		 *                 // ...
+		 *             },
+		 *             
+		 *             onModelChange : function() {
+		 *                 // ...
+		 *             }
+		 *             
+		 *         } );
+		 *         
+		 *     } );
+		 * 
+		 * Note that the handler functions should always be references to functions defined in the class, not anonymous
+		 * functions. The same function references are needed to unbind the collection later, and providing an anonymous
+		 * function as a handler for an event will not allow the event listener to be removed.
+		 * 
+		 * @protected
+		 * @param {data.Collection} collection The Collection being bound. Note that listeners should not be attached here,
+		 *   but the Collection instance is provided in case it needs to be queried for any reason (such as for a particular 
+		 *   Collection subclass type).
+		 * @return {Object} An {@link Observable#addListener addListener} config object for the listeners to be added.
+		 */
+		getCollectionListeners : function( collection ) {
+			return {};
+		},
+		
+		
+		/**
+		 * Unbinds the currently-bound collection's listeners, which were set up in {@link #bindCollectionListeners}.
+		 * 
+		 * @private
+		 */
+		unbindCollectionListeners : function() {
+			var currentCollection = this[ this.collectionProp ];
+			if( currentCollection && this.collectionListeners ) {
+				currentCollection.un( this.collectionListeners );  // the Collection listener's set up in bindCollectionListeners()
+			}
+		}
+		
+	} );
+	
+	return CollectionBindable;
+	
+} );
+/*global define */
 define('jqc/view/Collection', [
 	'jquery',
 	'lodash',
 	'jqc/ComponentManager',
-	'jqc/Component'
-], function( jQuery, _, ComponentManager, Component ) {
+	'jqc/Component',
+	'jqc/util/CollectionBindable'
+], function( jQuery, _, ComponentManager, Component, CollectionBindable ) {
 	
 	/**
 	 * @class jqc.view.Collection
 	 * @extends jqc.Component
+	 * @mixins jqc.util.CollectionBindable
 	 * @alias type.collectionview
 	 * 
 	 * A view of the {@link data.Model Models} in a {@link data.Collection}. The view uses the {@link #tpl} config, which 
@@ -10074,6 +10341,8 @@ define('jqc/view/Collection', [
 	 * it shows a {@link data.Collection Collection} of them.
 	 */
 	var CollectionView = Component.extend( {
+		mixins : [ CollectionBindable ],
+		
 		
 		/**
 		 * @cfg {data.Collection} collection (required)
@@ -10195,22 +10464,6 @@ define('jqc/view/Collection', [
 		maskOnLoad : true,
 		
 		
-		
-		/**
-		 * @private
-		 * @property {Boolean} firstBindComplete
-		 * 
-		 * Property which is set to true when the initial bind (called from {@link #initComponent} is complete.
-		 */
-		
-		/**
-		 * @private
-		 * @property {Object} collectionListeners
-		 * 
-		 * The listeners that were bound to the current {@link #collection} in the {@link #bindCollectionListeners} method. 
-		 * If there has been no Collection bound to this view yet, this will be `undefined`.
-		 */
-		
 		/**
 		 * @protected
 		 * @property {Object} modelElCache
@@ -10240,7 +10493,11 @@ define('jqc/view/Collection', [
 			// </debug>
 			
 			this.modelElCache = {};
-			this.bindCollection( this.collection || null );
+			if( this.collection ) {
+				this.bindCollection( this.collection );
+			} else {
+				this.refresh();  // do an initial refresh if no collection, which simply sets up the CollectionView to not show anything (and not run the template, since we don't have models to run it with)
+			}
 			
 			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
 			// while the collection is loading.
@@ -10268,58 +10525,12 @@ define('jqc/view/Collection', [
 		
 		// -----------------------------------
 		
-		// Collection binding methods
-		
-		
-		/**
-		 * Binds a {@link data.Collection} to the view. The Collection will be used to populate the {@link #tpl},
-		 * and will also be monitored for changes to refresh the view as well.
-		 * 
-		 * Any previous {@link #collection} will be unbound from the view.
-		 * 
-		 * @param {data.Collection} collection The Collection to bind. To unbind the currently-bound Collection,
-		 *   pass `null`.
-		 */
-		bindCollection : function( collection ) {
-			if( this.collection !== collection || !this.firstBindComplete ) {
-				// If there is a current collection, and there have been listeners bound to it (i.e. it is not the initial bind
-				// call from having a `collection` config), then unbind its listeners in preparation to bind a new Collection
-				if( this.collection ) {
-					this.unbindCollectionListeners();
-				}
-				
-				this.collection = collection;
-				if( collection ) {
-					this.bindCollectionListeners();
-				}
-				this.firstBindComplete = true;
-				
-				this.refresh();
-			}
-		},
-		
+		// Implementation of CollectionBindable mixin methods
 		
 		/**
-		 * Binds listeners to the current {@link #collection}, so that the view can refresh itself upon
-		 * changes. The listeners that are set up are created by the {@link #getCollectionListeners} method,
-		 * which may be overridden to listen to other events that a particular {@link data.Collection} subclass
-		 * may fire.
-		 * 
-		 * @private
-		 */
-		bindCollectionListeners : function() {
-			var collection = this.collection,
-			    listeners = _.clone( this.getCollectionListeners( collection ) );  // shallow copy of the listeners
-			
-			collection.on( listeners );
-			this.collectionListeners = listeners;
-		},
-		
-		
-		/**
-		 * Retrieves an Object (map) of the listeners that should be set up on the {@link #collection}, when 
-		 * a {@link data.Collection} is bound to the view. This method may be overridden in a subclass to add 
-		 * events that should be listened for.
+		 * Implementation of {@link jqc.util.CollectionBindable} mixin method used to retrieve the Object (map) of the listeners 
+		 * that should be set up on the {@link #collection}, when a {@link data.Collection} is bound to the view. This method may 
+		 * be overridden in a subclass to add events that should be listened for.
 		 * 
 		 * @protected
 		 * @param {data.Collection} collection The Collection being bound.
@@ -10339,15 +10550,17 @@ define('jqc/view/Collection', [
 		
 		
 		/**
-		 * Unbinds the current {@link #collection collection's} listeners, which were bound by
-		 * {@link #bindCollectionListeners}.
+		 * Implementation of {@link jqc.util.CollectionBindable} mixin method. Handles when a new {@link #collection} has been 
+		 * bound to the view.
 		 * 
-		 * @private
+		 * @protected
+		 * @param {data.Collection} collection The newly bound collection. Will be `null` if the previous collection was
+		 *   simply unbound (i.e. `null` was passed to {@link #bindCollection}, or {@link #unbindCollection} was called). 
+		 * @param {data.Collection} oldCollection The collection that was just unbound. Will be `null` if there was no
+		 *   previously-bound collection.
 		 */
-		unbindCollectionListeners : function() {
-			if( this.collection && this.collectionListeners ) {
-				this.collection.un( this.collectionListeners );  // the Collection listener's set up in bindCollectionListeners()
-			}
+		onCollectionBind : function( collection ) {
+			this.refresh();
 		},
 		
 		
@@ -10390,7 +10603,7 @@ define('jqc/view/Collection', [
 		 */
 		refresh : function() {
 			if( !this.collection ) {
-				this.update( "" );  // don't display anything
+				this.update( "" );  // don't display anything (and don't run the template which uses a variable we don't have, i.e. the collection's models)
 				
 			} else {
 				var models = this.collectModels();
@@ -10519,10 +10732,7 @@ define('jqc/view/Collection', [
 		 * @inheritdoc
 		 */
 		onDestroy : function() {
-			if( this.collection ) {
-				this.unbindCollectionListeners();
-				delete this.collection;
-			}
+			this.unbindCollection();  // unbind any bound collection
 			
 			this._super( arguments );
 		}
