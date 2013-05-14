@@ -56,16 +56,31 @@ define( [
 		
 		
 		describe( 'getType()', function() {
+			
+			it( "should retrieve the base 'component' type (added for workaround needed for RequireJS circular dependency, where Component can't register itself with the ComponentManager)", function() {
+				expect( ComponentManager.getType( 'component' ) ).toBe( Component );
+				expect( ComponentManager.hasType( 'CoMpoNeNt' ) ).toBe( true );  // test mixed case
+			} );
+			
+			
 			it( "should retrieve a Component subclass based on its type name", function() {
 				var someClass = function() { this.value = 1; };
 				ComponentManager.registerType( 'someClass', someClass );
 				expect( ComponentManager.hasType( 'someClass' ) ).toBe( true );  // ComponentManager should now have type 'someClass'.
 				expect( ComponentManager.getType( 'someClass' ) ).toBe( someClass );  // getType() not returning the constructor function for 'someClass'
 			} );
+			
 		} );
 		
 		
 		describe( 'hasType()', function() {
+			
+			it( "should always return true if queried for 'component' (due to workaround needed for RequireJS circular dependency, where Component can't register itself with the ComponentManager)", function() {
+				expect( ComponentManager.hasType( 'component' ) ).toBe( true );
+				expect( ComponentManager.hasType( 'CoMpoNeNt' ) ).toBe( true );  // test mixed case
+			} );
+			
+			
 			it( "should determine if a class with the given type name is registered or not", function() {
 				// Test initial state
 				expect( ComponentManager.hasType( 'someClass' ) ).toBe( false );  // ComponentManager should not initially have type 'someClass'.
@@ -86,6 +101,7 @@ define( [
 				expect( ComponentManager.hasType( false ) ).toBe( false );  // hasType should have returned false for boolean false type name.
 				expect( ComponentManager.hasType( "" ) ).toBe( false );  // hasType should have returned false for an empty string type name.
 			} );
+			
 		} );
 			
 			

@@ -6,11 +6,10 @@ define( [
 	
 	/**
 	 * @class jqc.ComponentManager
+	 * @singleton
 	 *
 	 * Object used to manage {@link jqc.Component} "types", and handles instantiating them based on the string that is specified
-	 * for them in the manifest.  
-	 *
-	 * @singleton
+	 * for them in the manifest.
 	 */
 	var ComponentManager = {
 		
@@ -31,7 +30,6 @@ define( [
 		 * This method will throw an error if a type name is already registered, to assist in making sure that we don't get
 		 * unexpected behavior from a type name being overwritten.
 		 * 
-		 * @method registerType
 		 * @param {String} type The type name of registered class.
 		 * @param {Function} jsClass The class (constructor function) to register.
 		 */
@@ -40,8 +38,10 @@ define( [
 			
 			if( !this.componentClasses[ type ] ) { 
 				this.componentClasses[ type ] = jsClass;
+			// <debug>
 			} else {
 				throw new Error( "Error: jqc.ComponentManager already has a type '" + type + "'" );
+			// </debug>
 			}
 		},
 		
@@ -49,27 +49,33 @@ define( [
 		/**
 		 * Retrieves the Component class (constructor function) that has been registered by the supplied `type` name. 
 		 * 
-		 * @method getType
 		 * @param {String} type The type name of the registered class.
 		 * @return {Function} The class (constructor function) that has been registered under the given type name.
 		 */
 		getType : function( type ) {
-			return this.componentClasses[ type.toLowerCase() ];
+			type = type.toLowerCase();
+			
+			// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
+			// Component can't register itself with the ComponentManager
+			return ( type === 'component' ) ? require( 'jqc/Component' ) : this.componentClasses[ type ];
 		},
 		
 		
 		/**
 		 * Determines if the ComponentManager has (i.e. can instantiate) a given `type`.
 		 * 
-		 * @method hasType
-		 * @param {String} type
-		 * @return {Boolean} True if the ComponentManager has the given type.
+		 * @param {String} type The type name to check for.
+		 * @return {Boolean} `true` if the ComponentManager has the given type, `false` otherwise.
 		 */
 		hasType : function( type ) {
 			if( !type ) {  // any falsy type value given, return false
 				return false;
 			} else {
-				return !!this.componentClasses[ type.toLowerCase() ];
+				type = type.toLowerCase();
+				
+				// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
+				// Component can't register itself with the ComponentManager
+				return ( type === 'component' ) ? true : !!this.componentClasses[ type ];
 			}
 		},
 		
@@ -79,7 +85,6 @@ define( [
 		 * a configuration object that has a `type` property. If an already-instantiated 
 		 * {@link jqc.Component Component} is provided, it will simply be returned unchanged.
 		 * 
-		 * @method create
 		 * @param {Object} config The configuration object for the Component. Config objects should have the property `type`, 
 		 *   which determines which type of {@link jqc.Component Component} will be instantiated. If the object does not
 		 *   have a `type` property, it will default to "container", which makes it simple to create things like tab containers. 
