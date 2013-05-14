@@ -57,6 +57,14 @@ define( [
 		
 		describe( 'getType()', function() {
 			
+			it( "should throw an error when trying to retrieve an unregistered component `type`", function() {
+				expect( function() {
+					ComponentManager.getType( "nonExistentType" );
+				} ).toThrow( "The class with type name 'nonexistenttype' has not been registered. Make sure that the component " +
+				             "exists, and has been 'required' by a RequireJS require() or define() call" );
+			} );
+			
+			
 			it( "should retrieve the base 'component' type (added for workaround needed for RequireJS circular dependency, where Component can't register itself with the ComponentManager)", function() {
 				expect( ComponentManager.getType( 'component' ) ).toBe( Component );
 				expect( ComponentManager.hasType( 'CoMpoNeNt' ) ).toBe( true );  // test mixed case

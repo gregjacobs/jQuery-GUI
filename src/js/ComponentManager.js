@@ -50,14 +50,22 @@ define( [
 		 * Retrieves the Component class (constructor function) that has been registered by the supplied `type` name. 
 		 * 
 		 * @param {String} type The type name of the registered class.
-		 * @return {Function} The class (constructor function) that has been registered under the given type name.
+		 * @return {Function} The class (constructor function) that has been registered under the given `type` name.
 		 */
 		getType : function( type ) {
 			type = type.toLowerCase();
 			
 			// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
-			// Component can't register itself with the ComponentManager
-			return ( type === 'component' ) ? require( 'jqc/Component' ) : this.componentClasses[ type ];
+			// jqc.Component can't register itself with the ComponentManager
+			var jsClass = ( type === 'component' ) ? require( 'jqc/Component' ) : this.componentClasses[ type ];
+			
+			// <debug>
+			if( !jsClass ) 
+				throw new Error( "The class with type name '" + type + "' has not been registered. Make sure that the component " +
+				                 "exists, and has been 'required' by a RequireJS require() or define() call" );
+			// </debug>
+			
+			return jsClass;
 		},
 		
 		
