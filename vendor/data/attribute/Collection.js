@@ -61,7 +61,7 @@ define( [
 		/**
 		 * @cfg {Boolean} embedded
 		 * 
-		 * Setting this config to true has the parent {@link data.Model Model} treat the child {@link data.Collection Collection} as if it is 
+		 * Setting this config to `true` has the parent {@link data.Model Model} treat the child {@link data.Collection Collection} as if it is 
 		 * a part of itself. Normally, a child Collection that is not embedded is treated as a "relation", where it is considered as independent 
 		 * from the parent Model.
 		 * 
@@ -74,7 +74,6 @@ define( [
 		 * - The child Collection's model data is persisted with the parent Collection's data, unless the {@link #persistIdOnly} config is set to true,
 		 *   in which case just the child Collection's models' {@link data.Model#idAttribute ids} are persisted with the parent Model.
 		 */
-		embedded : false,
 		
 		/**
 		 * @cfg {Boolean} persistIdOnly
@@ -122,24 +121,25 @@ define( [
 		
 		
 		/**
-		 * Overridden `beforeSet` method used to convert any arrays into the specified {@link #collection} subclass. The array
+		 * Override of superclass method used to convert any arrays into the specified {@link #collection} subclass. The array
 		 * will be provided to the {@link #collection} subclass's constructor.
 		 * 
-		 * @inheritdoc
+		 * @param {Mixed} value The value to convert.
+		 * @return {data.Collection} The Collection.
 		 */
-		beforeSet : function( model, newValue, oldValue ) {
-			// Now, normalize the newValue to an object, or null
-			newValue = this._super( arguments );
+		convert : function( value ) {
+			// First, call the superclass method to normalize the value to an object, or `null`
+			value = this._super( arguments );
 			
-			if( newValue !== null ) {
+			if( value !== null ) {
 				var collectionClass = this.resolveCollectionClass();
 				
-				if( newValue && typeof collectionClass === 'function' && !( newValue instanceof collectionClass ) ) {
-					newValue = new collectionClass( newValue );
+				if( value && typeof collectionClass === 'function' && !( value instanceof collectionClass ) ) {
+					value = new collectionClass( value );
 				}
 			}
 			
-			return newValue;
+			return value;
 		},
 		
 		

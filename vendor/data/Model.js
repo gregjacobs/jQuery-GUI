@@ -16,6 +16,7 @@ define( [
 	'data/attribute/Attribute',
 	'data/attribute/DataComponent',
 	'data/attribute/Collection',
+	'data/attribute/Model',
 	
 	// All attribute types included so developers don't have to specify these when they declare attributes in their models.
 	// These are not included in the arguments list though, as they are not needed specifically by the Model implementation.
@@ -46,7 +47,8 @@ define( [
 	
 	Attribute,
 	DataComponentAttribute,
-	CollectionAttribute
+	CollectionAttribute,
+	ModelAttribute
 ) {
 	
 	/**
@@ -79,14 +81,14 @@ define( [
 			 * @ignore
 			 */
 			onClassExtended : function( newModelClass ) {
-				// Assign a unique id to this class, which is used in hashmaps that hold the class
+				// Assign a unique id to this class, which is used in maps that hold the class
 				newModelClass.__Data_modelTypeId = _.uniqueId();
 				
 				
 				// Now handle initializing the Attributes, merging this subclass's attributes with the superclass's attributes
 				var classPrototype = newModelClass.prototype,
 				    superclassPrototype = newModelClass.superclass,
-				    superclassAttributes = superclassPrototype.attributes || {},    // will be an object (hashmap) of attributeName -> Attribute instances
+				    superclassAttributes = superclassPrototype.attributes || {},    // will be an Object (map) of attributeName -> Attribute instances
 				    newAttributes = {},
 				    attributeDefs = [],  // will be an array of Attribute configs (definitions) on the new subclass 
 				    attributeObj,   // for holding each of the attributeDefs, one at a time
@@ -117,12 +119,12 @@ define( [
 			
 			
 			/**
-			 * Retrieves the Attribute objects that are present for the Model, in an object (hashmap) where the keys
+			 * Retrieves the Attribute objects that are present for the Model, in an Object (map) where the keys
 			 * are the Attribute names, and the values are the {@link data.attribute.Attribute} objects themselves.
 			 * 
 			 * @inheritable
 			 * @static
-			 * @return {Object} An Object (hashmap) where the keys are the attribute {@link data.attribute.Attribute#name names},
+			 * @return {Object} An Object (map) where the keys are the attribute {@link data.attribute.Attribute#name names},
 			 *   and the values are the {@link data.attribute.Attribute Attribute} instances themselves.
 			 */
 			getAttributes : function() {
@@ -151,7 +153,7 @@ define( [
 		 * @cfg {data.persistence.proxy.Proxy} proxy
 		 * 
 		 * The persistence proxy to use (if any) to load or persist the Model's data to/from persistent
-		 * storage. If this is not specified, the Model may not {@link #reload load} or {@link #save} its data.
+		 * storage. If this is not specified, the Model may not {@link #method-load} or {@link #method-save} its data.
 		 * 
 		 * Note that this may be specified as part of a Model subclass (so that all instances of the Model inherit
 		 * the proxy), or on a particular model instance using {@link #setProxy}.
@@ -244,7 +246,7 @@ define( [
 		 * @private
 		 * @property {Object} changeSetNewValues
 		 * 
-		 * A hashmap which holds the changes to attributes for the {@link #changeset} event to fire with. This hashmap collects the 
+		 * An Object (map) which holds the changes to attributes for the {@link #changeset} event to fire with. This map collects the 
 		 * changed values as calls to {@link #method-set} are made, and is used with the arguments that the {@link #changeset} event fires
 		 * with (when it does fire, at the end of all of the calls to {@link #method-set}).
 		 */
@@ -253,7 +255,7 @@ define( [
 		 * @private
 		 * @property {Object} changeSetOldValues
 		 * 
-		 * A hashmap which holds the changes to attributes for the {@link #changeset} event to fire with. This hashmap collects the 
+		 * A map which holds the changes to attributes for the {@link #changeset} event to fire with. This map collects the 
 		 * previous ("old") values as calls to {@link #method-set} are made, and is used with the arguments that the {@link #changeset} event fires
 		 * with (when it does fire, at the end of all of the calls to {@link #method-set}).
 		 */
@@ -270,9 +272,33 @@ define( [
 		
 		/**
 		 * @protected
+		 * @property {Boolean} loading
+		 * 
+		 * Flag that is set to `true` while the Model is loading.
+		 */
+		loading : false,
+		
+		/**
+		 * @protected
+		 * @property {Boolean} saving
+		 * 
+		 * Flag that is set to `true` while the Model is saving.
+		 */
+		saving : false,
+		
+		/**
+		 * @protected
+		 * @property {Boolean} destroying
+		 * 
+		 * Flag that is set to `true` while the Model is destroying.
+		 */
+		destroying : false,
+		
+		/**
+		 * @protected
 		 * @property {Boolean} destroyed
 		 * 
-		 * Flag that is set to true once the Model is successfully destroyed.
+		 * Flag that is set to true once the Model has been successfully destroyed.
 		 */
 		destroyed : false,
 		
@@ -352,16 +378,16 @@ define( [
 				 * 
 				 * @event changeset
 				 * @param {data.Model} model This Model instance.
-				 * @param {Object} newValues An object (hashmap) of the new values of the Attributes that changed. The object's keys (property names) are the
+				 * @param {Object} newValues An Object (map) of the new values of the Attributes that changed. The object's keys (property names) are the
 				 *   {@link data.attribute.Attribute#name Attribute names}, and the object's values are the new values for those Attributes.
-				 * @param {Object} oldValues An object (hashmap) of the old values of the Attributes that changed. The object's keys (property names) are the
+				 * @param {Object} oldValues An Object (map) of the old values of the Attributes that changed. The object's keys (property names) are the
 				 *   {@link data.attribute.Attribute#name Attribute names}, and the object's values are the old values that were held for those Attributes.
 				 */
 				'changeset',
 				
 				/**
 				 * Fires when the data in the model is {@link #method-commit committed}. This happens if the
-				 * {@link #method-commit commit} method is called, and after a successful {@link #save}.
+				 * {@link #method-commit commit} method is called, and after a successful {@link #method-save}.
 				 * 
 				 * @event commit
 				 * @param {data.Model} model This Model instance.
@@ -378,10 +404,67 @@ define( [
 				'rollback',
 				
 				/**
-				 * Fires when the Model has been destroyed (via {@link #method-destroy}).
+				 * Fires when the Model begins a {@link #method-load} request, through its {@link #proxy}. The 
+				 * {@link #event-load} event will fire when the load is complete.
+				 * 
+				 * @event loadbegin
+				 * @param {data.Model} This Model instance.
+				 */
+				'loadbegin',
+				
+				/**
+				 * Fires when the Model is {@link #method-load loaded} from its external data store (such as a web server), 
+				 * through its {@link #proxy}.
+				 * 
+				 * This event fires for both successful and failed "load" requests. Success of the load request may 
+				 * be determined using the `operation`'s {@link data.persistence.operation.Operation#wasSuccessful wasSuccessful} 
+				 * method.
+				 * 
+				 * @event load
+				 * @param {data.Model} model This Model instance.
+				 * @param {data.persistence.operation.Read} operation The ReadOperation object for the load request.
+				 */
+				'load',
+				
+				/**
+				 * Fires when the Model begins a {@link #method-save} request, through its {@link #proxy}. The 
+				 * {@link #event-save} event will fire when the save is complete.
+				 * 
+				 * @event savebegin
+				 * @param {data.Model} This Model instance.
+				 */
+				'savebegin',
+				
+				/**
+				 * Fires when the Model is {@link #method-save saved} to its external data store (such as a web server),
+				 * through its {@link #proxy}.
+				 * 
+				 * This event fires for both successful and failed "save" requests. Success of the save request may 
+				 * be determined using the `operation`'s {@link data.persistence.operation.Operation#wasSuccessful wasSuccessful} 
+				 * method.
+				 * 
+				 * @event save
+				 * @param {data.Model} model This Model instance.
+				 * @param {data.persistence.operation.Write} operation The WriteOperation object for the save request.
+				 */
+				'save',
+				
+				/**
+				 * Fires when the Model begins a {@link #method-destroy} request, through its {@link #proxy}. The 
+				 * {@link #event-destroy} event will fire when the destroy is complete.
+				 * 
+				 * @event destroybegin
+				 * @param {data.Model} This Model instance.
+				 */
+				'destroybegin',
+				
+				/**
+				 * Fires when the Model has been {@link #method-destroy destroyed} on its external data store (such as a 
+				 * web server), through its {@link #proxy}.
 				 * 
 				 * @event destroy
 				 * @param {data.Model} model This Model instance.
+				 * @param {data.persistence.operation.Write} operation The WriteOperation object for the destroy request.
 				 */
 				'destroy'
 			);
@@ -436,10 +519,10 @@ define( [
 		
 		
 		/**
-		 * Retrieves the Attribute objects that are present for the Model, in an object (hashmap) where the keys
+		 * Retrieves the Attribute objects that are present for the Model, in an Object (map) where the keys
 		 * are the Attribute names, and the values are the {@link data.attribute.Attribute} objects themselves.
 		 * 
-		 * @return {Object} An Object (hashmap) where the keys are the attribute {@link data.attribute.Attribute#name names},
+		 * @return {Object} An Object (map) where the keys are the attribute {@link data.attribute.Attribute#name names},
 		 *   and the values are the {@link data.attribute.Attribute Attribute} instances themselves.
 		 */
 		getAttributes : function() {
@@ -519,7 +602,7 @@ define( [
 		 */
 		set : function( attributeName, newValue ) {
 			// If coming into the set() method for the first time (non-recursively, not from an attribute setter, not from a 'change' handler, etc),
-			// reset the hashmaps which will hold the newValues and oldValues that will be provided to the 'changeset' event.
+			// reset the maps which will hold the newValues and oldValues that will be provided to the 'changeset' event.
 			if( this.setCallCount === 0 ) {
 				this.changeSetNewValues = {};
 				this.changeSetOldValues = {};
@@ -533,7 +616,7 @@ define( [
 			    changeSetOldValues = this.changeSetOldValues;
 			
 			if( typeof attributeName === 'object' ) {
-				// Hash provided
+				// Map provided
 				var values = attributeName,  // for clarity
 				    attrsWithSetters = [];
 				
@@ -558,7 +641,7 @@ define( [
 				}
 				
 			} else {
-				// attributeName and newValue provided
+				// `attributeName` and `newValue` args provided to method
 				var attribute = attributes[ attributeName ];
 				
 				// <debug>
@@ -570,12 +653,9 @@ define( [
 				// Get the current (old) value of the attribute, and its current "getter" value (to provide to the 'change' event as the oldValue)
 				var oldValue = this.data[ attributeName ],
 				    oldGetterValue = this.get( attributeName );
-							
-				// Allow the Attribute to pre-process the newValue
-				newValue = attribute.beforeSet( this, newValue, oldValue );
 				
-				// Now call the Attribute's set() method (or user-provided 'set' config function)
-				newValue = attribute.doSet( this, newValue, oldValue );  // doSet() is a method which provides a level of indirection for calling the 'set' config function, or set() method
+				// Call the Attribute's set() method (or user-provided 'set' config function) to do any implemented conversion
+				newValue = attribute.set( this, newValue, oldValue );
 				
 				// *** Temporary workaround to get the 'change' event to fire on an Attribute whose set() config function does not
 				// return a new value to set to the underlying data. This will be resolved once dependencies are 
@@ -591,7 +671,7 @@ define( [
 					// Fire the events with the value of the Attribute after it has been processed by any Attribute-specific `get()` function.
 					newValue = this.get( attributeName );
 					
-					// Store the 'change' in the 'changeset' hashmaps
+					// Store the 'change' in the 'changeset' maps
 					this.changeSetNewValues[ attributeName ] = newValue;
 					if( !( attributeName in changeSetOldValues ) ) {  // only store the "old" value if we don't have an "old" value for the attribute already. This leaves us with the real "old" value when multiple sets occur for an attribute during the changeset.
 						this.changeSetOldValues[ attributeName ] = oldGetterValue;
@@ -602,15 +682,15 @@ define( [
 					this.fireEvent( 'change', this, attributeName, newValue, oldGetterValue );    // model, attributeName, newValue, oldValue
 				}
 				
-				// Allow the Attribute to post-process the newValue
+				// Allow the Attribute to post-process the newValue (the value returned from the Attribute's set() function)
 				newValue = attribute.afterSet( this, newValue );
 				
 				// Only change if there is no current value for the attribute, or if newValue is different from the current
-				if( !( attributeName in this.data ) || !attribute.valuesAreEqual( oldValue, newValue ) ) {   // let the Attribute itself determine if two values of its datatype are equal
+				if( !this.data.hasOwnProperty( attributeName ) || !attribute.valuesAreEqual( oldValue, newValue ) ) {   // let the Attribute itself determine if two values of its datatype are equal
 					// Store the attribute's *current* value (not the newValue) into the "modifiedData" attributes hash.
 					// This should only happen the first time the attribute is set, so that the attribute can be rolled back even if there are multiple
 					// set() calls to change it.
-					if( !( attributeName in this.modifiedData ) ) {
+					if( !this.modifiedData.hasOwnProperty( attributeName ) ) {
 						this.modifiedData[ attributeName ] = oldValue;
 					}
 					this.data[ attributeName ] = newValue;
@@ -629,7 +709,7 @@ define( [
 						ModelCache.get( this, newValue );
 					}
 					
-					// Store the 'change' values in the changeset hashmaps, for use when the 'changeset' event fires
+					// Store the 'change' values in the changeset maps, for use when the 'changeset' event fires
 					changeSetNewValues[ attributeName ] = newValue;
 					if( !( attributeName in changeSetOldValues ) ) {  // Only store the "old" value if we don't have an "old" value for the attribute already. This leaves us with the real "old" value when multiple set()'s occur for an attribute during the changeset.
 						changeSetOldValues[ attributeName ] = oldGetterValue;
@@ -671,7 +751,7 @@ define( [
 			
 			// If there is a `get` function on the Attribute, run it now to convert the value before it is returned.
 			if( typeof attribute.get === 'function' ) {
-				value = attribute.get.call( this, value );  // provided the underlying value
+				value = attribute.get( this, value );  // provide the underlying value
 			}
 			
 			return value;
@@ -691,17 +771,17 @@ define( [
 		 */
 		raw : function( attributeName ) {
 			// <debug>
-			if( !( attributeName in this.attributes ) ) {
+			if( !this.attributes.hasOwnProperty( attributeName ) ) {
 				throw new Error( "data.Model::raw() error: attribute '" + attributeName + "' was not found on the Model." );
 			}
 			// </debug>
 			
 			var value = this.data[ attributeName ],
 			    attribute = this.attributes[ attributeName ];
-			    
+			
 			// If there is a `raw` function on the Attribute, run it now to convert the value before it is returned.
 			if( typeof attribute.raw === 'function' ) {
-				value = attribute.raw.call( this, value, this );  // provided the value, and the Model instance
+				value = attribute.raw( this, value );  // provide the underlying value
 			}
 			
 			return value;
@@ -780,7 +860,7 @@ define( [
 				// If the 'persistedOnly' option is true, we only consider attributes that are persisted.
 				for( var attr in modifiedData ) {
 					if( modifiedData.hasOwnProperty( attr ) && ( !options.persistedOnly || ( options.persistedOnly && attributes[ attr ].isPersisted() ) ) ) {
-						return true;  // there is any property in the modifiedData hashmap, return true (unless 'persistedOnly' option is set, in which case we only consider persisted attributes)
+						return true;  // there is any property in the modifiedData map, return true (unless 'persistedOnly' option is set, in which case we only consider persisted attributes)
 					}
 				}
 				
@@ -842,7 +922,7 @@ define( [
 		 *   that the {@link data.NativeObjectConverter#convert} method does. See that method for details. Options specific to this method include:
 		 * @param {Boolean} [options.persistedOnly=false] True to have the method only return only changed attributes that are 
 		 *   {@link data.attribute.Attribute#persist persisted}. In the case of nested models, a nested model will only be returned in the resulting
-		 *   hashmap if one if its {@link data.attribute.Attribute#persist persisted} attributes are modified. 
+		 *   map if one if its {@link data.attribute.Attribute#persist persisted} attributes are modified. 
 		 * 
 		 * @return {Object} A hash of the attributes that have been changed since the last {@link #method-commit} or {@link #method-rollback}.
 		 *   The hash's property names are the attribute names, and the hash's values are the new values.
@@ -1006,7 +1086,49 @@ define( [
 		
 		
 		/**
-		 * Reloads the Model data from the server (discarding any changed data), using the configured {@link #proxy}.
+		 * Determines if the Model is currently {@link #loading}, via its {@link #proxy}.
+		 * 
+		 * @return {Boolean} `true` if the Model is currently loading a set of data, `false` otherwise.
+		 */
+		isLoading : function() {
+			return this.loading;
+		},
+		
+		
+		/**
+		 * Determines if the Model is currently {@link #method-save saving} its data, via its {@link #proxy}
+		 * 
+		 * @return {Boolean} `true` if the Model is currently saving its set of data, `false` otherwise.
+		 */
+		isSaving : function() {
+			return this.saving;
+		},
+		
+		
+		/**
+		 * Determines if the Model is currently {@link #method-destroy destroying} itself, via its {@link #proxy}.
+		 * 
+		 * @return {Boolean} `true` if the Model is currently saving its set of data, `false` otherwise.
+		 */
+		isDestroying : function() {
+			return this.destroying;
+		},
+		
+		
+		/**
+		 * Determines if the Model has been {@link #method-destroy destroyed}.
+		 * 
+		 * @return {Boolean} `true` if the Model has been destroyed, `false` otherwise.
+		 */
+		isDestroyed : function() {
+			return this.destroyed;
+		},
+		
+		
+		/**
+		 * (Re)Loads the Model's attributes from its persistent storage (such as a web server), using the configured 
+		 * {@link #proxy}. Any changed data will be discarded. The Model must have a value for its {@link #idAttribute}
+		 * for this method to succeed.
 		 * 
 		 * All of the callbacks, and the promise handlers are called with the following arguments:
 		 * 
@@ -1024,7 +1146,7 @@ define( [
 		 * @return {jQuery.Promise} A Promise object which may have handlers attached for when the reload completes. The Promise is both 
 		 *   resolved or rejected with the arguments listed above in the method description.
 		 */
-		reload : function( options ) {
+		load : function( options ) {
 			options = options || {};
 			var emptyFn    = Data.emptyFn,
 			    scope      = options.scope    || options.context || this,
@@ -1035,30 +1157,73 @@ define( [
 			
 			// <debug>
 			if( !this.proxy ) {
-				throw new Error( "data.Model::reload() error: Cannot load. No proxy configured." );
+				throw new Error( "data.Model::load() error: Cannot load. No proxy configured." );
 			}
 			if( this.isNew() ) {
-				throw new Error( "data.Model::reload() error: Cannot load. Model does not have an idAttribute that relates to a valid attribute, or does not yet have a valid id (i.e. an id that is not null)." );
+				throw new Error( "data.Model::load() error: Cannot load. Model does not have an idAttribute that relates to a valid attribute, or does not yet have a valid id (i.e. an id that is not null)." );
 			}
 			// </debug>
 			
 			// Attach any user-provided callbacks to the deferred.
-			// This model is always provided as the first argument to the callbacks, and the ReadOperation
-			// object will be provided as the second.
 			deferred
 				.done( _.bind( successCb, scope ) )
 				.fail( _.bind( errorCb, scope ) )
 				.always( _.bind( completeCb, scope ) );
 			
+			// Set the `loading` flag while the Model is loading. Will be set to false in onLoadSuccess or onLoadError
+			this.loading = true;
+			this.fireEvent( 'loadbegin', this );
+			
 			// Make a request to load the data from the proxy
 			var me = this,  // for closures
 			    operation = new ReadOperation( { modelId: this.getId(), params: options.params } );
 			this.proxy.read( operation ).then(
-				function( operation ) { me.set( operation.getResultSet().getRecords()[ 0 ] ); me.commit(); deferred.resolve( me, operation ); },
-				function( operation ) { deferred.reject( me, operation ); }
+				function( operation ) { me.onLoadSuccess( deferred, operation ); },
+				function( operation ) { me.onLoadError( deferred, operation ); }
 			);
 			
 			return deferred.promise();
+		},
+		
+		
+		/**
+		 * Handles the {@link #proxy} successfully loading a set of data as a result of the {@link #method-load}
+		 * method being called.
+		 * 
+		 * Resolves the `jQuery.Deferred` object created by {@link #method-load}.
+		 * 
+		 * @protected
+		 * @param {jQuery.Deferred} deferred The Deferred object created in the {@link #method-load} method. This 
+		 *   Deferred will be resolved after post-processing of the successful load is complete.
+		 * @param {data.persistence.operation.Read} operation The ReadOperation object which represents the load.
+		 */
+		onLoadSuccess : function( deferred, operation ) {
+			this.set( operation.getResultSet().getRecords()[ 0 ] );
+			this.loading = false;
+			
+			this.commit();
+			
+			deferred.resolve( this, operation ); 
+			this.fireEvent( 'load', this, operation );
+		},
+		
+		
+		/**
+		 * Handles the {@link #proxy} failing to load a set of data as a result of the {@link #method-load} method 
+		 * being called.
+		 * 
+		 * Rejects the `jQuery.Deferred` object created by {@link #method-load}.
+		 * 
+		 * @protected
+		 * @param {jQuery.Deferred} deferred The Deferred object created in the {@link #method-load} method. This 
+		 *   Deferred will be rejected after any post-processing.
+		 * @param {data.persistence.operation.Read} operation The ReadOperation object which represents the load.
+		 */
+		onLoadError : function( deferred, operation ) {
+			this.loading = false;
+			
+			deferred.reject( this, operation );
+			this.fireEvent( 'load', this, operation );
 		},
 		
 		
@@ -1072,6 +1237,14 @@ define( [
 		 * - `operation` : {@link data.persistence.operation.Write} The WriteOperation that was executed.
 		 * 
 		 * @param {Object} [options] An object which may contain the following properties:
+		 * @param {Boolean} [options.syncRelated=true] `true` to synchronize (persist) the "related" child models/collections 
+		 *   of this Model (if it has any). Related models/collections must be stored under {@link data.attribute.Model}
+		 *   or {@link data.attribute.Collection} Attributes for this to work. The models/collections that would be synchronized
+		 *   would be the child models/{@link data.Collection collections} that are related to the Model (i.e. not 
+		 *   {@link data.attribute.DataComponent#embedded embedded} in the Model). 
+		 *   
+		 *   Set to `false` to only save the data in this Model, leaving any related child models/collections to be persisted 
+		 *   individually, at another time.
 		 * @param {Object} [options.params] Any additional parameters to pass along to the configured {@link #proxy}
 		 *   for the operation. See {@link data.persistence.operation.Operation#params} for details.
 		 * @param {Function} [options.success] Function to call if the save is successful.
@@ -1085,6 +1258,7 @@ define( [
 		save : function( options ) {
 			options = options || {};
 			var me          = this,  // for closures
+			    syncRelated = ( options.syncRelated === undefined ) ? true : options.syncRelated,  // defaults to true
 			    emptyFn     = Data.emptyFn,
 			    scope       = options.scope    || options.context || this,
 			    successCb   = options.success  || emptyFn,
@@ -1102,12 +1276,21 @@ define( [
 			}
 			// </debug>
 			
-			// First, synchronize any nested related (i.e. non-embedded) Collections of the model.
+			// Set the `saving` flag while the Model is saving. Will be set to false in onSaveSuccess or onSaveError
+			this.saving = true;
+			this.fireEvent( 'savebegin', this );
+			
+			// First, synchronize any nested related (i.e. non-embedded) Models and Collections of the model.
 			// Chain the synchronization of collections to the synchronization of this Model itself to create
-			// the `modelSavePromise`.
-			var modelSavePromise = this.syncRelatedCollections().then( function() { 
-				return me.doSave( options ); 
-		    } );
+			// the `modelSavePromise` (if the `syncRelated` option is true)
+			var modelSavePromise;
+			if( syncRelated ) {
+				modelSavePromise = jQuery.when( this.syncRelatedCollections(), this.syncRelatedModels() ).then( function() { 
+					return me.doSave( options ); 
+			    } );
+			} else {  // not synchronizing related collections/models
+				modelSavePromise = this.doSave( options );
+			}
 			
 			// Set up any callbacks provided in the options
 			modelSavePromise
@@ -1132,6 +1315,7 @@ define( [
 		syncRelatedCollections : function() {
 			var collectionSyncPromises = [],
 			    relatedCollectionAttributes = this.getRelatedCollectionAttributes();
+			
 			for( var i = 0, len = relatedCollectionAttributes.length; i < len; i++ ) {
 				var collection = this.get( relatedCollectionAttributes[ i ].getName() );
 				if( collection ) {  // make sure there is actually a Collection (i.e. it's not null)
@@ -1145,15 +1329,41 @@ define( [
 		
 		
 		/**
-		 * Private method that performs the actual save (persistence) of this Model. This method is called from {@link #save} at the appropriate
-		 * time. It is delayed from being called if the Model first has to persist non-{@link data.attribute.DataComponent#embedded embedded}) 
-		 * child collections.
+		 * Private utility method which is used to save all of the nested related (i.e. not 'embedded') 
+		 * models for this Model. Returns a Promise object which is resolved when all models have been 
+		 * successfully saved.
 		 * 
 		 * @private
-		 * @param {Object} options The `options` object provided to the {@link #save} method.
-		 * @return {jQuery.Promise} The observable Promise object which can be used to determine if the save call has completed
-		 *   successfully (`done` callback) or errored (`fail` callback), and to perform any actions that need to be taken in either
-		 *   case with the `always` callback.
+		 * @return {jQuery.Promise} A Promise object which is resolved when all related models have been successfully
+		 *   saved. If any of the requests to save a model should fail, the Promise will be rejected.
+		 *   If there are no nested related models, the promise is resolved immediately.
+		 */
+		syncRelatedModels : function() {
+			var modelSavePromises = [],
+			    relatedModelAttributes = this.getRelatedModelAttributes();
+			
+			for( var i = 0, len = relatedModelAttributes.length; i < len; i++ ) {
+				var model = this.get( relatedModelAttributes[ i ].getName() );
+				if( model ) {  // make sure there is actually a Model (i.e. it's not null)
+					modelSavePromises.push( model.save() );
+				}
+			}
+			
+			// create and return single Promise object out of all the Model save promises
+			return jQuery.when.apply( null, modelSavePromises );
+		},
+		
+		
+		/**
+		 * Private method that performs the actual save (persistence) of this Model. This method is called from 
+		 * {@link #method-save} at the appropriate time. It is delayed from being called if the Model first has to 
+		 * persist non-{@link data.attribute.DataComponent#embedded embedded}) child collections.
+		 * 
+		 * @private
+		 * @param {Object} options The `options` object provided to the {@link #method-save} method.
+		 * @return {jQuery.Promise} The observable Promise object which can be used to determine if the save call has 
+		 *   completed successfully (`done` callback) or errored (`fail` callback), and to perform any actions that need to 
+		 *   be taken in either case with the `always` callback.
 		 */
 		doSave : function( options ) {
 			var me = this,   // for closures
@@ -1191,11 +1401,49 @@ define( [
 				params : options.params
 			} );
 			this.proxy[ this.isNew() ? 'create' : 'update' ]( writeOperation ).then(
-				function( operation ) { handleServerUpdate( operation.getResultSet() ); deferred.resolve( me, writeOperation ); },
-				function( operation ) { deferred.reject( me, writeOperation ); }
+				function( operation ) { handleServerUpdate( operation.getResultSet() ); me.onSaveSuccess( deferred, operation ); },
+				function( operation ) { me.onSaveError( deferred, operation ); }
 			);
 			
 			return deferred.promise();  // return only the observable Promise object of the Deferred
+		},
+		
+		
+		/**
+		 * Handles the {@link #proxy} successfully saving the Model as a result of the {@link #method-save}
+		 * method being called.
+		 * 
+		 * Resolves the `jQuery.Deferred` object created by {@link #method-save}.
+		 * 
+		 * @protected
+		 * @param {jQuery.Deferred} deferred The Deferred object created in the {@link #method-save} method. This 
+		 *   Deferred will be resolved after post-processing of the successful save is complete.
+		 * @param {data.persistence.operation.Write} operation The WriteOperation object which represents the save.
+		 */
+		onSaveSuccess : function( deferred, operation ) {
+			this.saving = false;
+			
+			deferred.resolve( this, operation ); 
+			this.fireEvent( 'save', this, operation );
+		},
+		
+		
+		/**
+		 * Handles the {@link #proxy} failing to destroy the Model a result of the {@link #method-destroy} method 
+		 * being called.
+		 * 
+		 * Rejects the `jQuery.Deferred` object created by {@link #method-save}.
+		 * 
+		 * @protected
+		 * @param {jQuery.Deferred} deferred The Deferred object created in the {@link #method-save} method. This 
+		 *   Deferred will be rejected after post-processing of the successful save is complete.
+		 * @param {data.persistence.operation.Write} operation The WriteOperation object which represents the save.
+		 */
+		onSaveError : function( deferred, operation ) {
+			this.saving = false;
+			
+			deferred.reject( this, operation );
+			this.fireEvent( 'save', this, operation );
 		},
 		
 		
@@ -1222,55 +1470,93 @@ define( [
 		destroy : function( options ) {
 			options = options || {};
 			var me          = this,   // for closures
-			    deferred    = new jQuery.Deferred(),
 			    emptyFn     = Data.emptyFn,
 			    scope       = options.scope    || options.context || this,
 			    successCb   = options.success  || emptyFn,
 			    errorCb     = options.error    || emptyFn,
-			    completeCb  = options.complete || emptyFn;
+			    completeCb  = options.complete || emptyFn,
+			    deferred    = new jQuery.Deferred();
+			
+			// No proxy, cannot destroy. Throw an error
+			// <debug>
+			if( !this.proxy ) {
+				throw new Error( "data.Model::destroy() error: Cannot destroy model on server. No proxy." );
+			}
+			// </debug>
+			
+			// Attach any user-provided callbacks to the deferred.
+			deferred
+				.done( _.bind( successCb, scope ) )
+				.fail( _.bind( errorCb, scope ) )
+				.always( _.bind( completeCb, scope ) );
+			
+			// Set the `destroying` flag while the Model is destroying. Will be set to false in onDestroySuccess 
+			// or onDestroyError
+			this.destroying = true;
+			this.fireEvent( 'destroybegin', this );
 			
 			var operation = new WriteOperation( {
 				models : [ this ],
 				params : options.params
 			} );
 			
-			deferred.done( function() {
-				me.destroyed = true;
-				me.fireEvent( 'destroy', me );
-			} );
-			
-			
 			if( this.isNew() ) {
-				// If it is a new model, there is nothing on the server to destroy. Simply fire the event and call the callback
-				operation.setSuccess();
-				deferred.resolve( this, operation );
+				// If it is a new model, there is nothing on the server to destroy. Simply fire the event and call the callback.
+				operation.setSuccess();  // would normally be set by the proxy if we were making a request to it
+				this.onDestroySuccess( deferred, operation );
 				
 			} else {
-				// No proxy, cannot destroy. Throw an error
-				// <debug>
-				if( !this.proxy ) {
-					throw new Error( "data.Model::destroy() error: Cannot destroy model on server. No proxy." );
-				}
-				// </debug>
-				
 				// Make a request to destroy the data on the server
 				this.proxy.destroy( operation ).then(
-					function( operation ) { deferred.resolve( me, operation ); },
-					function( operation ) { deferred.reject( me, operation ); }
+					function( operation ) { me.onDestroySuccess( deferred, operation ); },
+					function( operation ) { me.onDestroyError( deferred, operation ); }
 				);
 			}
-			
-			// Set up any callbacks provided in the options
-			deferred
-				.done( _.bind( successCb, scope ) )
-				.fail( _.bind( errorCb, scope ) )
-				.always( _.bind( completeCb, scope ) );
 			
 			return deferred.promise();  // return just the observable Promise object of the Deferred
 		},
 		
 		
-		// --------------------------
+		/**
+		 * Handles the {@link #proxy} successfully destroying the Model as a result of the {@link #method-destroy}
+		 * method being called.
+		 * 
+		 * Resolves the `jQuery.Deferred` object created by {@link #method-destroy}.
+		 * 
+		 * @protected
+		 * @param {jQuery.Deferred} deferred The Deferred object created in the {@link #method-destroy} method. This 
+		 *   Deferred will be resolved after post-processing of the successful destroy is complete.
+		 * @param {data.persistence.operation.Write} operation The WriteOperation object which represents the destroy.
+		 */
+		onDestroySuccess : function( deferred, operation ) {
+			this.destroying = false;
+			this.destroyed = true;
+			
+			deferred.resolve( this, operation ); 
+			this.fireEvent( 'destroy', this, operation );
+		},
+		
+		
+		/**
+		 * Handles the {@link #proxy} failing to destroy the Model a result of the {@link #method-destroy} method 
+		 * being called.
+		 * 
+		 * Rejects the `jQuery.Deferred` object created by {@link #method-destroy}.
+		 * 
+		 * @protected
+		 * @param {jQuery.Deferred} deferred The Deferred object created in the {@link #method-destroy} method. This 
+		 *   Deferred will be rejected after post-processing of the successful destroy is complete.
+		 * @param {data.persistence.operation.Write} operation The WriteOperation object which represents the destroy.
+		 */
+		onDestroyError : function( deferred, operation ) {
+			this.destroying = false;
+			
+			deferred.reject( this, operation );
+			this.fireEvent( 'destroy', this, operation );
+		},
+		
+		
+		// ------------------------------------
 		
 		// Protected utility methods
 		
@@ -1282,16 +1568,7 @@ define( [
 		 * @return {data.attribute.DataComponent[]}
 		 */
 		getDataComponentAttributes : function() {
-			var attributes = this.attributes,
-			    attribute,
-			    dataComponentAttributes = [];
-			
-			for( var attrName in attributes ) {
-				if( attributes.hasOwnProperty( attrName ) && ( attribute = attributes[ attrName ] ) instanceof DataComponentAttribute ) {
-					dataComponentAttributes.push( attribute );
-				}
-			}
-			return dataComponentAttributes;
+			return _.filter( this.attributes, function( attr ) { return ( attr instanceof DataComponentAttribute ); } );
 		},
 		
 		
@@ -1304,18 +1581,7 @@ define( [
 		 * @return {data.attribute.DataComponent[]} The array of embedded DataComponent Attributes.
 		 */
 		getEmbeddedDataComponentAttributes : function() {
-			var dataComponentAttributes = this.getDataComponentAttributes(),
-			    dataComponentAttribute,
-			    embeddedAttributes = [];
-			
-			for( var i = 0, len = dataComponentAttributes.length; i < len; i++ ) {
-				dataComponentAttribute = dataComponentAttributes[ i ];
-				
-				if( dataComponentAttribute.isEmbedded() ) {
-					embeddedAttributes.push( dataComponentAttribute );
-				}
-			}
-			return embeddedAttributes;
+			return _.filter( this.getDataComponentAttributes(), function( attr ) { return attr.isEmbedded(); } );
 		},
 		
 		
@@ -1326,18 +1592,7 @@ define( [
 		 * @return {data.attribute.Collection[]}
 		 */
 		getCollectionAttributes : function() {
-			var dataComponentAttributes = this.getDataComponentAttributes(),
-			    dataComponentAttribute,
-			    collectionAttributes = [];
-			
-			for( var i = 0, len = dataComponentAttributes.length; i < len; i++ ) {
-				dataComponentAttribute = dataComponentAttributes[ i ];
-				
-				if( dataComponentAttribute instanceof CollectionAttribute ) {
-					collectionAttributes.push( dataComponentAttribute );
-				}
-			}
-			return collectionAttributes;
+			return _.filter( this.attributes, function( attr ) { return attr instanceof CollectionAttribute; } );
 		},
 		
 		
@@ -1349,15 +1604,30 @@ define( [
 		 * @return {data.attribute.Collection[]} 
 		 */
 		getRelatedCollectionAttributes : function() {
-			var collectionAttributes = this.getCollectionAttributes(),
-			    relatedCollectionAttributes = [];
-			
-			for( var i = 0, len = collectionAttributes.length; i < len; i++ ) {
-				if( !collectionAttributes[ i ].isEmbedded() ) {
-					relatedCollectionAttributes.push( collectionAttributes[ i ] );
-				}
-			}
-			return relatedCollectionAttributes;
+			return _.filter( this.getCollectionAttributes(), function( attr ) { return !attr.isEmbedded(); } );
+		},
+		
+		
+		/**
+		 * Retrieves an array of the Attributes configured for this model that are {@link data.attribute.Model Model Attributes}.
+		 * 
+		 * @protected
+		 * @return {data.attribute.Model[]}
+		 */
+		getModelAttributes : function() {
+			return _.filter( this.attributes, function( attr ) { return attr instanceof ModelAttribute; } );
+		},
+		
+		
+		/**
+		 * Retrieves an array of the Attributes configured for this model that are {@link data.attribute.Collection Collection Attributes},
+		 * but are *not* {@link data.attribute.Collection#embedded embedded} attributes (i.e. they are "related" attributes).
+		 * 
+		 * @protected
+		 * @return {data.attribute.Collection[]} 
+		 */
+		getRelatedModelAttributes : function() {
+			return _.filter( this.getModelAttributes(), function( attr ) { return !attr.isEmbedded(); } );
 		}
 		
 	} );

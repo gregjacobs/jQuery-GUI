@@ -56,14 +56,14 @@ define( [
 		 */
 		
 		/**
-		 * @cfg {Object} extraParams
+		 * @cfg {Object} defaultParams
 		 * 
-		 * An Object (map) of any extra parameters to include with every request. Params provided to individual
-		 * requests will override these params of the same name.
+		 * An Object (map) of any default parameters to include with every request. `params` provided to individual
+		 * requests will override default parameters of the same name.
 		 * 
 		 * Ex:
 		 * 
-		 *     extraParams : {
+		 *     defaultParams : {
 		 *         returnType : 'json'
 		 *     }
 		 *     
@@ -133,7 +133,7 @@ define( [
 			this._super( arguments );
 			
 			this.api = this.api || {};
-			this.extraParams = this.extraParams || {};
+			this.defaultParams = this.defaultParams || {};
 		},
 		
 		
@@ -230,7 +230,7 @@ define( [
 		 * @return {String} The full URL, with all parameters.
 		 */
 		buildUrl : function( action, operation ) {
-			var params = _.assign( {}, this.extraParams, operation.getParams() || {} );   // build the params map
+			var params = _.assign( {}, this.defaultParams, operation.getParams() || {} );   // build the params map
 			
 			if( action === 'read' ) {
 				var modelId = operation.getModelId(),

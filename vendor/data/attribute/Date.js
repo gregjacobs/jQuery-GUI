@@ -13,28 +13,24 @@ define( [
 	 * Attribute definition class for an Attribute that takes a JavaScript Date object.
 	 */
 	var DateAttribute = Class.extend( ObjectAttribute, {
-			
+		
 		/**
-		 * Converts the provided data value into a Date object. If the value provided is not a Date, or cannot be parsed
-		 * into a Date, will return null.
+		 * Override of superclass method used to convert the provided data value into a JavaScript Date object. If the value provided 
+		 * is not a Date, or cannot be parsed into a Date, will return `null`.
 		 * 
-		 * @method beforeSet
-		 * @param {data.Model} model The Model instance that is providing the value. This is normally not used,
-		 *   but is provided in case any model processing is needed.
-		 * @param {Mixed} newValue The new value provided to the {@link data.Model#set} method.
-		 * @param {Mixed} oldValue The old (previous) value that the model held (if any).
-		 * @return {Boolean} The converted value.
+		 * @param {Mixed} value The value to convert.
+		 * @return {Date} The Date object, or `null` if the value could not be parsed into a Date.
 		 */
-		beforeSet : function( model, newValue, oldValue ) {
-			if( _.isDate( newValue ) ) {
-				return newValue;
+		convert : function( value ) {
+			if( _.isDate( value ) ) {
+				return value;
 			}
-			if( _.isNumber( newValue ) || ( _.isString( newValue ) && newValue && !isNaN( +newValue ) ) ) {
-				return new Date( +newValue );  // If the date is a number (or a number in a string), assume it's the number of milliseconds since the Unix epoch (1/1/1970)
+			if( _.isNumber( value ) || ( _.isString( value ) && value && !isNaN( +value ) ) ) {
+				return new Date( +value );  // If the date is a number (or a number in a string), assume it's the number of milliseconds since the Unix epoch (1/1/1970)
 			}
 			
 			// All else fails, try to parse the value using Date.parse
-			var parsed = Date.parse( newValue );
+			var parsed = Date.parse( value );
 			return ( parsed ) ? new Date( parsed ) : null;
 		}
 	} );

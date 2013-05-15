@@ -21,17 +21,20 @@ define( [
 		
 		
 		/**
-		 * Overridden `beforeSet` method used to normalize the value provided. All non-object values are converted to null,
+		 * Override of superclass method used to normalize the provided `value`. All non-object values are converted to `null`,
 		 * while object values are returned unchanged.
 		 * 
-		 * @inheritdoc
+		 * @param {Mixed} value The value to convert.
+		 * @return {Object}
 		 */
-		beforeSet : function( model, newValue, oldValue ) {
-			if( typeof newValue !== 'object' ) {
-				newValue = null;  // convert all non-object values to null
+		convert : function( value ) {
+			value = this._super( arguments );
+			
+			if( typeof value !== 'object' ) {
+				value = null;  // convert all non-object values to null
 			}
 			
-			return newValue;
+			return value;
 		}
 		
 	} );

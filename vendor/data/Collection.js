@@ -10,6 +10,7 @@ define( [
 	'data/persistence/operation/Read',
 	'data/persistence/operation/Write',
 	'data/persistence/operation/Batch',
+	'data/persistence/proxy/Proxy',
 	'data/Model'   // may be circular dependency, depending on load order. require( 'data/Model' ) is used internally
 ], function(
 	require,
@@ -21,7 +22,8 @@ define( [
 	NativeObjectConverter,
 	ReadOperation,
 	WriteOperation,
-	OperationBatch
+	OperationBatch,
+	Proxy
 ) {
 
 	/**
@@ -114,9 +116,9 @@ define( [
 		/**
 		 * @cfg {Boolean} autoLoad
 		 * 
-		 * If no initial {@link #cfg-models} are specified (specifying inline data), and this config is 
-		 * `true`, the Collection's {@link #method-load} method will be called immediately upon 
-		 * instantiation to load the Collection.
+		 * If no initial {@link #data} config is specified (specifying an initial set of data/models), and this config is 
+		 * `true`, the Collection's {@link #method-load} method will be called immediately upon instantiation to load the 
+		 * Collection.
 		 * 
 		 * If the {@link #pageSize} config is set, setting this to `true` will just cause the first page of
 		 * data to be loaded. 
@@ -171,10 +173,12 @@ define( [
 		 */
 		
 		/**
-		 * @cfg {Object/data.Model/Object[]/data.Model[]} models
-		 * If providing a configuration object to the data.Collection constructor instead of an array of initial models, the initial 
-		 * model(s) may be specified using this configuration option. Can be a single model or an array of models (or object / array of
-		 * objects that will be converted to models).
+		 * @cfg {Object/Object[]/data.Model/data.Model[]} data
+		 * 
+		 * Any initial data/models to load the Collection with. This is used when providing a configuration object to the 
+		 * Collection constructor, instead of an array of initial data/models. Can be a single model, an array of models,
+		 * or an object / array of objects that will be converted to models based on the {@link #model} config (or 
+		 * overridden implementation of {@link #createModel}).
 		 * 
 		 * Ex:
 		 * 
@@ -184,7 +188,20 @@ define( [
 		 *         model2 = new myApp.MyModel();
 		 *     
 		 *     var collection = new myApp.MyCollection( {
-		 *         models: [ model1, model2 ]
+		 *         data: [ model1, model2 ]
+		 *     } );
+		 * 
+		 * Ex 2:    
+		 *     var MyModel = Model.extend( {
+		 *         attributes : [ 'id', 'name' ]
+		 *     } );
+		 *     
+		 *     var collection = new myApp.MyCollection( {
+		 *         model : MyModel,
+		 *         data: [
+		 *             { id: 1, name: "John" },
+		 *             { id: 2, name: "Jane" }
+		 *         ]
 		 *     } );
 		 */
 		
@@ -237,6 +254,14 @@ define( [
 		
 		/**
 		 * @protected
+		 * @property {Number[]} loadedPages
+		 * 
+		 * An array that stores the currently-loaded pages in the Collection. This is only used when a {@link #pageSize}
+		 * is set, and the user loads pages using the {@link #loadPage} or {@link #loadPageRange} methods.
+		 */
+		
+		/**
+		 * @protected
 		 * @property {Number} totalCount
 		 * 
 		 * This property is used to keep track of total number of models in a windowed (paged) data 
@@ -253,8 +278,8 @@ define( [
 		 * @constructor
 		 * @param {Object/Object[]/data.Model[]} config This can either be a configuration object (in which the options listed
 		 *   under "configuration options" can be provided), or an initial set of Models to provide to the Collection. If providing
-		 *   an initial set of models, they must be wrapped in an array. Note that an initial set of models can be provided when using
-		 *   a configuration object with the {@link #cfg-models} config.
+		 *   an initial set of data/models, they must be wrapped in an array. Note that an initial set of data/models can be provided 
+		 *   when using a configuration object with the {@link #data} config.
 		 */
 		constructor : function( config ) {
 			this.addEvents(
@@ -322,6 +347,15 @@ define( [
 				'removeset',
 				
 				/**
+				 * Fires when the Collection begins a load request, through its {@link #proxy}. The {@link #event-load} event
+				 * will fire when the load is complete.
+				 * 
+				 * @event loadbegin
+				 * @param {data.Collection} This Collection instance.
+				 */
+				'loadbegin',
+				
+				/**
 				 * Fires when the Collection is loaded from an external data source, through its {@link #proxy}.
 				 * 
 				 * This event fires for both successful and failed "load" requests. Success of the load request may 
@@ -348,7 +382,7 @@ define( [
 			} else if( typeof config === 'object' ) {
 				_.assign( this, config );
 				
-				initialModels = this.models;  // grab any initial models in the config
+				initialModels = this.data;  // grab any initial data/models in the config
 			}
 
 			// Call Observable constructor
@@ -366,7 +400,7 @@ define( [
 			this.modelsByClientId = {};
 			this.modelsById = {};
 			this.removedModels = [];
-			
+			this.loadedPages = [];
 			
 			if( initialModels ) {
 				this.add( initialModels );
@@ -718,11 +752,11 @@ define( [
 		
 		
 		/**
-		 * Determines if the collection holds the range of {@link data.Model Models} specified by the `startIndex` and
+		 * Determines if the Collection holds the range of {@link data.Model Models} specified by the `startIndex` and
 		 * `endIndex`. If one or more {@link data.Model Models} are missing from the given range, this method returns
 		 * `false`.
 		 * 
-		 * @param {Number} [startIndex] The starting index.
+		 * @param {Number} startIndex The starting index.
 		 * @param {Number} [endIndex] The ending index. Defaults to the last Model in the Collection.
 		 * @return {Boolean} `true` if the Collection has {@link data.Model Models} in all indexes specified by
 		 *   the range of `startIndex` to `endIndex`, or `false` if one or more {@link data.Model Models} are missing.
@@ -731,6 +765,18 @@ define( [
 			// A bit of a naive implementation for now. In the future, this method will cover when say, pages
 			// are loaded out of order, and will ensure that the entire range is present.
 			return endIndex < this.models.length;
+		},
+		
+		
+		/**
+		 * Determines if the Collection has the given page number loaded. This is only valid when a {@link #pageSize} is set,
+		 * and using the paging methods {@link #loadPage} or {@link #loadPageRange}.
+		 * 
+		 * @param {Number} pageNum The page number to check.
+		 * @return {Boolean} `true` if the Collection has the given `pageNum` currently loaded, `false` otherwise.
+		 */
+		hasPage : function( pageNum ) {
+			return _.contains( this.loadedPages, pageNum );
 		},
 		
 		
@@ -753,7 +799,7 @@ define( [
 		 * @param {Object} [options] An object (hash) of options to change the behavior of this method. This object is sent to
 		 *   the {@link data.NativeObjectConverter#convert NativeObjectConverter's convert method}, and accepts all of the options
 		 *   that the {@link data.NativeObjectConverter#convert} method does. See that method for details.
-		 * @return {Object} A hash of the data, where the property names are the keys, and the values are the {@link data.attribute.Attribute Attribute} values.
+		 * @return {Object[]} An array of the Object representation of each of the Models in the Collection.
 		 */
 		getData : function( options ) {
 			return NativeObjectConverter.convert( this, options );
@@ -1035,7 +1081,12 @@ define( [
 		 * @return {data.persistence.proxy.Proxy} The Proxy configured for the collection, or null.
 		 */
 		getProxy : function() {
-			return this.proxy || null;
+			// Lazy instantiate an anonymous config object to a Proxy instance
+			var proxy = this.proxy;
+			if( _.isPlainObject( proxy ) ) {
+				this.proxy = proxy = Proxy.create( proxy );
+			}
+			return proxy || null;
 		},
 		
 		
@@ -1286,8 +1337,15 @@ define( [
 			deferred.done( options.success ).fail( options.error ).always( options.complete );
 			
 			masterPromise.then(
-				function( operation ) { me.onLoadSuccess( deferred, batch, { addModels: addModels } ); },
-				function( operation ) { me.onLoadError( deferred, batch ); }
+				function( operation ) {
+					var loadedPages = _.range( startPage, endPage+1 );  // second arg needs +1 because it is "up to but not included"
+					me.loadedPages = ( addModels ) ? me.loadedPages.concat( loadedPages ) : loadedPages;
+					
+					me.onLoadSuccess( deferred, batch, { addModels: addModels } ); 
+				},
+				function( operation ) { 
+					me.onLoadError( deferred, batch );
+				}
 			);
 			return deferred.promise();
 		},
@@ -1304,7 +1362,7 @@ define( [
 		 */
 		doLoad : function( operation ) {
 			var me = this,  // for closures
-			    proxy = this.proxy || ( this.model ? this.model.getProxy() : null );
+			    proxy = this.getProxy() || ( this.model ? this.model.getProxy() : null );
 			
 			// <debug>
 			// No persistence proxy, cannot load. Throw an error
@@ -1314,7 +1372,10 @@ define( [
 			// </debug>
 			
 			// Set the loading flag while the Collection is loading. Will be set to false in onLoadSuccess() or onLoadError().
-			this.loading = true;
+			if( !this.loading ) {   // only set the flag and fire the event if the collection is not already loading for another request (i.e. should only fire once even if multiple pages are being loaded)
+				this.loading = true;
+				this.fireEvent( 'loadbegin', this );
+			}
 			
 			// Make a request to read the data from the persistent storage, and return a Promise object
 			// which is resolved or rejected with the `operation` object
@@ -1393,6 +1454,7 @@ define( [
 		 * `success`, `error`, and `complete` functions, and binds them to the `scope` (or `context`). All other properties
 		 * that exist on the `options` object will remain unchanged. 
 		 * 
+		 * @protected
 		 * @param {Object} options The options object provided to any of the "load" methods. If `undefined` or `null` is
 		 *   provided, a normalized options object will still be returned, simply with defaults filled out.
 		 * @param {Function} [options.success] Function to call if the loading is successful. Will be defaulted to an

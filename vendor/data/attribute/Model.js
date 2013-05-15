@@ -50,7 +50,7 @@ define( [
 		/**
 		 * @cfg {Boolean} embedded
 		 * 
-		 * Setting this config to true has the parent {@link data.Model Model} treat the child {@link data.Model Model} as if it is a part of itself. 
+		 * Setting this config to `true` has the parent {@link data.Model Model} treat the child {@link data.Model Model} as if it is a part of itself. 
 		 * Normally, a child Model that is not embedded is treated as a "relation", where it is considered as independent from the parent Model.
 		 * 
 		 * What this means is that, when true:
@@ -61,7 +61,6 @@ define( [
 		 * - The child Model's data is persisted with the parent Model's data, unless the {@link #persistIdOnly} config is set to true,
 		 *   in which case just the child Model's {@link data.Model#idAttribute id} is persisted with the parent Model.
 		 */
-		embedded : false,
 		
 		/**
 		 * @cfg {Boolean} persistIdOnly
@@ -109,24 +108,25 @@ define( [
 		
 		
 		/**
-		 * Overridden `beforeSet` method used to convert any anonymous objects into the specified {@link #model} subclass. The anonymous 
+		 * Override of superclass method used to convert any anonymous objects into the specified {@link #model} subclass. The anonymous 
 		 * object will be provided to the {@link #model} subclass's constructor.
 		 * 
-		 * @inheritdoc
+		 * @param {Mixed} value The value to convert.
+		 * @return {data.Model} The Model.
 		 */
-		beforeSet : function( model, newValue, oldValue ) {
-			// Now, normalize the newValue to an object, or null
-			newValue = this._super( arguments );
+		convert : function( value ) {
+			// First, normalize the value to an object, or `null`
+			value = this._super( arguments );
 			
-			if( newValue !== null ) {
+			if( value !== null ) {
 				var modelClass = this.resolveModelClass();
 				
-				if( newValue && typeof modelClass === 'function' && !( newValue instanceof modelClass ) ) {
-					newValue = new modelClass( newValue );
+				if( value && typeof modelClass === 'function' && !( value instanceof modelClass ) ) {
+					value = new modelClass( value );
 				}
 			}
 			
-			return newValue;
+			return value;
 		},
 		
 		
