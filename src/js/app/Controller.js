@@ -19,38 +19,73 @@ define( [
 	 * and their descendant components may be manipulated / listened to.
 	 * 
 	 * 
-	 * ## Referencing Components
+	 * ## View Component References
 	 * 
-	 * A Controller may set up {@link #addRef refs} to easily retrieve references to components, based on a {@link jqc.ComponentQuery}
-	 * selector. The {@link #addRef} method adds a reference (usually in the {@link #init} method), and {@link #getRef} retrieves 
-	 * the component(s) for that reference. For example, defining a Controller implementation subclass:
+	 * A Controller may set up {@link #cfg-refs} to easily retrieve references to components, based on a 
+	 * {@link jqc.ComponentQuery ComponentQuery} selector. Alternatively, the {@link #addRef} method may also be used to 
+	 * dynamically add references. 
+	 * 
+	 * References to component(s) are retrieved using the {@link #getRef} method. The {@link #getRef} accepts the reference
+	 * name, and returns the component, or array of components (if the `multiple` flag was set to true), for that reference. 
+	 * For example, defining a Controller implementation subclass:
 	 * 
 	 *     define( [
 	 *         'jqc/Controller'
 	 *     ], function( Controller ) {
 	 *     
 	 *         var UserController = Controller.extend( {
+	 *             
+	 *             refs : {
+	 *                 'userPanel'      : '#mainUserPanel',
+	 *                 'userTextFields' : { selector: 'textfield', multiple: true }
+	 *             },
 	 *         
 	 *             init : function() {
 	 *                 this._super( arguments );
 	 *                 
-	 *                 // Set up refs
-	 *                 this.addRef( 'userPanel', '#mainUserPanel' );
-	 *                 this.addRef( 'userTextFields', 'textfield', { multiple: true } );
-	 *                 
-	 *                 
-	 *                 // (If we wanted to retrieve the components right here from the init() method...)
-	 *                 this.getRef( 'userPanel' );      // --> Retrieves the panel (or any component) with an id of 'mainUserPanel'
+	 *                 // (If we wanted to retrieve the components right here in the init() method...)
+	 *                 this.getRef( 'userPanel' );      // --> Retrieves the Panel instance with an id of 'mainUserPanel'
 	 *                 this.getRef( 'userTextFields' ); // --> Retrieves the array of {@link jqc.form.field.Text} components
 	 *             }
 	 *         
 	 *         } );
 	 *         
+	 *         
 	 *         return UserController;
 	 *         
 	 *     } );
+	 * 
+	 * The selector query for a reference is only executed the first time that it is called for from {@link #getRef}. The 
+	 * component(s) that matched the selector are then cached for subsequent calls to {@link #getRef}. This behavior may
+	 * be overridden by either passing the `forceQuery` option to {@link #getRef}, or if the reference is defined with
+	 * the `noCache` option set to `true`. A reason this may be useful is if components are dynamically added to the {@link #view}
+	 * that this Controller is working with, in which case you may want to retrieve the latest list of components.
+	 * 
+	 * See the {@link #cfg-refs} config for more details on setting up references.
 	 */
 	var Controller = Observable.extend( {
+		
+		inheritedStatics : {
+			
+			// Subclass-specific setup
+			/**
+			 * @ignore
+			 */
+			onClassExtended : function( NewController ) {
+				// Extend `refs` config from superclass
+				var proto = NewController.prototype,
+				    superclassProto = NewController.superclass,
+				    superclassRefs = superclassProto.refs;
+				
+				if( !proto.hasOwnProperty( 'refs' ) ) {
+					proto.refs = _.clone( superclassRefs ) || {};
+				} else {
+					proto.refs = _.assign( {}, superclassRefs, proto.refs );  // the refs on the new class's prototype take precedence
+				}
+			}
+			
+		},
+		
 		
 		/**
 		 * @cfg {jqc.Component/jqc.Component[]} view (required)
@@ -60,6 +95,39 @@ define( [
 		 * of the components provided to this config (in which case, the particular component must be a {@link jqc.Container}
 		 * to have descendants).
 		 */
+		
+		/**
+		 * @cfg {Object} refs
+		 * 
+		 * An Object (map) for component references that the Controller should set up. This config should be added to the
+		 * **prototype** of the Controller, in a Controller subclass. See the documentation of this class for an example of
+		 * how to create a Controller subclass.
+		 * 
+		 * References are based on a {@link jqc.ComponentQuery ComponentQuery} selector, and make it easy to retrieve matching 
+		 * component(s) throughout the Controller's code using {@link #getRef}.
+		 * 
+		 * This Object should be keyed by the ref names, and whose values are Objects with the following properties:
+		 * - **selector** (String) : The selector string for the ref.
+		 * - **multiple** (Boolean) : (Optional) `true` if this is a multi-component selector (in which case an array is returned
+		 *   when retrieving the ref), or `false` if the selector returns a single component. Defaults to `false`.
+		 * - **noCache** (Boolean) : (Optional) `true` if this ref should not cache its result, and instead re-query the {@link #view}
+		 *   when the ref is requested again. Defaults to `false`.
+		 * 
+		 * The values may also simply be a string, where the string is taken as the selector.
+		 * 
+		 * Example:
+		 * 
+		 *     refs : {
+		 *         'myComponent1' : '#myComponent1',  // shorthand use with just a selector
+		 *         'myComponent2' : { selector: '#myComponent2' },
+		 *         'myTextFields' : { selector: 'textfield', multiple: true },  // matches all TextField components
+		 *         'myButtons'    : { selector: 'button', multiple: true, noCache: true }
+		 *     }
+		 *     
+		 * `refs` extend to subclasses, but any refs defined in a subclass with the same name as one in a superclass
+		 * will overwrite the superclass's ref.
+		 */
+		
 		
 		
 		/**
@@ -100,7 +168,12 @@ define( [
 			if( !this.view ) throw new Error( "`view` cfg required" );
 			// </debug>
 			
-			this.refs = {};
+			var refsConfig = this.refs;
+			this.refs = {};  // reset `refs` property for how refs will be stored internally
+			
+			if( refsConfig ) {
+				this.addRef( refsConfig );
+			}
 			
 			this.init();
 		},
@@ -124,9 +197,20 @@ define( [
 		 * After the first retrieval of a reference with {@link #getRef}, the result is cached for subsequent {@link #getRef}
 		 * calls.
 		 * 
+		 * This method accepts an alternative arguments list other than the one documented. It accepts an Object as the first
+		 * (and only) argument, for a configuration object of ref(s) to add. This configuration object should matche the form that 
+		 * the {@link #cfg-refs refs config} accepts. Example:
+		 * 
+		 *     this.addRef( {
+		 *         'myComponent'  : '#myComponent',
+		 *         'myTextFields' : { selector: 'textfield' },
+		 *         'myButtons'    : { selector: 'button', multiple: true, noCache: true }
+		 *     } );
+		 * 
 		 * @protected
-		 * @param {String} refName
-		 * @param {String} selector
+		 * @param {String/Object} ref The reference name, or a configuration object for one or more refs. If providing a configuration
+		 *   object, the rest of the parameters of this method are ignored.
+		 * @param {String} selector The selector string to select components by.
 		 * @param {Object} [options] An object which may contain the following properties:
 		 * @param {Boolean} [options.multiple=false] `true` to create a reference which returns multiple
 		 *   components. The return from {@link #getRef} will be an array of {@link jqc.Component Components}
@@ -136,14 +220,33 @@ define( [
 		 *   are retrieved with {@link #getRef}. This is useful for `multiple` refs (selectors which are to retrieve multiple 
 		 *   components), where the number of components may change due to additions or removals from the page.
 		 */
-		addRef : function( refName, selector, options ) {
-			options = options || {};
-			
-			this.refs[ refName ] = {
-				selector : selector,
-				multiple : !!options.multiple,
-				noCache  : !!options.noCache
-			};
+		addRef : function( ref, selector, options ) {
+			if( typeof ref === 'string' ) {
+				options = options || {};
+				
+				this.refs[ ref ] = {
+					selector : selector,
+					multiple : !!options.multiple,
+					noCache  : !!options.noCache
+				};
+				
+			} else {  // configuration object for the refs
+				var refs = ref;  // for clarity, that this is an object which may have multiple refs
+				
+				refs = _.forOwn( refs, function( refCfg, refName, refs ) {
+					if( typeof refCfg === 'string' )  // if the value was simply a selector string, convert it to an object now
+						refCfg = { selector: refCfg };
+					
+					// Apply default properties for missing ones in the ref config
+					refs[ refName ] = _.defaults( refCfg, {
+						multiple : false,
+						noCache  : false
+					} );
+				} );
+				
+				// Assign the new refs to the current map of refs
+				_.assign( this.refs, refs );
+			}
 		},
 		
 		
@@ -180,7 +283,7 @@ define( [
 		
 		
 		/**
-		 * Destroys the Controller by removing all {@link #refs references} and removing the listeners that
+		 * Destroys the Controller by removing all {@link #property-refs references} and removing the listeners that
 		 * have been set up.
 		 * 
 		 * Subclasses should not override this method, but instead override the {@link #onDestroy} hook method
