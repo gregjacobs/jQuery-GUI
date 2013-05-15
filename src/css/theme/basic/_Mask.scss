@@ -1,0 +1,17 @@
+.jqc-mask-overlay {
+	background-color: #000;
+	@include opacity( .40 );
+}
+
+.jqc-mask-content {
+	background-color: #BBBBBB;
+	padding: 8px;
+	border: 1px solid black;
+}
+
+.jqc-mask-spinner {
+	margin: 5px;
+	height: 16px;
+	width: 16px;
+	background-image: image-url( 'icons/spinner.gif' );
+}

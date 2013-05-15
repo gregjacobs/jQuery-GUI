@@ -1,3 +1,25 @@
+/* line 1, ../../../../src/css/theme/basic/_Mask.scss */
+.jqc-mask-overlay {
+  background-color: #000;
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
+  opacity: 0.4;
+}
+
+/* line 6, ../../../../src/css/theme/basic/_Mask.scss */
+.jqc-mask-content {
+  background-color: #BBBBBB;
+  padding: 8px;
+  border: 1px solid black;
+}
+
+/* line 12, ../../../../src/css/theme/basic/_Mask.scss */
+.jqc-mask-spinner {
+  margin: 5px;
+  height: 16px;
+  width: 16px;
+  background-image: url('../../../../resources/img/icons/spinner.gif?1368639652');
+}
+
 /* line 1, ../../../../src/css/theme/basic/button/_Button.scss */
 .jqc-Button {
   border: 1px solid #D3D3D3;

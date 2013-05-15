@@ -894,65 +894,64 @@
   z-index: 1000;
 }
 
-/* Generalized Mask Component (ui.Mask) 
---------------------------------------------*/
-/* line 3, ../../../src/css/base/_Mask.scss */
-.jqc-mask {
+/* line 1, ../../../src/css/base/_Mask.scss */
+.jqc-mask-overlay {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 100;
-  background-color: #000;
-  -moz-opacity: .40;
-  opacity: .40;
-  filter: alpha(opacity=40);
+  z-index: 9000;
   width: 100%;
   height: 100%;
   zoom: 1;
 }
 
-/* line 5, ../../../src/css/base/_Mask.scss */
+/* line 11, ../../../src/css/base/_Mask.scss */
 .jqc-mask-content {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 101;
+  z-index: 9001;
   zoom: 1;
-  font-size: 14px;
-}
-
-/* line 6, ../../../src/css/base/_Mask.scss */
-.jqc-mask-contentBox {
-  background-color: #BBBBBB;
-  padding: 8px;
-  border: 1px solid black;
-}
-
-/* line 8, ../../../src/css/base/_Mask.scss */
-.jqc-mask-content-spinner {
   display: none;
-  padding: 5px;
+}
+/* line 19, ../../../src/css/base/_Mask.scss */
+.jqc-mask-content.jqc-mask-spinner-visible {
+  display: block;
+}
+/* line 20, ../../../src/css/base/_Mask.scss */
+.jqc-mask-content.jqc-mask-msg-visible {
+  display: block;
 }
 
-/* line 9, ../../../src/css/base/_Mask.scss */
-.jqc-mask-spinnerEnabled .jqc-mask-content-spinner {
+/* line 23, ../../../src/css/base/_Mask.scss */
+.jqc-mask-spinner {
+  display: none;
+  vertical-align: middle;
+}
+/* line 27, ../../../src/css/base/_Mask.scss */
+.jqc-mask-spinner-visible .jqc-mask-spinner {
   display: inline-block;
 }
 
-/* line 12, ../../../src/css/base/_Mask.scss */
+/* line 30, ../../../src/css/base/_Mask.scss */
 .jqc-mask-msg {
+  display: none;
+  vertical-align: middle;
+}
+/* line 34, ../../../src/css/base/_Mask.scss */
+.jqc-mask-msg-visible .jqc-mask-msg {
   display: inline-block;
 }
 
 /* For elements that are masked, they should have their overflow hidden to remove scroll bars */
 /* Note: the uses of !important are necessary to override more specific css classes! */
-/* line 16, ../../../src/css/base/_Mask.scss */
+/* line 39, ../../../src/css/base/_Mask.scss */
 .jqc-masked {
   overflow: hidden !important;
 }
 
-/* For elements that are masked, they need a positioning context if they don't have one */
-/* line 20, ../../../src/css/base/_Mask.scss */
+/* For elements that are masked, they need a positioning context. This will only be added if they don't have a positioning context. */
+/* line 44, ../../../src/css/base/_Mask.scss */
 .jqc-masked-relative {
   position: relative !important;
 }
@@ -1143,7 +1142,7 @@ iframe.jqc-form-DropdownField-shim {
 }
 
 /* General Styles */
-/* line 21, ../../../src/css/base/base.scss */
+/* line 23, ../../../src/css/base/base.scss */
 .jqc-clear {
   clear: both;
 }

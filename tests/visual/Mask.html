@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Mask Visual Tests</title>
+
+	<link rel="stylesheet" href="../../dist/css/base/base.css" />
+	<link rel="stylesheet" href="../../dist/css/theme/basic/basic.css" />
+
+	<script type="text/javascript" src="../../vendor/require/require.js"></script>
+	<script type="text/javascript">
+		require.config( {
+			baseUrl : '../../',
+			
+			paths : {
+				// General dependencies
+				'jquery'             : 'vendor/jquery/jquery',
+				'jquery-ui.position' : 'vendor/jquery-ui.position/jquery-ui.position',
+				'lodash'             : 'vendor/lodash/lodash',
+				'Class'              : 'vendor/class/Class',
+				'Observable'         : 'vendor/observable/Observable',
+				'data'               : 'vendor/data',
+				
+				// jQuery-Component Library
+				'jqc' : 'src/js'
+			},
+			
+			shim : {
+				'jquery-ui.position' : [ 'jquery' ]   // jQuery UI's 'position' plugin
+			}
+		} );
+		
+		var win;
+		require( [
+			'jquery',
+			'jqc/Mask'
+		], function( $, Mask ) {
+			$( document ).ready( function() {
+				
+				var hiddenMask = new Mask( $( '#contentArea1' ) );
+				hiddenMask.show();
+				hiddenMask.hide();
+				
+				var basicMask = new Mask( $( '#contentArea2' ) );
+				basicMask.show();
+				
+				var spinnerMask = new Mask( $( '#contentArea3' ), {
+					spinner : true
+				} );
+				spinnerMask.show();
+				
+				var messageMask = new Mask( $( '#contentArea4' ), {
+					msg : "Loading..."
+				} );
+				messageMask.show();
+				
+				var spinnerAndMessageMask = new Mask( $( '#contentArea5' ), {
+					spinner : true,
+					msg : "Loading..."
+				} );
+				spinnerAndMessageMask.show();
+				
+				var showHideShowMask = new Mask( $( '#contentArea6' ), {
+					spinner : true,
+					msg : "Loading..."
+				} );
+				showHideShowMask.show();
+				showHideShowMask.hide();
+				showHideShowMask.show();
+				
+			} );
+		} );
+	</script>
+	
+	<style>
+		.contentArea {
+			display: block;
+			float: left;
+			margin: 5px;
+			height: 300px;
+			width: 300px;
+			border: 1px solid black;
+		}
+	</style>
+
+</head>
+
+<body>
+
+<div id="contentArea1" class="contentArea">Hidden Mask</div>
+<div id="contentArea2" class="contentArea">Basic Mask (no spinner or message)</div>
+<div id="contentArea3" class="contentArea">Spinner-only Mask</div>
+<div id="contentArea4" class="contentArea">Message-only Mask</div>
+<div id="contentArea5" class="contentArea">Spinner and Message Mask</div>
+<div id="contentArea6" class="contentArea">Mask which has been shown, hidden, and then shown again.</div>
+
+</body>
+</html>

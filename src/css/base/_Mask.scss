@@ -1,20 +1,44 @@
-/* Generalized Mask Component (ui.Mask) 
---------------------------------------------*/
-.jqc-mask { position: absolute; top: 0; left: 0; z-index: 100; background-color: #000; -moz-opacity: .40; opacity: .40; filter: alpha(opacity=40); width: 100%; height: 100%; zoom: 1; }
+.jqc-mask-overlay { 
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 9000;
+	width: 100%;
+	height: 100%;
+	zoom: 1;
+}
 
-.jqc-mask-content { position: absolute; top: 0; left: 0; z-index: 101; zoom: 1; font-size: 14px; }
-.jqc-mask-contentBox { background-color: #BBBBBB; padding: 8px; border: 1px solid black; }
-
-.jqc-mask-content-spinner { display: none; padding: 5px;}
-.jqc-mask-spinnerEnabled .jqc-mask-content-spinner { display: inline-block; }
-.jqc-mask-spinnerEnabled.jqc-mask-contentBox .jqc-mask-content-spinner {  }
+.jqc-mask-content {
+	position: absolute; 
+	top: 0; 
+	left: 0; 
+	z-index: 9001; 
+	zoom: 1;
+	display: none;  // Initially hidden. Will be displayed if the spinner is enabled, or if there is a msg.
 	
-.jqc-mask-msg { display: inline-block; }
+	&.jqc-mask-spinner-visible { display: block; }  // if either the spinner is enabled, or a
+	&.jqc-mask-msg-visible { display: block; }      // message is shown, show the content element
+}
+
+.jqc-mask-spinner { 
+	display: none;
+	vertical-align: middle;
+
+	.jqc-mask-spinner-visible & { display: inline-block; }
+}
+
+.jqc-mask-msg { 
+	display: none;
+	vertical-align: middle;
+	
+	.jqc-mask-msg-visible & { display: inline-block; }
+}
 
 /* For elements that are masked, they should have their overflow hidden to remove scroll bars */
 /* Note: the uses of !important are necessary to override more specific css classes! */
 .jqc-masked { 
 	overflow: hidden !important;  
 }
-/* For elements that are masked, they need a positioning context if they don't have one */
-.jqc-masked-relative { position: relative !important; } 
+
+/* For elements that are masked, they need a positioning context. This will only be added if they don't have a positioning context. */
+.jqc-masked-relative { position: relative !important; }
