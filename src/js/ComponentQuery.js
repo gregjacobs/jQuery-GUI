@@ -26,6 +26,9 @@ define( [
 	var ComponentQuery = Class.extend( Object, {
 		
 		/**
+		 * Queries for components in the `context` array of components, using the `selector`. Returns the array of matching
+		 * components. See the description of this class for valid selectors.
+		 * 
 		 * @param {String} selector The selector to query components by.
 		 * @param {jqc.Component/jqc.Component[]} context The component(s) to query the `selector` for. If one
 		 *   or more of the components match the selector, they will be included. Components that are 
