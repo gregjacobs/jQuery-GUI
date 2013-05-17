@@ -1,4 +1,5 @@
 /*global define */
+/*jshint eqnull:true */
 define( [
 	'lodash',
 	'Class',
@@ -21,13 +22,14 @@ define( [
 		 * The Boolean Attribute defaults to `false`, unless the {@link #useNull} config is set to `true`, 
 		 * in which case it defaults to `null` (to denote the Attribute being "unset").
 		 */
-		defaultValue: function( attribute ) {
-			return attribute.useNull ? null : false;
+		defaultValue: function() {
+			return this.useNull ? null : false;
 		},
 		
 		
 		/**
 		 * @cfg {Boolean} useNull
+		 * 
 		 * True to allow `null` to be set to the Attribute (which is usually used to denote that the 
 		 * Attribute is "unset", and it shouldn't take an actual default value).
 		 * 
@@ -38,21 +40,19 @@ define( [
 		
 		
 		/**
-		 * Converts the provided data value into a Boolean. If {@link #useNull} is true, "unparsable" values
-		 * will return null. 
+		 * Override of superclass method, which converts the provided data value into a Boolean. If {@link #useNull} is true, 
+		 * "unparsable" values will return `null`. See {@link #useNull} for details.
 		 * 
-		 * @method beforeSet
-		 * @param {data.Model} model The Model instance that is providing the value. This is normally not used,
-		 *   but is provided in case any model processing is needed.
-		 * @param {Mixed} newValue The new value provided to the {@link data.Model#set} method.
-		 * @param {Mixed} oldValue The old (previous) value that the model held (if any).
+		 * @param {Mixed} value The value to convert.
 		 * @return {Boolean} The converted value.
 		 */
-		beforeSet : function( model, newValue, oldValue ) {
-			if( this.useNull && ( newValue === undefined || newValue === null || newValue === '' ) ) {
+		convert : function( value ) {
+			value = this._super( arguments );
+			
+			if( this.useNull && ( value == null || value === '' ) ) {
 				return null;
 			}
-			return newValue === true || newValue === 'true' || newValue === 1 || newValue === "1";
+			return value === true || value === 'true' || value === 1 || value === "1";
 		}
 		
 	} );

@@ -15,20 +15,18 @@ define( [
 	var FloatAttribute = Class.extend( NumberAttribute, {
 		
 		/**
-		 * Converts the provided data value into a float. If {@link #useNull} is true, undefined/null/empty string 
-		 * values will return null, or else will otherwise be converted to 0. If the number is simply not parsable, will 
-		 * return NaN.
+		 * Override of superclass method used to convert the provided data value into a float. If {@link #useNull} is true, 
+		 * undefined/null/empty string values will return `null`, or else will otherwise be converted to 0. If the number is 
+		 * simply not parsable, will return NaN.
 		 * 
-		 * @method beforeSet
-		 * @param {data.Model} model The Model instance that is providing the value. This is normally not used,
-		 *   but is provided in case any model processing is needed.
-		 * @param {Mixed} newValue The new value provided to the {@link data.Model#set} method.
-		 * @param {Mixed} oldValue The old (previous) value that the model held (if any).
-		 * @return {Boolean} The converted value.
+		 * @param {Mixed} value The value to convert.
+		 * @return {Number} The converted value.
 		 */
-		beforeSet : function( model, newValue, oldValue ) {
+		convert : function( value ) {
+			value = this._super( arguments );
+			
 			var defaultValue = ( this.useNull ) ? null : 0;
-			return ( newValue !== undefined && newValue !== null && newValue !== '' ) ? parseFloat( String( newValue ).replace( this.stripCharsRegex, '' ), 10 ) : defaultValue;
+			return ( value !== undefined && value !== null && value !== '' ) ? parseFloat( String( value ).replace( this.stripCharsRegex, '' ), 10 ) : defaultValue;
 		}
 		
 	} );

@@ -14,11 +14,11 @@ define( [
 	 * (i.e. A Boolean, Number, or String).
 	 */
 	var PrimitiveAttribute = Class.extend( Attribute, {
-		
 		abstractClass: true,
 		
 		/**
 		 * @cfg {Boolean} useNull
+		 * 
 		 * True to allow `null` to be set to the Attribute (which is usually used to denote that the 
 		 * Attribute is "unset", and it shouldn't take an actual default value).
 		 * 

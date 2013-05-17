@@ -14,7 +14,6 @@ define( [
 	 * Abstract base class for an Attribute that takes a number data value.
 	 */
 	var NumberAttribute = Class.extend( PrimitiveAttribute, {
-		
 		abstractClass: true,
 		
 		/**
@@ -24,13 +23,14 @@ define( [
 		 * The Number Attribute defaults to 0, unless the {@link #useNull} config is 
 		 * set to `true`, in which case it defaults to `null` (to denote the Attribute being "unset").
 		 */
-		defaultValue: function( attribute ) {
-			return attribute.useNull ? null : 0;
+		defaultValue: function() {
+			return this.useNull ? null : 0;
 		},
 		
 		
 		/**
 		 * @cfg {Boolean} useNull
+		 * 
 		 * True to allow `null` to be set to the Attribute (which is usually used to denote that the 
 		 * Attribute is "unset", and it shouldn't take an actual default value).
 		 * 
