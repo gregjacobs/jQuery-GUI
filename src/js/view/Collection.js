@@ -144,6 +144,16 @@ define( [
 		 */
 		maskOnLoad : true,
 		
+		/**
+		 * @cfg {Number} loadingHeight
+		 * 
+		 * A minimum height to give the CollectionView while its {@link #collection} is loading. This is useful to prevent the 
+		 * CollectionView from collapsing to 0 height while the load mask is being shown, and there is no content in the view.
+		 * 
+		 * This is only used if the {@link #maskOnLoad} config is `true`. It is also only applied if the CollectionView's height
+		 * is less than this number.
+		 */
+		
 		
 		/**
 		 * @protected
@@ -159,6 +169,14 @@ define( [
 		 * 
 		 * Where `1` and `2` are the models' clientIds, and the values are jQuery instances, each which wrap the HTMLElement
 		 * that corresponds to that model.
+		 */
+		
+		/**
+		 * @private
+		 * @property {Boolean} hasLoadingHeight
+		 * 
+		 * Flag which is set to true when the {@link #loadingHeight} is applied, and set back to `false` after the
+		 * {@link #loadingHeight} has been removed.
 		 */
 		
 		
@@ -197,7 +215,8 @@ define( [
 				this.collectModelElements( this.collectModels() );  // need to determine the initial set of models that were rendered (if any)
 				
 				// Mask the view if the Collection is currently loading when the view is rendered
-				if( this.maskOnLoad && collection.isLoading() ) {
+				if( collection.isLoading() ) {
+					this.applyLoadingHeight();
 					this.mask();
 				}
 			}
@@ -255,7 +274,9 @@ define( [
 		 * @protected
 		 */
 		onLoadBegin : function() {
-			if( this.maskOnLoad ) {
+			if( this.maskOnLoad && this.rendered ) {
+				this.applyLoadingHeight();
+				
 				this.mask();
 			}
 		},
@@ -271,8 +292,48 @@ define( [
 		 * @protected
 		 */
 		onLoadComplete : function() {
-			if( this.maskOnLoad ) {
+			if( this.maskOnLoad && this.rendered ) {
 				this.unMask();
+				
+				this.removeLoadingHeight();
+			}
+		},
+		
+		
+		/**
+		 * Applies the {@link loadingHeight} to the CollectionView's {@link #$el element}, if the current height of the
+		 * CollectionView is less than the configured {@link #loadingHeight}. It also only applies the {@link #loadingHeight}
+		 * if the {@link #maskOnLoad} config is `true`.
+		 * 
+		 * This is called when the {@link #collection} is in its loading state.
+		 * 
+		 * @protected
+		 */
+		applyLoadingHeight : function() {
+			var loadingHeight = this.loadingHeight,
+			    $el = this.$el;
+			
+			if( loadingHeight > this.getHeight() ) {
+				this.hasLoadingHeight = true;
+				$el.css( 'min-height', loadingHeight + 'px' );
+			}
+		},
+		
+		
+		/**
+		 * Removes the {@link loadingHeight} from the CollectionView's {@link #$el element}, restoring any {@link #minHeight} that
+		 * the CollectionView has configured. This is only done if the {@link #loadingHeight} was applied in {@link #applyLoadingHeight}.
+		 * 
+		 * This is called when the {@link #collection} has finished loading.
+		 * 
+		 * @protected
+		 */
+		removeLoadingHeight : function() {
+			if( this.hasLoadingHeight ) {
+				var minHeight = ( this.minHeight ) ? this.minHeight + 'px' : '';
+				this.$el.css( 'min-height', minHeight );  // re-apply any configured `minHeight` to the component's element
+				
+				this.hasLoadingHeight = false;
 			}
 		},
 		

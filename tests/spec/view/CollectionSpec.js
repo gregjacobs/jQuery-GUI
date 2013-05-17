@@ -79,8 +79,8 @@ define( [
 						renderTo : 'body',
 						
 						collection : new Collection( {
-							model  : UserModel,
-							models : [
+							model : UserModel,
+							data  : [
 								{ id: 1, firstName: "John", lastName: "Smith" },
 								{ id: 2, firstName: "Bob",  lastName: "Jones" }
 							]
@@ -111,8 +111,8 @@ define( [
 						modelsVar : 'users',
 						
 						collection : new Collection( {
-							model  : UserModel,
-							models : [
+							model : UserModel,
+							data  : [
 								{ id: 1, firstName: "John", lastName: "Smith" }
 							]
 						} )
@@ -122,6 +122,81 @@ define( [
 					expect( collectionView.getEl().html() ).toMatch( /<div.*?>Smith, John<\/div>/ );
 					
 					collectionView.destroy();  // clean up
+				} );
+				
+			} );
+			
+			
+			describe( "`loadingHeight` config", function() {
+				var collection,
+				    collectionView;
+				
+				beforeEach( function() {
+					collection = new Collection( {
+						model : UserModel
+					} );
+					
+					collectionView = new ConfiguredCollectionView( {
+						collection : collection,
+						
+						maskOnLoad : true,
+						loadingHeight : 100
+					} );
+				} );
+				
+				afterEach( function() {
+					collectionView.destroy();
+				} );
+				
+				
+				it( "should apply the `loadingHeight` if the CollectionView is first rendered while the `collection` is loading", function() {
+					spyOn( collection, 'isLoading' ).andReturn( true );
+					
+					collectionView.render( 'body' );
+					expect( collectionView.getHeight() ).toBe( 100 );
+					
+					// Now pretend loading is complete
+					collection.isLoading.andReturn( false );
+					collection.fireEvent( 'load', collection );
+					expect( collectionView.getHeight() ).toBe( 0 );  // no content
+				} );
+				
+				
+				it( "should apply the `loadingHeight` if the CollectionView is currently rendered, and then the `collection` starts loading", function() {
+					collectionView.render( 'body' );
+					expect( collectionView.getHeight() ).toBe( 0 );
+					
+					// Now start loading
+					spyOn( collection, 'isLoading' ).andReturn( true );
+					collection.fireEvent( 'loadBegin', collection );
+					
+					expect( collectionView.getHeight() ).toBe( 100 );
+					
+					// Now pretend loading is complete
+					collection.isLoading.andReturn( false );
+					collection.fireEvent( 'load', collection );
+					expect( collectionView.getHeight() ).toBe( 0 );  // no content
+				} );
+				
+				
+				it( "should re-apply the configured `minHeight` after loading is complete", function() {
+					var minHeight = 25;
+					
+					collectionView.minHeight = minHeight;
+					collectionView.render( 'body' );
+					expect( collectionView.getHeight() ).toBe( minHeight );
+					
+					// Now start loading
+					spyOn( collection, 'isLoading' ).andReturn( true );
+					collection.fireEvent( 'loadBegin', collection );
+					
+					expect( collectionView.getHeight() ).toBe( 100 );  // the loading height
+					
+					// Now pretend loading is complete
+					collection.isLoading.andReturn( false );
+					collection.fireEvent( 'load', collection );
+					expect( collectionView.getHeight() ).toBe( minHeight );  // `minHeight` re-applied
+					
 				} );
 				
 			} );
