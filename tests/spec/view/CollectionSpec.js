@@ -149,6 +149,25 @@ define( [
 				} );
 				
 				
+				it( "should not apply any `loadingHeight` if it is not configured", function() {
+					// Make a new CollectionView (not the one on the test level)
+					var collectionView = new ConfiguredCollectionView( {
+						renderTo   : 'body',
+						collection : collection,
+						
+						maskOnLoad : true
+						// loadingHeight : 100  -- not applying
+					} );
+					expect( collectionView.getHeight() ).toBe( 0 );  // initial condition
+					
+					// Now start loading
+					spyOn( collection, 'isLoading' ).andReturn( true );
+					collection.fireEvent( 'loadBegin', collection );
+					
+					expect( collectionView.getHeight() ).toBe( 0 );  // still 0 - no loading height applied
+				} );
+				
+				
 				it( "should apply the `loadingHeight` if the CollectionView is first rendered while the `collection` is loading", function() {
 					spyOn( collection, 'isLoading' ).andReturn( true );
 					
