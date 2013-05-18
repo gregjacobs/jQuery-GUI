@@ -3,8 +3,9 @@ define( [
 	'lodash',
 	'Observable',
 	'jqc/Jqc',
-	'jqc/ComponentQuery'
-], function( _, Observable, Jqc, ComponentQuery ) {
+	'jqc/ComponentQuery',
+	'jqc/app/EventBus'
+], function( _, Observable, Jqc, ComponentQuery, EventBus ) {
 	
 	/**
 	 * @class jqc.app.Controller
@@ -62,6 +63,55 @@ define( [
 	 * that this Controller is working with, in which case you may want to retrieve the latest list of components.
 	 * 
 	 * See the {@link #cfg-refs} config for more details on setting up references.
+	 * 
+	 * 
+	 * ## Listening to Events
+	 * 
+	 * A Controller may set up listeners based on {@link jqc.ComponentQuery ComponentQuery} selectors, to be able to respond to
+	 * events from components living under its configured {@link #view}. The {@link #listen} method handles this functionality,
+	 * and listeners are usually set up from the {@link #init} hook method. For example:
+	 * 
+	 *     define( [
+	 *         'jqc/Controller'
+	 *     ], function( Controller ) {
+	 *     
+	 *         var UserController = Controller.extend( {
+	 *             
+	 *             init : function() {
+	 *                 this._super( arguments );
+	 *                 
+	 *                 this.listen( {
+	 *                     '#userPanel' : {
+	 *                         'show' : this.onUserPanelShow,
+	 *                         'hide' : this.onUserPanelHide
+	 *                     },
+	 *                     '#submitButton' : {
+	 *                         'click' : this.onSubmitClick
+	 *                     }
+	 *                 } );
+	 *             },
+	 *             
+	 *             
+	 *             this.onUserPanelShow : function( panel ) {
+	 *                 console.log( "User panel has been shown" );
+	 *             },
+	 *             
+	 *             this.onUserPanelHide : function( panel ) {
+	 *                 console.log( "User panel has been hidden" );
+	 *             },
+	 *             
+	 *             this.onSubmitClick : function( button ) {
+	 *                 console.log( "Submit button has been clicked" );
+	 *             }
+	 *         
+	 *         } );
+	 *         
+	 *         
+	 *         return UserController;
+	 *         
+	 *     } );
+	 * 
+	 * All event handler methods are called in the scope of the Controller. See {@link #listen} for more details.
 	 */
 	var Controller = Observable.extend( {
 		
@@ -176,6 +226,36 @@ define( [
 		 *   first use of the ref.
 		 */
 		
+		/**
+		 * @protected
+		 * @property {Object} listeners
+		 * 
+		 * An Object (map) which stores the listeners registered from {@link #listen}.
+		 * 
+		 * This Object is keyed by the event names which are registered, and its values are an array of objects, each of which
+		 * have properties: `selector` and `handlerFn`.
+		 * 
+		 * An example of what this map looks like is this:
+		 * 
+		 *     {
+		 *         'click' : [
+		 *             { selector: '#myCmp1', handlerFn: this.onMyCmp1Click },
+		 *             { selector: 'button',  handlerFn: this.onButtonClick }
+		 *         ],
+		 *         'keyup' : [
+		 *             { selector: '#searchTextField', handlerFn: this.onSearchFieldKeyUp }
+		 *         ]
+		 *     }
+		 */
+		
+		/**
+		 * @protected
+		 * @property {Boolean} eventBusSubscribed
+		 * 
+		 * Flag which is set to true once this controller has subscribed to the {@link jqc.app.EventBus}, to listen for all
+		 * {@link jqc.Component} events.
+		 */
+		
 		
 		/**
 		 * @constructor
@@ -206,6 +286,8 @@ define( [
 				this.addRef( refsConfig );
 			}
 			
+			this.listeners = {};
+			
 			this.init();
 		},
 		
@@ -218,6 +300,11 @@ define( [
 		 * @method init
 		 */
 		init : Jqc.emptyFn,
+		
+		
+		// ------------------------------------
+		
+		// References (Refs) Functionality
 		
 		
 		/**
@@ -313,24 +400,138 @@ define( [
 		},
 		
 		
+		// ------------------------------------
+		
+		// Event Listening Functionality
+		
 		/**
-		 * Destroys the Controller by removing all {@link #property-refs references} and removing the listeners that
-		 * have been set up.
+		 * Adds event listeners to components selected via {@link jqc.ComponentQuery} selectors. The `selectors` argument accepts an 
+		 * Object (map) of component selector strings as its keys, and a map of event names -&gt; handler functions as its values.
+		 * 
+		 * For example, in this controller, we may want to handle the click event of all {@link jqc.button.Button} components which 
+		 * exist under the {@link #view}, as well as a {@link jqc.Anchor} component with the id "myAnchor".
+		 * 
+		 *     define( [
+		 *         'jqc/app/Controller'
+		 *     ], function( Controller ) {
+		 *         
+		 *         var MyController = Controller.extend( {
+		 *             
+		 *             init : function() {
+		 *                 this._super( arguments );
+		 *                 
+		 *                 this.listen( {
+		 *                     'button' : {   // select all Button components
+		 *                         'click' : this.onButtonClick
+		 *                     },
+		 *                     '#myAnchor' : {   // select component by id
+		 *                         'click' : this.onAnchorClick
+		 *                     }
+		 *                 } );
+		 *             },
+		 *             
+		 *             
+		 *             onButtonClick : function( button ) {
+		 *                 console.log( "clicked the button with text: ", button.text );
+		 *             },
+		 *             
+		 *             
+		 *             onAnchorClick : function( anchor ) {
+		 *                 console.log( "you clicked the anchor" );
+		 *             }
+		 *             
+		 *         } );
+		 *     
+		 *     } );
+		 * 
+		 * Note that handlers are always called in the scope (`this` reference) of the Controller.
+		 * 
+		 * See {@link jqc.ComponentQuery} for more information on component selector strings.
+		 * 
+		 * @param {Object} selectors An Object (map) where the keys are component selector strings, and the values are Objects (maps)
+		 *   which map event names to handler functions. See the description of this method for details.
+		 */
+		listen : function( selectors ) {
+			if( !this.eventBusSubscribed )
+				EventBus.subscribe( this.onComponentEvent, this );
+			
+			var listeners = this.listeners;
+			
+			// Create the internal `listeners` map keyed by event names, and whose values are arrays of objects. Each object
+			// has properties: `selector` and `handlerFn`.
+			_.forOwn( selectors, function( listenersCfg, selector ) {
+				_.forOwn( listenersCfg, function( handlerFn, eventName ) {
+					var eventListeners = listeners[ eventName ] = listeners[ eventName ] || [];
+					
+					eventListeners.push( {
+						selector  : selector,
+						handlerFn : handlerFn
+					} );
+				} );
+			} );
+		},
+		
+		
+		/**
+		 * Handles an event being fired by a component, from the {@link jqc.app.EventBus EventBus}. Calls the handlers
+		 * that are registered for the particular `eventName`, and that match the selector which was set up in {@link #listen}.
+		 * 
+		 * @protected
+		 * @param {jqc.Component} component The Component which fired the event.
+		 * @param {String} eventName The name of the event which was fired.
+		 * @param {Mixed[]} fireEventArgs The arguments provided to the original {@link Observable#fireEvent fireEvent} call.
+		 *   This does not include the event name.
+		 */
+		onComponentEvent : function( component, eventName, fireEventArgs ) {
+			var eventListeners = this.listeners[ eventName ],
+			    ret;
+			
+			if( eventListeners ) {  // if there are any listeners for this event name
+				var controllerView = this.view;
+				
+				for( var i = 0, len = eventListeners.length; i < len; i++ ) {
+					var selector = eventListeners[ i ].selector;
+					
+					// If the Component that fired the event matches a registered selector, and that Component is either the `view`
+					// that the controller is working with or a descendant of it, then call the handler function.
+					if( ComponentQuery.is( component, selector ) && ( component === controllerView || component.isDescendantOf( controllerView ) ) ) {
+						var callResult = eventListeners[ i ].handlerFn.apply( this, fireEventArgs );  // call the handler function
+						if( callResult === false ) {
+							ret = false;  // `false` return to cancel the default action (if any). This is used in 'before' events, where returning false will cancel the actual event's action
+						}
+					}
+				}
+			}
+			
+			return ret;
+		},
+		
+		
+		// ------------------------------------
+		
+		
+		/**
+		 * Destroys the Controller by removing all {@link #property-refs references}, and removing any {@link #property-listeners}
+		 * that have been set up.
 		 * 
 		 * Subclasses should not override this method, but instead override the {@link #onDestroy} hook method
-		 * to implement any subclass-specific destruction processing.
+		 * to implement any subclass-specific destruction processing. Subclass overrides of {@link #onDestroy}
+		 * should call the superclass method at the end of their subclass-specific processing.
 		 */
 		destroy : function() {
 			this.onDestroy();
 			
 			this.fireEvent( 'destroy', this );
 			this.purgeListeners();  // Note: purgeListeners() must be called after 'destroy' event has fired!
+			
+			if( this.eventBusSubscribed )
+				EventBus.unsubscribe( this.onComponentEvent, this );
 		},
 		
 		
 		/**
 		 * Hook method which should be overridden by subclasses to implement their own subclass-specific
-		 * destruction logic. The superclass method should be called after subclass-specific processing.
+		 * destruction logic. The superclass method should be called after any subclass-specific processing.
 		 * 
 		 * @protected
 		 * @method onDestroy

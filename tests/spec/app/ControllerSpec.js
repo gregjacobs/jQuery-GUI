@@ -7,7 +7,7 @@ define( [
 	
 	'jqc/Component',     // type: 'component'
 	'jqc/Container',     // type: 'container'
-	'jqc/panel/Panel'   // type: 'panel
+	'jqc/panel/Panel'    // type: 'panel'
 ], function( _, ComponentQuery, Controller, Component, Container, Panel ) {
 	
 	describe( 'jqc.app.Controller', function() {
@@ -178,6 +178,10 @@ define( [
 			
 		} );
 		
+		// ------------------------------------
+		
+		// References (Refs) Functionality
+		
 		
 		describe( 'addRef()', function() {
 			var view, controller;
@@ -327,6 +331,216 @@ define( [
 				expect( ComponentQuery.query.calls.length ).toBe( 1 );  // check that ComponentQuery.query() was still only called once, using the cache to return the reference
 				
 				controller.destroy();
+			} );
+			
+		} );
+		
+		
+		// ------------------------------------
+		
+		// Event Listening Functionality
+		
+		
+		describe( 'listen()', function() {
+			var view,
+			    controller;
+			
+			beforeEach( function() {
+				view = new Container();
+				controller = new Controller( { view: view } );
+			} );
+			
+			afterEach( function() {
+				view.destroy();
+				controller.destroy();
+			} );
+			
+			
+			it( "should add the listeners provided to the `listeners` map", function() {
+				function doSomethingHandler( cmp ) {}
+				function doSomethingElseHandler( cmp ) {}
+				function cmpClickHandler( cmp ) {}
+				function anchorClickHandler( anchor ) {}
+				
+				controller.listen( {
+					'component' : {
+						'dosomething'     : doSomethingHandler,
+						'dosomethingelse' : doSomethingElseHandler,
+						'click' : cmpClickHandler
+					},
+					'#myAnchor' : {
+						'click' : anchorClickHandler
+					}
+				} );
+				
+				expect( controller.listeners ).toEqual( {
+					'click' : [
+						{ selector: 'component', handlerFn: cmpClickHandler },
+						{ selector: '#myAnchor', handlerFn: anchorClickHandler }
+					],
+					'dosomething' : [
+						{ selector: 'component', handlerFn: doSomethingHandler }
+					],
+					'dosomethingelse' : [
+						{ selector: 'component', handlerFn: doSomethingElseHandler }
+					]
+				} );
+			} );
+			
+		} );
+		
+		
+		describe( 'onComponentEvent()', function() {
+			var view,
+			    component,
+			    container,
+			    panel,
+			    controller;
+			
+			beforeEach( function() {
+				component = new Component( { id: 'cmp1' } );
+				container = new Container( { id: 'cmp2' } );
+				panel = new Panel( { id: 'cmp3' } );
+				
+				view = new Container( {
+					id : 'cmp0',
+					
+					items : [
+						component,
+						container,
+						panel
+					]
+				} );
+				
+				controller = new Controller( { view: view } );
+			} );
+			
+			afterEach( function() {
+				view.destroy();  // note: will destroy the child components
+				controller.destroy();
+			} );
+			
+			
+			it( "should call the appropriate handler function based on the listeners that have been set up, and the event that is fired", function() {
+				var componentClickCount = 0,
+				    panelClickCount = 0,
+				    cmp2SomethingCount = 0;
+				
+				function componentClickHandler( component, arg1, arg2, arg3 ) {
+					componentClickCount++;
+					
+					// Make sure args are passed correctly
+					expect( component instanceof Component ).toBe( true );
+					expect( arg1 ).toBe( 1 );
+					expect( arg2 ).toBe( 2 );
+					expect( arg3 ).toBe( 3 );
+				}
+				function panelClickHandler( panel ) {
+					panelClickCount++;
+					
+					expect( panel instanceof Panel ).toBe( true );
+				}
+				function cmp2SomethingHandler( container, arg1, arg2, arg3 ) {
+					cmp2SomethingCount++;
+					
+					// Make sure args are passed correctly
+					expect( container instanceof Container ).toBe( true );
+					expect( arg1 ).toBe( 1 );
+					expect( arg2 ).toBe( 2 );
+					expect( arg3 ).toBe( 3 );
+				}
+				
+				controller.listen( {
+					'component' : {
+						'click' : componentClickHandler
+					},
+					'panel' : {
+						'click' : panelClickHandler
+					},
+					'#cmp2' : {
+						'something' : cmp2SomethingHandler
+					}
+				} );
+				
+				
+				// Simulate 'click' on component
+				component.fireEvent( 'click', component, 1, 2, 3 );
+				expect( componentClickCount ).toBe( 1 );  // Component is a Panel superclass, so its selector matches
+				
+				// Simulate 'click' on panel
+				panel.fireEvent( 'click', panel, 1, 2, 3 );
+				expect( componentClickCount ).toBe( 2 );  // Component is a Panel superclass, so its selector matches, and its count increased
+				expect( panelClickCount ).toBe( 1 );     
+				expect( cmp2SomethingCount ).toBe( 0 );
+				
+				// Simulate 'something' event on #cmp2 (the Container)
+				container.fireEvent( 'something', container, 1, 2, 3 );
+				expect( componentClickCount ).toBe( 2 );  // remains unchanged
+				expect( panelClickCount ).toBe( 1 );      // remains unchanged
+				expect( cmp2SomethingCount ).toBe( 1 );
+			} );
+			
+			
+			it( "should return false if any handler returns false", function() {
+				var componentClickCount = 0,
+				    containerClickCount = 0,
+				    panelClickCount = 0;
+				
+				controller.listen( {
+					'component' : {
+						'click' : function() {
+							componentClickCount++;
+						}
+					},
+					'container' : {
+						'click' : function() {
+							containerClickCount++;
+							return false;
+						}
+					},
+					'panel' : {
+						'click' : function() {
+							panelClickCount++;
+						}
+					}
+				} );
+				
+				// Simulate 'click' on panel. All handlers should be fired, as the others match Panel superclasses.
+				// The second handler (the 'container' handler) returns false, but all handlers should be called (as
+				// order of handler registration should not matter).
+				var returnVal = panel.fireEvent( 'click', panel );
+				expect( componentClickCount ).toBe( 1 );
+				expect( containerClickCount ).toBe( 1 );
+				expect( panelClickCount ).toBe( 1 );
+				expect( returnVal ).toBe( false );
+			} );
+			
+			
+			it( "should only call the handler function for a Component that matches a selector, *and* is either the `view` that the Controller is working with, or a descendant of it", function() {
+				var componentClickCount = 0;
+				
+				var randomOtherComponent = new Component();
+				
+				controller.listen( {
+					'component' : {
+						'click' : function() {
+							componentClickCount++;
+						}
+					}
+				} );
+				
+				
+				// Simulate 'click' event on the outer container; the `view` itself
+				view.fireEvent( 'click' );
+				expect( componentClickCount ).toBe( 1 );
+				
+				// Simulate 'click' event on the child component
+				component.fireEvent( 'click' );
+				expect( componentClickCount ).toBe( 2 );
+				
+				// Simulate 'click' event on the random "other" component
+				randomOtherComponent.fireEvent( 'click' );
+				expect( componentClickCount ).toBe( 2 );  // should not have changed; `randomOtherComponent` is not a component in the scope of the Controller's `view`
 			} );
 			
 		} );
