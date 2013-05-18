@@ -88,12 +88,43 @@ define( [
 		
 		
 		/**
-		 * @cfg {jqc.Component/jqc.Component[]} view (required)
+		 * @cfg {jqc.Component} view (required)
 		 * 
-		 * The view(s) that the Controller should manage. References retrieved for components and events listened
-		 * to on components must exist as one of the components provided to this config, or as a descendant of one
-		 * of the components provided to this config (in which case, the particular component must be a {@link jqc.Container}
-		 * to have descendants).
+		 * The view Component that the Controller should manage. {@link #cfg-refs References} retrieved for components, and events 
+		 * listened to must either be on the Component provided to this config, or a descendant of the component (which
+		 * in this case is a {@link jqc.Container Container}) provided to this config.
+		 * 
+		 * Most often, this config will be the the page's outermost {@link jqc.Viewport Viewport} (which itself is a 
+		 * {@link jqc.Container Container} subclass). However, this may also be any 
+		 * {@link jqc.Component Component}/{@link jqc.Container Container}, which will limit the scope of what component(s) the 
+		 * Controller controls.
+		 * 
+		 * As an example setup for a page:
+		 * 
+		 *     require( [
+		 *         'jquery',
+		 *         'jqc/Viewport',
+		 *         'my/app/Controller'  // your own jqc.app.Controller subclass, which implements your page's logic
+		 *     ], function( $, Viewport, Controller ) {
+		 *         
+		 *         var viewport = new Viewport( {
+		 *             items : [ 
+		 *                 // all of the page's view components go here,
+		 *                 // in their nested hierarchy
+		 *             ]
+		 *         } );
+		 *             
+		 *         var controller = new Controller( {
+		 *             view : viewport   // pass the Viewport as the view that the Controller controls
+		 *         } );
+		 *         
+		 *         
+		 *         // Render the Viewport on doc ready
+		 *         $( document ).ready( function() {
+		 *             viewport.render( 'body' );
+		 *         } );
+		 *         
+		 *     } );
 		 */
 		
 		/**
