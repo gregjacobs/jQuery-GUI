@@ -99,6 +99,53 @@ define( [
 		} );
 		
 		
+		describe( 'is()', function() {
+			var cmps, nestedContainer;
+			
+			beforeEach( function() {
+				cmps = [
+					new Component( { id: 'cmp1' } ),
+				    new Container( { id: 'cmp2' } ),
+				    new Panel( { id: 'cmp3' } )
+				];
+			} );
+			
+			afterEach( function() {
+				_.forEach( cmps, function( cmp ) { cmp.destroy(); } );
+			} );
+			
+			
+			it( "should return true for components that match the selector", function() {
+				expect( ComponentQuery.is( cmps[ 0 ], '#cmp1' ) ).toBe( true );
+				expect( ComponentQuery.is( cmps[ 0 ], 'component' ) ).toBe( true );
+				
+				expect( ComponentQuery.is( cmps[ 1 ], '#cmp2' ) ).toBe( true );
+				expect( ComponentQuery.is( cmps[ 1 ], 'component' ) ).toBe( true );
+				expect( ComponentQuery.is( cmps[ 1 ], 'container' ) ).toBe( true );
+				
+				expect( ComponentQuery.is( cmps[ 2 ], '#cmp3' ) ).toBe( true );
+				expect( ComponentQuery.is( cmps[ 2 ], 'component' ) ).toBe( true );
+				expect( ComponentQuery.is( cmps[ 2 ], 'container' ) ).toBe( true );
+				expect( ComponentQuery.is( cmps[ 2 ], 'panel' ) ).toBe( true );
+			} );
+			
+			
+			it( "should return false for components that don't match the selector", function() {
+				expect( ComponentQuery.is( cmps[ 0 ], '#cmp99' ) ).toBe( false );
+				expect( ComponentQuery.is( cmps[ 0 ], 'container' ) ).toBe( false );
+				
+				expect( ComponentQuery.is( cmps[ 1 ], '#cmp99' ) ).toBe( false );
+				expect( ComponentQuery.is( cmps[ 1 ], 'panel' ) ).toBe( false );
+				
+				expect( ComponentQuery.is( cmps[ 2 ], '#cmp99' ) ).toBe( false );
+				expect( ComponentQuery.is( cmps[ 2 ], 'button' ) ).toBe( false );
+			} );
+			
+		} );
+		
+		
+		// -----------------------------------
+		
 		
 		describe( 'getDescendants()', function() {
 			

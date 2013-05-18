@@ -48,37 +48,39 @@ define( [
 				}
 			}
 			
-			var result;
-			if( selector.charAt( 0 ) === '#' ) {  // ID selector
-				result = this.filterById( workingSet, selector.substr( 1 ) );
-			} else {
-				result = this.filterByType( workingSet, selector );
-			}
-			
-			return _.unique( result );  // return only the unique set of components (i.e. duplicates removed)
+			return this.filterBySelector( workingSet, selector );
 		},
 		
 		
 		/**
-		 * Retrieves the descendants of the provided {@link jqc.Container Container}.
+		 * Determines if a given `component` is matched by the provided `selector`.
+		 * 
+		 * @param {jqc.Component} component The Component(s) to test.
+		 * @param {String} selector The selector string to test the `component` against.
+		 * @return {Boolean} `true` if the Component matches the selector, `false` otherwise.
+		 */
+		is : function( component, selector ) {
+			var components = [ component ];
+			return ( this.filterBySelector( components, selector ).length === 1 );  // returns true if the length is still 1 after applying the selector as a filter  
+		},
+		
+		
+		/**
+		 * Applies the given `selector` against a set of `components`. The components array will be filtered based
+		 * on the selector, and the resulting array returned.
 		 * 
 		 * @protected
-		 * @param {jqc.Container} container
-		 * @param {jqc.Component[]} All of the descendant components of the `container`. 
+		 * @param {jqc.Component[]} The list of components which is to be filtered by the selector.
+		 * @param {String} selector The selector string to apply to the set of components.
+		 * @return {jqc.Component[]} The unique set of Components that matched the selector. Duplicates are removed.
 		 */
-		getDescendants : function( container ) {
-			var items = container.getItems(),
-			    result = [];
-			
-			for( var i = 0, len = items.length; i < len; i++ ) {
-				var item = items[ i ];
-				
-				result.push( item );
-				if( item instanceof Container ) {
-					result.push.apply( result, this.getDescendants( item ) );
-				}
+		filterBySelector : function( components, selector ) {
+			if( selector.charAt( 0 ) === '#' ) {  // ID selector
+				components = this.filterById( components, selector.substr( 1 ) );
+			} else {
+				components = this.filterByType( components, selector );
 			}
-			return result;
+			return _.unique( components );  // return only the unique set of components (i.e. duplicates removed)
 		},
 		
 		
@@ -114,6 +116,29 @@ define( [
 			
 			var _Class = Class;  // local ref to be closer to the below closure
 			return _.filter( components, function( component ) { return _Class.isInstanceOf( component, type ); } );
+		},
+		
+		
+		/**
+		 * Retrieves the descendants of the provided {@link jqc.Container Container}.
+		 * 
+		 * @protected
+		 * @param {jqc.Container} container
+		 * @param {jqc.Component[]} All of the descendant components of the `container`. 
+		 */
+		getDescendants : function( container ) {
+			var items = container.getItems(),
+			    result = [];
+			
+			for( var i = 0, len = items.length; i < len; i++ ) {
+				var item = items[ i ];
+				
+				result.push( item );
+				if( item instanceof Container ) {
+					result.push.apply( result, this.getDescendants( item ) );
+				}
+			}
+			return result;
 		}
 		
 	} );
