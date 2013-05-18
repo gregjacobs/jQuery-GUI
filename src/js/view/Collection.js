@@ -301,7 +301,7 @@ define( [
 		
 		
 		/**
-		 * Applies the {@link loadingHeight} to the CollectionView's {@link #$el element}, if the current height of the
+		 * Applies the {@link #loadingHeight} to the CollectionView's {@link #$el element}, if the current height of the
 		 * CollectionView is less than the configured {@link #loadingHeight}. It also only applies the {@link #loadingHeight}
 		 * if the {@link #maskOnLoad} config is `true`.
 		 * 
@@ -321,7 +321,7 @@ define( [
 		
 		
 		/**
-		 * Removes the {@link loadingHeight} from the CollectionView's {@link #$el element}, restoring any {@link #minHeight} that
+		 * Removes the {@link #loadingHeight} from the CollectionView's {@link #$el element}, restoring any {@link #minHeight} that
 		 * the CollectionView has configured. This is only done if the {@link #loadingHeight} was applied in {@link #applyLoadingHeight}.
 		 * 
 		 * This is called when the {@link #collection} has finished loading.
