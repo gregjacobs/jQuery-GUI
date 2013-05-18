@@ -1992,6 +1992,18 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		},
 		
 		
+		/**
+		 * Determines if this Component is a descendent of the provided `container`.
+		 * 
+		 * @param {jqc.Container} container
+		 * @return {Boolean} `true` if the Component is a descendant of the `container`, otherwise `false`.
+		 */
+		isDescendantOf : function( container ) {
+			for( var p = this.parentContainer; p && p !== container; p = p.parentContainer );  // intentional semicolon, loop does the work
+			return !!p;
+		},
+		
+		
 		// -------------------------------------
 		
 		

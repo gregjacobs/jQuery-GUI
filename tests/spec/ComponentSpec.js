@@ -2360,8 +2360,61 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				expect( cmps[ 6 ].findParentById( 'second' ) ).toBe( cmps[ 6 ].findParentById( 'second' ) );  // Container 'second' not found from cmps[ 6 ]
 				expect( cmps[ 6 ].findParentById( 'second_nested' ) ).toBe( cmps[ 6 ].findParentById( 'second_nested' ) );  // Container 'second_nested' not found from cmps[ 6 ]
 			} );
-		} );   // eo "General Tests" test case
+		} );
 		
+		
+		describe( 'isDescendantOf()', function() {
+			var component,
+			    container1,
+			    container2,
+			    container3;
+			
+			beforeEach( function() {
+				component = new Component();
+				container1 = new Container();
+				container2 = new Container();
+				container3 = new Container();
+			} );
+			
+			afterEach( function() {
+				component.destroy();
+				container1.destroy();
+				container2.destroy();
+				container3.destroy();
+			} );
+			
+			
+			it( "should return true when the Component is a direct child of a Container", function() {
+				container1.add( component );
+				
+				expect( component.isDescendantOf( container1 ) ).toBe( true );
+			} );
+			
+			
+			it( "should return true when the Component is a deep descendant of a Container", function() {
+				container1.add( container2 );
+				container2.add( container3 );
+				container3.add( component );
+				
+				expect( component.isDescendantOf( container1 ) ).toBe( true );
+			} );
+			
+			
+			it( "should return false if the Component is not a descendant of the provided Container", function() {
+				container1.add( component );
+				
+				expect( component.isDescendantOf( container2 ) ).toBe( false );
+			} );
+			
+			
+			it( "should return false if the Component doesn't have any parent", function() {
+				expect( component.isDescendantOf( container1 ) ).toBe( false );
+			} );
+			
+		} );
+		
+		
+		// -----------------------------------
 		
 		
 		describe( 'destroy()', function() {
