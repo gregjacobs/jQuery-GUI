@@ -3493,6 +3493,18 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		},
 		
 		
+		/**
+		 * Determines if this Component is a descendent of the provided `container`.
+		 * 
+		 * @param {jqc.Container} container
+		 * @return {Boolean} `true` if the Component is a descendant of the `container`, otherwise `false`.
+		 */
+		isDescendantOf : function( container ) {
+			for( var p = this.parentContainer; p && p !== container; p = p.parentContainer );  // intentional semicolon, loop does the work
+			return !!p;
+		},
+		
+		
 		// -------------------------------------
 		
 		
@@ -10571,6 +10583,17 @@ define('jqc/view/Collection', [
 		},
 		
 		
+		/**
+		 * Retrieves the {@link #collection} which is currently bound to the CollectionView.
+		 * 
+		 * @return {data.Collection} The Collection which is currently bound to the CollectionView, or `null`
+		 *   if there is no currently-bound Collection.
+		 */
+		getCollection : function() {
+			return this.collection || null;
+		},
+		
+		
 		// -----------------------------------
 		
 		// Implementation of CollectionBindable mixin methods
@@ -10649,7 +10672,7 @@ define('jqc/view/Collection', [
 		
 		
 		/**
-		 * Applies the {@link loadingHeight} to the CollectionView's {@link #$el element}, if the current height of the
+		 * Applies the {@link #loadingHeight} to the CollectionView's {@link #$el element}, if the current height of the
 		 * CollectionView is less than the configured {@link #loadingHeight}. It also only applies the {@link #loadingHeight}
 		 * if the {@link #maskOnLoad} config is `true`.
 		 * 
@@ -10669,7 +10692,7 @@ define('jqc/view/Collection', [
 		
 		
 		/**
-		 * Removes the {@link loadingHeight} from the CollectionView's {@link #$el element}, restoring any {@link #minHeight} that
+		 * Removes the {@link #loadingHeight} from the CollectionView's {@link #$el element}, restoring any {@link #minHeight} that
 		 * the CollectionView has configured. This is only done if the {@link #loadingHeight} was applied in {@link #applyLoadingHeight}.
 		 * 
 		 * This is called when the {@link #collection} has finished loading.
@@ -10978,6 +11001,17 @@ define('jqc/view/Model', [
 			if( model && this.maskOnLoad && model.isLoading() ) {
 				this.mask();
 			}*/
+		},
+		
+		
+		/**
+		 * Retrieves the {@link #model} which is currently bound to the ModelView
+		 * 
+		 * @return {data.Model} The Model which is currently bound to the ModelView, or `null`
+		 *   if there is no currently-bound Model.
+		 */
+		getModel : function() {
+			return this.model || null;
 		},
 		
 		
