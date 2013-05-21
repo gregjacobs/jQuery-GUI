@@ -144,6 +144,17 @@ define( [
 		},
 		
 		
+		/**
+		 * Retrieves the {@link #model} which is currently bound to the ModelView
+		 * 
+		 * @return {data.Model} The Model which is currently bound to the ModelView, or `null`
+		 *   if there is no currently-bound Model.
+		 */
+		getModel : function() {
+			return this.model || null;
+		},
+		
+		
 		// -----------------------------------
 		
 		// Model binding methods
