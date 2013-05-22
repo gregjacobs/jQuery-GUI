@@ -58,7 +58,7 @@ function( jQuery, Mask ) {
 		} );
 		
 		
-		xdescribe( 'isShown()', function() {
+		xdescribe( 'isVisible()', function() {
 			
 		} );
 		

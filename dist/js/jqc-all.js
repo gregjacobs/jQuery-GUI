@@ -750,11 +750,11 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		
 		/**
 		 * @protected
-		 * @property {Boolean} shown
+		 * @property {Boolean} visible
 		 * 
-		 * Stores if the mask is currently being shown or not. Retrieve with {@link #isShown}.
+		 * Stores if the mask is currently being shown or not (visible). Retrieve with {@link #isVisible}.
 		 */
-		shown : false,
+		visible : false,
 		
 		
 		/**
@@ -860,10 +860,9 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 * @param {String} msg The message. Accepts HTML. To remove the message, provide an empty string.
 		 */
 		setMsg : function( msg ) {
-			if( !this.rendered ) {
-				this.msg = msg;
-				
-			} else {
+			this.msg = msg;
+			
+			if( this.rendered ) {
 				this.$contentEl.toggleClass( this.msgVisibleCls, !!msg );
 				this.$msgEl.html( msg );
 			}
@@ -888,11 +887,11 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		/**
 		 * Shows the mask over the target element.
 		 * 
-		 * Note that if the mask is already shown, and its height needs to be recalculated because the underlying element's 
+		 * Note that if the mask is already visible, and its height needs to be recalculated because the underlying element's 
 		 * size has changed, this method may be called again to redraw the mask.
 		 */
 		show : function() {
-			if( !this.isShown() ) {
+			if( !this.isVisible() ) {
 				// First, make sure the masking elements have been created (lazily created upon showing the mask, not in the constructor)
 				this.initMaskElements();
 				
@@ -927,14 +926,14 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 				this.repositionContentEl();
 				var me = this;  // for closure
 				var repositionIntervalId = setInterval( function() {
-					if( me.isShown() ) {
+					if( me.isVisible() ) {
 						me.repositionContentEl();
 					} else {
 						clearInterval( repositionIntervalId );  // When no longer shown, clear the interval
 					}
 				}, 100 );
 				
-				this.shown = true;
+				this.visible = true;
 			}
 		},
 		
@@ -946,11 +945,13 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 */
 		repositionContentEl : function() {
 			// using jQuery UI positioning utility to center the content element
-			this.$contentEl.position( {
-				my: 'center center',
-				at: 'center center',
-				of: this.$targetEl
-			} );
+			if( this.isContentElVisible() ) {
+				this.$contentEl.position( {
+					my: 'center center',
+					at: 'center center',
+					of: this.$targetEl
+				} );
+			}
 		},
 		
 		
@@ -958,15 +959,15 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 * Hides the mask.
 		 */
 		hide : function() {
-			// Should only hide if the mask is currently shown.
-			if( this.isShown() ) {
+			// Should only hide if the mask is currently visible.
+			if( this.isVisible() ) {
 				// Hide the mask and the content element (if it exists), and restore the target element 
 				// to its original state (i.e. scrollbars allowed, and no positioning context if it didn't have one)
 				this.$overlayEl.detach();
 				this.$contentEl.detach();
 				this.$targetEl.removeClass( 'jqc-masked' ).removeClass( 'jqc-masked-relative' );
 				
-				this.shown = false;
+				this.visible = false;
 			}
 		},
 		
@@ -974,10 +975,21 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		/**
 		 * Determines if the Mask is currently shown (visible).
 		 * 
-		 * @return {Boolean} True if the mask is currently shown (visible).
+		 * @return {Boolean} `true` if the mask is currently shown (visible), `false` otherwise.
 		 */
-		isShown : function() {
-			return this.shown;
+		isVisible : function() {
+			return this.visible;
+		},
+		
+		
+		/**
+		 * Determines if the {@link #$contentEl} is visible. This is used internally.
+		 * 
+		 * @protected
+		 * @return {Boolean} `true` if the {@link #$contentEl} is visible, `false` otherwise.
+		 */
+		isContentElVisible : function() {
+			return ( this.spinner || !!this.msg );
 		},
 		
 		
