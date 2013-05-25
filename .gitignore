@@ -4,3 +4,4 @@
 .sass-cache
 web.config
 /docs
+/node_modules
