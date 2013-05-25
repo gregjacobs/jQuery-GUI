@@ -12106,6 +12106,17 @@ define('jqc/view/Collection', [
 		},
 		
 		
+		/**
+		 * Retrieves the {@link #collection} which is currently bound to the CollectionView.
+		 * 
+		 * @return {data.Collection} The Collection which is currently bound to the CollectionView, or `null`
+		 *   if there is no currently-bound Collection.
+		 */
+		getCollection : function() {
+			return this.collection || null;
+		},
+		
+		
 		// -----------------------------------
 		
 		// Implementation of CollectionBindable mixin methods
@@ -12513,6 +12524,17 @@ define('jqc/view/Model', [
 			if( model && this.maskOnLoad && model.isLoading() ) {
 				this.mask();
 			}*/
+		},
+		
+		
+		/**
+		 * Retrieves the {@link #model} which is currently bound to the ModelView
+		 * 
+		 * @return {data.Model} The Model which is currently bound to the ModelView, or `null`
+		 *   if there is no currently-bound Model.
+		 */
+		getModel : function() {
+			return this.model || null;
 		},
 		
 		

@@ -96,6 +96,35 @@ define( [
 		} );
 		
 		
+		describe( 'getModel()', function() {
+			
+			it( "should return null if there is no currently-bound Model", function() {
+				var modelView = new ConfiguredModelView();
+				
+				expect( modelView.getModel() ).toBe( null );
+			} );
+			
+			
+			it( "should return the bound Model that was configured with the ModelView", function() {
+				var model = new UserModel(),
+				    modelView = new ConfiguredModelView( { model: model } );
+				
+				expect( modelView.getModel() ).toBe( model );
+			} );
+			
+			
+			it( "should return the currently-bound Model, bound by `bindModel()`", function() {
+				var model = new UserModel(),
+				    modelView = new ConfiguredModelView();
+				
+				modelView.bindModel( model );
+				
+				expect( modelView.getModel() ).toBe( model );
+			} );
+			
+		} );
+		
+		
 		describe( 'bindModel()', function() {
 			var SimpleModelView = ModelView.extend( {
 				tpl : '<span>Testing 123</span>'

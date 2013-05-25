@@ -223,6 +223,17 @@ define( [
 		},
 		
 		
+		/**
+		 * Retrieves the {@link #collection} which is currently bound to the CollectionView.
+		 * 
+		 * @return {data.Collection} The Collection which is currently bound to the CollectionView, or `null`
+		 *   if there is no currently-bound Collection.
+		 */
+		getCollection : function() {
+			return this.collection || null;
+		},
+		
+		
 		// -----------------------------------
 		
 		// Implementation of CollectionBindable mixin methods

@@ -223,6 +223,35 @@ define( [
 		} );
 		
 		
+		describe( 'getCollection()', function() {
+			
+			it( "should return null if there is no currently-bound Collection", function() {
+				var collectionView = new ConfiguredCollectionView();
+				
+				expect( collectionView.getCollection() ).toBe( null );
+			} );
+			
+			
+			it( "should return the bound Collection that was configured with the CollectionView", function() {
+				var collection = new Collection(),
+				    collectionView = new ConfiguredCollectionView( { collection: collection } );
+				
+				expect( collectionView.getCollection() ).toBe( collection );
+			} );
+			
+			
+			it( "should return the currently-bound Collection, bound by `bindCollection()`", function() {
+				var collection = new Collection(),
+				    collectionView = new ConfiguredCollectionView();
+				
+				collectionView.bindCollection( collection );
+				
+				expect( collectionView.getCollection() ).toBe( collection );
+			} );
+			
+		} );
+		
+		
 		describe( 'bindCollection()', function() {
 			var SimpleCollectionView = CollectionView.extend( {
 				tpl : '<span>Testing 123</span>',
