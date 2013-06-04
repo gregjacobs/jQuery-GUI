@@ -10494,6 +10494,144 @@ define('jqc/form/field/TextArea', [
 	
 } );
 /*global define */
+define('jqc/form/field/autocomplete/Menu', [
+	'jqc/Overlay'
+], function( Overlay ) {
+	
+	/**
+	 * @abstract
+	 * @class jqc.form.field.autocomplete.Menu
+	 * @extends jqc.Overlay
+	 * 
+	 * Base class for the actual menu that is displayed to the user as they type, in the 
+	 * {@link jqc.form.field.autocomplete.Autocomplete Autocomplete} field.
+	 */
+	var AutocompleteMenu = Overlay.extend( {
+		abstractClass : true,
+		
+		/**
+		 * @cfg {data.Collection} collection (required)
+		 * 
+		 * The Collection which is used to provide the suggestions.
+		 */
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		initComponent : function() {
+			this.addEvents(
+				/**
+				 * Fires when an item has been selected. This event is listened to by the {@link jqc.form.field.autocomplete.Autocomplete Autocomplete}
+				 * field, for its own {@link jqc.form.field.autocomplete.Autocomplete#select select} event, and select actions.
+				 * 
+				 * @event select
+				 * @param {jqc.form.field.autocomplete.Menu} menu This Menu instance.
+				 */
+				'select'
+			);
+			
+			this._super( arguments );
+		}
+		
+	} );
+	
+	
+	return AutocompleteMenu;
+	
+} );
+/*global define */
+define('jqc/form/field/autocomplete/ListMenu', [
+	'jqc/form/field/autocomplete/Menu'
+], function( AutocompleteMenu ) {
+	
+	/**
+	 * @class jqc.form.field.autocomplete.Menu
+	 * @extends jqc.Overlay
+	 * 
+	 * Implements a list-style menu for the {@link jqc.form.field.autocomplete.Autocomplete Autocomplete} field.
+	 * This is the default class that will be instantiated for an Autocomplete field, if no other instance is provided
+	 * to the Autocomplete's {@link jqc.form.field.autocomplete.Autocomplete#menu} config.
+	 */
+	var AutocompleteListMenu = AutocompleteMenu.extend( {
+		
+		
+		
+	} );
+	
+	
+	return AutocompleteListMenu;
+	
+} );
+/*global define */
+define('jqc/form/field/autocomplete/Autocomplete', [
+	'jqc/form/field/Text',
+	'jqc/form/field/autocomplete/Menu',
+	'jqc/form/field/autocomplete/ListMenu'  // the default implementation
+], function( TextField, AutocompleteMenu, AutocompleteListMenu ) {
+	
+	/**
+	 * @class jqc.form.field.autocomplete.Autocomplete
+	 * @extends jqc.form.field.Text
+	 * 
+	 * Field which allows a user to begin typing in a value, and then is presented with suggestions in an 
+	 * overlay that appears below the field.
+	 */
+	var Autocomplete = TextField.extend( {
+		
+		/**
+		 * @cfg {data.Collection} collection (required)
+		 * 
+		 * The Collection which is used to provide the suggestions. This may be used with local data that is already
+		 * populated in the collection, or it may be loaded from a remote data source using the Collection's configured
+		 * {@link data.Collection#proxy proxy}.
+		 */
+		
+		/**
+		 * @cfg {Object/jqc.form.field.autocomplete.Menu} menu
+		 * 
+		 * The Autocomplete Menu that displays the suggestions to the user while he/she types.
+		 * 
+		 * This may be either a configuration object for the {@link jqc.form.field.autocomplete.Menu} that will be internally 
+		 * instantiated, or a {@link jqc.form.field.autocomplete.Menu Menu} instance. 
+		 */
+		
+		/**
+		 * @cfg {Number} minChars
+		 * 
+		 * The minimum number of characters that must be typed before the Autocomplete's suggestion {@link #menu} is shown.
+		 */
+		
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		initComponent : function() {
+			this._super( arguments );
+			
+			this.addEvents(
+				/**
+				 * Fires when an item has been selected in the Autocomplete's {@link #menu}.
+				 * 
+				 * @event select
+				 * @param {jqc.form.field.autocomplete.Autocomplete} autocomplete This Autocomplete instance.
+				 */
+				'select'
+			);
+			
+			// If the `menu` provided was an anonymous configuration object, instantiate a ListMenu
+			if( !this.menu instanceof AutocompleteMenu ) {
+				this.menu = new AutocompleteListMenu( this.menu );
+			}
+		}
+		
+	} );
+	
+	return Autocomplete;
+	
+} );
+/*global define */
 define('jqc/layout/Card.Transition', [
 	'Class',
 	'jqc/Jqc'
@@ -12847,4 +12985,4 @@ define('jqc/window/Window', [
 	return Window;
 	
 } );
-require(["jqc/Anchor", "jqc/Component", "jqc/ComponentManager", "jqc/ComponentQuery", "jqc/Container", "jqc/Image", "jqc/Jqc", "jqc/Label", "jqc/Mask", "jqc/Overlay", "jqc/Viewport", "jqc/anim/Animation", "jqc/app/Controller", "jqc/app/EventBus", "jqc/button/Button", "jqc/form/field/Checkbox", "jqc/form/field/Dropdown", "jqc/form/field/Field", "jqc/form/field/Hidden", "jqc/form/field/Radio", "jqc/form/field/Text", "jqc/form/field/TextArea", "jqc/layout/Auto", "jqc/layout/Card.SwitchTransition", "jqc/layout/Card.Transition", "jqc/layout/Card", "jqc/layout/Column", "jqc/layout/Fit", "jqc/layout/HBox", "jqc/layout/Layout", "jqc/layout/VBox", "jqc/panel/Header", "jqc/panel/Panel", "jqc/panel/ToolButton", "jqc/plugin/Plugin", "jqc/tab/Bar", "jqc/tab/Panel", "jqc/tab/Tab", "jqc/template/LoDash", "jqc/template/Template", "jqc/util/CollectionBindable", "jqc/util/Css", "jqc/util/Html", "jqc/util/OptionsStore", "jqc/view/Collection", "jqc/view/Model", "jqc/window/Window"]);
+require(["jqc/Anchor", "jqc/Component", "jqc/ComponentManager", "jqc/ComponentQuery", "jqc/Container", "jqc/Image", "jqc/Jqc", "jqc/Label", "jqc/Mask", "jqc/Overlay", "jqc/Viewport", "jqc/anim/Animation", "jqc/app/Controller", "jqc/app/EventBus", "jqc/button/Button", "jqc/form/field/Checkbox", "jqc/form/field/Dropdown", "jqc/form/field/Field", "jqc/form/field/Hidden", "jqc/form/field/Radio", "jqc/form/field/Text", "jqc/form/field/TextArea", "jqc/form/field/autocomplete/Autocomplete", "jqc/form/field/autocomplete/ListMenu", "jqc/form/field/autocomplete/Menu", "jqc/layout/Auto", "jqc/layout/Card.SwitchTransition", "jqc/layout/Card.Transition", "jqc/layout/Card", "jqc/layout/Column", "jqc/layout/Fit", "jqc/layout/HBox", "jqc/layout/Layout", "jqc/layout/VBox", "jqc/panel/Header", "jqc/panel/Panel", "jqc/panel/ToolButton", "jqc/plugin/Plugin", "jqc/tab/Bar", "jqc/tab/Panel", "jqc/tab/Tab", "jqc/template/LoDash", "jqc/template/Template", "jqc/util/CollectionBindable", "jqc/util/Css", "jqc/util/Html", "jqc/util/OptionsStore", "jqc/view/Collection", "jqc/view/Model", "jqc/window/Window"]);
