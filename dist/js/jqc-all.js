@@ -1,3 +1,12 @@
+/*!
+ * jQuery-Component
+ * Version 0.1.0
+ *
+ * Copyright(c) 2013 Gregory Jacobs.
+ * MIT Licensed. http://www.opensource.org/licenses/mit-license.php
+ *
+ * https://github.com/gregjacobs/jQuery-Component
+ */
 
 /*!
  * jQuery-Component
@@ -1385,132 +1394,6 @@ function( _, Class, Observable ) {
 	
 } );
 
-/*global define */
-define('jqc/ComponentManager', [
-	'require',
-	'jqc/Component'  // loaded via require() call in the code below, as it is a circular dependency
-], function( require ) {
-	
-	/**
-	 * @class jqc.ComponentManager
-	 * @singleton
-	 *
-	 * Object used to manage {@link jqc.Component} "types", and handles instantiating them based on the string that is specified
-	 * for them in the manifest.
-	 */
-	var ComponentManager = {
-		
-		/**
-		 * @private
-		 * @property {Object} componentClasses
-		 * 
-		 * An Object (map) of the {@link jqc.Component} classes which have been {@link #registerType registered}, 
-		 * keyed by their type name. 
-		 */
-		componentClasses : {},
-	   
-	   
-		/**
-		 * Registers a given class with a `type` name. This is used to map the type names specified in Bit manifests
-		 * to the class that should be instantiated.  Note that type names are case-insensitive.
-		 * 
-		 * This method will throw an error if a type name is already registered, to assist in making sure that we don't get
-		 * unexpected behavior from a type name being overwritten.
-		 * 
-		 * @param {String} type The type name of registered class.
-		 * @param {Function} jsClass The class (constructor function) to register.
-		 */
-		registerType : function( type, jsClass ) {
-			type = type.toLowerCase();
-			
-			if( !this.componentClasses[ type ] ) { 
-				this.componentClasses[ type ] = jsClass;
-			// <debug>
-			} else {
-				throw new Error( "Error: jqc.ComponentManager already has a type '" + type + "'" );
-			// </debug>
-			}
-		},
-		
-		
-		/**
-		 * Retrieves the Component class (constructor function) that has been registered by the supplied `type` name. 
-		 * 
-		 * @param {String} type The type name of the registered class.
-		 * @return {Function} The class (constructor function) that has been registered under the given `type` name.
-		 */
-		getType : function( type ) {
-			type = type.toLowerCase();
-			
-			// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
-			// jqc.Component can't register itself with the ComponentManager
-			var jsClass = ( type === 'component' ) ? require( 'jqc/Component' ) : this.componentClasses[ type ];
-			
-			// <debug>
-			if( !jsClass ) 
-				throw new Error( "The class with type name '" + type + "' has not been registered. Make sure that the component " +
-				                 "exists, and has been 'required' by a RequireJS require() or define() call" );
-			// </debug>
-			
-			return jsClass;
-		},
-		
-		
-		/**
-		 * Determines if the ComponentManager has (i.e. can instantiate) a given `type`.
-		 * 
-		 * @param {String} type The type name to check for.
-		 * @return {Boolean} `true` if the ComponentManager has the given type, `false` otherwise.
-		 */
-		hasType : function( type ) {
-			if( !type ) {  // any falsy type value given, return false
-				return false;
-			} else {
-				type = type.toLowerCase();
-				
-				// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
-				// Component can't register itself with the ComponentManager
-				return ( type === 'component' ) ? true : !!this.componentClasses[ type ];
-			}
-		},
-		
-		
-		/**
-		 * Creates (instantiates) a {@link jqc.Component Component} based on its type name, given
-		 * a configuration object that has a `type` property. If an already-instantiated 
-		 * {@link jqc.Component Component} is provided, it will simply be returned unchanged.
-		 * 
-		 * @param {Object} config The configuration object for the Component. Config objects should have the property `type`, 
-		 *   which determines which type of {@link jqc.Component Component} will be instantiated. If the object does not
-		 *   have a `type` property, it will default to "container", which makes it simple to create things like tab containers. 
-		 *   Note that already-instantiated {@link jqc.Component Components} will simply be returned unchanged. 
-		 * @return {jqc.Component} The instantiated Component.
-		 */
-		create : function( config ) {
-			var type = config.type ? config.type.toLowerCase() : undefined,
-			    Component = require( 'jqc/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (jqc.Component depends on jqc.ComponentManager)
-			
-			if( config instanceof Component ) {
-				// Already a Component instance, return it
-				return config;
-				
-			} else if( type === 'component' ) {  // special case, added to get around the RequireJS circular dependency issue where Component can't register itself with the ComponentManager
-				return new Component( config );
-				
-			} else if( this.hasType( type || "container" ) ) {
-				return new this.componentClasses[ type || "container" ]( config );
-				
-			} else {
-				// No registered type with the given type, throw an error
-				throw new Error( "ComponentManager.create(): Unknown type: '" + type + "'" );
-			}
-		}
-		
-	};
-	
-	return ComponentManager;
-	
-} );
 /*global define */
 define('jqc/Component', [
 	'require',
@@ -3595,6 +3478,318 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 } );
 
 /*global define */
+define('jqc/ComponentManager', [
+	'require',
+	'jqc/Component'  // loaded via require() call in the code below, as it is a circular dependency
+], function( require ) {
+	
+	/**
+	 * @class jqc.ComponentManager
+	 * @singleton
+	 *
+	 * Object used to manage {@link jqc.Component} "types", and handles instantiating them based on the string that is specified
+	 * for them in the manifest.
+	 */
+	var ComponentManager = {
+		
+		/**
+		 * @private
+		 * @property {Object} componentClasses
+		 * 
+		 * An Object (map) of the {@link jqc.Component} classes which have been {@link #registerType registered}, 
+		 * keyed by their type name. 
+		 */
+		componentClasses : {},
+	   
+	   
+		/**
+		 * Registers a given class with a `type` name. This is used to map the type names specified in Bit manifests
+		 * to the class that should be instantiated.  Note that type names are case-insensitive.
+		 * 
+		 * This method will throw an error if a type name is already registered, to assist in making sure that we don't get
+		 * unexpected behavior from a type name being overwritten.
+		 * 
+		 * @param {String} type The type name of registered class.
+		 * @param {Function} jsClass The class (constructor function) to register.
+		 */
+		registerType : function( type, jsClass ) {
+			type = type.toLowerCase();
+			
+			if( !this.componentClasses[ type ] ) { 
+				this.componentClasses[ type ] = jsClass;
+			// <debug>
+			} else {
+				throw new Error( "Error: jqc.ComponentManager already has a type '" + type + "'" );
+			// </debug>
+			}
+		},
+		
+		
+		/**
+		 * Retrieves the Component class (constructor function) that has been registered by the supplied `type` name. 
+		 * 
+		 * @param {String} type The type name of the registered class.
+		 * @return {Function} The class (constructor function) that has been registered under the given `type` name.
+		 */
+		getType : function( type ) {
+			type = type.toLowerCase();
+			
+			// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
+			// jqc.Component can't register itself with the ComponentManager
+			var jsClass = ( type === 'component' ) ? require( 'jqc/Component' ) : this.componentClasses[ type ];
+			
+			// <debug>
+			if( !jsClass ) 
+				throw new Error( "The class with type name '" + type + "' has not been registered. Make sure that the component " +
+				                 "exists, and has been 'required' by a RequireJS require() or define() call" );
+			// </debug>
+			
+			return jsClass;
+		},
+		
+		
+		/**
+		 * Determines if the ComponentManager has (i.e. can instantiate) a given `type`.
+		 * 
+		 * @param {String} type The type name to check for.
+		 * @return {Boolean} `true` if the ComponentManager has the given type, `false` otherwise.
+		 */
+		hasType : function( type ) {
+			if( !type ) {  // any falsy type value given, return false
+				return false;
+			} else {
+				type = type.toLowerCase();
+				
+				// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
+				// Component can't register itself with the ComponentManager
+				return ( type === 'component' ) ? true : !!this.componentClasses[ type ];
+			}
+		},
+		
+		
+		/**
+		 * Creates (instantiates) a {@link jqc.Component Component} based on its type name, given
+		 * a configuration object that has a `type` property. If an already-instantiated 
+		 * {@link jqc.Component Component} is provided, it will simply be returned unchanged.
+		 * 
+		 * @param {Object} config The configuration object for the Component. Config objects should have the property `type`, 
+		 *   which determines which type of {@link jqc.Component Component} will be instantiated. If the object does not
+		 *   have a `type` property, it will default to "container", which makes it simple to create things like tab containers. 
+		 *   Note that already-instantiated {@link jqc.Component Components} will simply be returned unchanged. 
+		 * @return {jqc.Component} The instantiated Component.
+		 */
+		create : function( config ) {
+			var type = config.type ? config.type.toLowerCase() : undefined,
+			    Component = require( 'jqc/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (jqc.Component depends on jqc.ComponentManager)
+			
+			if( config instanceof Component ) {
+				// Already a Component instance, return it
+				return config;
+				
+			} else if( type === 'component' ) {  // special case, added to get around the RequireJS circular dependency issue where Component can't register itself with the ComponentManager
+				return new Component( config );
+				
+			} else if( this.hasType( type || "container" ) ) {
+				return new this.componentClasses[ type || "container" ]( config );
+				
+			} else {
+				// No registered type with the given type, throw an error
+				throw new Error( "ComponentManager.create(): Unknown type: '" + type + "'" );
+			}
+		}
+		
+	};
+	
+	return ComponentManager;
+	
+} );
+/*global define */
+/*jshint scripturl:true */
+define('jqc/Anchor', [
+	'jquery',
+	'lodash',
+	'jqc/ComponentManager',
+	'jqc/Component'
+], function( jQuery, _, ComponentManager, Component ) {
+	
+	/**
+	 * @class jqc.Anchor
+	 * @extends jqc.Component
+	 * @alias type.anchor
+	 *
+	 * A simple anchor component. This component can be used as a standard anchor (&lt;a&gt; tag) by setting
+	 * the {@link #href} config, or clicks can be responded to dynamically by listening for the {@link #click} 
+	 * event.
+	 * 
+	 *     @example
+	 *     require( [
+	 *         'jqc/Anchor'
+	 *     ], function( Anchor ) {
+	 *     
+	 *         var standardAnchor = new Anchor( {
+	 *             renderTo : 'body'
+	 *             
+	 *             text : "Google.com",
+	 *             href : "http://www.google.com",
+	 *             target : "_blank"
+	 *         } );
+	 *         
+	 *         var listenerAnchor = new Anchor( {
+	 *             renderTo : 'body'
+	 *             
+	 *             text : "Click Me",
+	 *             listeners : {
+	 *                 'click' : function( anchor ) {
+	 *                     alert( "You clicked the anchor!" );
+	 *                 }
+	 *             }
+	 *         } );
+	 *     } );
+	 */
+	var Anchor = Component.extend( {
+		
+		/**
+		 * @cfg {String} href
+		 * 
+		 * The href for the anchor tag. Defaults to 'javascript:;' so that the anchor takes no action.
+		 * In this case, listen to the {@link #click} event to respond to the click in a custom manner.
+		 */
+		
+		/**
+		 * @cfg {String} target
+		 * 
+		 * The HTML `target` attribute for the anchor. This can be, for example, set to "_blank" to have
+		 * the anchor open its {@link #href} in a new window.
+		 */
+		
+		/**
+		 * @cfg {String} text
+		 * 
+		 * The text (or html) to put inside the anchor. (Synonymous to the {@link #html} config in this case).
+		 */
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		elType : 'a',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		baseCls : 'jqc-Anchor',
+	
+	
+		// protected
+		initComponent : function() {
+			this.addEvents(
+				/**
+				 * Fires before the Anchor is clicked. Handlers may return false to cancel the action of the anchor.
+				 * 
+				 * @event beforeclick
+				 * @param {jqc.Anchor} anchor This Anchor instance.
+				 * @preventable
+				 */
+				'beforeclick',
+				
+				/**
+				 * Fires when the Anchor is clicked.
+				 * 
+				 * @event click
+				 * @param {jqc.Anchor} anchor This Anchor instance.
+				 */
+				'click'
+			);
+			
+			this.setAttr( 'href', this.normalizeHref( this.href ) );
+			if( this.target ) {
+				this.setAttr( 'target', this.target );
+			}
+			this.html = this.html || this.text;
+			
+			this._super( arguments );
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onRender : function() {
+			this._super( arguments );
+			
+			this.getEl().on( 'click', _.bind( this.onClick, this ) );
+		},
+	
+	
+		// -------------------------------------
+		
+		/**
+		 * Normalizes the provided `href` to 'javascript:;' if an empty string
+		 * or only whitespace is provided.
+		 *
+		 * @param {String} href
+		 * @return {String} The normalized href.
+		 */
+		normalizeHref : function( href ) {
+			return jQuery.trim( href ) || 'javascript:;';
+		},
+
+
+		/**
+		 * Sets the anchor's {@link #href}.
+		 *
+		 * @param {String} href
+		 * @chainable
+		 */
+		setHref : function( href ) {
+			this.setAttr( 'href', this.normalizeHref( href ) );
+			return this;
+		},
+
+
+		/**
+		 * Sets the anchor's text (or html). Internally calls {@link #update}.
+		 *
+		 * @param {String} text The text for the anchor.
+		 * @chainable
+		 */
+		setText : function( text ) {
+			this.update( text );
+			return this;
+		},
+
+
+		// -----------------------------------
+
+
+		/**
+		 * Handler for when the anchor is clicked.
+		 *
+		 * @protected
+		 * @param {jQuery.Event} evt
+		 */
+		onClick : function( evt ) {
+			// If the Anchor has a 'beforeclick' handler that returns false, prevent the default browser behavior
+			// and do not fire the 'click' event
+			if( this.fireEvent( 'beforeclick', this ) === false ) {
+				evt.stopPropagation();
+				evt.preventDefault();
+				return false;
+			} else {
+				this.fireEvent( 'click', this );
+			}
+		}
+	
+	} );
+	
+	
+	ComponentManager.registerType( 'anchor', Anchor );
+	
+	return Anchor;
+	
+} );
+/*global define */
 define('jqc/layout/Layout', [
 	'lodash',
 	'Class',
@@ -4983,6 +5178,156 @@ define('jqc/Container', [
 	
 	
 	return Container;
+} );
+/*global define */
+define('jqc/ComponentQuery', [
+	'lodash',
+	'Class',
+	'jqc/Container',
+	'jqc/ComponentManager'
+], function( _, Class, Container, ComponentManager ) {
+	
+	/**
+	 * @class jqc.ComponentQuery
+	 * @extends Object
+	 * @singleton
+	 * 
+	 * Singleton class which implements a simple querying mechanism in order to find components.
+	 * 
+	 * At this time, the selectors that are available are limited to:
+	 * 
+	 * - **id** : For referencing a Component by {@link jqc.Component#id}. Example: "#myComponent".
+	 * - **type** : For referencing one or more Components by their string 'type' name. Example: "button" would
+	 *   find all {@link jqc.button.Button} instances, and any subclasses of Button instances. It will also find
+	 *   instances which implementing the type name as a mixin.
+	 * 
+	 * No child or descendant selectors are available yet at this time, but this class will be extended to do
+	 * so in the near future.
+	 */
+	var ComponentQuery = Class.extend( Object, {
+		
+		/**
+		 * Queries for components in the `context` array of components, using the `selector`. Returns the array of matching
+		 * components. See the description of this class for valid selectors.
+		 * 
+		 * @param {String} selector The selector to query components by.
+		 * @param {jqc.Component/jqc.Component[]} context The component(s) to query the `selector` for. If one
+		 *   or more of the components match the selector, they will be included. Components that are 
+		 *   {@link jqc.Container Containers} will be recursively queried to determine if their descendant 
+		 *   components match the `selector` as well.
+		 */
+		query : function( selector, context ) {
+			context = [].concat( context );  // normalize to array
+			
+			var workingSet = _.flatten( context, /* isShallow */ true ),
+			    i, len;
+			
+			// Compile the working set of components
+			for( i = 0, len = context.length; i < len; i++ ) {
+				if( context[ i ] instanceof Container ) {
+					workingSet.push.apply( workingSet, this.getDescendants( context[ i ] ) );
+				}
+			}
+			
+			return this.filterBySelector( workingSet, selector );
+		},
+		
+		
+		/**
+		 * Determines if a given `component` is matched by the provided `selector`.
+		 * 
+		 * @param {jqc.Component} component The Component(s) to test.
+		 * @param {String} selector The selector string to test the `component` against.
+		 * @return {Boolean} `true` if the Component matches the selector, `false` otherwise.
+		 */
+		is : function( component, selector ) {
+			var components = [ component ];
+			return ( this.filterBySelector( components, selector ).length === 1 );  // returns true if the length is still 1 after applying the selector as a filter  
+		},
+		
+		
+		/**
+		 * Applies the given `selector` against a set of `components`. The components array will be filtered based
+		 * on the selector, and the resulting array returned.
+		 * 
+		 * @protected
+		 * @param {jqc.Component[]} The list of components which is to be filtered by the selector.
+		 * @param {String} selector The selector string to apply to the set of components.
+		 * @return {jqc.Component[]} The unique set of Components that matched the selector. Duplicates are removed.
+		 */
+		filterBySelector : function( components, selector ) {
+			if( selector.charAt( 0 ) === '#' ) {  // ID selector
+				components = this.filterById( components, selector.substr( 1 ) );
+			} else {
+				components = this.filterByType( components, selector );
+			}
+			return _.unique( components );  // return only the unique set of components (i.e. duplicates removed)
+		},
+		
+		
+		/**
+		 * Filters the given set of `components` by returning only the ones that have an {@link jqc.Component#id id}
+		 * matching the provided `id`.
+		 * 
+		 * @protected
+		 * @param {jqc.Component[]} components
+		 * @param {String} id The ID of the component to return.
+		 * @return {jqc.Component[]} The filtered array of components.
+		 */
+		filterById : function( components, id ) {
+			return _.filter( components, function( component ) { return ( component.getId() === id ); } );
+		},
+		
+		
+		/**
+		 * Filters the given set of `components` by returning only the ones that are of the `type` provided.
+		 * The `type` name is resolved to the component's class, in which each component is tested to be an
+		 * instance of that class (i.e. a direct instance of that class, an instance of a subclass of that
+		 * type, or an instance of a class that implements the `type` as a mixin).
+		 * 
+		 * @protected
+		 * @param {jqc.Component[]} components
+		 * @param {String} type The component `type`, which will be resolved to a component class to test each
+		 *   component against.
+		 * @return {jqc.Component[]} The filtered array of components.
+		 */
+		filterByType : function( components, type ) {
+			// Resolve `type` string to its corresponding class
+			type = ComponentManager.getType( type );
+			
+			var _Class = Class;  // local ref to be closer to the below closure
+			return _.filter( components, function( component ) { return _Class.isInstanceOf( component, type ); } );
+		},
+		
+		
+		/**
+		 * Retrieves the descendants of the provided {@link jqc.Container Container}.
+		 * 
+		 * @protected
+		 * @param {jqc.Container} container
+		 * @param {jqc.Component[]} All of the descendant components of the `container`. 
+		 */
+		getDescendants : function( container ) {
+			var items = container.getItems(),
+			    result = [];
+			
+			for( var i = 0, len = items.length; i < len; i++ ) {
+				var item = items[ i ];
+				
+				result.push( item );
+				if( item instanceof Container ) {
+					result.push.apply( result, this.getDescendants( item ) );
+				}
+			}
+			return result;
+		}
+		
+	} );
+	
+	
+	// Return singleton instance
+	return new ComponentQuery();
+	
 } );
 /*global define */
 define('jqc/Image', [
@@ -6944,6 +7289,722 @@ define('jqc/Viewport', [
 	ComponentManager.registerType( 'viewport', Viewport );
 	
 	return Viewport;
+	
+} );
+/*global define */
+define('jqc/app/EventBus', [
+	'lodash',
+	'Class',
+	'jqc/Component'
+], function( _, Class, Component ) {
+	
+	/**
+	 * @class jqc.app.EventBus
+	 * @extends Object
+	 * @singleton
+	 * 
+	 * Singleton class which allows any subscriber to listen to all events from all {@link jqc.Component Component}
+	 * instances (including {@link jqc.Component Component} subclass instances).
+	 */
+	var EventBus = new Class( {
+		
+		/**
+		 * @protected
+		 * @property {Object[]} callbacks
+		 * 
+		 * An array of Objects (maps), each of which have properties `callback` and `scope`. Callbacks are subscribed
+		 * using the {@link #subscribe} method.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {Boolean} fireEventPatched
+		 * 
+		 * Flag which is set to `true` once Observable's {@link Observable#fireEvent fireEvent} method has been wrapped in an
+		 * interceptor function on {@link jqc.Component Component's} prototype, which provides the hook to be able to listen
+		 * for all Component events.
+		 * 
+		 * Without this, we would need to subscribe an 'all' event listener to every instantiated component, and then remove that 
+		 * listener when the components are {@link jqc.Component#method-destroy destroyed}. This would really just be extra processing 
+		 * and memory usage.
+		 */
+		fireEventPatched : false,
+		
+		
+		/**
+		 * @constructor
+		 */
+		constructor : function() {
+			this.callbacks = [];
+		},
+		
+		
+		/**
+		 * Subscribes a callback to all events from all components. The callback is provided the following arguments:
+		 * 
+		 * - component ({@link jqc.Component}) : The Component that fired the event.
+		 * - eventName (String) : The name of the event that was fired.
+		 * - fireEventArgs (Mixed[]) : The array of arguments that were passed to the original {@link Observable#fireEvent fireEvent}
+		 *   call. This does not include the event name.
+		 * 
+		 * For example:
+		 * 
+		 *     var handlerFn = function( component, eventName ) {
+		 *         console.log( "Component " + component.getId() + " fired the event '" + eventName + 
+		 *             "' with args: ", Array.prototype.slice.call( arguments, 2 ) );
+		 *     };
+		 * 
+		 *     EventBus.subscribe( handlerFn );
+		 * 
+		 * 
+		 * @param {Function} callback The callback function to subscribe.
+		 * @param {Object} [scope=window] The scope (`this` reference) to call the `callback` in.
+		 */
+		subscribe : function( callback, scope ) {
+			this.patchFireEvent();  // only patches if it isn't already patched
+			
+			if( this.findCallback( callback, scope ) === -1 ) {
+				this.callbacks.push( { callback: callback, scope: scope } );
+			}
+		},
+		
+		
+		/**
+		 * Unsubscribes a callback subscribed with {@link #subscribe}.
+		 * 
+		 * @param {Function} callback The callback function to unsubscribe.
+		 * @param {Object} [scope=window] The scope (`this` reference) which the `callback` was set to be called with.
+		 */
+		unsubscribe : function( callback, scope ) {
+			var callbackIdx = this.findCallback( callback, scope );
+			if( callbackIdx !== -1 ) {
+				this.callbacks.splice( callbackIdx, 1 );
+			}
+		},
+		
+		
+		/**
+		 * Finds the index of the provided `callback` and `scope` in the {@link #callbacks} array. If none exists,
+		 * returns -1.
+		 * 
+		 * @protected
+		 * @param {Function} callback The callback to look for.
+		 * @param {Object} scope The scope that the callback is attached to.
+		 * @return {Number} The index in the {@link #callbacks} array, or -1 for "not found".
+		 */
+		findCallback : function( callback, scope ) {
+			return _.findIndex( this.callbacks, function( cbObj ) { return ( cbObj.callback === callback && cbObj.scope === scope ); } );
+		},
+		
+		
+		/**
+		 * Handles an event being fired on a {@link jqc.Component}, by dispatching the event to all subscribed callbacks.
+		 * The arguments that are passed to the callback are documented in {@link #subscribe}.
+		 * 
+		 * @protected
+		 * @param {jqc.Component} component The Component that fired the event.
+		 * @param {String} eventName The event name that was fired.
+		 * @param {Mixed[]} fireEventArgs The arguments provided to the original {@link Observable#fireEvent fireEvent} call.
+		 *   This does not include the event name.
+		 */
+		dispatchEvent : function( component, eventName, fireEventArgs ) {
+			var callbackObjs = this.callbacks,
+			    ret;
+			
+			for( var i = 0, len = callbackObjs.length; i < len; i++ ) {
+				var callResult = callbackObjs[ i ].callback.call( callbackObjs[ i ].scope, component, eventName, fireEventArgs );
+				if( callResult === false )
+					ret = false;
+			}
+			
+			return ret;
+		},
+		
+		
+		/**
+		 * Patches Observable's {@link Observable#fireEvent fireEvent} method on {@link jqc.Component Component's} prototype, using
+		 * an interceptor function which provides the hook to be able to listen for all Component events.
+		 * 
+		 * Without this, we would need to subscribe an 'all' event listener to every instantiated component, and then remove that 
+		 * listener when the components are {@link jqc.Component#method-destroy destroyed}. This would just be extra processing 
+		 * and memory usage, when this method is much simpler.
+		 * 
+		 * This method will only be executed once. Once the interceptor method has been placed, it does not need to be added again.
+		 * 
+		 * @protected
+		 */
+		patchFireEvent : function() {
+			if( !this.fireEventPatched ) {
+				var me = this,
+				    prototype = Component.prototype,
+				    origFireEvent = prototype.fireEvent;
+				
+				prototype.fireEvent = function( eventName ) {
+					var returnVal = origFireEvent.apply( this, arguments );
+					
+					if( returnVal !== false ) {
+					    returnVal = me.dispatchEvent( this, eventName, Array.prototype.slice.call( arguments, 1 ) );
+					}
+					
+					return returnVal;
+				};
+				
+				this.fireEventPatched = true;
+			}
+		}
+		
+		
+	} );
+	
+	
+	// Return singleton instance
+	return new EventBus();
+	
+} );
+/*global define */
+define('jqc/app/Controller', [
+	'lodash',
+	'Observable',
+	'jqc/Jqc',
+	'jqc/ComponentQuery',
+	'jqc/app/EventBus'
+], function( _, Observable, Jqc, ComponentQuery, EventBus ) {
+	
+	/**
+	 * @class jqc.app.Controller
+	 * @extends Observable
+	 * 
+	 * Base class Controller which should be extended by implementations to implement controller logic.
+	 * 
+	 * The Controller must be provided the {@link #view view(s)} ({@link jqc.Component Components}) that it is to work with. 
+	 * It uses this to query for components, and listen to events from. This may be one Component (most likely an outer
+	 * {@link jqc.Viewport} or {@link jqc.Container}), or multiple components to reference and listen to events from. The
+	 * Component(s) provided to the {@link #view} config give the scope of the Controllers reach, where both those components
+	 * and their descendant components may be manipulated / listened to.
+	 * 
+	 * 
+	 * ## View Component References
+	 * 
+	 * A Controller may set up {@link #cfg-refs} to easily retrieve references to components, based on a 
+	 * {@link jqc.ComponentQuery ComponentQuery} selector. Alternatively, the {@link #addRef} method may also be used to 
+	 * dynamically add references. 
+	 * 
+	 * References to component(s) are retrieved using the {@link #getRef} method. The {@link #getRef} accepts the reference
+	 * name, and returns the component, or array of components (if the `multiple` flag was set to true), for that reference. 
+	 * For example, defining a Controller implementation subclass:
+	 * 
+	 *     define( [
+	 *         'jqc/Controller'
+	 *     ], function( Controller ) {
+	 *     
+	 *         var UserController = Controller.extend( {
+	 *             
+	 *             refs : {
+	 *                 'userPanel'      : '#mainUserPanel',
+	 *                 'userTextFields' : { selector: 'textfield', multiple: true }
+	 *             },
+	 *         
+	 *             init : function() {
+	 *                 this._super( arguments );
+	 *                 
+	 *                 // (If we wanted to retrieve the components right here in the init() method...)
+	 *                 this.getRef( 'userPanel' );      // --> Retrieves the Panel instance with an id of 'mainUserPanel'
+	 *                 this.getRef( 'userTextFields' ); // --> Retrieves the array of {@link jqc.form.field.Text} components
+	 *             }
+	 *         
+	 *         } );
+	 *         
+	 *         
+	 *         return UserController;
+	 *         
+	 *     } );
+	 * 
+	 * The selector query for a reference is only executed the first time that it is called for from {@link #getRef}. The 
+	 * component(s) that matched the selector are then cached for subsequent calls to {@link #getRef}. This behavior may
+	 * be overridden by either passing the `forceQuery` option to {@link #getRef}, or if the reference is defined with
+	 * the `noCache` option set to `true`. A reason this may be useful is if components are dynamically added to the {@link #view}
+	 * that this Controller is working with, in which case you may want to retrieve the latest list of components.
+	 * 
+	 * See the {@link #cfg-refs} config for more details on setting up references.
+	 * 
+	 * 
+	 * ## Listening to Events
+	 * 
+	 * A Controller may set up listeners based on {@link jqc.ComponentQuery ComponentQuery} selectors, to be able to respond to
+	 * events from components living under its configured {@link #view}. The {@link #listen} method handles this functionality,
+	 * and listeners are usually set up from the {@link #init} hook method. For example:
+	 * 
+	 *     define( [
+	 *         'jqc/Controller'
+	 *     ], function( Controller ) {
+	 *     
+	 *         var UserController = Controller.extend( {
+	 *             
+	 *             init : function() {
+	 *                 this._super( arguments );
+	 *                 
+	 *                 this.listen( {
+	 *                     '#userPanel' : {
+	 *                         'show' : this.onUserPanelShow,
+	 *                         'hide' : this.onUserPanelHide
+	 *                     },
+	 *                     '#submitButton' : {
+	 *                         'click' : this.onSubmitClick
+	 *                     }
+	 *                 } );
+	 *             },
+	 *             
+	 *             
+	 *             this.onUserPanelShow : function( panel ) {
+	 *                 console.log( "User panel has been shown" );
+	 *             },
+	 *             
+	 *             this.onUserPanelHide : function( panel ) {
+	 *                 console.log( "User panel has been hidden" );
+	 *             },
+	 *             
+	 *             this.onSubmitClick : function( button ) {
+	 *                 console.log( "Submit button has been clicked" );
+	 *             }
+	 *         
+	 *         } );
+	 *         
+	 *         
+	 *         return UserController;
+	 *         
+	 *     } );
+	 * 
+	 * All event handler methods are called in the scope of the Controller. See {@link #listen} for more details.
+	 */
+	var Controller = Observable.extend( {
+		
+		inheritedStatics : {
+			
+			// Subclass-specific setup
+			/**
+			 * @ignore
+			 */
+			onClassExtended : function( NewController ) {
+				// Extend `refs` config from superclass
+				var proto = NewController.prototype,
+				    superclassProto = NewController.superclass,
+				    superclassRefs = superclassProto.refs;
+				
+				if( !proto.hasOwnProperty( 'refs' ) ) {
+					proto.refs = _.clone( superclassRefs ) || {};
+				} else {
+					proto.refs = _.assign( {}, superclassRefs, proto.refs );  // the refs on the new class's prototype take precedence
+				}
+			}
+			
+		},
+		
+		
+		/**
+		 * @cfg {jqc.Component} view (required)
+		 * 
+		 * The view Component that the Controller should manage. {@link #cfg-refs References} retrieved for components, and events 
+		 * listened to must either be on the Component provided to this config, or a descendant of the component (which
+		 * in this case is a {@link jqc.Container Container}) provided to this config.
+		 * 
+		 * Most often, this config will be the the page's outermost {@link jqc.Viewport Viewport} (which itself is a 
+		 * {@link jqc.Container Container} subclass). However, this may also be any 
+		 * {@link jqc.Component Component}/{@link jqc.Container Container}, which will limit the scope of what component(s) the 
+		 * Controller controls.
+		 * 
+		 * As an example setup for a page:
+		 * 
+		 *     require( [
+		 *         'jquery',
+		 *         'jqc/Viewport',
+		 *         'my/app/Controller'  // your own jqc.app.Controller subclass, which implements your page's logic
+		 *     ], function( $, Viewport, Controller ) {
+		 *         
+		 *         var viewport = new Viewport( {
+		 *             items : [ 
+		 *                 // all of the page's view components go here,
+		 *                 // in their nested hierarchy
+		 *             ]
+		 *         } );
+		 *             
+		 *         var controller = new Controller( {
+		 *             view : viewport   // pass the Viewport as the view that the Controller controls
+		 *         } );
+		 *         
+		 *         
+		 *         // Render the Viewport on doc ready
+		 *         $( document ).ready( function() {
+		 *             viewport.render( 'body' );
+		 *         } );
+		 *         
+		 *     } );
+		 */
+		
+		/**
+		 * @cfg {Object} refs
+		 * 
+		 * An Object (map) for component references that the Controller should set up. This config should be added to the
+		 * **prototype** of the Controller, in a Controller subclass. See the documentation of this class for an example of
+		 * how to create a Controller subclass.
+		 * 
+		 * References are based on a {@link jqc.ComponentQuery ComponentQuery} selector, and make it easy to retrieve matching 
+		 * component(s) throughout the Controller's code using {@link #getRef}.
+		 * 
+		 * This Object should be keyed by the ref names, and whose values are Objects with the following properties:
+		 * - **selector** (String) : The selector string for the ref.
+		 * - **multiple** (Boolean) : (Optional) `true` if this is a multi-component selector (in which case an array is returned
+		 *   when retrieving the ref), or `false` if the selector returns a single component. Defaults to `false`.
+		 * - **noCache** (Boolean) : (Optional) `true` if this ref should not cache its result, and instead re-query the {@link #view}
+		 *   when the ref is requested again. Defaults to `false`.
+		 * 
+		 * The values may also simply be a string, where the string is taken as the selector.
+		 * 
+		 * Example:
+		 * 
+		 *     refs : {
+		 *         'myComponent1' : '#myComponent1',  // shorthand use with just a selector
+		 *         'myComponent2' : { selector: '#myComponent2' },
+		 *         'myTextFields' : { selector: 'textfield', multiple: true },  // matches all TextField components
+		 *         'myButtons'    : { selector: 'button', multiple: true, noCache: true }
+		 *     }
+		 *     
+		 * `refs` extend to subclasses, but any refs defined in a subclass with the same name as one in a superclass
+		 * will overwrite the superclass's ref.
+		 */
+		
+		
+		
+		/**
+		 * @protected
+		 * @property {Object} refs
+		 * 
+		 * An Object (map) which is keyed by the ref names, and whose values are Objects with the following properties:
+		 * 
+		 * - **selector** (String) : The selector string for the ref.
+		 * - **multiple** (Boolean} : `true` if this is a multi-component selector (in which case an array is returned
+		 *   when retrieving the ref), or `false` if the selector returns a single component.
+		 * - **noCache** (Boolean) : `true` if this ref should not cache its result, and instead re-query the {@link #view}
+		 *   when the ref is requested again.
+		 * - **cachedComponents** (jqc.Component[]) : An array of the cached component references. This is populated after the
+		 *   first use of the ref.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {Object} listeners
+		 * 
+		 * An Object (map) which stores the listeners registered from {@link #listen}.
+		 * 
+		 * This Object is keyed by the event names which are registered, and its values are an array of objects, each of which
+		 * have properties: `selector` and `handlerFn`.
+		 * 
+		 * An example of what this map looks like is this:
+		 * 
+		 *     {
+		 *         'click' : [
+		 *             { selector: '#myCmp1', handlerFn: this.onMyCmp1Click },
+		 *             { selector: 'button',  handlerFn: this.onButtonClick }
+		 *         ],
+		 *         'keyup' : [
+		 *             { selector: '#searchTextField', handlerFn: this.onSearchFieldKeyUp }
+		 *         ]
+		 *     }
+		 */
+		
+		/**
+		 * @protected
+		 * @property {Boolean} eventBusSubscribed
+		 * 
+		 * Flag which is set to true once this controller has subscribed to the {@link jqc.app.EventBus}, to listen for all
+		 * {@link jqc.Component} events.
+		 */
+		
+		
+		/**
+		 * @constructor
+		 * @param {Object} cfg Any of the configuration options of this class, specified in an Object (map).
+		 */
+		constructor : function( cfg ) {
+			_.assign( this, cfg );
+			this._super( arguments );
+			
+			this.addEvents(
+				/**
+				 * Fires when the Controller has been destroyed.
+				 * 
+				 * @event destroy
+				 * @param {jqc.app.Controller} controller This Controller instance.
+				 */
+				'destroy'
+			);
+			
+			// <debug>
+			if( !this.view ) throw new Error( "`view` cfg required" );
+			// </debug>
+			
+			var refsConfig = this.refs;
+			this.refs = {};  // reset `refs` property for how refs will be stored internally
+			
+			if( refsConfig ) {
+				this.addRef( refsConfig );
+			}
+			
+			this.listeners = {};
+			
+			this.init();
+		},
+		
+		
+		/**
+		 * Hook method which should be overridden in subclasses to implement the Controller's initialization logic.
+		 * 
+		 * @protected
+		 * @template
+		 * @method init
+		 */
+		init : Jqc.emptyFn,
+		
+		
+		// ------------------------------------
+		
+		// References (Refs) Functionality
+		
+		
+		/**
+		 * Adds a reference to one or more components that can be retrieved easily by name. A reference is related
+		 * to a {@link jqc.ComponentQuery ComponentQuery} selector, which is executed when the reference is retrieved
+		 * (via {@link #getRef}).
+		 * 
+		 * After the first retrieval of a reference with {@link #getRef}, the result is cached for subsequent {@link #getRef}
+		 * calls.
+		 * 
+		 * This method accepts an alternative arguments list other than the one documented. It accepts an Object as the first
+		 * (and only) argument, for a configuration object of ref(s) to add. This configuration object should matche the form that 
+		 * the {@link #cfg-refs refs config} accepts. Example:
+		 * 
+		 *     this.addRef( {
+		 *         'myComponent'  : '#myComponent',
+		 *         'myTextFields' : { selector: 'textfield' },
+		 *         'myButtons'    : { selector: 'button', multiple: true, noCache: true }
+		 *     } );
+		 * 
+		 * @protected
+		 * @param {String/Object} ref The reference name, or a configuration object for one or more refs. If providing a configuration
+		 *   object, the rest of the parameters of this method are ignored.
+		 * @param {String} selector The selector string to select components by.
+		 * @param {Object} [options] An object which may contain the following properties:
+		 * @param {Boolean} [options.multiple=false] `true` to create a reference which returns multiple
+		 *   components. The return from {@link #getRef} will be an array of {@link jqc.Component Components}
+		 *   if this option is set to `true`. By default, a ref only retrieves a single component, and its
+		 *   instance is directly returned by {@link #getRef}. 
+		 * @param {Boolean} [options.noCache=true] `false` to prevent the caching of the retrieved components after they
+		 *   are retrieved with {@link #getRef}. This is useful for `multiple` refs (selectors which are to retrieve multiple 
+		 *   components), where the number of components may change due to additions or removals from the page.
+		 */
+		addRef : function( ref, selector, options ) {
+			if( typeof ref === 'string' ) {
+				options = options || {};
+				
+				this.refs[ ref ] = {
+					selector : selector,
+					multiple : !!options.multiple,
+					noCache  : !!options.noCache
+				};
+				
+			} else {  // configuration object for the refs
+				var refs = ref;  // for clarity, that this is an object which may have multiple refs
+				
+				refs = _.forOwn( refs, function( refCfg, refName, refs ) {
+					if( typeof refCfg === 'string' )  // if the value was simply a selector string, convert it to an object now
+						refCfg = { selector: refCfg };
+					
+					// Apply default properties for missing ones in the ref config
+					refs[ refName ] = _.defaults( refCfg, {
+						multiple : false,
+						noCache  : false
+					} );
+				} );
+				
+				// Assign the new refs to the current map of refs
+				_.assign( this.refs, refs );
+			}
+		},
+		
+		
+		/**
+		 * Retrieves a {@link jqc.Component Component} by ref name (or multiple {@link jqc.Component Components}, if the 
+		 * `multiple` flag was set to `true` when {@link #addRef adding the ref}).
+		 * 
+		 * @param {String} refName
+		 * @param {Object} [options] An object which may contain the following properties:
+		 * @param {Boolean} [options.forceQuery=false] `true` to force the reference to re-query for the component(s),
+		 *   even if the component references have previously been cached. This may be useful for "multi-component"
+		 *   references, if the components on the page have changed, and a new query for them must be made. (Single
+		 *   component references are automatically handled if the component has been 
+		 *   {@link jqc.Component#method-destroy destroyed}.)
+		 * @return {jqc.Component/jqc.Component[]} A single component (in the case of singular references, which are
+		 *   the default), or an array if the `multiple` flag was provided for the reference in {@link #addRef}.
+		 */
+		getRef : function( refName, options ) {
+			var ref = this.refs[ refName ];
+			
+			// <debug>
+			if( !ref ) throw new Error( "A ref with name: '" + refName + "' was not defined using addRef()" );
+			// </debug>
+			
+			options = options || {};
+			
+			var cachedComponents = ref.cachedComponents;
+			if( cachedComponents === undefined || options.forceQuery || ref.noCache ) {
+				ref.cachedComponents = cachedComponents = ComponentQuery.query( ref.selector, this.view );
+			}
+			
+			return ( ref.multiple ) ? cachedComponents : cachedComponents[ 0 ] || null;
+		},
+		
+		
+		// ------------------------------------
+		
+		// Event Listening Functionality
+		
+		/**
+		 * Adds event listeners to components selected via {@link jqc.ComponentQuery} selectors. The `selectors` argument accepts an 
+		 * Object (map) of component selector strings as its keys, and a map of event names -&gt; handler functions as its values.
+		 * 
+		 * For example, in this controller, we may want to handle the click event of all {@link jqc.button.Button} components which 
+		 * exist under the {@link #view}, as well as a {@link jqc.Anchor} component with the id "myAnchor".
+		 * 
+		 *     define( [
+		 *         'jqc/app/Controller'
+		 *     ], function( Controller ) {
+		 *         
+		 *         var MyController = Controller.extend( {
+		 *             
+		 *             init : function() {
+		 *                 this._super( arguments );
+		 *                 
+		 *                 this.listen( {
+		 *                     'button' : {   // select all Button components
+		 *                         'click' : this.onButtonClick
+		 *                     },
+		 *                     '#myAnchor' : {   // select component by id
+		 *                         'click' : this.onAnchorClick
+		 *                     }
+		 *                 } );
+		 *             },
+		 *             
+		 *             
+		 *             onButtonClick : function( button ) {
+		 *                 console.log( "clicked the button with text: ", button.text );
+		 *             },
+		 *             
+		 *             
+		 *             onAnchorClick : function( anchor ) {
+		 *                 console.log( "you clicked the anchor" );
+		 *             }
+		 *             
+		 *         } );
+		 *     
+		 *     } );
+		 * 
+		 * Note that handlers are always called in the scope (`this` reference) of the Controller.
+		 * 
+		 * See {@link jqc.ComponentQuery} for more information on component selector strings.
+		 * 
+		 * @param {Object} selectors An Object (map) where the keys are component selector strings, and the values are Objects (maps)
+		 *   which map event names to handler functions. See the description of this method for details.
+		 */
+		listen : function( selectors ) {
+			if( !this.eventBusSubscribed )
+				EventBus.subscribe( this.onComponentEvent, this );
+			
+			var listeners = this.listeners;
+			
+			// Create the internal `listeners` map keyed by event names, and whose values are arrays of objects. Each object
+			// has properties: `selector` and `handlerFn`.
+			_.forOwn( selectors, function( listenersCfg, selector ) {
+				_.forOwn( listenersCfg, function( handlerFn, eventName ) {
+					var eventListeners = listeners[ eventName ] = listeners[ eventName ] || [];
+					
+					eventListeners.push( {
+						selector  : selector,
+						handlerFn : handlerFn
+					} );
+				} );
+			} );
+		},
+		
+		
+		/**
+		 * Handles an event being fired by a component, from the {@link jqc.app.EventBus EventBus}. Calls the handlers
+		 * that are registered for the particular `eventName`, and that match the selector which was set up in {@link #listen}.
+		 * 
+		 * @protected
+		 * @param {jqc.Component} component The Component which fired the event.
+		 * @param {String} eventName The name of the event which was fired.
+		 * @param {Mixed[]} fireEventArgs The arguments provided to the original {@link Observable#fireEvent fireEvent} call.
+		 *   This does not include the event name.
+		 */
+		onComponentEvent : function( component, eventName, fireEventArgs ) {
+			var eventListeners = this.listeners[ eventName ],
+			    ret;
+			
+			if( eventListeners ) {  // if there are any listeners for this event name
+				var controllerView = this.view;
+				
+				for( var i = 0, len = eventListeners.length; i < len; i++ ) {
+					var selector = eventListeners[ i ].selector;
+					
+					// If the Component that fired the event matches a registered selector, and that Component is either the `view`
+					// that the controller is working with or a descendant of it, then call the handler function.
+					if( ComponentQuery.is( component, selector ) && ( component === controllerView || component.isDescendantOf( controllerView ) ) ) {
+						var callResult = eventListeners[ i ].handlerFn.apply( this, fireEventArgs );  // call the handler function
+						if( callResult === false ) {
+							ret = false;  // `false` return to cancel the default action (if any). This is used in 'before' events, where returning false will cancel the actual event's action
+						}
+					}
+				}
+			}
+			
+			return ret;
+		},
+		
+		
+		// ------------------------------------
+		
+		
+		/**
+		 * Destroys the Controller by removing all {@link #property-refs references}, and removing any {@link #property-listeners}
+		 * that have been set up.
+		 * 
+		 * Subclasses should not override this method, but instead override the {@link #onDestroy} hook method
+		 * to implement any subclass-specific destruction processing. Subclass overrides of {@link #onDestroy}
+		 * should call the superclass method at the end of their subclass-specific processing.
+		 */
+		destroy : function() {
+			this.onDestroy();
+			
+			this.fireEvent( 'destroy', this );
+			this.purgeListeners();  // Note: purgeListeners() must be called after 'destroy' event has fired!
+			
+			if( this.eventBusSubscribed )
+				EventBus.unsubscribe( this.onComponentEvent, this );
+		},
+		
+		
+		/**
+		 * Hook method which should be overridden by subclasses to implement their own subclass-specific
+		 * destruction logic. The superclass method should be called after any subclass-specific processing.
+		 * 
+		 * @protected
+		 * @method onDestroy
+		 */
+		onDestroy : Jqc.emptyFn
+		
+	} );
+	
+	
+	return Controller;
 	
 } );
 /*global define */
@@ -10102,6 +11163,468 @@ define('jqc/layout/VBox', [
 } );
 
 /*global define */
+define('jqc/tab/Tab', [
+	'jquery',
+	'lodash',
+	'jqc/ComponentManager',
+	'jqc/button/Button',
+	'jqc/template/LoDash'
+], function( jQuery, _, ComponentManager, Button, LoDashTpl ) {
+
+	/**
+	 * @class jqc.tab.Tab
+	 * @extends jqc.button.Button
+	 * @alias type.tab
+	 *
+	 * A specialized button used as the tabs of a {@link jqc.tab.Panel TabPanel}.
+	 */
+	var Tab = Button.extend( {
+		
+		/**
+		 * @cfg {jqc.panel.Panel} correspondingPanel (required)
+		 * 
+		 * The Panel that this tab has been created for, and corresponds to. The Panel is a child item of the parent
+		 * {@link jqc.tab.Panel TabPanel}, and is needed to map the Tab to the Panel it shows.
+		 */
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'jqc-TabPanel-Tab',
+		
+		
+		/**
+		 * @protected
+		 * @property {Boolean} active
+		 * 
+		 * Flag which is set to `true` when this is the active Tab. The active Tab is the one whose {@link #correspondingPanel}
+		 * is the one shown in the parent {@link jqc.tab.Panel TabPanel}.
+		 */
+		active : false,
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		initComponent : function() {
+			// <debug>
+			if( !this.correspondingPanel ) throw new Error( "`correspondingPanel` cfg required" );
+			// </debug>
+			
+			this._super( arguments );
+		},
+		
+		
+		/**
+		 * Retrieves the {@link jqc.panel.Panel Panel} that this Tab corresponds to in the parent {@link jqc.tab.Panel TabPanel}.
+		 * 
+		 * @return {jqc.panel.Panel}
+		 */
+		getCorrespondingPanel : function() {
+			return this.correspondingPanel;
+		},
+		
+		
+		/**
+		 * Sets the tab as the "active" tab. The active Tab is the one whose {@link #correspondingPanel}
+		 * is the one shown in the parent {@link jqc.tab.Panel TabPanel}.
+		 * 
+		 * @chainable
+		 */
+		setActive : function() {
+			if( !this.active ) {
+				this.active = true;
+				this.addCls( this.componentCls + '-active' );
+			}
+			
+			return this;
+		},
+		
+		
+		/**
+		 * Sets the tab as an "inactive" tab. This is for when the {@link #correspondingPanel} is made invisible
+		 * in the parent {@link jqc.tab.Panel TabPanel}.
+		 * 
+		 * @chainable
+		 */
+		setInactive : function() {
+			if( this.active ) {
+				this.active = false;
+				this.removeCls( this.componentCls + '-active' );
+			}
+			
+			return this;
+		},
+		
+		
+		/**
+		 * Determines if the tab is the "active" tab. The active Tab is the one whose {@link #correspondingPanel}
+		 * is the one shown in the parent {@link jqc.tab.Panel TabPanel}.
+		 * 
+		 * @return {Boolean}
+		 */
+		isActive : function() {
+			return this.active;
+		}
+		
+	} );
+	
+	
+	ComponentManager.registerType( 'tab', Tab );
+	
+	return Tab;
+	
+} );
+		
+/*global define */
+define('jqc/tab/Bar', [
+	'jqc/ComponentManager',
+	'jqc/Container',
+	'jqc/tab/Tab'
+], function( ComponentManager, Container, Tab ) {
+	
+	/**
+	 * @class jqc.tab.Bar
+	 * @extends jqc.Container
+	 * @alias type.tabbar
+	 * 
+	 * Specialized container for a {@link jqc.tab.Panel Tab Panel's} tabs.
+	 */
+	var TabBar = Container.extend( {
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		defaultType : 'tab',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'jqc-TabPanel-Bar',
+		
+		
+		/**
+		 * Sets the "active" tab based on the given activated {@link jqc.panel.Panel Panel} which corresponds
+		 * to it. All other tabs will be set to "inactive".
+		 * 
+		 * @param {jqc.panel.Panel} panel The Panel that corresponds to the Tab that should be made active.
+		 *   If `null` is provided, or a Panel that does not have a corresponding Tab, then all tabs will
+		 *   be set to their "inactive" state.
+		 * @chainable
+		 */
+		setActiveTab : function( panel ) {
+			var tabs = this.getItems(), 
+			    tab;
+			
+			for( var i = 0, len = tabs.length; i < len; i++ ) {
+				tab = tabs[ i ];
+				
+				tab[ ( tab.getCorrespondingPanel() === panel ) ? 'setActive' : 'setInactive' ]();
+			}
+			return this;
+		}
+		
+	} );
+	
+	
+	ComponentManager.registerType( 'tabbar', TabBar );
+	
+	return TabBar;
+	
+} );
+/*global define */
+define('jqc/tab/Panel', [
+	'jquery',
+	'lodash',
+	'jqc/ComponentManager',
+	'jqc/Component',
+	'jqc/Container',
+	'jqc/panel/Panel',
+	'jqc/tab/Bar',
+	'jqc/tab/Tab',
+	'jqc/template/LoDash',
+	'jqc/layout/Card'
+], function( jQuery, _, ComponentManager, Component, Container, Panel, TabBar, Tab, LoDashTpl ) {
+
+	/**
+	 * @class jqc.tab.Panel
+	 * @extends jqc.panel.Panel
+	 * @alias type.tabpanel
+	 *
+	 * A basic tab container panel. Child {@link #items} must be {@link jqc.panel.Panel Panels} or Panel subclasses,
+	 * as their {@link jqc.panel.Panel#title title} property is read to create the tabs.
+	 * 
+	 * The Tab Panel is internally configured with a {@link jqc.layout.Card Card} layout, which switches between
+	 * the panels when the tabs are clicked.
+	 * 
+	 * By default, each child Panel has its header hidden, and takes its {@link jqc.panel.Panel#title} config
+	 * to use as the tab's title. To not hide each panel's header, set the {@link #hideChildPanelHeaders} config
+	 * to `false`.
+	 */
+	var TabPanel = Panel.extend( {
+		
+		/**
+		 * @cfg {Number/jqc.Component} activeTab
+		 * 
+		 * The tab number, or {@link jqc.Component} instance to set as the initially active tab. Defaults to 0 
+		 * (for the first tab). If this is a {@link jqc.Component} instance, it must exist within the TabPanel.
+		 */
+		activeTab : 0,
+		
+		/**
+		 * @cfg {Boolean} hideChildPanelHeaders
+		 * 
+		 * `true` to hide each child panel's {@link jqc.panel.Panel#header header} when added to the Tab Panel.
+		 * The headers are hidden because the tabs that are created will have the panels' titles, and having
+		 * the header would just be showing that information twice. Set to `false` to disable this behavior.
+		 */
+		hideChildPanelHeaders : true,
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		defaultType : 'panel',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		layout : 'card',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		baseCls : 'jqc-TabPanel',
+		
+		
+		/**
+		 * @protected
+		 * @property {jqc.tab.Bar} tabBar
+		 * 
+		 * The Container that holds the TabPanel's tabs.
+		 */
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		initComponent : function() {
+			this.addEvents(
+				/**
+				 * Fires before the {@link #activeTab} is changed.
+				 * 
+				 * @event beforetabchange
+				 * @param {jqc.tab.Panel} tabPanel This TabPanel instance.
+				 * @param {jqc.panel.Panel} panel The Panel instance for the tab is to be activated.
+				 * @param {jqc.panel.Panel} oldPanel The Panel instance of the tab that is to be de-activated. 
+				 *   Will be null if there is no currently activated tab.
+				 * @preventable
+				 */
+				'beforetabchange',
+				
+				/**
+				 * Fires when the {@link #activeTab} has been changed. 
+				 * 
+				 * @event tabchange
+				 * @param {jqc.tab.Panel} tabPanel This TabPanel instance.
+				 * @param {jqc.panel.Panel} panel The Panel instance for the tab that was activated.
+				 * @param {jqc.panel.Panel} oldPanel The Panel instance of the tab that was de-activated. 
+				 *   Will be null if there was no previously activated tab.
+				 */
+				'tabchange'
+			);
+			
+			this.tabBar = this.createTabBar();
+			
+			this._super( arguments );
+			
+			this.setActiveTab( this.activeTab );
+			this.layout.on( 'cardchange', this.onTabChange, this );
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onRender : function() {
+			this._super( arguments );
+			
+			this.tabBar.render( this.$el, /* insert before */ this.$bodyEl );
+		},
+		
+		
+		/**
+		 * Factory method to create the TabPanel's {@link #tabBar}.
+		 * 
+		 * @protected
+		 * @return {jqc.tab.Bar}
+		 */
+		createTabBar : function() {
+			return new TabBar();
+		},
+		
+		
+		/**
+		 * Factory method used to create a {@link jqc.tab.Tab Tab} for the {@link #tabBar}.
+		 * 
+		 * @protected
+		 * @param {jqc.panel.Panel} The Panel which a Tab is being created for. 
+		 * @return {jqc.tab.Tab}
+		 */
+		createTab : function( panel ) {
+			return new Tab( {
+				text  : panel.getTitle(),
+				correspondingPanel : panel
+			} );
+		},
+		
+		
+		// ------------------------------------------
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onAdd : function( panel, idx ) {
+			this._super( arguments );
+			
+			// <debug>
+			if( !( panel instanceof Panel ) ) {
+				throw new Error( "Child components added to the TabPanel must be a jqc.panel.Panel instance, or subclass" );
+			}
+			// </debug>
+			
+			
+			// Create a Tab for the panel
+			var tab = this.createTab( panel );
+			tab.on( 'click', this.onTabClick, this );
+			
+			this.tabBar.insert( tab, idx );
+			
+			// And finally, hide the panel's header (which is done by default)
+			if( this.hideChildPanelHeaders ) {
+				panel.hideHeader();
+			}
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onRemove : function( panel, idx ) {
+			// Remove the tab that corresponds to the panel from the TabBar
+			var tab = this.tabBar.removeAt( idx );
+			
+			this._super( arguments );
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onReorder : function( panel, newIdx, oldIdx ) {
+			this._super( arguments );
+			
+			// Reorder the Tab in the TabBar to correspond to the Panel reordering
+			var tabBar = this.tabBar,
+			    tab = tabBar.getItemAt( oldIdx );
+			tabBar.insert( tab, newIdx );
+		},
+		
+		
+		// ------------------------------------------
+		
+		
+		/**
+		 * Sets the active tab {@link jqc.panel.Panel Panel}.
+		 * 
+		 * @param {jqc.panel.Panel/Number} panel The Panel to activate in the TabPanel, or the index of the Panel in the TabPanel
+		 *   (0 for the first Panel). Note that if a {@link jqc.panel.Panel Panel} is provided, it must be an *instantiated* Panel,
+		 *   and not the anonymous config object used to create the Panel.
+		 */
+		setActiveTab : function( panel ) {
+			if( typeof panel === 'number' ) {
+				panel = this.getItemAt( panel );
+			}
+			
+			var previousActiveTab = this.getActiveTab();
+			if( this.fireEvent( 'beforetabchange', this, panel, previousActiveTab ) !== false ) {
+				this.layout.setActiveItem( panel );
+				
+				this.tabBar.setActiveTab( panel );  // set the active tab based on the corresponding active Panel
+			}
+		},
+		
+		
+		/**
+		 * Gets the active tab ({@link jqc.panel.Panel Panel}).
+		 * 
+		 * @return {jqc.panel.Panel} The Panel that is currently shown as the active tab, or `null` if there is no active tab.
+		 */
+		getActiveTab : function() {
+			return this.layout.getActiveItem();
+		},
+		
+		
+		/**
+		 * Gets the {@link #activeTab} index (i.e. the 0-based tab number that is currently selected).
+		 * 
+		 * @return {Number} The index of the tab that is currently shown as the active tab, or -1 if there is no active tab.
+		 */
+		getActiveTabIndex : function() {
+			return this.layout.getActiveItemIndex();
+		},
+		
+		
+		/**
+		 * Handles a click to a {@link jqc.tab.Tab Tab} in the TabBar.
+		 *
+		 * @protected
+		 * @param {jqc.tab.Tab} tab The Tab that was clicked.
+		 */
+		onTabClick : function( tab ) {
+			this.setActiveTab( tab.getCorrespondingPanel() );  // show the Panel that corresponds to the tab
+		},
+		
+		
+		/**
+		 * Method that is run after a new tab has been activated (shown).
+		 * 
+		 * @protected
+		 * @param {jqc.layout.Card} cardLayout
+		 * @param {jqc.panel.Panel} newPanel The newly activated Panel.
+		 * @param {jqc.panel.Panel} oldPanel The previously activated Panel.
+		 */
+		onTabChange : function( cardLayout, newPanel, oldPanel ) {
+			this.fireEvent( 'tabchange', this, newPanel, oldPanel );
+		},
+		
+		
+		// ------------------------------------------
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onDestroy : function() {
+			this.tabBar.destroy();
+			
+			this._super( arguments );
+		}
+		
+	} );
+	
+	ComponentManager.registerType( 'tabpanel', TabPanel );
+	
+	return TabPanel;
+	
+} );
+/*global define */
 define('jqc/util/CollectionBindable', [
 	'lodash',
 	'Class',
@@ -11324,4 +12847,4 @@ define('jqc/window/Window', [
 	return Window;
 	
 } );
-require(["jqc/Component", "jqc/ComponentManager", "jqc/Container", "jqc/Image", "jqc/Jqc", "jqc/Label", "jqc/Mask", "jqc/Overlay", "jqc/Viewport", "jqc/anim/Animation", "jqc/button/Button", "jqc/form/field/Checkbox", "jqc/form/field/Dropdown", "jqc/form/field/Field", "jqc/form/field/Hidden", "jqc/form/field/Radio", "jqc/form/field/Text", "jqc/form/field/TextArea", "jqc/layout/Auto", "jqc/layout/Card", "jqc/layout/Card.SwitchTransition", "jqc/layout/Card.Transition", "jqc/layout/Column", "jqc/layout/Fit", "jqc/layout/HBox", "jqc/layout/Layout", "jqc/layout/VBox", "jqc/panel/Panel", "jqc/panel/ToolButton", "jqc/plugin/Plugin", "jqc/template/LoDash", "jqc/template/Template", "jqc/util/Css", "jqc/util/Html", "jqc/util/OptionsStore", "jqc/view/Collection", "jqc/view/Model", "jqc/window/Window"]);
+require(["jqc/Anchor", "jqc/Component", "jqc/ComponentManager", "jqc/ComponentQuery", "jqc/Container", "jqc/Image", "jqc/Jqc", "jqc/Label", "jqc/Mask", "jqc/Overlay", "jqc/Viewport", "jqc/anim/Animation", "jqc/app/Controller", "jqc/app/EventBus", "jqc/button/Button", "jqc/form/field/Checkbox", "jqc/form/field/Dropdown", "jqc/form/field/Field", "jqc/form/field/Hidden", "jqc/form/field/Radio", "jqc/form/field/Text", "jqc/form/field/TextArea", "jqc/layout/Auto", "jqc/layout/Card.SwitchTransition", "jqc/layout/Card.Transition", "jqc/layout/Card", "jqc/layout/Column", "jqc/layout/Fit", "jqc/layout/HBox", "jqc/layout/Layout", "jqc/layout/VBox", "jqc/panel/Header", "jqc/panel/Panel", "jqc/panel/ToolButton", "jqc/plugin/Plugin", "jqc/tab/Bar", "jqc/tab/Panel", "jqc/tab/Tab", "jqc/template/LoDash", "jqc/template/Template", "jqc/util/CollectionBindable", "jqc/util/Css", "jqc/util/Html", "jqc/util/OptionsStore", "jqc/view/Collection", "jqc/view/Model", "jqc/window/Window"]);
