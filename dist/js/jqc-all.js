@@ -5285,6 +5285,11 @@ define('jqc/ComponentQuery', [
 		 * instance of that class (i.e. a direct instance of that class, an instance of a subclass of that
 		 * type, or an instance of a class that implements the `type` as a mixin).
 		 * 
+		 * If the `type` provided is not a registered type name, then an empty array is returned, as no component
+		 * could possibly match it. This is done instead of throwing an error for the case that a certain type has 
+		 * not yet been loaded in yet when using the {@link #query} or {@link #is} methods, or when a
+		 * {@link jqc.app.Controller} listens for events on a certain component type which hasn't been loaded yet.
+		 * 
 		 * @protected
 		 * @param {jqc.Component[]} components
 		 * @param {String} type The component `type`, which will be resolved to a component class to test each
@@ -5292,11 +5297,16 @@ define('jqc/ComponentQuery', [
 		 * @return {jqc.Component[]} The filtered array of components.
 		 */
 		filterByType : function( components, type ) {
-			// Resolve `type` string to its corresponding class
-			type = ComponentManager.getType( type );
-			
-			var _Class = Class;  // local ref to be closer to the below closure
-			return _.filter( components, function( component ) { return _Class.isInstanceOf( component, type ); } );
+			if( !ComponentManager.hasType( type ) ) {
+				return [];
+				
+			} else {
+				// Resolve `type` string to its corresponding class
+				type = ComponentManager.getType( type );
+				
+				var _Class = Class;  // local ref to be closer to the below closure
+				return _.filter( components, function( component ) { return _Class.isInstanceOf( component, type ); } );
+			}
 		},
 		
 		

@@ -133,12 +133,15 @@ define( [
 			it( "should return false for components that don't match the selector", function() {
 				expect( ComponentQuery.is( cmps[ 0 ], '#cmp99' ) ).toBe( false );
 				expect( ComponentQuery.is( cmps[ 0 ], 'container' ) ).toBe( false );
+				expect( ComponentQuery.is( cmps[ 0 ], 'something-else' ) ).toBe( false );
 				
 				expect( ComponentQuery.is( cmps[ 1 ], '#cmp99' ) ).toBe( false );
 				expect( ComponentQuery.is( cmps[ 1 ], 'panel' ) ).toBe( false );
+				expect( ComponentQuery.is( cmps[ 1 ], 'something-else' ) ).toBe( false );
 				
 				expect( ComponentQuery.is( cmps[ 2 ], '#cmp99' ) ).toBe( false );
 				expect( ComponentQuery.is( cmps[ 2 ], 'button' ) ).toBe( false );
+				expect( ComponentQuery.is( cmps[ 2 ], 'something-else' ) ).toBe( false );
 			} );
 			
 		} );
@@ -247,6 +250,13 @@ define( [
 			
 			it( "should return an empty array if no components match the provided `type`", function() {
 				var result = ComponentQuery.filterByType( cmps, "button" );  // no buttons in the cmps array
+				
+				expect( result ).toEqual( [] );
+			} );
+			
+			
+			it( "should return an empty array if the provided `type` does not correspond to a registered type name", function() {
+				var result = ComponentQuery.filterByType( cmps, "non-existent-component-type" );
 				
 				expect( result ).toEqual( [] );
 			} );
