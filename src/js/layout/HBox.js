@@ -134,6 +134,7 @@ define( [
 					// If sizing the last component, add in (the smallest whole number of) the decimal value pixels that were trimmed from previous components
 					if( i === len - 1 ) {
 						newChildWidth += Math.floor( trimmedPixels );
+						newChildWidth--;  // and take off a pixel to attempt to fix the accidental browser wrapping issue with sub-pixel widths...
 					}
 					
 					this.sizeComponent( childComponent, newChildWidth, undefined );
