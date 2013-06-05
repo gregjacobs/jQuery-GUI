@@ -80,7 +80,7 @@ define( [
 	 *         
 	 *     } );
 	 */
-	var CollectionBindable = new Class( {
+	var CollectionBindable = Class.create( {
 		
 		/**
 		 * @protected
