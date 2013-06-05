@@ -4262,19 +4262,24 @@ define('jqc/Container', [
 	
 		/**
 		 * @cfg {String} defaultType
+		 * 
 		 * The default Component 'type' to instantiate when child {@link #items} are specified as anonymous config objects
 		 * without a `type` property of their own. 
 		 */
 		defaultType : 'container',
 		
 		/**
-		 * @cfg {Function} acceptType
+		 * @cfg {String/Function} acceptType
+		 * 
 		 * The {@link jqc.Component} class (or subclass) to accept in the Container for child {@link #items}. If an added component 
 		 * is not an instance of this type, an error will be thrown. This should be set to a {@link jqc.Component} subclass (as only 
 		 * {@link jqc.Component Components} may be added to a Container in the first place).
 		 * 
 		 * This config is useful for subclasses to set/override if they require a specific {@link jqc.Component} subclass to be added to
 		 * them, so as to not allow just any {@link jqc.Component} to be added, and direct the user as such.
+		 * 
+		 * The value for this configuration option can either be the constructor function for a {@link jqc.Component} class, or a
+		 * 'type' string which will be resolved to a {@link jqc.Component} class via {@link jqc.ComponentManager#getType}.
 		 * 
 		 * Note that the check for this is performed after any anonymous config objects have been converted into their corresponding
 		 * {@link jqc.Component} instance.
@@ -4328,7 +4333,9 @@ define('jqc/Container', [
 		deferLayout : false,
 	
 	
-		// protected
+		/**
+		 * @inheritdoc
+		 */
 		initComponent : function() {
 			// If the items config has a value, remove any html and contentEl configs, as the items config takes precedence.
 			if( this.items ) {
@@ -4336,9 +4343,9 @@ define('jqc/Container', [
 				this.contentEl = undefined;
 			}
 	
-			// Check that the 'acceptType' config actually refers to a class
-			if( typeof this.acceptType !== 'function' ) { throw new Error( "'acceptType' config did not resolve to a constructor function" ); }
-	
+			// Check that the `acceptType` config actually refer to a class, or resolve a type name to the class.
+			this.acceptType = this.resolveType( this.acceptType );
+			
 			this.addEvents(
 				/**
 				 * Fires before a Component has been added to this Container. A handler of
@@ -4428,8 +4435,34 @@ define('jqc/Container', [
 				this.setData( this.data );
 			}
 		},
-	
-	
+		
+		
+		/**
+		 * Resolves the constructor function for the value provided to the `type` argument. If a string is provided,
+		 * it is assumed to be a 'type' name and a lookup for the constructor function is performed via 
+		 * {@link jqc.ComponentManager#getType}. If a function is provided, the function is returned as-is.
+		 * 
+		 * This method is used to support the {@link #defaultType} and {@link #acceptType} configs.
+		 * 
+		 * @protected
+		 * @param {String/Function} type The input type name, or constructor function.
+		 * @return {Function} The constructor function for the `type`.
+		 * @throws {Error} If the `type` does not resolve to a constructor function.
+		 */
+		resolveType : function( type ) {
+			if( typeof type === 'string' && ComponentManager.hasType( type ) ) {
+				type = ComponentManager.getType( type );
+			}
+			
+			// <debug>
+			if( !_.isFunction( type ) ) {
+				throw new Error( "The provided `type` did not resolve to a constructor function" );
+			}
+			// </debug>
+			
+			return type;
+		},
+		
 	
 		// ----------------------------------------
 	

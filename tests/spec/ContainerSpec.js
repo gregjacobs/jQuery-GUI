@@ -17,8 +17,61 @@ define( [
 					var container = new Container( {
 						acceptType : undefined
 					} );
-				} ).toThrow( "'acceptType' config did not resolve to a constructor function" );
+				} ).toThrow( "The provided `type` did not resolve to a constructor function" );
+				
+				expect( function() {
+					var container = new Container( {
+						acceptType : 'non-existent-class-type'
+					} );
+				} ).toThrow( "The provided `type` did not resolve to a constructor function" );
+				
 			} );
+			
+		} );
+		
+		
+		describe( 'resolveType()', function() {
+			var container;
+			
+			beforeEach( function() {
+				container = new Container();
+			} );
+			
+			afterEach( function() {
+				container.destroy();
+			} );
+			
+			
+			it( "should resolve a type name to a constructor function (js class)", function() {
+				expect( container.resolveType( 'component' ) ).toBe( Component );
+			} );
+			
+			
+			it( "should return a provided constructor function unchanged", function() {
+				expect( container.resolveType( Component ) ).toBe( Component );
+			} );
+			
+			
+			it( "should throw an error if the provided argument does not resolve to a constructor function", function() {
+				var errMsg = "The provided `type` did not resolve to a constructor function";
+				
+				expect( function() {
+					container.resolveType( undefined );
+				} ).toThrow( errMsg );
+				
+				expect( function() {
+					container.resolveType( null );
+				} ).toThrow( errMsg );
+				
+				expect( function() {
+					container.resolveType( 'non-existent-type-name' );
+				} ).toThrow( errMsg );
+				
+				expect( function() {
+					container.resolveType( {} );
+				} ).toThrow( errMsg );
+			} );
+			
 		} );
 		
 		
@@ -28,7 +81,6 @@ define( [
 		describe( "Adding and inserting of Components functionality", function() {
 			
 			it( "Adding a single component should return the component", function() {
-				// Test that 
 				var container = new Container();
 				var component = container.add( new Component( { id: "test1" } ) );
 				expect( component.getId() ).toEqual( "test1" );  // add() not returning the component. did not get correct id from getId()
