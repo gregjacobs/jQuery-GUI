@@ -7494,7 +7494,7 @@ define('jqc/app/Controller', [
 	 * and their descendant components may be manipulated / listened to.
 	 * 
 	 * 
-	 * ## View Component References
+	 * ## References to View Components
 	 * 
 	 * A Controller may set up {@link #cfg-refs} to easily retrieve references to components, based on a 
 	 * {@link jqc.ComponentQuery ComponentQuery} selector. Alternatively, the {@link #addRef} method may also be used to 
