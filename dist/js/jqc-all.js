@@ -11993,6 +11993,17 @@ define('jqc/util/CollectionBindable', [
 		
 		
 		/**
+		 * Retrieves the current {@link data.Collection Collectoin} which is bound to this object. Returns `null` if there
+		 * is no currently-bound Collection.
+		 * 
+		 * @return {data.Collection} The currently-bound collection, or `null` if there is none.
+		 */
+		getCollection : function() {
+			return this[ this.collectionProp ] || null;
+		},
+		
+		
+		/**
 		 * Binds listeners to the current collection, so that the view can refresh itself upon changes. The listeners 
 		 * that are set up are defined by the {@link #getCollectionListeners} method, which should be overridden by 
 		 * the target class to listen for the events that are needed.
@@ -12263,6 +12274,17 @@ define('jqc/util/ModelBindable', [
 		 *   previously-bound model.
 		 */
 		onModelBind : Jqc.emptyFn,
+		
+		
+		/**
+		 * Retrieves the current {@link data.Model Model} which is bound to this object. Returns `null` if there
+		 * is no currently-bound Model.
+		 * 
+		 * @return {data.Model} The currently-bound model, or `null` if there is none.
+		 */
+		getModel : function() {
+			return this[ this.modelProp ] || null;
+		},
 		
 		
 		/**
@@ -12539,6 +12561,9 @@ define('jqc/view/Collection', [
 		 * @inheritdoc
 		 */
 		initComponent : function() {
+			// Call CollectionBindable constructor
+			CollectionBindable.call( this );
+			
 			this._super( arguments );
 			
 			// <debug>
@@ -12575,17 +12600,6 @@ define('jqc/view/Collection', [
 					this.mask();
 				}
 			}
-		},
-		
-		
-		/**
-		 * Retrieves the {@link #collection} which is currently bound to the CollectionView.
-		 * 
-		 * @return {data.Collection} The Collection which is currently bound to the CollectionView, or `null`
-		 *   if there is no currently-bound Collection.
-		 */
-		getCollection : function() {
-			return this.collection || null;
 		},
 		
 		
@@ -12858,12 +12872,14 @@ define('jqc/view/Model', [
 	'jquery',
 	'lodash',
 	'jqc/ComponentManager',
-	'jqc/Component'
-], function( jQuery, _, ComponentManager, Component ) {
+	'jqc/Component',
+	'jqc/util/ModelBindable'
+], function( jQuery, _, ComponentManager, Component, ModelBindable ) {
 	
 	/**
 	 * @class jqc.view.Model
 	 * @extends jqc.Component
+	 * @mixins jqc.util.ModelBindable
 	 * @alias type.modelview
 	 * 
 	 * A view of the data in a single {@link data.Model}. The view uses the {@link #tpl} config, which 
@@ -12874,6 +12890,7 @@ define('jqc/view/Model', [
 	 * of {@link data.Model Models} instead of a single one.  
 	 */
 	var ModelView = Component.extend( {
+		mixins : [ ModelBindable ],
 		
 		/**
 		 * @cfg {data.Model} model (required)
@@ -12950,34 +12967,24 @@ define('jqc/view/Model', [
 		maskOnLoad : true,
 		
 		
-		
-		/**
-		 * @private
-		 * @property {Boolean} firstBindComplete
-		 * 
-		 * Property which is set to true when the initial bind (called from {@link #initComponent} is complete.
-		 */
-		
-		/**
-		 * @private
-		 * @property {Object} modelListeners
-		 * 
-		 * The listeners that were bound to the current {@link #model} in the {@link #bindModelListeners} method. 
-		 * If there has been no model bound to this view yet, this will be `undefined`.
-		 */
-		
-		
 		/**
 		 * @inheritdoc
 		 */
 		initComponent : function() {
+			// Call the ModelBindable constructor
+			ModelBindable.call( this );
+			
 			this._super( arguments );
 			
 			// <debug>
 			if( !this.tpl ) throw new Error( "`tpl` config required" );
 			// </debug>
 			
-			this.bindModel( this.model || null );
+			if( this.model ) {
+				this.bindModel( this.model );
+			} else {
+				this.refresh();  // do an initial refresh if no model, which simply sets up the ModelView to not show anything (and not run the template, since we don't have a model to run it with)
+			}
 			
 			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
 			// while the model is loading.
@@ -12999,71 +13006,15 @@ define('jqc/view/Model', [
 		},
 		
 		
-		/**
-		 * Retrieves the {@link #model} which is currently bound to the ModelView
-		 * 
-		 * @return {data.Model} The Model which is currently bound to the ModelView, or `null`
-		 *   if there is no currently-bound Model.
-		 */
-		getModel : function() {
-			return this.model || null;
-		},
-		
-		
 		// -----------------------------------
 		
-		// Model binding methods
+		// Implementation of ModelBindable mixin methods
 		
 		
 		/**
-		 * Binds a {@link data.Model} to the view. The Model will be used to populate the {@link #tpl},
-		 * and will also be monitored for changes to refresh the view as well.
-		 * 
-		 * Any previous {@link #model} will be unbound from the view.
-		 * 
-		 * @param {data.Model} model The Model to bind. To unbind the currently-bound Model,
-		 *   pass `null`.
-		 */
-		bindModel : function( model ) {
-			if( this.model !== model || !this.firstBindComplete ) {
-				// If there is a current model, and there have been listeners bound to it (i.e. it is not the initial bind
-				// call from having a `model` config), then unbind its listeners in preparation to bind a new Model
-				if( this.model ) {
-					this.unbindModelListeners();
-				}
-				
-				this.model = model;
-				if( model ) {
-					this.bindModelListeners();
-				}
-				this.firstBindComplete = true;
-				
-				this.refresh();
-			}
-		},
-		
-		
-		/**
-		 * Binds listeners to the current {@link #model}, so that the view can refresh itself upon
-		 * changes. The listeners that are set up are created by the {@link #getModelListeners} method,
-		 * which may be overridden to listen to other events that a particular {@link data.Model} subclass
-		 * may fire.
-		 * 
-		 * @private
-		 */
-		bindModelListeners : function() {
-			var model = this.model,
-			    listeners = _.clone( this.getModelListeners( model ) );  // shallow copy of the listeners
-			
-			model.on( listeners );
-			this.modelListeners = listeners;
-		},
-		
-		
-		/**
-		 * Retrieves an Object (map) of the listeners that should be set up on the {@link #model}, when 
-		 * a {@link data.Model} is bound to the view. This method may be overridden in a subclass to add 
-		 * events that should be listened for.
+		 * Implementation of {@link jqc.util.ModelBindable} mixin method, which retrieves an Object (map) of the listeners that 
+		 * should be set up on the {@link #model}, when a {@link data.Model} is bound to the view. This method may be overridden 
+		 * in a subclass to add extra events that should be listened for.
 		 * 
 		 * @protected
 		 * @param {data.Model} model The Model being bound.
@@ -13081,15 +13032,17 @@ define('jqc/view/Model', [
 		
 		
 		/**
-		 * Unbinds the current {@link #model model's} listeners, which were bound by
-		 * {@link #bindModelListeners}.
+		 * Implementation of {@link jqc.util.ModelBindable} mixin method. Handles when a new {@link #model} has been 
+		 * bound to the view.
 		 * 
-		 * @private
+		 * @protected
+		 * @param {data.Model} model The newly bound model. Will be `null` if the previous model was
+		 *   simply unbound (i.e. `null` was passed to {@link #bindModel}, or {@link #unbindModel} was called). 
+		 * @param {data.Model} oldModel The model that was just unbound. Will be `null` if there was no
+		 *   previously-bound model.
 		 */
-		unbindModelListeners : function() {
-			if( this.model && this.modelListeners ) {
-				this.model.un( this.modelListeners );  // the Model listener's set up in bindModelListeners()
-			}
+		onModelBind : function( model ) {
+			this.refresh();
 		},
 		
 		
@@ -13167,10 +13120,7 @@ define('jqc/view/Model', [
 		 * @inheritdoc
 		 */
 		onDestroy : function() {
-			if( this.model ) {
-				this.unbindModelListeners();
-				delete this.model;
-			}
+			this.unbindModel();
 			
 			this._super( arguments );
 		}

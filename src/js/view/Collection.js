@@ -184,6 +184,9 @@ define( [
 		 * @inheritdoc
 		 */
 		initComponent : function() {
+			// Call CollectionBindable constructor
+			CollectionBindable.call( this );
+			
 			this._super( arguments );
 			
 			// <debug>
@@ -220,17 +223,6 @@ define( [
 					this.mask();
 				}
 			}
-		},
-		
-		
-		/**
-		 * Retrieves the {@link #collection} which is currently bound to the CollectionView.
-		 * 
-		 * @return {data.Collection} The Collection which is currently bound to the CollectionView, or `null`
-		 *   if there is no currently-bound Collection.
-		 */
-		getCollection : function() {
-			return this.collection || null;
 		},
 		
 		
