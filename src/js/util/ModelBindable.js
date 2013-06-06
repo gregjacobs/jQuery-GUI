@@ -189,6 +189,17 @@ define( [
 		
 		
 		/**
+		 * Retrieves the current {@link data.Model Model} which is bound to this object. Returns `null` if there
+		 * is no currently-bound Model.
+		 * 
+		 * @return {data.Model} The currently-bound model, or `null` if there is none.
+		 */
+		getModel : function() {
+			return this[ this.modelProp ] || null;
+		},
+		
+		
+		/**
 		 * Binds listeners to the current model, so that the view can refresh itself upon changes. The listeners 
 		 * that are set up are defined by the {@link #getModelListeners} method, which should be overridden by 
 		 * the target class to listen for the events that are needed.

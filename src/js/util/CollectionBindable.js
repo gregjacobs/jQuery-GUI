@@ -185,6 +185,17 @@ define( [
 		
 		
 		/**
+		 * Retrieves the current {@link data.Collection Collectoin} which is bound to this object. Returns `null` if there
+		 * is no currently-bound Collection.
+		 * 
+		 * @return {data.Collection} The currently-bound collection, or `null` if there is none.
+		 */
+		getCollection : function() {
+			return this[ this.collectionProp ] || null;
+		},
+		
+		
+		/**
 		 * Binds listeners to the current collection, so that the view can refresh itself upon changes. The listeners 
 		 * that are set up are defined by the {@link #getCollectionListeners} method, which should be overridden by 
 		 * the target class to listen for the events that are needed.

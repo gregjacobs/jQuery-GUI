@@ -150,6 +150,27 @@ function( Model, ModelBindable ) {
 			} );
 			
 		} );
+
+		
+		describe( 'getModel()', function() {
+			
+			it( "should retrieve the currently-bound model", function() {
+				modelBindable.bindModel( model1 );
+				expect( modelBindable.getModel() ).toBe( model1 );
+			} );
+			
+			
+			it( "should return `null` if there is no currently-bound model", function() {
+				expect( modelBindable.getModel() ).toBe( null );  // initial, never-bound state
+
+				modelBindable.bindModel( model1 );
+				expect( modelBindable.getModel() ).toBe( model1 );
+				
+				modelBindable.unbindModel();
+				expect( modelBindable.getModel() ).toBe( null );
+			} );
+			
+		} );
 		
 	} );
 	

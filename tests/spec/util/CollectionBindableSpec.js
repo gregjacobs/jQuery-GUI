@@ -150,6 +150,27 @@ function( Collection, CollectionBindable ) {
 			} );
 			
 		} );
+
+		
+		describe( 'getCollection()', function() {
+			
+			it( "should retrieve the currently-bound collection", function() {
+				collectionBindable.bindCollection( collection1 );
+				expect( collectionBindable.getCollection() ).toBe( collection1 );
+			} );
+			
+			
+			it( "should return `null` if there is no currently-bound collection", function() {
+				expect( collectionBindable.getCollection() ).toBe( null );  // initial, never-bound state
+
+				collectionBindable.bindCollection( collection1 );
+				expect( collectionBindable.getCollection() ).toBe( collection1 );
+				
+				collectionBindable.unbindCollection();
+				expect( collectionBindable.getCollection() ).toBe( null );
+			} );
+			
+		} );
 		
 	} );
 	
