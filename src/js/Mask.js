@@ -279,9 +279,11 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 				// will be cleared once the mask is hidden.
 				this.$contentEl.appendTo( $targetEl );  // Make sure it is appended if it has been detached.
 				this.repositionContentEl();
+				
 				var me = this;  // for closure
 				var repositionIntervalId = setInterval( function() {
 					if( me.isVisible() ) {
+						$overlayEl.height( $targetEl.outerHeight() );  // continually make sure that the mask's overlay height is correct, in case the content changes
 						me.repositionContentEl();
 					} else {
 						clearInterval( repositionIntervalId );  // When no longer shown, clear the interval
