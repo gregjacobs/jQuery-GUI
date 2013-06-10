@@ -1,4 +1,4 @@
-/*global define, describe, beforeEach, afterEach, it, expect, JsMockito */
+/*global define, describe, beforeEach, afterEach, it, expect, spyOn */
 define( [
 	'jquery',
 	'jqc/Component',
@@ -32,35 +32,43 @@ define( [
 			
 			
 			it( "should call doLayout() on each of the container's child components, to recalculate their layout", function() {
-				var childCmp1 = JsMockito.mock( Component ),
-				    childCmp2 = JsMockito.mock( Component ),
-				    childCmp3 = JsMockito.mock( Component );
+				var childCmp1 = new Component(),
+				    childCmp2 = new Component(),
+				    childCmp3 = new Component(),
+				    container = fixture.getContainer();
 				
-				JsMockito.when( childCmp1 ).getUuid().thenReturn( 1 );
-				JsMockito.when( childCmp1 ).getUuid().thenReturn( 2 );
-				JsMockito.when( childCmp1 ).getUuid().thenReturn( 3 );
-				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( [ childCmp1, childCmp2, childCmp3 ] );
+				spyOn( childCmp1, 'getUuid' ).andReturn( 1 );
+				spyOn( childCmp2, 'getUuid' ).andReturn( 2 );
+				spyOn( childCmp3, 'getUuid' ).andReturn( 3 );
+				spyOn( childCmp1, 'doLayout' );
+				spyOn( childCmp2, 'doLayout' );
+				spyOn( childCmp3, 'doLayout' );
+				container.getItems.andReturn( [ childCmp1, childCmp2, childCmp3 ] );
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();
 				
-				JsMockito.verify( childCmp1 ).doLayout();
-				JsMockito.verify( childCmp2 ).doLayout();
-				JsMockito.verify( childCmp3 ).doLayout();
+				expect( childCmp1.doLayout.callCount ).toBe( 1 );
+				expect( childCmp2.doLayout.callCount ).toBe( 1 );
+				expect( childCmp3.doLayout.callCount ).toBe( 1 );
 			} );
 			
 			
 			it( "should *not* call doLayout on a child component that is manually laid out by the layout routine implemented in a Layout subclass", function() {
-				var childCmp1 = JsMockito.spy( new Container() ),  // Note: using actual
-				    childCmp2 = JsMockito.spy( new Container() ),  // Containers here, because
-				    childCmp3 = JsMockito.spy( new Container() );  // we need their 'afterlayout' event
+				var childCmp1 = new Container(),  // Note: using actual
+				    childCmp2 = new Container(),  // Containers here, because
+				    childCmp3 = new Container();  // we need their 'afterlayout' event
+
+				spyOn( childCmp1, 'doLayout' ).andCallThrough();
+				spyOn( childCmp2, 'doLayout' ).andCallThrough();
+				spyOn( childCmp3, 'doLayout' ).andCallThrough();
 				
 				var container = fixture.getContainer(),
 				    layout = fixture.getLayout(),
 				    $targetEl = fixture.getTargetEl();
 				
 				$targetEl.appendTo( 'body' );
-				JsMockito.when( container ).getItems().thenReturn( [ childCmp1, childCmp2, childCmp3 ] );
+				container.getItems.andReturn( [ childCmp1, childCmp2, childCmp3 ] );
 				
 				// Overwrite onLayout for this layout, to manually lay out childCmp2
 				layout.onLayout = function() {
@@ -72,9 +80,9 @@ define( [
 				};
 				
 				layout.doLayout();
-				JsMockito.verify( childCmp1 ).doLayout();
-				JsMockito.verify( childCmp2 ).doLayout();  // should only happen once!
-				JsMockito.verify( childCmp3 ).doLayout();
+				expect( childCmp1.doLayout.callCount ).toBe( 1 );
+				expect( childCmp2.doLayout.callCount ).toBe( 1 );  // should only happen once!
+				expect( childCmp3.doLayout.callCount ).toBe( 1 );
 			} );
 			
 		} );
@@ -86,13 +94,15 @@ define( [
 			    $componentEl;
 			
 			beforeEach( function() {
-				unrenderedComponent = JsMockito.mock( Component );
-				JsMockito.when( unrenderedComponent ).isRendered().thenReturn( false );
+				unrenderedComponent = new Component();
+				spyOn( unrenderedComponent, 'render' );
+				spyOn( unrenderedComponent, 'isRendered' ).andReturn( false );
 				
-				renderedComponent = JsMockito.mock( Component );
+				renderedComponent = new Component();
 				$componentEl = jQuery( '<div />' );
-				JsMockito.when( renderedComponent ).isRendered().thenReturn( true );
-				JsMockito.when( renderedComponent ).getEl().thenReturn( $componentEl );
+				spyOn( renderedComponent, 'render' );
+				spyOn( renderedComponent, 'isRendered' ).andReturn( true );
+				spyOn( renderedComponent, 'getEl' ).andReturn( $componentEl );
 			} );
 			
 			afterEach( function() {
@@ -106,7 +116,7 @@ define( [
 				
 				layout.renderComponent( unrenderedComponent, $targetEl );
 				
-				JsMockito.verify( unrenderedComponent ).render();
+				expect( unrenderedComponent.render.callCount ).toBe( 1 );
 			} );
 			
 			
@@ -119,7 +129,7 @@ define( [
 				var layout = fixture.getLayout();
 				layout.renderComponent( renderedComponent, $targetEl );
 				
-				JsMockito.verify( renderedComponent ).render();
+				expect( renderedComponent.render.calls.length ).toBe( 1 );
 			} );
 			
 			
@@ -134,7 +144,7 @@ define( [
 				var layout = fixture.getLayout();
 				layout.renderComponent( renderedComponent, $targetEl, { position: 0 } );  // the component is supposed to be the first element, but $otherCmpEl is
 				
-				JsMockito.verify( renderedComponent ).render();
+				expect( renderedComponent.render.calls.length ).toBe( 1 );
 			} );
 			
 			
@@ -149,7 +159,7 @@ define( [
 				var layout = fixture.getLayout();
 				layout.renderComponent( renderedComponent, $targetEl, { position: $otherCmpEl[ 0 ] } );  // the component is supposed to be before $otherCmpEl, but it is currently after it
 				
-				JsMockito.verify( renderedComponent ).render();
+				expect( renderedComponent.render.calls.length ).toBe( 1 );
 			} );
 			
 			
@@ -164,7 +174,7 @@ define( [
 				var layout = fixture.getLayout();
 				layout.renderComponent( renderedComponent, $targetEl, { position: $otherCmpEl } );  // the component is supposed to be before $otherCmpEl, but it is currently after it
 				
-				JsMockito.verify( renderedComponent ).render();
+				expect( renderedComponent.render.calls.length ).toBe( 1 );
 			} );
 			
 			
@@ -180,7 +190,7 @@ define( [
 				var layout = fixture.getLayout();
 				layout.renderComponent( renderedComponent, $targetEl );
 				
-				JsMockito.verify( renderedComponent, JsMockito.Verifiers.never() ).render();
+				expect( renderedComponent.render ).not.toHaveBeenCalled();
 			} );
 			
 			
@@ -195,7 +205,7 @@ define( [
 				var layout = fixture.getLayout();
 				layout.renderComponent( renderedComponent, $targetEl, { position: 0 } );
 				
-				JsMockito.verify( renderedComponent, JsMockito.Verifiers.never() ).render();
+				expect( renderedComponent.render ).not.toHaveBeenCalled();
 			} );
 			
 			
@@ -210,7 +220,7 @@ define( [
 				var layout = fixture.getLayout();
 				layout.renderComponent( renderedComponent, $targetEl, { position: $otherCmpEl[ 0 ] } );
 				
-				JsMockito.verify( renderedComponent, JsMockito.Verifiers.never() ).render();
+				expect( renderedComponent.render ).not.toHaveBeenCalled();
 			} );
 			
 			
@@ -225,7 +235,7 @@ define( [
 				var layout = fixture.getLayout();
 				layout.renderComponent( renderedComponent, $targetEl, { position: $otherCmpEl } );
 				
-				JsMockito.verify( renderedComponent, JsMockito.Verifiers.never() ).render();
+				expect( renderedComponent.render ).not.toHaveBeenCalled();
 			} );
 		} );
 	} );

@@ -1,4 +1,4 @@
-/*global define, JsMockito */
+/*global define, spyOn */
 define( [
 	'jquery',
 	'lodash',
@@ -72,13 +72,13 @@ define( [
 			this.$targetEl = jQuery( '<div style="width: ' + this.targetWidth + 'px; height: ' + this.targetHeight + 'px;" />' );
 			
 			// A mock Container, which uses the $targetEl as its content target
-			this.container = JsMockito.mock( Container );
-			JsMockito.when( this.container ).getContentTarget().thenReturn( this.$targetEl );
-			JsMockito.when( this.container ).getCount().thenReturn( 0 );      // initially 0. Override in tests.
-			JsMockito.when( this.container ).getItems().thenReturn( [] );     // initially empty. Override in tests.
-			JsMockito.when( this.container ).getItemAt().thenReturn( null );  // all calls to getItemAt() (with any argument) should return null by default. 
-			                                                                  // Specific argument values can be overridden in tests to return actual objects.
-			JsMockito.when( this.container ).isRendered().thenReturn( true ); // must be rendered for the layout routine to run
+			this.container = new Container();
+			spyOn( this.container, 'getContentTarget' ).andReturn( this.$targetEl );
+			spyOn( this.container, 'getCount' ).andReturn( 0 );      // initially 0. Override in tests.
+			spyOn( this.container, 'getItems' ).andReturn( [] );     // initially empty. Override in tests.
+			spyOn( this.container, 'getItemAt' ).andReturn( null );  // all calls to getItemAt() (with any argument) should return null by default. 
+			                                                         // Specific argument values can be overridden in tests to return actual objects.
+			spyOn( this.container, 'isRendered' ).andReturn( true ); // must be rendered for the layout routine to run
 			
 			
 			// Create a layout for testing, and set its 'container' to the mock Container
@@ -118,19 +118,19 @@ define( [
 			    childComponent;
 			
 			for( var i = 0; i < howMany; i++ ) {
-				childComponent = childComponents[ i ] = JsMockito.mock( Component );
+				childComponent = childComponents[ i ] = new Component();
 				
 				// Note: All mock returns can be overridden
-				JsMockito.when( childComponent ).getPadding().thenReturn( 0 );
-				JsMockito.when( childComponent ).getMargin().thenReturn( 0 );
-				JsMockito.when( childComponent ).getBorderWidth().thenReturn( 0 );
+				spyOn( childComponent, 'getPadding' ).andReturn( 0 );
+				spyOn( childComponent, 'getMargin' ).andReturn( 0 );
+				spyOn( childComponent, 'getBorderWidth' ).andReturn( 0 );
 				
-				JsMockito.when( childComponent ).getHeight().thenReturn( this.targetHeight );
-				JsMockito.when( childComponent ).getInnerHeight().thenReturn( this.targetHeight );
-				JsMockito.when( childComponent ).getOuterHeight().thenReturn( this.targetHeight );
-				JsMockito.when( childComponent ).getWidth().thenReturn( this.targetWidth );
-				JsMockito.when( childComponent ).getInnerWidth().thenReturn( this.targetWidth );
-				JsMockito.when( childComponent ).getOuterWidth().thenReturn( this.targetWidth );
+				spyOn( childComponent, 'getHeight' ).andReturn( this.targetHeight );
+				spyOn( childComponent, 'getInnerHeight' ).andReturn( this.targetHeight );
+				spyOn( childComponent, 'getOuterHeight' ).andReturn( this.targetHeight );
+				spyOn( childComponent, 'getWidth' ).andReturn( this.targetWidth );
+				spyOn( childComponent, 'getInnerWidth' ).andReturn( this.targetWidth );
+				spyOn( childComponent, 'getOuterWidth' ).andReturn( this.targetWidth );
 			}
 			return childComponents;
 		},

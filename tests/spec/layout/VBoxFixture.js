@@ -1,4 +1,4 @@
-/*global define, JsMockito */
+/*global define */
 define( [
 	'jqc/layout/VBox',
 	'spec/layout/LayoutFixture'

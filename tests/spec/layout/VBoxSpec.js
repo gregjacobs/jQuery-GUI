@@ -1,4 +1,4 @@
-/*global define, describe, beforeEach, afterEach, it, expect, JsMockito */
+/*global define, describe, beforeEach, afterEach, it, expect, spyOn */
 define( [
 	'spec/layout/VBoxFixture'
 ], function( VBoxLayoutFixture ) {
@@ -18,24 +18,34 @@ define( [
 			
 			
 			it( "doLayout() should properly lay out 2 child components, one regularly sized, and the other flexed", function() {
-				var childComponents = fixture.createChildComponents( 2 );
-				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( childComponents );
+				var childComponents = fixture.createChildComponents( 2 ),
+				    container = fixture.getContainer();
+				
+				container.getItems.andReturn( childComponents );
+				spyOn( childComponents[ 1 ], 'setSize' );
 				
 				var cmp0Height = 20;
-				JsMockito.when( childComponents[ 0 ] ).getOuterHeight().thenReturn( cmp0Height );
+				childComponents[ 0 ].getOuterHeight.andReturn( cmp0Height );
 				childComponents[ 1 ].flex = 1;  // Set the flex config on the 2nd component
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();
 				
 				// Note: Changed implementation to always use width: 100% to allow the browser to resize the components
-				JsMockito.verify( childComponents[ 1 ] ).setSize( /*thisSuite.targetWidth*/ '100%', fixture.getContainerHeight() - cmp0Height );
+				expect( childComponents[ 1 ].setSize.callCount ).toBe( 1 );
+				expect( childComponents[ 1 ].setSize ).toHaveBeenCalledWith( /*thisSuite.targetWidth*/ '100%', fixture.getContainerHeight() - cmp0Height );
 			} );
 			
 			
 			it( "doLayout() should properly lay out 4 child components, all flexed", function() {
-				var childComponents = fixture.createChildComponents( 4 );
-				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( childComponents );
+				var childComponents = fixture.createChildComponents( 4 ),
+				    container = fixture.getContainer();
+				
+				container.getItems.andReturn( childComponents );
+				spyOn( childComponents[ 0 ], 'setSize' );
+				spyOn( childComponents[ 1 ], 'setSize' );
+				spyOn( childComponents[ 2 ], 'setSize' );
+				spyOn( childComponents[ 3 ], 'setSize' );
 				
 				// Set the flex configs
 				childComponents[ 0 ].flex = 1;  // 1/6 * 200 = 33.33 ~= 33 and .33 remainder
@@ -48,43 +58,55 @@ define( [
 				layout.doLayout();
 				
 				// Note: Changed implementation to always use width: 100% to allow the browser to resize the components
-				JsMockito.verify( childComponents[ 0 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 1/6 * fixture.getContainerHeight() ) );
-				JsMockito.verify( childComponents[ 1 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 2/6 * fixture.getContainerHeight() ) );
-				JsMockito.verify( childComponents[ 2 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 1/6 * fixture.getContainerHeight() ) );
-				JsMockito.verify( childComponents[ 3 ] ).setSize( /*thisSuite.targetWidth*/ '100%', Math.floor( 2/6 * fixture.getContainerHeight() ) + 1 );  // the + 1 is the floored sum of the trimmed off decimal remainders from flexing other components
+				expect( childComponents[ 0 ].setSize.callCount ).toBe( 1 );
+				expect( childComponents[ 1 ].setSize.callCount ).toBe( 1 );
+				expect( childComponents[ 2 ].setSize.callCount ).toBe( 1 );
+				expect( childComponents[ 3 ].setSize.callCount ).toBe( 1 );
+				expect( childComponents[ 0 ].setSize ).toHaveBeenCalledWith( /*thisSuite.targetWidth*/ '100%', Math.floor( 1/6 * fixture.getContainerHeight() ) );
+				expect( childComponents[ 1 ].setSize ).toHaveBeenCalledWith( /*thisSuite.targetWidth*/ '100%', Math.floor( 2/6 * fixture.getContainerHeight() ) );
+				expect( childComponents[ 2 ].setSize ).toHaveBeenCalledWith( /*thisSuite.targetWidth*/ '100%', Math.floor( 1/6 * fixture.getContainerHeight() ) );
+				expect( childComponents[ 3 ].setSize ).toHaveBeenCalledWith( /*thisSuite.targetWidth*/ '100%', Math.floor( 2/6 * fixture.getContainerHeight() ) + 1 );  // the + 1 is the floored sum of the trimmed off decimal remainders from flexing other components
 			} );
 			
 			
 			it( "should properly lay out child components, ignoring hidden ones that don't have a flex value", function() {
-				var childComponents = fixture.createChildComponents( 2 );
-				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( childComponents );
+				var childComponents = fixture.createChildComponents( 2 ),
+				    container = fixture.getContainer();
+				
+				container.getItems.andReturn( childComponents );
+				spyOn( childComponents[ 0 ], 'setSize' );
 				
 				// Set the flex config
 				childComponents[ 0 ].flex = 1;
 				
 				// Hide the other component
-				JsMockito.when( childComponents[ 1 ] ).isHidden().thenReturn( true );
+				spyOn( childComponents[ 1 ], 'isHidden' ).andReturn( true );
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();
-				JsMockito.verify( childComponents[ 0 ] ).setSize( '100%', fixture.getContainerHeight() );
+				expect( childComponents[ 0 ].setSize.callCount ).toBe( 1 );
+				expect( childComponents[ 0 ].setSize ).toHaveBeenCalledWith( '100%', fixture.getContainerHeight() );
 			} );
 			
 			
 			it( "should properly lay out child components, ignoring hidden ones that do have a flex value", function() {
-				var childComponents = fixture.createChildComponents( 2 );
-				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( childComponents );
+				var childComponents = fixture.createChildComponents( 2 ),
+				    container = fixture.getContainer();
+				
+				container.getItems.andReturn( childComponents );
+				spyOn( childComponents[ 0 ], 'setSize' );
 				
 				// Set the flex configs
 				childComponents[ 0 ].flex = 1;
 				childComponents[ 1 ].flex = 1;
 				
 				// Hide the second component
-				JsMockito.when( childComponents[ 1 ] ).isHidden().thenReturn( true );
+				spyOn( childComponents[ 1 ], 'isHidden' ).andReturn( true );
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();
-				JsMockito.verify( childComponents[ 0 ] ).setSize( '100%', fixture.getContainerHeight() );
+				expect( childComponents[ 0 ].setSize.callCount ).toBe( 1 );
+				expect( childComponents[ 0 ].setSize ).toHaveBeenCalledWith( '100%', fixture.getContainerHeight() );
 			} );
 			
 		} );

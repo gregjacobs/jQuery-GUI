@@ -1,4 +1,4 @@
-/*global define, describe, beforeEach, afterEach, it, expect, JsMockito */
+/*global define, describe, beforeEach, afterEach, it, expect, spyOn */
 define( [
 	'jquery',
 	'spec/layout/FitFixture'
@@ -27,88 +27,113 @@ define( [
 			
 			
 			it( "doLayout() should do an initial render of the container's child component with the correct size, taking into account margin/border/padding", function() {
-				var childCmp = fixture.getChildCmp();
-				JsMockito.when( childCmp ).isRendered().thenReturn( false );  // Not yet rendered
+				var childCmp = fixture.getChildCmp(),
+				    container = fixture.getContainer();
+
+				spyOn( childCmp, 'render' );
+				spyOn( childCmp, 'setSize' );
+				spyOn( childCmp, 'isRendered' ).andReturn( false );  // Not yet rendered
 				
 				var lrPadding = 1, lrMargin = 2, lrBorderWidth = 3,
 				    tbPadding = 2, tbMargin = 3, tbBorderWidth = 4;
+
+				childCmp.getPadding.andCallFake( function( sides ) {
+					if( sides === 'lr' ) return lrPadding;
+					if( sides === 'tb' ) return tbPadding;
+				} );
+				childCmp.getMargin.andCallFake( function( sides ) {
+					if( sides === 'lr' ) return lrMargin;
+					if( sides === 'tb' ) return tbMargin;
+				} );
+				childCmp.getBorderWidth.andCallFake( function( sides ) {
+					if( sides === 'lr' ) return lrBorderWidth;
+					if( sides === 'tb' ) return tbBorderWidth;
+				} );
 				
-				JsMockito.when( childCmp ).getPadding( 'lr' ).thenReturn( lrPadding );
-				JsMockito.when( childCmp ).getPadding( 'tb' ).thenReturn( tbPadding );
-				JsMockito.when( childCmp ).getMargin( 'lr' ).thenReturn( lrMargin );
-				JsMockito.when( childCmp ).getMargin( 'tb' ).thenReturn( tbMargin );
-				JsMockito.when( childCmp ).getBorderWidth( 'lr' ).thenReturn( lrBorderWidth );
-				JsMockito.when( childCmp ).getBorderWidth( 'tb' ).thenReturn( tbBorderWidth );
-				
-				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( [ childCmp ] );
+				container.getItems.andReturn( [ childCmp ] );
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();
 				
-				JsMockito.verify( childCmp ).render( fixture.getTargetEl() );
-				JsMockito.verify( childCmp ).setSize( fixture.getContainerWidth() - lrPadding - lrMargin - lrBorderWidth, fixture.getContainerHeight() - tbPadding - tbMargin - tbBorderWidth );
+				expect( childCmp.render.callCount ).toBe( 1 );
+				expect( childCmp.render.calls[ 0 ].args[ 0 ] ).toBe( fixture.getTargetEl() );
+				expect( childCmp.setSize.callCount ).toBe( 1 );
+				expect( childCmp.setSize ).toHaveBeenCalledWith( fixture.getContainerWidth() - lrPadding - lrMargin - lrBorderWidth, fixture.getContainerHeight() - tbPadding - tbMargin - tbBorderWidth );
 			} );
 			
 			
 			it( "doLayout() should move the container's child component if it is already rendered, but elsewhere", function() {
 				var childCmp = fixture.getChildCmp(),
+				    container = fixture.getContainer(),
 				    $cmpEl = jQuery( '<div />' ).appendTo( 'body' );
-				JsMockito.when( childCmp ).isRendered().thenReturn( true );  // Already rendered
-				JsMockito.when( childCmp ).getEl().thenReturn( $cmpEl );
 				
-				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( [ childCmp ] );
+				spyOn( childCmp, 'render' );
+				spyOn( childCmp, 'setSize' );
+				spyOn( childCmp, 'isRendered' ).andReturn( true );  // Already rendered
+				spyOn( childCmp, 'getEl' ).andReturn( $cmpEl );
+				
+				container.getItems.andReturn( [ childCmp ] );
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();
 				
-				JsMockito.verify( childCmp ).setSize( fixture.getContainerWidth(), fixture.getContainerHeight() );
-				JsMockito.verify( childCmp ).render( fixture.getTargetEl() );   // Call render(), to make sure the component is in the correct place
+				expect( childCmp.setSize.callCount ).toBe( 1 );
+				expect( childCmp.setSize ).toHaveBeenCalledWith( fixture.getContainerWidth(), fixture.getContainerHeight() );
+				expect( childCmp.render.callCount ).toBe( 1 );
+				expect( childCmp.render ).toHaveBeenCalledWith( fixture.getTargetEl(), { deferLayout: true } );   // Call render(), to make sure the component is in the correct place
 				
 				$cmpEl.remove();
 			} );
 			
 			
 			it( "doLayout() should *not* move the container's child component if it is already rendered in the FitLayout", function() {
-				var childCmp = fixture.getChildCmp();
+				var childCmp = fixture.getChildCmp(),
+				    container = fixture.getContainer();
 				
 				// Simulate that the component's element was created and added to the $targetEl
 				var $cmpEl = jQuery( '<div />' );
 				fixture.getTargetEl().append( $cmpEl );
-				JsMockito.when( childCmp ).isRendered().thenReturn( true );
-				JsMockito.when( childCmp ).getEl().thenReturn( $cmpEl );
+				spyOn( childCmp, 'render' );
+				spyOn( childCmp, 'isRendered' ).andReturn( true );
+				spyOn( childCmp, 'getEl' ).andReturn( $cmpEl );
 				
-				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( [ childCmp ] );
+				container.getItems.andReturn( [ childCmp ] );
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();
 				
-				JsMockito.verify( childCmp, JsMockito.Verifiers.never() ).render( fixture.getTargetEl() );
+				expect( childCmp.render ).not.toHaveBeenCalled();  // original tested that it wasn't called with `fixture.getTargetEl()`
 			} );
 			
 			
 			it( "doLayout() should *not* move the container's child component if it is already rendered in the FitLayout, but should fix its size if the Container's contentTargetEl's size has changed", function() {
-				var childCmp = fixture.getChildCmp();
-				JsMockito.when( childCmp ).isRendered().thenReturn( false );
+				var childCmp = fixture.getChildCmp(),
+				    container = fixture.getContainer();
+				spyOn( childCmp, 'render' );
+				spyOn( childCmp, 'setSize' );
+				spyOn( childCmp, 'isRendered' ).andReturn( false );
 				
-				JsMockito.when( fixture.getContainer() ).getItems().thenReturn( [ childCmp ] );
+				container.getItems.andReturn( [ childCmp ] );
 				
 				var layout = fixture.getLayout();
 				layout.doLayout();  // initial layout
 				
 				// Need to pretend the component is rendered now, and change the size of the target element 
 				// before running the layout again
-				JsMockito.when( childCmp ).isRendered().thenReturn( true );
-				JsMockito.when( childCmp ).getEl().thenReturn( jQuery( '<div />' ).appendTo( fixture.getTargetEl() ) );
+				childCmp.isRendered.andReturn( true );
+				spyOn( childCmp, 'getEl' ).andReturn( jQuery( '<div />' ).appendTo( fixture.getTargetEl() ) );
 				fixture.getTargetEl().width( 42 );
 				fixture.getTargetEl().height( 7 );
 				layout.doLayout();
 				
-				JsMockito.verify( childCmp, JsMockito.Verifiers.once() ).render( fixture.getTargetEl() );   // should only be rendered the first time
+				expect( childCmp.render.callCount ).toBe( 1 );
+				expect( childCmp.render ).toHaveBeenCalledWith( fixture.getTargetEl(), { deferLayout: true } );   // should only be rendered the first time
 				
 				var targetWidth = fixture.getContainerWidth(),
 				    targetHeight = fixture.getContainerHeight();
-				JsMockito.verify( childCmp ).setSize( targetWidth, targetHeight );   // verify that it was set to the initial size first
-				JsMockito.verify( childCmp ).setSize( 42, 7 );                       // verify that it was set to the new size as well
+				expect( childCmp.setSize.callCount ).toBe( 2 );
+				expect( childCmp.setSize ).toHaveBeenCalledWith( targetWidth, targetHeight );   // verify that it was set to the initial size first
+				expect( childCmp.setSize ).toHaveBeenCalledWith( 42, 7 );                       // verify that it was set to the new size as well
 			} );
 			
 		} );

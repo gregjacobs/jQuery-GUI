@@ -1,4 +1,4 @@
-/*global define, JsMockito */
+/*global define, spyOn */
 define( [
 	'jquery',
 	'jqc/Component',
@@ -29,10 +29,10 @@ define( [
 		constructor : function() {
 			this._super( arguments );
 			
-			this.childCmp = JsMockito.mock( Component );
-			JsMockito.when( this.childCmp ).getPadding().thenReturn( 0 );       // default implementation, can be overridden
-			JsMockito.when( this.childCmp ).getMargin().thenReturn( 0 );        // default implementation, can be overridden
-			JsMockito.when( this.childCmp ).getBorderWidth().thenReturn( 0 );   // default implementation, can be overridden
+			this.childCmp = new Component();
+			spyOn( this.childCmp, 'getPadding' ).andReturn( 0 );       // default implementation, can be overridden
+			spyOn( this.childCmp, 'getMargin' ).andReturn( 0 );        // default implementation, can be overridden
+			spyOn( this.childCmp, 'getBorderWidth' ).andReturn( 0 );   // default implementation, can be overridden
 		},
 		
 		
