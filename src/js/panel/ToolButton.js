@@ -41,7 +41,6 @@ define( [
 			    toolType = this.toolType;
 			
 			this.iconCls = [
-				'jqc-icon',
 				'jqc-icon-' + toolType,
 				componentCls + '-icon',
 				componentCls + '-icon-' + toolType
