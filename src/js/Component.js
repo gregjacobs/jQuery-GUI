@@ -1190,6 +1190,117 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		},
 		
 		
+		/**
+		 * Adds one or more event listeners to the Component's {@link #$el element}, when the element becomes {@link #render rendered}. 
+		 * 
+		 * This method's signature mostly follows the signature of jQuery's `on` method (minus the `data` parameter), but is 
+		 * especially useful due to the fact that it properly handles the Component's {@link #rendered} and 
+		 * {@link #rendered unrendered} states, and allows for a scope argument, which does not exist for jQuery's `on` method. 
+		 * It also allows the attachment of multiple handlers with filtering selectors (to set up event delegation) when the first 
+		 * argument is an Object (map), also which is not available from jQuery's `on` method. 
+		 * 
+		 * Note that this method will most likely be called by a subclass of Component, and not on specific Component instances in
+		 * consuming code. It is provided as a public method, however, to support simple cases where it may be needed. In most cases, 
+		 * a subclass of Component should be created, where a specific {@link Observable} event should be fired for when an 
+		 * interaction is made with the Component instead.
+		 * 
+		 * ## Example Usage
+		 * 
+		 *     this.addElementListener( 'click', 'a[data-elem="myAnchor"]', this.onMyAnchorClick, this );
+		 * 
+		 * ## Using an Object (map) to specify multiple handlers
+		 * 
+		 * This method accepts an Object (map) as its first argument (in which case, all other arguments are ignored) to specify
+		 * multiple handlers to attach to the Component's {@link #$el element} at once. For example:
+		 * 
+		 *     this.addElementListener( {
+		 *         'click'     : function( evt ) {},
+		 *         'mouseover' : function( evt ) {},
+		 *         'mouseout'  : function( evt ) {},
+		 *         
+		 *         scope : this
+		 *     } );
+		 * 
+		 * It also allows for a filtering selector for events in this form when the event name and the filtering selector are
+		 * separated by a space. For example:
+		 * 
+		 *     this.addElementListener( {
+		 *         'click a[data-elem="element1"]' : function( evt ) {},
+		 *         'click a[data-elem="element2"]' : function( evt ) {},
+		 *         'click a > span'                : function( evt ) {},  // this one not recommended, but demonstrates more complex selectors
+		 *         
+		 *         scope : this
+		 *     } );
+		 * 
+		 * 
+		 * @param {String/Object} eventName The name of the event to add a listener for, or an Object (map) of the listeners to
+		 *   add to the element. See this method's description for usage of the latter form.
+		 * @param {String} [selector] A selector string to filter the descendent elements that trigger the event. This is used
+		 *   to create "delegate" listeners. Ex: 'div[data-elem="myElement"]'. If the value is `null`, or omitted, then no filtering
+		 *   will occur.
+		 * @param {Function} callback The handler callback function to execute when the event occurs. The callback is called
+		 *   with one argument, the `jQuery.Event` object (usually named `evt`).
+		 * @param {Object} [scope] The scope to execute the `callback` function in. Defaults to this Component instance.
+		 */
+		addElementListener : function( eventName, selector, callback, scope ) {
+			
+			
+			throw new Error( "Not yet implemented" );
+			
+			
+			var eventsCfg;
+			
+			// First normalize the event(s) into the eventCfg object
+			if( typeof eventName === 'object' ) {
+				eventsCfg = eventName;
+				eventsCfg.scope = eventCfg.scope || this;
+				
+			} else {
+				if( typeof selector === 'function' ) {
+					scope = callback;
+					callback = selector;
+					selector = '';
+				}
+				selector = selector || '';
+				
+				eventsCfg = {};
+				eventsCfg[ jQuery.trim( eventName + ' ' + selector ) ] = callback;
+				eventsCfg.scope = scope || this;
+			}
+			
+			
+			var elementListeners = this.elementListeners = this.elementListeners || {},
+			    scope = eventCfg.scope;
+			
+			_.forOwn( eventsCfg, function( eventCfg, eventName ) {
+				if( !elementListeners[ eventName ] ) {
+					elementListeners[ eventName ] = [];
+				}
+				
+				var callback = eventCfg.callback,
+				    boundFn = _.bind( eventCfg.callback, scope );
+				
+				elementListeners[ eventName ].push( { 
+					callback : eventCfg.callback,
+					scope    : scope,
+					boundFn  : boundFn
+				} );
+				
+				if( this.rendered ) {
+					this.attachElementListener( elementListeners[ eventName ] );
+				}
+			}, this );
+		},
+		
+		
+		/**
+		 * 
+		 */
+		removeElementListener : function() {
+			throw new Error( "Not yet implemented" );
+		},
+		
+		
 		// ----------------------------
 		
 		
