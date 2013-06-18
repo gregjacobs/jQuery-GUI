@@ -55,7 +55,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-DropdownField',
+		componentCls : 'jqc-form-field-dropdown',
 		
 		
 		/**
@@ -104,7 +104,7 @@ define( [
 			 * The template to use to render the dropdown's options menu elements.
 			 */
 			optionsMenuRenderTpl : new LoDashTpl( [
-				'<li data-elem="jqc-form-DropdownField-menu-item" class="<%= componentCls %>-menu-item <%= menuItemCls %>" style="<%= menuItemStyle %>">',
+				'<li data-elem="jqc-form-field-dropdown-menu-item" class="<%= componentCls %>-menu-item <%= menuItemCls %>" style="<%= menuItemStyle %>">',
 					'<%= text %>',
 				'</li>'
 			] )
@@ -484,7 +484,7 @@ define( [
 				
 				// Now that the markup is appended and DOM nodes have been created, assign the values to the menu item
 				// elements using .data() (so that values of any datatype may be assigned)
-				var $itemEls = $optionsMenu.find( '[data-elem="jqc-form-DropdownField-menu-item"]' );
+				var $itemEls = $optionsMenu.find( '[data-elem="jqc-form-field-dropdown-menu-item"]' );
 				for( i = 0; i < numOptions; i++ ) {
 					// Add the "value" as data (instead of an attribute), so that any datatype can be stored for the value
 					$itemEls.eq( i ).data( 'value', options[ i ].value );
@@ -577,7 +577,7 @@ define( [
 					$optionsMenu.find( 'li.' + selectedCls ).removeClass( selectedCls );  // De-select any currently selected item in the dropdown menu
 					
 					// Select the item with the given value
-					var $itemEls = $optionsMenu.find( 'li[data-elem="jqc-form-DropdownField-menu-item"]' );
+					var $itemEls = $optionsMenu.find( 'li[data-elem="jqc-form-field-dropdown-menu-item"]' );
 					for( var i = 0, len = $itemEls.length; i < len; i++ ) {
 						var $item = $itemEls.eq( i );
 						if( $item.data( 'value' ) === value ) {

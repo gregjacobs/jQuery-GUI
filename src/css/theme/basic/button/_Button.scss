@@ -1,16 +1,16 @@
-.jqc-Button {
+.jqc-button {
 	border: 1px solid #D3D3D3;
 }
 
-.jqc-Button-hover {
+.jqc-button-hover {
 	border: 1px outset #999;
 }
-.jqc-Button-active {
+.jqc-button-active {
 	border: 1px inset #AAA;
 }
 
 
-.jqc-Button-icon {
+.jqc-button-icon {
 	position: relative;
 	top: 2px;
 	
@@ -18,7 +18,7 @@
 	height: 16px;
 }
 
-.jqc-Button-text {
+.jqc-button-text {
 	padding: 2px 6px;
 	text-decoration: none;
 }

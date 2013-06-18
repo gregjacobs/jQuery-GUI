@@ -32,7 +32,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-TextAreaField',
+		componentCls : 'jqc-form-field-textarea',
 		
 		
 		/**

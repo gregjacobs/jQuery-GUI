@@ -67,7 +67,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Button',
+		baseCls : 'jqc-button',
 		
 		/**
 		 * @cfg

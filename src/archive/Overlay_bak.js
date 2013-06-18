@@ -181,7 +181,7 @@ define( [
 			// Call superclass initComponent
 			this._super( arguments );
 			
-			this.addCls( 'ui-Overlay' );
+			this.addCls( 'ui-overlay' );
 			this.hidden = true;   // Overlays are always hidden to start, as they rely on the show() logic to be properly shown w/ a position and size
 	
 			// If the autoShow config has been set to true, show the overlay immediately

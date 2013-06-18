@@ -36,7 +36,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-Panel-Header',
+		componentCls : 'jqc-panel-header',
 		
 		
 		/**

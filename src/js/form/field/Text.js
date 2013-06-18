@@ -52,7 +52,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-TextField',
+		componentCls : 'jqc-form-field-text',
 		
 		
 		/**

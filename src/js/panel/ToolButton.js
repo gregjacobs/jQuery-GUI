@@ -26,7 +26,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-ToolButton',
+		componentCls : 'jqc-panel-toolbutton',
 		
 		
 		/**

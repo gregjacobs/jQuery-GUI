@@ -1,10 +1,10 @@
-.jqc-Window {
-  @extend .jqc-Overlay;
+.jqc-window {
+  @extend .jqc-overlay;
 }
 
-.jqc-Window-header {}
-.jqc-Window-header-innerCt {}
-.jqc-Window-header-title { float: left; }
-.jqc-Window-header-toolButtons { float: right; }
+.jqc-window-header {}
+.jqc-window-header-innerCt {}
+.jqc-window-header-title { float: left; }
+.jqc-window-header-toolButtons { float: right; }
 
-.jqc-Window-body {}
+.jqc-window-body {}

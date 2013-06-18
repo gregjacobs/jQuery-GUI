@@ -77,10 +77,10 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * is applied to the Component's {@link #$el element}. 
 		 * 
 		 * The value of this config, by convention, is also used to prefix descendent elements of a Component subclass. For 
-		 * example, {@link jqc.panel.Panel Panel} sets this config to 'jqc-Panel', and its header and body elements are prefixed with 
-		 * this to become 'jqc-Panel-header' and 'jqc-Panel-body', respectively. However when a {@link jqc.window.Window Window} is 
-		 * created (which is a subclass of {@link jqc.panel.Panel Panel}, the value is 'jqc-Window', and the header and body become 
-		 * 'jqc-Window-header' and 'jqc-Window-body' instead.
+		 * example, {@link jqc.panel.Panel Panel} sets this config to 'jqc-panel', and its header and body elements are prefixed with 
+		 * this to become 'jqc-panel-header' and 'jqc-panel-body', respectively. However when a {@link jqc.window.Window Window} is 
+		 * created (which is a subclass of {@link jqc.panel.Panel Panel}, the value is 'jqc-window', and the header and body become 
+		 * 'jqc-window-header' and 'jqc-window-body' instead.
 		 */
 		baseCls : 'jqc-Component',
 		
@@ -92,11 +92,11 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * This is used for subclasses whose parent defines a {@link #baseCls}, but then have to add additional styling
 		 * themselves. 
 		 * 
-		 * For example, the base form {@link jqc.form.field.Field Field} class adds the {@link #baseCls} 'jqc-form-Field', and
-		 * the {@link jqc.form.field.Text Text} field subclass wants to keep that class, and also add 'jqc-form-TextField'
+		 * For example, the base form {@link jqc.form.field.Field Field} class adds the {@link #baseCls} 'jqc-form-field', and
+		 * the {@link jqc.form.field.Text Text} field subclass wants to keep that class, and also add 'jqc-form-field-text'
 		 * to allow for any different styling of that particular subclass component. The result is two css classes:
-		 * 'jqc-form-Field' and 'jqc-form-TextField'. In the case of {@link jqc.form.field.TextArea TextArea} (a subclass
-		 * of the Text field}, its componentCls is 'jqc-form-TextAreaField', which overrides Text field's componentCls.
+		 * 'jqc-form-field' and 'jqc-form-field-text'. In the case of {@link jqc.form.field.TextArea TextArea} (a subclass
+		 * of the Text field}, its componentCls is 'jqc-form-field-textarea', which overrides Text field's componentCls.
 		 */
 		
 		/**
@@ -192,9 +192,9 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * 
 		 * - **elId**: The value of the {@link #elId} property (an auto-generated, unique value).
 		 * - **baseCls**: The {@link #baseCls} config, which is the base CSS class to prefix descendent elements' CSS
-		 *   classes with. Ex: a {@link #baseCls} of 'jqc-Panel' is used to prefix a {@link jqc.panel.Panel Panel's} body
-		 *   element to become 'jqc-Panel-body', but when a {@link jqc.window.Window Window} is created, the value is
-		 *   'jqc-Window', and the body becomes 'jqc-Window-body' instead. 
+		 *   classes with. Ex: a {@link #baseCls} of 'jqc-panel' is used to prefix a {@link jqc.panel.Panel Panel's} body
+		 *   element to become 'jqc-panel-body', but when a {@link jqc.window.Window Window} is created, the value is
+		 *   'jqc-window', and the body becomes 'jqc-window-body' instead. 
 		 * - **componentCls**: The {@link #componentCls} config.
 		 */
 		

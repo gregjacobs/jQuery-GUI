@@ -1,5 +1,5 @@
 /* line 1, ../../../src/css/base/_Overlay.scss */
-.jqc-Overlay, .jqc-Window {
+.jqc-overlay, .jqc-window {
   position: absolute;
   top: 0;
   left: 0;
@@ -69,7 +69,7 @@
 }
 
 /* line 1, ../../../src/css/base/button/_Button.scss */
-.jqc-Button {
+.jqc-button {
   display: inline-block;
   position: relative;
   margin: 0;
@@ -85,74 +85,66 @@
 
 /* General Button Styles */
 /* line 15, ../../../src/css/base/button/_Button.scss */
-.jqc-Button-hiddenEl {
+.jqc-button-hiddenEl {
   display: none !important;
 }
 
 /* Icons */
 /* line 18, ../../../src/css/base/button/_Button.scss */
-.jqc-Button-icon {
+.jqc-button-icon {
   display: inline-block;
 }
 
 /* button text element */
 /* line 23, ../../../src/css/base/button/_Button.scss */
-.jqc-Button-text {
+.jqc-button-text {
   display: inline-block;
   line-height: normal;
 }
 
-/* workarounds */
-/* reset extra padding in Firefox, see h5bp.com/l */
-/* line 31, ../../../src/css/base/button/_Button.scss */
-button.jqc-Button::-moz-focus-inner {
-  border: 0;
-  padding: 0;
-}
-
 /* line 1, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-Field {
+.jqc-form-field {
   margin: 0;
   padding: 0;
   width: 100%;
   border-collapse: collapse;
 }
 /* line 7, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-Field tbody, .jqc-form-Field tr, .jqc-form-Field th {
+.jqc-form-field tbody, .jqc-form-field tr, .jqc-form-field th {
   margin: 0;
   padding: 0;
 }
 /* line 9, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-Field.jqc-form-Field-leftLabel {
+.jqc-form-field.jqc-form-field-leftLabel {
   table-layout: fixed;
 }
 /* line 10, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-Field.jqc-form-Field-topLabel {
+.jqc-form-field.jqc-form-field-topLabel {
   table-layout: auto;
 }
 
 /* line 14, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-Field-leftLabelCell {
+.jqc-form-field-leftLabelCell {
   margin: 0;
   padding: 0;
   vertical-align: top;
 }
 
 /* line 18, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-Field-inputCell {
+.jqc-form-field-inputCell {
   vertical-align: top;
   width: 100%;
 }
 
 /* line 19, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-Field-inputContainer {
+.jqc-form-field-inputContainer {
   position: relative;
 }
 
 /* This is for the custom implementation of dropdowns, which don't use the html <select> element 
 ============================================================================================== */
 /* line 3, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqc-form-DropdownField {
+.jqc-form-field-dropdown {
   position: relative;
   left: 0px;
   top: 0px;
@@ -160,7 +152,7 @@ button.jqc-Button::-moz-focus-inner {
 
 /* For IE, need an iframe to cover certain elements */
 /* line 10, ../../../src/css/base/form/field/_Dropdown.scss */
-iframe.jqc-form-DropdownField-shim {
+iframe.jqc-form-field-dropdown-shim {
   position: absolute;
   z-index: 1;
   width: 100%;
@@ -170,7 +162,7 @@ iframe.jqc-form-DropdownField-shim {
 
 /* The box that shows the selected option's text */
 /* line 15, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqc-form-DropdownField-selectText {
+.jqc-form-field-dropdown-selectText {
   overflow-x: hidden;
   white-space: nowrap;
   background: none transparent;
@@ -178,7 +170,7 @@ iframe.jqc-form-DropdownField-shim {
 }
 
 /* line 22, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqc-form-DropdownField-openButton {
+.jqc-form-field-dropdown-openButton {
   position: absolute;
   top: 0;
   right: 0;
@@ -187,7 +179,7 @@ iframe.jqc-form-DropdownField-shim {
 }
 
 /* line 32, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqc-form-DropdownField-menu {
+.jqc-form-field-dropdown-menu {
   position: absolute;
   list-style: none;
   display: none;
@@ -198,12 +190,12 @@ iframe.jqc-form-DropdownField-shim {
 }
 
 /* line 42, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqc-form-DropdownField-menu-item {
+.jqc-form-field-dropdown-menu-item {
   cursor: pointer;
 }
 
 /* line 3, ../../../src/css/base/form/field/_Text.scss */
-.jqc-form-TextField-input, .jqc-form-TextAreaField-input {
+.jqc-form-field-text-input, .jqc-form-field-textarea-input {
   background: none transparent;
   border: none;
   width: 100%;
@@ -213,13 +205,13 @@ iframe.jqc-form-DropdownField-shim {
 }
 
 /* line 11, ../../../src/css/base/form/field/_Text.scss */
-.jqc-form-TextField-input:focus, .jqc-form-TextAreaField-input:focus {
+.jqc-form-field-text-input:focus, .jqc-form-field-textarea-input:focus {
   outline: 0;
   /* Override some user agent style sheets, like Chrome which has a 5px outline */
 }
 
 /* line 15, ../../../src/css/base/form/field/_Text.scss */
-.jqc-form-TextField-emptyText, .jqc-form-TextAreaField-emptyText {
+.jqc-form-field-text-emptyText, .jqc-form-field-textarea-emptyText {
   position: absolute;
   top: 0;
   left: 0;
@@ -227,29 +219,29 @@ iframe.jqc-form-DropdownField-shim {
 }
 
 /* line 2, ../../../src/css/base/layout/_Hbox.scss */
-.jqc-layout-HBox-component {
+.jqc-layout-hbox-component {
   float: left;
   min-height: 1px;
 }
 
 /* line 8, ../../../src/css/base/layout/_Hbox.scss */
-.jqc-layout-HBox-clear {
+.jqc-layout-hbox-clear {
   clear: both;
 }
 
 /* line 3, ../../../src/css/base/panel/_ToolButton.scss */
-.jqc-ToolButton .jqc-Button-text {
+.jqc-panel-toolbutton .jqc-button-text {
   padding: 0;
   line-height: 0;
 }
 
 /* line 7, ../../../src/css/base/window/_Window.scss */
-.jqc-Window-header-title {
+.jqc-window-header-title {
   float: left;
 }
 
 /* line 8, ../../../src/css/base/window/_Window.scss */
-.jqc-Window-header-toolButtons {
+.jqc-window-header-toolButtons {
   float: right;
 }
 

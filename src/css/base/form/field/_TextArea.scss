@@ -1,9 +1,9 @@
-.jqc-form-TextAreaField {}
+.jqc-form-field-textarea {}
 
-.jqc-form-TextAreaField-input {
-	@extend .jqc-form-TextField-input;
+.jqc-form-field-textarea-input {
+	@extend .jqc-form-field-text-input;
 }
 
-.jqc-form-TextAreaField-emptyText {
-	@extend .jqc-form-TextField-emptyText;
+.jqc-form-field-textarea-emptyText {
+	@extend .jqc-form-field-text-emptyText;
 }

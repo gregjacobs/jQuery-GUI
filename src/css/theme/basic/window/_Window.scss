@@ -1,9 +1,9 @@
-.jqc-Window { border-color: #000; border-style: solid; border-width: 0 1px 1px 1px; }
+.jqc-window { border-color: #000; border-style: solid; border-width: 0 1px 1px 1px; }
 
-.jqc-Window-header { border-color: #000; border-style: solid; border-width: 1px 0 0 0; background-color: #2383B3; }
-.jqc-Window-header-title { font-weight: bold; color: #FFF; }
-.jqc-Window-header-toolButtons { 
-	@extend .jqc-Panel-Header-toolButtons
+.jqc-window-header { border-color: #000; border-style: solid; border-width: 1px 0 0 0; background-color: #2383B3; }
+.jqc-window-header-title { font-weight: bold; color: #FFF; }
+.jqc-window-header-toolButtons { 
+	@extend .jqc-panel-header-toolButtons
 }
 
-.jqc-Window-body { border-color: #000; border-style: solid; border-width: 1px 0 0 0; background-color: #FFF; }
+.jqc-window-body { border-color: #000; border-style: solid; border-width: 1px 0 0 0; background-color: #FFF; }

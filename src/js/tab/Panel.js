@@ -68,7 +68,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-TabPanel',
+		baseCls : 'jqc-tabpanel',
 		
 		/**
 		 * @cfg {String} childPanelCls

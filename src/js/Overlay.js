@@ -137,7 +137,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Overlay',
+		baseCls : 'jqc-overlay',
 		
 		/**
 		 * @hide

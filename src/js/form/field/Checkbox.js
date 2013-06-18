@@ -39,7 +39,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-CheckboxField',
+		componentCls : 'jqc-form-field-checkbox',
 		
 		
 		/**

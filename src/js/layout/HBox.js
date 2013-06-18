@@ -90,7 +90,7 @@ define( [
 				
 				// Add the CSS class to components to be able to place them in an HBox layout. This adds `float:left;`,
 				// and a few other fixing styles.
-				childComponent.addCls( 'jqc-layout-HBox-component' );
+				childComponent.addCls( 'jqc-layout-hbox-component' );
 				
 				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
 				this.renderComponent( childComponent, $targetEl, { position: i } );
@@ -142,7 +142,7 @@ define( [
 			}
 			
 			if( !this.$clearEl ) {
-				this.$clearEl = jQuery( '<div class="jqc-layout-HBox-clear" />' );  // to clear the floats
+				this.$clearEl = jQuery( '<div class="jqc-layout-hbox-clear" />' );  // to clear the floats
 			}
 			$targetEl.append( this.$clearEl );
 		},

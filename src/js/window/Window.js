@@ -47,7 +47,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Window',
+		baseCls : 'jqc-window',
 		
 		/**
 		 * @cfg

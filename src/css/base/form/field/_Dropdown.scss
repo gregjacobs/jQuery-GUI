@@ -1,25 +1,25 @@
 /* This is for the custom implementation of dropdowns, which don't use the html <select> element 
 ============================================================================================== */
-.jqc-form-DropdownField {
+.jqc-form-field-dropdown {
 	position: relative;
 	left: 0px; 
 	top: 0px;
 }
 
 /* For IE, need an iframe to cover certain elements */
-iframe.jqc-form-DropdownField-shim { position: absolute; z-index: 1; width: 100%; left: 0px; top: 0px; }
+iframe.jqc-form-field-dropdown-shim { position: absolute; z-index: 1; width: 100%; left: 0px; top: 0px; }
 
-.jqc-form-DropdownField-dropdownContainer {}
+.jqc-form-field-dropdown-dropdownContainer {}
 
 /* The box that shows the selected option's text */
-.jqc-form-DropdownField-selectText {
+.jqc-form-field-dropdown-selectText {
 	overflow-x: hidden;
 	white-space: nowrap;
 	background: none transparent;
 	cursor: pointer;
 }
 
-.jqc-form-DropdownField-openButton {
+.jqc-form-field-dropdown-openButton {
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -29,7 +29,7 @@ iframe.jqc-form-DropdownField-shim { position: absolute; z-index: 1; width: 100%
 
 
 // The dropdown menu itself. This is appended to the document body
-.jqc-form-DropdownField-menu {
+.jqc-form-field-dropdown-menu {
 	position: absolute;
 	list-style: none;
 	display: none;
@@ -39,7 +39,7 @@ iframe.jqc-form-DropdownField-shim { position: absolute; z-index: 1; width: 100%
 	z-index: 5000;
 }
 
-.jqc-form-DropdownField-menu-item {
+.jqc-form-field-dropdown-menu-item {
 	cursor: pointer;
 }
-.jqc-form-DropdownField-menu-item-selected {}
+.jqc-form-field-dropdown-menu-item-selected {}

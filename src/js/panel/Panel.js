@@ -75,7 +75,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Panel',
+		baseCls : 'jqc-panel',
 		
 		/**
 		 * @cfg
@@ -249,14 +249,14 @@ define( [
 		 */
 		createFooter : function() {
 			return new Container( {
-				cls    : this.baseCls + '-Footer',
+				cls    : this.baseCls + '-footer',
 				layout : 'hbox',
 				
 				items  : [
 					{ type: 'component', flex: 1 },  // to push the buttons to the right
 					{
 						type : 'container',
-						cls  : this.baseCls + '-Footer-buttons',
+						cls  : this.baseCls + '-footer-buttons',
 						
 						defaultType : 'button',   // jqc.button.Button
 						items       : this.buttons

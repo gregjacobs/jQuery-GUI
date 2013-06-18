@@ -115,7 +115,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-form-Field',
+		baseCls : 'jqc-form-field',
 		
 		/**
 		 * @cfg
@@ -210,7 +210,7 @@ define( [
 			// Fix labelAlign to be lowercase for use with setting the class name (just in case),
 			// and apply the appropriate CSS class for the label state
 			var labelAlign = this.labelAlign = this.labelAlign.toLowerCase(),
-			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'jqc-form-Field-noLabel' if there is no label, or 'jqc-form-Field-leftLabel' or 'jqc-form-Field-topLabel' if there is one
+			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'jqc-form-field-noLabel' if there is no label, or 'jqc-form-field-leftLabel' or 'jqc-form-field-topLabel' if there is one
 			this.addCls( labelCls );
 			
 			

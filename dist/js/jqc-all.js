@@ -300,6 +300,31 @@ function( jQuery, _, Jqc ) {
 		
 		
 		/**
+		 * Determines if a CSS class exists within a string of CSS classes. For example:
+		 *     
+		 *     Css.hasCls( "class1 class2", "class1" );  // -> true
+		 *     Css.hasCls( "class1 class2", "class3" );  // -> false
+		 *     Css.hasCls( "", "class1" );               // -> false
+		 *     Css.hasCls( "class1 class2 class3", "class2" );  // -> true
+		 * 
+		 * @param {String} str The string of CSS class(es) to query. Ex: "class1 class2"
+		 * @param {String} cssClass The CSS class to test for. Ex: "class2"
+		 * @return {Boolean} True if the `str` has the given `cssClass`, false otherwise.
+		 */
+		hasCls : function( str, cssClass ) {
+			str = jQuery.trim( str );
+			cssClass = jQuery.trim( cssClass );
+			
+			if( !str || !cssClass ) {
+				return false;
+			} else {
+				var regex = new RegExp( '(^| )' + cssClass + '( |$)' );
+				return regex.test( str );
+			}
+		},
+		
+		
+		/**
 		 * Given an Object (map) of CSS property/value pairs, will return a string that can be placed directly
 		 * into the "style" attribute of an element. camelCased CSS property names will be converted to 
 		 * dashes. Ex: "fontSize" will be converted to "font-size".
@@ -1531,10 +1556,10 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * is applied to the Component's {@link #$el element}. 
 		 * 
 		 * The value of this config, by convention, is also used to prefix descendent elements of a Component subclass. For 
-		 * example, {@link jqc.panel.Panel Panel} sets this config to 'jqc-Panel', and its header and body elements are prefixed with 
-		 * this to become 'jqc-Panel-header' and 'jqc-Panel-body', respectively. However when a {@link jqc.window.Window Window} is 
-		 * created (which is a subclass of {@link jqc.panel.Panel Panel}, the value is 'jqc-Window', and the header and body become 
-		 * 'jqc-Window-header' and 'jqc-Window-body' instead.
+		 * example, {@link jqc.panel.Panel Panel} sets this config to 'jqc-panel', and its header and body elements are prefixed with 
+		 * this to become 'jqc-panel-header' and 'jqc-panel-body', respectively. However when a {@link jqc.window.Window Window} is 
+		 * created (which is a subclass of {@link jqc.panel.Panel Panel}, the value is 'jqc-window', and the header and body become 
+		 * 'jqc-window-header' and 'jqc-window-body' instead.
 		 */
 		baseCls : 'jqc-Component',
 		
@@ -1546,11 +1571,11 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * This is used for subclasses whose parent defines a {@link #baseCls}, but then have to add additional styling
 		 * themselves. 
 		 * 
-		 * For example, the base form {@link jqc.form.field.Field Field} class adds the {@link #baseCls} 'jqc-form-Field', and
-		 * the {@link jqc.form.field.Text Text} field subclass wants to keep that class, and also add 'jqc-form-TextField'
+		 * For example, the base form {@link jqc.form.field.Field Field} class adds the {@link #baseCls} 'jqc-form-field', and
+		 * the {@link jqc.form.field.Text Text} field subclass wants to keep that class, and also add 'jqc-form-field-text'
 		 * to allow for any different styling of that particular subclass component. The result is two css classes:
-		 * 'jqc-form-Field' and 'jqc-form-TextField'. In the case of {@link jqc.form.field.TextArea TextArea} (a subclass
-		 * of the Text field}, its componentCls is 'jqc-form-TextAreaField', which overrides Text field's componentCls.
+		 * 'jqc-form-field' and 'jqc-form-field-text'. In the case of {@link jqc.form.field.TextArea TextArea} (a subclass
+		 * of the Text field}, its componentCls is 'jqc-form-field-textarea', which overrides Text field's componentCls.
 		 */
 		
 		/**
@@ -1646,9 +1671,9 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * 
 		 * - **elId**: The value of the {@link #elId} property (an auto-generated, unique value).
 		 * - **baseCls**: The {@link #baseCls} config, which is the base CSS class to prefix descendent elements' CSS
-		 *   classes with. Ex: a {@link #baseCls} of 'jqc-Panel' is used to prefix a {@link jqc.panel.Panel Panel's} body
-		 *   element to become 'jqc-Panel-body', but when a {@link jqc.window.Window Window} is created, the value is
-		 *   'jqc-Window', and the body becomes 'jqc-Window-body' instead. 
+		 *   classes with. Ex: a {@link #baseCls} of 'jqc-panel' is used to prefix a {@link jqc.panel.Panel Panel's} body
+		 *   element to become 'jqc-panel-body', but when a {@link jqc.window.Window Window} is created, the value is
+		 *   'jqc-window', and the body becomes 'jqc-window-body' instead. 
 		 * - **componentCls**: The {@link #componentCls} config.
 		 */
 		
@@ -2589,9 +2614,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		hasCls : function( cssClass ) {
 			if( !this.rendered ) {
-				var regex = new RegExp( '(^| )' + cssClass + '( |$)', 'g' );
-				return regex.test( this.cls );
-				
+				return Css.hasCls( this.cls, cssClass );  // check the `cls` config in the unrendered state
 			} else {
 				return this.$el.hasClass( cssClass );
 			}
@@ -5777,7 +5800,7 @@ define('jqc/layout/HBox', [
 				
 				// Add the CSS class to components to be able to place them in an HBox layout. This adds `float:left;`,
 				// and a few other fixing styles.
-				childComponent.addCls( 'jqc-layout-HBox-component' );
+				childComponent.addCls( 'jqc-layout-hbox-component' );
 				
 				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
 				this.renderComponent( childComponent, $targetEl, { position: i } );
@@ -5829,7 +5852,7 @@ define('jqc/layout/HBox', [
 			}
 			
 			if( !this.$clearEl ) {
-				this.$clearEl = jQuery( '<div class="jqc-layout-HBox-clear" />' );  // to clear the floats
+				this.$clearEl = jQuery( '<div class="jqc-layout-hbox-clear" />' );  // to clear the floats
 			}
 			$targetEl.append( this.$clearEl );
 		},
@@ -5894,7 +5917,7 @@ define('jqc/panel/Header', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-Panel-Header',
+		componentCls : 'jqc-panel-header',
 		
 		
 		/**
@@ -6058,7 +6081,7 @@ define('jqc/button/Button', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Button',
+		baseCls : 'jqc-button',
 		
 		/**
 		 * @cfg
@@ -6332,7 +6355,7 @@ define('jqc/panel/ToolButton', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-ToolButton',
+		componentCls : 'jqc-panel-toolbutton',
 		
 		
 		/**
@@ -6384,6 +6407,16 @@ define('jqc/panel/Panel', [
 	 * {@link #toolButtons}.
 	 */
 	var Panel = Container.extend( {
+
+		/**
+		 * @cfg {String} bodyCls
+		 * 
+		 * Any additional CSS class(es) to add to the Panel's {@link #$bodyEl body} element. If multiple CSS classes
+		 * are added, they should each be separated by a space. Ex:
+		 * 
+		 *     bodyCls : 'bodyClass1 bodyClass2'
+		 */
+		bodyCls: '',
 		
 		/**
 		 * @cfg {Object} bodyStyle
@@ -6430,14 +6463,18 @@ define('jqc/panel/Panel', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Panel',
+		baseCls : 'jqc-panel',
 		
 		/**
 		 * @cfg
 		 * @inheritdoc
 		 */
 		renderTpl : new LoDashTpl( [
-			'<div id="<%= elId %>-body" class="<%= baseCls %>-body" <% if( bodyStyle ) { %>style="<%= bodyStyle %>"<% } %>></div>'
+			'<div',
+				' id="<%= elId %>-body"',
+				' class="<%= baseCls %>-body<% if( bodyCls ) { %> <%= bodyCls %><% } %>"',
+				'<% if( bodyStyle ) { %> style="<%= bodyStyle %>"<% } %>>',
+			'</div>'
 		] ),
 		
 		
@@ -6507,8 +6544,20 @@ define('jqc/panel/Panel', [
 			var bodyStyle = Css.mapToString( this.bodyStyle || {} );
 			
 			return _.assign( this._super( arguments ), {
+				bodyCls   : this.bodyCls,
 				bodyStyle : bodyStyle
 			} );
+		},
+		
+		
+		/**
+		 * Returns the body element for the Panel, wrapped in a jQuery object.  This element will only be available after the 
+		 * Panel has been rendered by the {@link #method-render} method.  
+		 * 
+		 * @return {jQuery}
+		 */
+		getBodyEl : function() {
+			return this.$bodyEl;  // created when rendered
 		},
 		
 		
@@ -6519,7 +6568,7 @@ define('jqc/panel/Panel', [
 		 * @return {jQuery}
 		 */
 		getContentTarget : function() {
-			return this.$bodyEl;  // created when rendered
+			return this.getBodyEl();
 		},
 		
 		
@@ -6588,14 +6637,14 @@ define('jqc/panel/Panel', [
 		 */
 		createFooter : function() {
 			return new Container( {
-				cls    : this.baseCls + '-Footer',
+				cls    : this.baseCls + '-footer',
 				layout : 'hbox',
 				
 				items  : [
 					{ type: 'component', flex: 1 },  // to push the buttons to the right
 					{
 						type : 'container',
-						cls  : this.baseCls + '-Footer-buttons',
+						cls  : this.baseCls + '-footer-buttons',
 						
 						defaultType : 'button',   // jqc.button.Button
 						items       : this.buttons
@@ -6664,6 +6713,81 @@ define('jqc/panel/Panel', [
 				this.headerHidden = true;  // in case the header hasn't been created yet, we'll use this for when it is
 			}
 			
+			return this;
+		},
+		
+		
+		// ---------------------------------
+		
+		// Panel's Body Styling Functionality
+		
+		/**
+		 * Adds one or more CSS classes to the Panel's {@link #$bodyEl body} element.
+		 * 
+		 * @param {String} cssClass One or more CSS classes to add to the Panel's {@link #$bodyEl body} element. If specifying 
+		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
+		 * @return {jqc.panel.Panel} This Panel, to allow method chaining.
+		 */
+		addBodyCls : function( cssClass ) {
+			if( !this.rendered ) {
+				this.bodyCls = Css.addCls( this.bodyCls, cssClass );  // update the `bodyCls` config in the unrendered state
+			} else {
+				this.$bodyEl.addClass( cssClass ); // delegate to jQuery in this case
+			}
+			return this;
+		},
+		
+		
+		/**
+		 * Removes one or more CSS classes from the Panel's {@link #$bodyEl body} element.
+		 * 
+		 * @param {String} cssClass One or more CSS classes to remove from the Panel's {@link #$bodyEl body} element. If specifying 
+		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
+		 * @return {jqc.panel.Panel} This Panel, to allow method chaining.
+		 */
+		removeBodyCls : function( cssClass ) {
+			if( !this.rendered ) {
+				this.bodyCls = Css.removeCls( this.bodyCls, cssClass );  // update the `bodyCls` config in the unrendered state
+			} else {
+				this.$bodyEl.removeClass( cssClass ); // delegate to jQuery in this case
+			}
+			return this;
+		},
+		
+		
+		/**
+		 * Determines if the Panel's {@link #$bodyEl body} element has the given `cssClass`.
+		 * 
+		 * @param {String} cssClass The CSS class to test for.
+		 * @return {Boolean} True if the Panel's {@link #$bodyEl body} element has the given `cssClass`, false otherwise.
+		 */
+		hasBodyCls : function( cssClass ) {
+			// Check the `bodyCls` config in the unrendered state, or the body element itself in the rendered state
+			return ( !this.rendered ) ? Css.hasCls( this.bodyCls, cssClass ) : this.$bodyEl.hasClass( cssClass );
+		},
+		
+		
+		/**
+		 * Sets a CSS style property on the Panel's {@link #$bodyEl body} element.
+		 * 
+		 * @param {String/Object} name The CSS property name. This first argument may also be provided as an Object of key/value
+		 *   pairs for CSS property names/values to apply to the Panel's {@link #$bodyEl body} element.
+		 * @param {String} value The value for the CSS property. Optional if the first argument is an Object.
+		 * @return {jqc.panel.Panel} This Panel, to allow method chaining.
+		 */
+		setBodyStyle : function( name, value ) {
+			if( !this.rendered ) {
+				this.bodyStyle = this.bodyStyle || {};
+				
+				if( typeof name === 'object' ) {
+					_.assign( this.bodyStyle, name );  // apply each of the properties on the provided 'styles' object onto the Panel's bodyStyle
+				} else {
+					this.bodyStyle[ name ] = value;
+				}
+				
+			} else {
+				this.$bodyEl.css( name, value );  // will work for both method signatures (i.e. when `name` is an object, and when provided both name / value)
+			}
 			return this;
 		}
 		
@@ -6814,7 +6938,7 @@ define('jqc/Overlay', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Overlay',
+		baseCls : 'jqc-overlay',
 		
 		/**
 		 * @hide
@@ -8204,7 +8328,7 @@ define('jqc/form/field/Field', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-form-Field',
+		baseCls : 'jqc-form-field',
 		
 		/**
 		 * @cfg
@@ -8299,7 +8423,7 @@ define('jqc/form/field/Field', [
 			// Fix labelAlign to be lowercase for use with setting the class name (just in case),
 			// and apply the appropriate CSS class for the label state
 			var labelAlign = this.labelAlign = this.labelAlign.toLowerCase(),
-			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'jqc-form-Field-noLabel' if there is no label, or 'jqc-form-Field-leftLabel' or 'jqc-form-Field-topLabel' if there is one
+			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'jqc-form-field-noLabel' if there is no label, or 'jqc-form-field-leftLabel' or 'jqc-form-field-topLabel' if there is one
 			this.addCls( labelCls );
 			
 			
@@ -8574,7 +8698,7 @@ define('jqc/form/field/Checkbox', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-CheckboxField',
+		componentCls : 'jqc-form-field-checkbox',
 		
 		
 		/**
@@ -8914,7 +9038,7 @@ define('jqc/form/field/Dropdown', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-DropdownField',
+		componentCls : 'jqc-form-field-dropdown',
 		
 		
 		/**
@@ -8963,7 +9087,7 @@ define('jqc/form/field/Dropdown', [
 			 * The template to use to render the dropdown's options menu elements.
 			 */
 			optionsMenuRenderTpl : new LoDashTpl( [
-				'<li data-elem="jqc-form-DropdownField-menu-item" class="<%= componentCls %>-menu-item <%= menuItemCls %>" style="<%= menuItemStyle %>">',
+				'<li data-elem="jqc-form-field-dropdown-menu-item" class="<%= componentCls %>-menu-item <%= menuItemCls %>" style="<%= menuItemStyle %>">',
 					'<%= text %>',
 				'</li>'
 			] )
@@ -9343,7 +9467,7 @@ define('jqc/form/field/Dropdown', [
 				
 				// Now that the markup is appended and DOM nodes have been created, assign the values to the menu item
 				// elements using .data() (so that values of any datatype may be assigned)
-				var $itemEls = $optionsMenu.find( '[data-elem="jqc-form-DropdownField-menu-item"]' );
+				var $itemEls = $optionsMenu.find( '[data-elem="jqc-form-field-dropdown-menu-item"]' );
 				for( i = 0; i < numOptions; i++ ) {
 					// Add the "value" as data (instead of an attribute), so that any datatype can be stored for the value
 					$itemEls.eq( i ).data( 'value', options[ i ].value );
@@ -9436,7 +9560,7 @@ define('jqc/form/field/Dropdown', [
 					$optionsMenu.find( 'li.' + selectedCls ).removeClass( selectedCls );  // De-select any currently selected item in the dropdown menu
 					
 					// Select the item with the given value
-					var $itemEls = $optionsMenu.find( 'li[data-elem="jqc-form-DropdownField-menu-item"]' );
+					var $itemEls = $optionsMenu.find( 'li[data-elem="jqc-form-field-dropdown-menu-item"]' );
 					for( var i = 0, len = $itemEls.length; i < len; i++ ) {
 						var $item = $itemEls.eq( i );
 						if( $item.data( 'value' ) === value ) {
@@ -9693,7 +9817,7 @@ define('jqc/form/field/Radio', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-RadioField',
+		componentCls : 'jqc-form-field-radio',
 		
 		
 		/**
@@ -9893,7 +10017,7 @@ define('jqc/form/field/Text', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-TextField',
+		componentCls : 'jqc-form-field-text',
 		
 		
 		/**
@@ -10278,7 +10402,7 @@ define('jqc/form/field/TextArea', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-TextAreaField',
+		componentCls : 'jqc-form-field-textarea',
 		
 		
 		/**
@@ -11271,7 +11395,7 @@ define('jqc/tab/Tab', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-TabPanel-Tab',
+		componentCls : 'jqc-tabpanel-tab',
 		
 		
 		/**
@@ -11383,7 +11507,7 @@ define('jqc/tab/Bar', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-TabPanel-Bar',
+		componentCls : 'jqc-tabpanel-Bar',
 		
 		
 		/**
@@ -11473,13 +11597,31 @@ define('jqc/tab/Panel', [
 		 * @cfg
 		 * @inheritdoc
 		 */
+		acceptType : Panel,
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
 		layout : 'card',
 		
 		/**
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-TabPanel',
+		baseCls : 'jqc-tabpanel',
+		
+		/**
+		 * @cfg {String} childPanelCls
+		 * 
+		 * The CSS class to add to the *child* {@link jqc.panel.Panel Panels} of this TabPanel, when they are added.
+		 * This allows for custom styling of the Panels which are direct children of the TabPanel.
+		 * 
+		 * This CSS class, plus the string '-body' is also added to the child Panel's {@link jqc.panel.Panel#$bodyEl body}
+		 * element. An example of this would be if this config was 'jqc-tabpanel-child', then the body element of the child
+		 * Panel would get the CSS class: 'jqc-tabpanel-child-body'.
+		 */
+		childPanelCls : 'jqc-tabpanel-child',
 		
 		
 		/**
@@ -11568,23 +11710,21 @@ define('jqc/tab/Panel', [
 		
 		
 		/**
+		 * Handler for when a child Panel is added to the TabPanel.
+		 * 
 		 * @inheritdoc
 		 */
 		onAdd : function( panel, idx ) {
 			this._super( arguments );
 			
-			// <debug>
-			if( !( panel instanceof Panel ) ) {
-				throw new Error( "Child components added to the TabPanel must be a jqc.panel.Panel instance, or subclass" );
-			}
-			// </debug>
-			
-			
 			// Create a Tab for the panel
 			var tab = this.createTab( panel );
 			tab.on( 'click', this.onTabClick, this );
-			
 			this.tabBar.insert( tab, idx );
+			
+			// Add the "Tab Panel Child" CSS classes to the Panel
+			panel.addCls( this.childPanelCls );
+			panel.addBodyCls( this.childPanelCls + '-body' );
 			
 			// And finally, hide the panel's header (which is done by default)
 			if( this.hideChildPanelHeaders ) {
@@ -11594,11 +11734,17 @@ define('jqc/tab/Panel', [
 		
 		
 		/**
+		 * Handler for when a child Panel is removed from the TabPanel.
+		 * 
 		 * @inheritdoc
 		 */
 		onRemove : function( panel, idx ) {
 			// Remove the tab that corresponds to the panel from the TabBar
-			var tab = this.tabBar.removeAt( idx );
+			this.tabBar.removeAt( idx );
+			
+			// Remove the "Tab Panel Child" CSS classes from the Panel
+			panel.removeCls( this.childPanelCls );
+			panel.removeBodyCls( this.childPanelCls + '-body' );
 			
 			this._super( arguments );
 		},
@@ -13245,7 +13391,7 @@ define('jqc/window/Window', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Window',
+		baseCls : 'jqc-window',
 		
 		/**
 		 * @cfg

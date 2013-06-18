@@ -1,15 +1,15 @@
-.jqc-form-TextAreaField {
+.jqc-form-field-textarea {
 	
-	.jqc-form-Field-inputContainer {
+	.jqc-form-field-inputContainer {
 		border: 1px solid #C6C6C6;
 	}
 	
 }
 
-.jqc-form-TextAreaField-input {
+.jqc-form-field-textarea-input {
 	resize: none;  // don't allow resizing for Chrome. Layout system can't update when resized by user.
 }
 
-.jqc-form-TextAreaField-emptyText {
-	@extend .jqc-form-TextField-emptyText;
+.jqc-form-field-textarea-emptyText {
+	@extend .jqc-form-field-text-emptyText;
 }

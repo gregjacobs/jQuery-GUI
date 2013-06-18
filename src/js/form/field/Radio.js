@@ -57,7 +57,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-RadioField',
+		componentCls : 'jqc-form-field-radio',
 		
 		
 		/**

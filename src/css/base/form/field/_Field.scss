@@ -1,4 +1,4 @@
-.jqc-form-Field {
+.jqc-form-field {
 	margin: 0;
 	padding: 0;
 	width: 100%;  // default to taking up 100% width
@@ -6,17 +6,17 @@
 	border-collapse: collapse;
 	tbody, tr, th { margin: 0; padding: 0; }
 	
-	&.jqc-form-Field-leftLabel { table-layout: fixed; }
-	&.jqc-form-Field-topLabel { table-layout: auto; }
-	&.jqc-form-Field-focused {}
+	&.jqc-form-field-leftLabel { table-layout: fixed; }
+	&.jqc-form-field-topLabel { table-layout: auto; }
+	&.jqc-form-field-focused {}
 }
 
-.jqc-form-Field-leftLabelCell { margin: 0; padding: 0; vertical-align: top; }
-.jqc-form-Field-topLabelCell {}
-.jqc-form-Field-label {}
+.jqc-form-field-leftLabelCell { margin: 0; padding: 0; vertical-align: top; }
+.jqc-form-field-topLabelCell {}
+.jqc-form-field-label {}
 
-.jqc-form-Field-inputCell { vertical-align: top; width: 100%; }  // width=100% to always take up as much space as possible
-.jqc-form-Field-inputContainer { position: relative; }  // give positioning context. Things like TextField's empty text is absolutely positioned to it.
+.jqc-form-field-inputCell { vertical-align: top; width: 100%; }  // width=100% to always take up as much space as possible
+.jqc-form-field-inputContainer { position: relative; }  // give positioning context. Things like TextField's empty text is absolutely positioned to it.
 
-.jqc-form-Field-extraMsgCell {}
-.jqc-form-Field-extraMsg {}
+.jqc-form-field-extraMsgCell {}
+.jqc-form-field-extraMsg {}
