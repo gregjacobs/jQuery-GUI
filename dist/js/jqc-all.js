@@ -216,6 +216,9 @@ define('jqc/util/Css', [
 ],
 function( jQuery, _, Jqc ) {
 	
+	var spacesRe = /\s+/g;
+	
+	
 	/**
 	 * @class jqc.util.Css
 	 * @singleton
@@ -241,6 +244,59 @@ function( jQuery, _, Jqc ) {
 		
 		
 		// ------------------------------------
+		
+		
+		/**
+		 * Adds a CSS class to a string of space-delimited CSS classes. Only adds the CSS class if the CSS class
+		 * does not already exist in the string.
+		 * 
+		 * For example:
+		 *     
+		 *     Css.addCls( "class1 class2", "class3" );  // -> "class1 class2 class3"
+		 *     Css.addCls( "class1 class2", "class2" );  // -> "class1 class2" (no duplicate CSS classes)
+		 *     Css.addCls( "", "class1" );               // -> "class1"
+		 *     Css.addCls( "class1", "class2 class3" );  // -> "class1 class2 class3"
+		 * 
+		 * @param {String} str The string with the space-delimited CSS classes to add the `cssClass` to.
+		 * @param {String} cssClass The CSS class(es) to add to the `str`. If adding multiple CSS classes, they 
+		 *   must be separated by a space.
+		 * @return {String} The `str`, with the `cssClass` added.
+		 */
+		addCls : function( str, cssClass ) {
+			str = jQuery.trim( str );
+			cssClass = jQuery.trim( cssClass );
+			
+			var origClasses = ( str ) ? str.split( spacesRe ) : [],           // only split if the arg is not an empty string
+			    newClasses = ( cssClass ) ? cssClass.split( spacesRe ) : [];  // only split if the arg is not an empty string
+			
+			return _.unique( origClasses.concat( newClasses ) ).join( ' ' );
+		},
+		
+		
+		/**
+		 * Removes a CSS class from a string of space-delimited CSS classes. 
+		 * 
+		 * For example:
+		 *     
+		 *     Css.removeCls( "class1 class2", "class1" );  // -> "class2"
+		 *     Css.removeCls( "class1 class2", "class2" );  // -> "class1"
+		 *     Css.removeCls( "class1 class2", "class3" );  // -> "class1 class2" (class3 didn't exist in the `str`, so no removal)
+		 *     Css.removeCls( "class1 class2 class3", "class1 class2" );  // -> "class3"
+		 * 
+		 * @param {String} str The string with the space-delimited CSS classes to remove the `cssClass` from.
+		 * @param {String} cssClass The CSS class(es) to remove from the `str`. If removing multiple CSS classes, they 
+		 *   must be separated by a space.
+		 * @return {String} The `str`, with the `cssClass` removed.
+		 */
+		removeCls : function( str, cssClass ) {
+			str = jQuery.trim( str );
+			cssClass = jQuery.trim( cssClass );
+			
+			var origClasses = ( str ) ? str.split( spacesRe ) : [],              // only split if the arg is not an empty string
+			    removeClasses = ( cssClass ) ? cssClass.split( spacesRe ) : [];  // only split if the arg is not an empty string
+			
+			return _.without.apply( null, [ origClasses ].concat( removeClasses ) ).join( ' ' );
+		},
 		
 		
 		/**
@@ -2480,17 +2536,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		addCls : function( cssClass ) {
 			if( !this.rendered ) {
-				var cssClasses = cssClass.split( ' ' );
-				for( var i = 0, len = cssClasses.length; i < len; i++ ) {
-					var cls = cssClasses[ i ],
-					    regex = new RegExp( '(^| )' + cls + '( |$)' );
-					    
-					if( !regex.test( this.cls ) ) {
-						this.cls += ' ' + cls;
-					}
-				}
-				this.cls = jQuery.trim( this.cls );
-				
+				this.cls = Css.addCls( this.cls, cssClass );  // update the `cls` config in the unrendered state
 			} else {
 				this.$el.addClass( cssClass ); // delegate to jQuery in this case
 			}
@@ -2507,18 +2553,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		removeCls : function( cssClass ) {
 			if( !this.rendered ) {
-				var cssClasses = cssClass.split( ' ' );
-				var replaceFn = function( match, $1, $2 ) {
-					return ( $1 === " " && $2 === " " ) ? " " : "";  // if the css class was padded with spaces on both sides, replace with a single space. Otherwise, we can replace with nothing.
-				};
-				
-				for( var i = 0, len = cssClasses.length; i < len; i++ ) {
-					var cls = cssClasses[ i ],
-					    regex = new RegExp( '(^| )' + cls + '( |$)', 'g' );
-									
-					this.cls = this.cls.replace( regex, replaceFn );
-				}
-				
+				this.cls = Css.removeCls( this.cls, cssClass );  // update the `cls` config in the unrendered state
 			} else {
 				this.$el.removeClass( cssClass ); // delegate to jQuery in this case
 			}
@@ -10539,144 +10574,6 @@ define('jqc/form/field/TextArea', [
 	
 } );
 /*global define */
-define('jqc/form/field/autocomplete/Menu', [
-	'jqc/Overlay'
-], function( Overlay ) {
-	
-	/**
-	 * @abstract
-	 * @class jqc.form.field.autocomplete.Menu
-	 * @extends jqc.Overlay
-	 * 
-	 * Base class for the actual menu that is displayed to the user as they type, in the 
-	 * {@link jqc.form.field.autocomplete.Autocomplete Autocomplete} field.
-	 */
-	var AutocompleteMenu = Overlay.extend( {
-		abstractClass : true,
-		
-		/**
-		 * @cfg {data.Collection} collection (required)
-		 * 
-		 * The Collection which is used to provide the suggestions.
-		 */
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		initComponent : function() {
-			this.addEvents(
-				/**
-				 * Fires when an item has been selected. This event is listened to by the {@link jqc.form.field.autocomplete.Autocomplete Autocomplete}
-				 * field, for its own {@link jqc.form.field.autocomplete.Autocomplete#select select} event, and select actions.
-				 * 
-				 * @event select
-				 * @param {jqc.form.field.autocomplete.Menu} menu This Menu instance.
-				 */
-				'select'
-			);
-			
-			this._super( arguments );
-		}
-		
-	} );
-	
-	
-	return AutocompleteMenu;
-	
-} );
-/*global define */
-define('jqc/form/field/autocomplete/ListMenu', [
-	'jqc/form/field/autocomplete/Menu'
-], function( AutocompleteMenu ) {
-	
-	/**
-	 * @class jqc.form.field.autocomplete.Menu
-	 * @extends jqc.Overlay
-	 * 
-	 * Implements a list-style menu for the {@link jqc.form.field.autocomplete.Autocomplete Autocomplete} field.
-	 * This is the default class that will be instantiated for an Autocomplete field, if no other instance is provided
-	 * to the Autocomplete's {@link jqc.form.field.autocomplete.Autocomplete#menu} config.
-	 */
-	var AutocompleteListMenu = AutocompleteMenu.extend( {
-		
-		
-		
-	} );
-	
-	
-	return AutocompleteListMenu;
-	
-} );
-/*global define */
-define('jqc/form/field/autocomplete/Autocomplete', [
-	'jqc/form/field/Text',
-	'jqc/form/field/autocomplete/Menu',
-	'jqc/form/field/autocomplete/ListMenu'  // the default implementation
-], function( TextField, AutocompleteMenu, AutocompleteListMenu ) {
-	
-	/**
-	 * @class jqc.form.field.autocomplete.Autocomplete
-	 * @extends jqc.form.field.Text
-	 * 
-	 * Field which allows a user to begin typing in a value, and then is presented with suggestions in an 
-	 * overlay that appears below the field.
-	 */
-	var Autocomplete = TextField.extend( {
-		
-		/**
-		 * @cfg {data.Collection} collection (required)
-		 * 
-		 * The Collection which is used to provide the suggestions. This may be used with local data that is already
-		 * populated in the collection, or it may be loaded from a remote data source using the Collection's configured
-		 * {@link data.Collection#proxy proxy}.
-		 */
-		
-		/**
-		 * @cfg {Object/jqc.form.field.autocomplete.Menu} menu
-		 * 
-		 * The Autocomplete Menu that displays the suggestions to the user while he/she types.
-		 * 
-		 * This may be either a configuration object for the {@link jqc.form.field.autocomplete.Menu} that will be internally 
-		 * instantiated, or a {@link jqc.form.field.autocomplete.Menu Menu} instance. 
-		 */
-		
-		/**
-		 * @cfg {Number} minChars
-		 * 
-		 * The minimum number of characters that must be typed before the Autocomplete's suggestion {@link #menu} is shown.
-		 */
-		
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		initComponent : function() {
-			this._super( arguments );
-			
-			this.addEvents(
-				/**
-				 * Fires when an item has been selected in the Autocomplete's {@link #menu}.
-				 * 
-				 * @event select
-				 * @param {jqc.form.field.autocomplete.Autocomplete} autocomplete This Autocomplete instance.
-				 */
-				'select'
-			);
-			
-			// If the `menu` provided was an anonymous configuration object, instantiate a ListMenu
-			if( !this.menu instanceof AutocompleteMenu ) {
-				this.menu = new AutocompleteListMenu( this.menu );
-			}
-		}
-		
-	} );
-	
-	return Autocomplete;
-	
-} );
-/*global define */
 define('jqc/layout/Card.Transition', [
 	'Class',
 	'jqc/Jqc'
@@ -11805,6 +11702,171 @@ define('jqc/tab/Panel', [
 	ComponentManager.registerType( 'tabpanel', TabPanel );
 	
 	return TabPanel;
+	
+} );
+/*global define */
+define('jqc/util/CallbackList', [
+	'lodash',
+	'Class'
+], function( _, Class ) {
+	
+	/**
+	 * @class jqc.util.CallbackList
+	 * @extends Object
+	 * 
+	 * Simple utility used to maintain a list of callback functions, and their associated scope objects.
+	 * 
+	 * This utility ensures that a given callback is not added more than once, and provides convenient methods
+	 * to call all of the callbacks in the list in their own scopes.
+	 */
+	var CallbackList = Class.create( {
+		
+		/**
+		 * @protected
+		 * @property {Object[]} callbacks
+		 * 
+		 * An array of objects which stores the callbacks. Each object has properties `callback` and `scope`.
+		 * 
+		 * To give a visual example:
+		 * 
+		 *     callbacks : [
+		 *         { callback: function(){}, scope: obj },
+		 *         { callback: function(){}, scope: obj2 }
+		 *     ]
+		 */
+		
+		
+		/**
+		 * @constructor
+		 */
+		constructor : function() {
+			this.callbacks = [];
+		},
+		
+		
+		/**
+		 * Adds a `callback` to the CallbackList, with an optional `scope`.
+		 * 
+		 * If the `callback` function is already in the CallbackList with the given `scope`, it will not be added 
+		 * again to prevent inefficiencies by accidentally adding a callback more than once.
+		 * 
+		 * @param {Function} callback The callback function to add.
+		 * @param {Object} [scope] The scope to call the callback in.
+		 */
+		add : function( callback, scope ) {
+			if( !this.contains( callback, scope ) ) {
+				this.callbacks.push( { callback: callback, scope: scope } );
+			}
+		},
+		
+		
+		/**
+		 * Retrieves all of the callbacks in the CallbackList. This method returns an array of objects, where each object
+		 * has properties `callback` and `scope`.
+		 * 
+		 * This method is useful if you want to implement some other scheme than simply calling all of the callbacks using
+		 * {@link #callAll} or {@link #applyAll}, such as if a return value of `false` from one of them should stop the others
+		 * from being called.
+		 * 
+		 * Example return from this method:
+		 * 
+		 *     [
+		 *         { callback: function(){}, scope: obj },
+		 *         { callback: function(){}, scope: obj2 }
+		 *     ]
+		 *     
+		 * @return {Object[]}
+		 */
+		getAll : function() {
+			return this.callbacks;
+		},
+		
+		
+		/**
+		 * Determines if the CallbackList holds a given `callback`/`scope` pair. The `scope` parameter may be omitted if
+		 * the `callback` was not {@link #add added} with a `scope`.
+		 * 
+		 * @param {Function} callback The callback function to check for.
+		 * @param {Object} [scope] The scope that the callback was {@link #add added} with.
+		 */
+		contains : function( callback, scope ) {
+			return ( this.indexOf( callback, scope ) !== -1 );
+		},
+		
+		
+		/**
+		 * Determines the index that a given `callback`/`scope` pair exists within the CallbackList. Returns -1 if the
+		 * callback/scope is not found.
+		 * 
+		 * The `scope` parameter may be omitted if the `callback` was not {@link #add added} with a `scope`.
+		 * 
+		 * @param {Function} callback The callback function to check for.
+		 * @param {Object} [scope] The scope that the callback was {@link #add added} with.
+		 */
+		indexOf : function( callback, scope ) {
+			return _.findIndex( this.callbacks, function( cb ) { return cb.callback === callback && cb.scope === scope; } );
+		},
+		
+		
+		/**
+		 * Calls each of the callbacks in the CallBackList, in the scope that they were {@link #add added} in.
+		 * The arguments provided to this method will be provided to each callback function when they are called.
+		 * 
+		 * Example:
+		 * 
+		 *     callbackList.callAll( 1, 2, 3 );  // each callback is called with the arguments: 1, 2, 3
+		 * 
+		 * @param {Mixed...} args The arguments to provide to each callback function. Each argument provided to this
+		 *   method will be provided to each callback.
+		 */
+		callAll : function() {
+			this.applyAll( arguments );
+		},
+		
+		
+		/**
+		 * Calls each of the callbacks in the CallBackList, in the scope that they were {@link #add added} in, applying
+		 * the array of arguments that is provided to this method.
+		 * 
+		 * Example:
+		 * 
+		 *     callbackList.applyAll( [ 1, 2, 3 ] );  // each callback is called with the arguments: 1, 2, 3
+		 *     
+		 * @param {Mixed[]} args The array of arguments which will be applied to each callback function.
+		 */
+		applyAll : function( args ) {
+			var callbacks = this.callbacks;
+			for( var i = 0, len = callbacks.length; i < len; i++ ) {
+				callbacks[ i ].callback.apply( callbacks[ i ].scope || window, args );
+			}
+		},
+		
+		
+		/**
+		 * Removes a `callback` from the CallbackList. The `scope` parameter, if provided, must match the `scope` that the 
+		 * callback was {@link #add added} with. If the callback was added without a `scope`, then `scope` must be omitted.
+		 * 
+		 * @param {Function} callback The callback function to remove.
+		 * @param {Object} [scope] The scope that the callback was {@link #add added} with.
+		 */
+		remove : function( callback, scope ) {
+			var cbIdx = this.indexOf( callback, scope );
+			if( cbIdx !== -1 ) {
+				this.callbacks.splice( cbIdx, 1 );
+			}
+		},
+		
+		
+		/**
+		 * Removes all callbacks from the CallbackList, resetting it to its empty state.
+		 */
+		removeAll : function() {
+			this.callbacks.length = 0;
+		}
+		
+	} );
+	
+	return CallbackList;
 	
 } );
 /*global define */
@@ -13258,4 +13320,4 @@ define('jqc/window/Window', [
 	return Window;
 	
 } );
-require(["jqc/Anchor", "jqc/Component", "jqc/ComponentManager", "jqc/ComponentQuery", "jqc/Container", "jqc/Image", "jqc/Jqc", "jqc/Label", "jqc/Mask", "jqc/Overlay", "jqc/Viewport", "jqc/anim/Animation", "jqc/app/Controller", "jqc/app/EventBus", "jqc/button/Button", "jqc/form/field/Checkbox", "jqc/form/field/Dropdown", "jqc/form/field/Field", "jqc/form/field/Hidden", "jqc/form/field/Radio", "jqc/form/field/Text", "jqc/form/field/TextArea", "jqc/form/field/autocomplete/Autocomplete", "jqc/form/field/autocomplete/ListMenu", "jqc/form/field/autocomplete/Menu", "jqc/layout/Auto", "jqc/layout/Card.SwitchTransition", "jqc/layout/Card.Transition", "jqc/layout/Card", "jqc/layout/Column", "jqc/layout/Fit", "jqc/layout/HBox", "jqc/layout/Layout", "jqc/layout/VBox", "jqc/panel/Header", "jqc/panel/Panel", "jqc/panel/ToolButton", "jqc/plugin/Plugin", "jqc/tab/Bar", "jqc/tab/Panel", "jqc/tab/Tab", "jqc/template/LoDash", "jqc/template/Template", "jqc/util/CollectionBindable", "jqc/util/Css", "jqc/util/Html", "jqc/util/ModelBindable", "jqc/util/OptionsStore", "jqc/view/Collection", "jqc/view/Model", "jqc/window/Window"]);
+require(["jqc/Anchor", "jqc/Component", "jqc/ComponentManager", "jqc/ComponentQuery", "jqc/Container", "jqc/Image", "jqc/Jqc", "jqc/Label", "jqc/Mask", "jqc/Overlay", "jqc/Viewport", "jqc/anim/Animation", "jqc/app/Controller", "jqc/app/EventBus", "jqc/button/Button", "jqc/form/field/Checkbox", "jqc/form/field/Dropdown", "jqc/form/field/Field", "jqc/form/field/Hidden", "jqc/form/field/Radio", "jqc/form/field/Text", "jqc/form/field/TextArea", "jqc/layout/Auto", "jqc/layout/Card.SwitchTransition", "jqc/layout/Card.Transition", "jqc/layout/Card", "jqc/layout/Column", "jqc/layout/Fit", "jqc/layout/HBox", "jqc/layout/Layout", "jqc/layout/VBox", "jqc/panel/Header", "jqc/panel/Panel", "jqc/panel/ToolButton", "jqc/plugin/Plugin", "jqc/tab/Bar", "jqc/tab/Panel", "jqc/tab/Tab", "jqc/template/LoDash", "jqc/template/Template", "jqc/util/CallbackList", "jqc/util/CollectionBindable", "jqc/util/Css", "jqc/util/Html", "jqc/util/ModelBindable", "jqc/util/OptionsStore", "jqc/view/Collection", "jqc/view/Model", "jqc/window/Window"]);

@@ -592,7 +592,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.setAttr( 'data-myAttr', 'value' );
 				
 				cmp.render( 'body' );
-				expect( cmp.getEl().attr( 'data-myAttr' ) ).toBe( 'value' );  // 
+				expect( cmp.getEl().attr( 'data-myAttr' ) ).toBe( 'value' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -604,7 +604,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.setAttr( 'data-myAttr', 'value2' );
 				
 				cmp.render( 'body' );
-				expect( cmp.getEl().attr( 'data-myAttr' ) ).toBe( 'value2' );  // 
+				expect( cmp.getEl().attr( 'data-myAttr' ) ).toBe( 'value2' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -613,7 +613,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var cmp = new Component( { renderTo: 'body' } );
 				
 				cmp.setAttr( 'data-myAttr', 'value' );
-				expect( cmp.getEl().attr( 'data-myAttr' ) ).toBe( 'value' );  // 
+				expect( cmp.getEl().attr( 'data-myAttr' ) ).toBe( 'value' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -625,7 +625,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				} );
 				
 				cmp.setAttr( 'data-myAttr', 'value2' );
-				expect( cmp.getEl().attr( 'data-myAttr' ) ).toBe( 'value2' );  // 
+				expect( cmp.getEl().attr( 'data-myAttr' ) ).toBe( 'value2' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -637,8 +637,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.setAttr( { 'data-myAttr1': 'value1', 'data-myAttr2': 'value2' } );
 				
 				cmp.render( 'body' );
-				expect( cmp.getEl().attr( 'data-myAttr1' ) ).toBe( 'value1' );  // 
-				expect( cmp.getEl().attr( 'data-myAttr2' ) ).toBe( 'value2' );  // 
+				expect( cmp.getEl().attr( 'data-myAttr1' ) ).toBe( 'value1' );
+				expect( cmp.getEl().attr( 'data-myAttr2' ) ).toBe( 'value2' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -651,8 +651,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.setAttr( { 'data-myAttr1': 'value1_new', 'data-myAttr2': 'value2_new' } );
 				
 				cmp.render( 'body' );
-				expect( cmp.getEl().attr( 'data-myAttr1' ) ).toBe( 'value1_new' );  // 
-				expect( cmp.getEl().attr( 'data-myAttr2' ) ).toBe( 'value2_new' );  // 
+				expect( cmp.getEl().attr( 'data-myAttr1' ) ).toBe( 'value1_new' );
+				expect( cmp.getEl().attr( 'data-myAttr2' ) ).toBe( 'value2_new' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -664,8 +664,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				cmp.setAttr( { 'data-myAttr1': 'value1', 'data-myAttr2': 'value2' } );
 				
-				expect( cmp.getEl().attr( 'data-myAttr1' ) ).toBe( 'value1' );  // 
-				expect( cmp.getEl().attr( 'data-myAttr2' ) ).toBe( 'value2' );  // 
+				expect( cmp.getEl().attr( 'data-myAttr1' ) ).toBe( 'value1' );
+				expect( cmp.getEl().attr( 'data-myAttr2' ) ).toBe( 'value2' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -678,19 +678,16 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				cmp.setAttr( { 'data-myAttr1': 'value1_new', 'data-myAttr2': 'value2_new' } );
 				
-				expect( cmp.getEl().attr( 'data-myAttr1' ) ).toBe( 'value1_new' );  // 
-				expect( cmp.getEl().attr( 'data-myAttr2' ) ).toBe( 'value2_new' );  // 
+				expect( cmp.getEl().attr( 'data-myAttr1' ) ).toBe( 'value1_new' );
+				expect( cmp.getEl().attr( 'data-myAttr2' ) ).toBe( 'value2_new' );
 				
 				cmp.destroy();  // clean up
 			} );
 		} );
 		
 		
-		/*
-		 * Test addCls()
-		 */
-		describe( "Test addCls()", function() {
-			
+		
+		describe( 'addCls()', function() {
 			
 			it( "should add a CSS class when unrendered", function() {
 				var cmp = new Component();
@@ -698,7 +695,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				// Now render and check if the class is on it
 				cmp.render( document.body );
-				expect( cmp.getEl().hasClass( 'testCls' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'testCls' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -710,8 +707,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				// Now render and check if the classes are on it
 				cmp.render( document.body );
-				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( true );  // 
-				expect( cmp.getEl().hasClass( 'testCls' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( true );
+				expect( cmp.getEl().hasClass( 'testCls' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -723,9 +720,9 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				// Now render and check if the classes are on it
 				cmp.render( document.body );
-				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( true );  // 
-				expect( cmp.getEl().hasClass( 'testCls1' ) ).toBe( true );  // 
-				expect( cmp.getEl().hasClass( 'testCls2' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( true );
+				expect( cmp.getEl().hasClass( 'testCls1' ) ).toBe( true );
+				expect( cmp.getEl().hasClass( 'testCls2' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -736,11 +733,11 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.addCls( 'initialCls' );
 				
 				// We have to check the private 'cls' property to fully check this
-				expect( cmp.cls ).toBe( 'initialCls' );  // 
+				expect( cmp.cls ).toBe( 'initialCls' );
 				
 				// Now render and check if the class is on it
 				cmp.render( document.body );
-				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -751,12 +748,12 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.addCls( 'testCls1 testCls1 initialCls' );
 				
 				// We have to check the private 'cls' property to fully check this
-				expect( cmp.cls ).toBe( 'initialCls testCls1' );  // 
+				expect( cmp.cls ).toBe( 'initialCls testCls1' );
 				
 				// Now render and check if the classes are on it
 				cmp.render( document.body );
-				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( true );  // 
-				expect( cmp.getEl().hasClass( 'testCls1' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( true );
+				expect( cmp.getEl().hasClass( 'testCls1' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -768,7 +765,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.addCls( 'testCls' );
 				
 				// Now check if the class is on it
-				expect( cmp.getEl().hasClass( 'testCls' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'testCls' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -779,8 +776,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.addCls( 'testCls1 testCls2' );
 				
 				// Now check if the classes are on it
-				expect( cmp.getEl().hasClass( 'testCls1' ) ).toBe( true );  // 
-				expect( cmp.getEl().hasClass( 'testCls2' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'testCls1' ) ).toBe( true );
+				expect( cmp.getEl().hasClass( 'testCls2' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -830,8 +827,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				// Now render and check if the correct class(es) are on it
 				cmp.render( document.body );
-				expect( cmp.getEl().hasClass( 'testCls1' ) ).toBe( false );  // 
-				expect( cmp.getEl().hasClass( 'testCls2' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'testCls1' ) ).toBe( false );
+				expect( cmp.getEl().hasClass( 'testCls2' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -843,8 +840,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				// Now render and check if the correct class(es) are on it
 				cmp.render( document.body );
-				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( false );  // 
-				expect( cmp.getEl().hasClass( 'testCls' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'initialCls' ) ).toBe( false );
+				expect( cmp.getEl().hasClass( 'testCls' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -856,9 +853,9 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				// Now render and check if the correct class(es) are on it
 				cmp.render( document.body );
-				expect( cmp.getEl().hasClass( 'initialCls1' ) ).toBe( false );  // 
-				expect( cmp.getEl().hasClass( 'initialCls2' ) ).toBe( false );  // 
-				expect( cmp.getEl().hasClass( 'initialCls3' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'initialCls1' ) ).toBe( false );
+				expect( cmp.getEl().hasClass( 'initialCls2' ) ).toBe( false );
+				expect( cmp.getEl().hasClass( 'initialCls3' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -870,9 +867,9 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				// Now render and check if the correct class(es) are on it
 				cmp.render( document.body );
-				expect( cmp.getEl().hasClass( 'initialCls1' ) ).toBe( false );  // 
-				expect( cmp.getEl().hasClass( 'initialCls2' ) ).toBe( true );  // 
-				expect( cmp.getEl().hasClass( 'initialCls3' ) ).toBe( false );  // 
+				expect( cmp.getEl().hasClass( 'initialCls1' ) ).toBe( false );
+				expect( cmp.getEl().hasClass( 'initialCls2' ) ).toBe( true );
+				expect( cmp.getEl().hasClass( 'initialCls3' ) ).toBe( false );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -883,8 +880,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.removeCls( 'initialCls1' );
 				
 				// Now check if the correct class(es) are on it
-				expect( cmp.getEl().hasClass( 'initialCls1' ) ).toBe( false );  // 
-				expect( cmp.getEl().hasClass( 'initialCls2' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'initialCls1' ) ).toBe( false );
+				expect( cmp.getEl().hasClass( 'initialCls2' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -895,9 +892,9 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.removeCls( 'initialCls1 initialCls2' );
 				
 				// Now check if the correct class(es) are on it
-				expect( cmp.getEl().hasClass( 'initialCls1' ) ).toBe( false );  // 
-				expect( cmp.getEl().hasClass( 'initialCls2' ) ).toBe( false );  // 
-				expect( cmp.getEl().hasClass( 'initialCls3' ) ).toBe( true );  // 
+				expect( cmp.getEl().hasClass( 'initialCls1' ) ).toBe( false );
+				expect( cmp.getEl().hasClass( 'initialCls2' ) ).toBe( false );
+				expect( cmp.getEl().hasClass( 'initialCls3' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -915,7 +912,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var cmp = new Component();
 				cmp.toggleCls( 'testCls1' );
 				
-				expect( cmp.hasCls( 'testCls1' ) ).toBe( true );  // 
+				expect( cmp.hasCls( 'testCls1' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -924,7 +921,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var cmp = new Component( { renderTo: document.body } );
 				cmp.toggleCls( 'testCls1' );
 				
-				expect( cmp.hasCls( 'testCls1' ) ).toBe( true );  // 
+				expect( cmp.hasCls( 'testCls1' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -933,7 +930,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var cmp = new Component( { cls: 'testCls1' } );
 				cmp.toggleCls( 'testCls1' );
 				
-				expect( cmp.hasCls( 'testCls1' ) ).toBe( false );  // 
+				expect( cmp.hasCls( 'testCls1' ) ).toBe( false );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -942,7 +939,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var cmp = new Component( { renderTo: document.body, cls: 'testCls1' } );
 				cmp.toggleCls( 'testCls1' );
 				
-				expect( cmp.hasCls( 'testCls1' ) ).toBe( false );  // 
+				expect( cmp.hasCls( 'testCls1' ) ).toBe( false );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -956,7 +953,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var cmp = new Component();
 				cmp.toggleCls( 'testCls1', /* flag */ true );
 				
-				expect( cmp.hasCls( 'testCls1' ) ).toBe( true );  // 
+				expect( cmp.hasCls( 'testCls1' ) ).toBe( true );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -966,7 +963,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var cmp = new Component( { cls: 'testCls1' } );
 				cmp.toggleCls( 'testCls1', /* flag */ true );
 				
-				expect( cmp.hasCls( 'testCls1' ) ).toBe( true );  // 
+				expect( cmp.hasCls( 'testCls1' ) ).toBe( true );
 				
 				// As a double check, test the actual `cls` property
 				expect( cmp.cls ).toBe( 'testCls1' );  // The `cls` property should have exactly 'testCls1'
@@ -979,7 +976,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var cmp = new Component( { cls: 'testCls1' } );
 				cmp.toggleCls( 'testCls1', /* flag */ false );
 
-				expect( cmp.hasCls( 'testCls1' ) ).toBe( false );  // 
+				expect( cmp.hasCls( 'testCls1' ) ).toBe( false );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -989,7 +986,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var cmp = new Component();
 				cmp.toggleCls( 'testCls1', /* flag */ false );
 
-				expect( cmp.hasCls( 'testCls1' ) ).toBe( false );  // 
+				expect( cmp.hasCls( 'testCls1' ) ).toBe( false );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -1003,8 +1000,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			
 			it( "hasCls() should determine if the component has a class when unrendered", function() {
 				var cmp = new Component( { cls: 'testCls1' } );
-				expect( cmp.hasCls( 'testCls1' ) ).toBe( true );  // 
-				expect( cmp.hasCls( 'testCls2' ) ).toBe( false );  // 
+				expect( cmp.hasCls( 'testCls1' ) ).toBe( true );
+				expect( cmp.hasCls( 'testCls2' ) ).toBe( false );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -1012,8 +1009,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			
 			it( "hasCls() should determine if the component has a class when rendered", function() {
 				var cmp = new Component( { renderTo: document.body, cls: 'testCls1' } );
-				expect( cmp.hasCls( 'testCls1' ) ).toBe( true );  // 
-				expect( cmp.hasCls( 'testCls2' ) ).toBe( false );  // 
+				expect( cmp.hasCls( 'testCls1' ) ).toBe( true );
+				expect( cmp.hasCls( 'testCls2' ) ).toBe( false );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -1030,7 +1027,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.setStyle( 'margin-left', '1px' );
 				
 				cmp.render( 'body' );
-				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '1px' );  // 
+				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '1px' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -1042,7 +1039,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.setStyle( 'margin-left', '2px' );
 				
 				cmp.render( 'body' );
-				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '2px' );  // 
+				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '2px' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -1051,7 +1048,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var cmp = new Component( { renderTo: 'body' } );
 				
 				cmp.setStyle( 'margin-left', '1px' );
-				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '1px' );  // 
+				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '1px' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -1063,7 +1060,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				} );
 				
 				cmp.setStyle( 'margin-left', '2px' );
-				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '2px' );  // 
+				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '2px' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -1075,8 +1072,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.setStyle( { 'margin-left': '1px', 'margin-right': '2px' } );
 				
 				cmp.render( 'body' );
-				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '1px' );  // 
-				expect( cmp.getEl().css( 'margin-right' ) ).toBe( '2px' );  // 
+				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '1px' );
+				expect( cmp.getEl().css( 'margin-right' ) ).toBe( '2px' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -1089,8 +1086,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.setStyle( { 'margin-left': '3px', 'margin-right': '4px' } );
 				
 				cmp.render( 'body' );
-				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '3px' );  // 
-				expect( cmp.getEl().css( 'margin-right' ) ).toBe( '4px' );  // 
+				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '3px' );
+				expect( cmp.getEl().css( 'margin-right' ) ).toBe( '4px' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -1102,8 +1099,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				cmp.setStyle( { 'margin-left': '1px', 'margin-right': '2px' } );
 				
-				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '1px' );  // 
-				expect( cmp.getEl().css( 'margin-right' ) ).toBe( '2px' );  // 
+				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '1px' );
+				expect( cmp.getEl().css( 'margin-right' ) ).toBe( '2px' );
 				
 				cmp.destroy();  // clean up
 			} );
@@ -1116,8 +1113,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				cmp.setStyle( { 'margin-left': '3px', 'margin-right': '4px' } );
 				
-				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '3px' );  // 
-				expect( cmp.getEl().css( 'margin-right' ) ).toBe( '4px' );  // 
+				expect( cmp.getEl().css( 'margin-left' ) ).toBe( '3px' );
+				expect( cmp.getEl().css( 'margin-right' ) ).toBe( '4px' );
 				
 				cmp.destroy();  // clean up
 			} );

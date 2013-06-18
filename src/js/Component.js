@@ -1082,17 +1082,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		addCls : function( cssClass ) {
 			if( !this.rendered ) {
-				var cssClasses = cssClass.split( ' ' );
-				for( var i = 0, len = cssClasses.length; i < len; i++ ) {
-					var cls = cssClasses[ i ],
-					    regex = new RegExp( '(^| )' + cls + '( |$)' );
-					    
-					if( !regex.test( this.cls ) ) {
-						this.cls += ' ' + cls;
-					}
-				}
-				this.cls = jQuery.trim( this.cls );
-				
+				this.cls = Css.addCls( this.cls, cssClass );  // update the `cls` config in the unrendered state
 			} else {
 				this.$el.addClass( cssClass ); // delegate to jQuery in this case
 			}
@@ -1109,18 +1099,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		removeCls : function( cssClass ) {
 			if( !this.rendered ) {
-				var cssClasses = cssClass.split( ' ' );
-				var replaceFn = function( match, $1, $2 ) {
-					return ( $1 === " " && $2 === " " ) ? " " : "";  // if the css class was padded with spaces on both sides, replace with a single space. Otherwise, we can replace with nothing.
-				};
-				
-				for( var i = 0, len = cssClasses.length; i < len; i++ ) {
-					var cls = cssClasses[ i ],
-					    regex = new RegExp( '(^| )' + cls + '( |$)', 'g' );
-									
-					this.cls = this.cls.replace( regex, replaceFn );
-				}
-				
+				this.cls = Css.removeCls( this.cls, cssClass );  // update the `cls` config in the unrendered state
 			} else {
 				this.$el.removeClass( cssClass ); // delegate to jQuery in this case
 			}
