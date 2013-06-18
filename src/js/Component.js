@@ -1135,9 +1135,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		hasCls : function( cssClass ) {
 			if( !this.rendered ) {
-				var regex = new RegExp( '(^| )' + cssClass + '( |$)', 'g' );
-				return regex.test( this.cls );
-				
+				return Css.hasCls( this.cls, cssClass );  // check the `cls` config in the unrendered state
 			} else {
 				return this.$el.hasClass( cssClass );
 			}
