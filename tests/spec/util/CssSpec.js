@@ -5,6 +5,71 @@ define( [
 function( Css ) {
 	
 	describe( 'jqc.util.Css', function() {
+		
+		describe( 'addCls()', function() {
+			
+			it( "should add CSS classes to an empty string", function() {
+				expect( Css.addCls( "", "" ) ).toBe( "" );
+				expect( Css.addCls( "", "class1" ) ).toBe( "class1" );
+				expect( Css.addCls( "", "class1 class2" ) ).toBe( "class1 class2" );
+				expect( Css.addCls( "", "class1 class2 class3" ) ).toBe( "class1 class2 class3" );
+			} );
+			
+			
+			it( "should not add duplicate CSS classes to a string of CSS classes", function() {
+				expect( Css.addCls( "class1", "class1" ) ).toBe( "class1" );
+				expect( Css.addCls( "class1 class2", "class1 class2" ) ).toBe( "class1 class2" );
+				expect( Css.addCls( "class1 class2 class3", "class1 class2 class3" ) ).toBe( "class1 class2 class3" );
+
+				expect( Css.addCls( "class1", "class1 class2" ) ).toBe( "class1 class2" );
+				expect( Css.addCls( "class1", "class1 class2 class3" ) ).toBe( "class1 class2 class3" );
+
+				expect( Css.addCls( "class1", "class1 class1 class2 class2" ) ).toBe( "class1 class2" );
+			} );
+			
+			
+			it( "should handle extra spaces in the arguments where they don't really belong", function() {
+				expect( Css.addCls( "  ", "   " ) ).toBe( "" );
+				expect( Css.addCls( "", "  class1   " ) ).toBe( "class1" );
+				expect( Css.addCls( "   ", "class1" ) ).toBe( "class1" );
+				expect( Css.addCls( "     ", "  class1   " ) ).toBe( "class1" );
+				expect( Css.addCls( "  class1    class2 ", "  class3   class4    " ) ).toBe( "class1 class2 class3 class4" );
+			} );
+			
+		} );
+		
+		
+		describe( 'removeCls()', function() {
+
+			it( "should have no effect on an empty string of CSS classes", function() {
+				expect( Css.removeCls( "", "" ) ).toBe( "" );
+				expect( Css.removeCls( "", "class1" ) ).toBe( "" );
+				expect( Css.removeCls( "", "class1 class2" ) ).toBe( "" );
+				expect( Css.removeCls( "", "class1 class2 class3" ) ).toBe( "" );
+			} );
+			
+			
+			it( "should remove CSS classes from the string of CSS classes", function() {
+				expect( Css.removeCls( "class1 class2", "class1" ) ).toBe( "class2" );
+				expect( Css.removeCls( "class1 class2", "class1 class2" ) ).toBe( "" );
+				expect( Css.removeCls( "class1 class2 class3", "class1 class2" ) ).toBe( "class3" );
+				expect( Css.removeCls( "class1 class2", "class3" ) ).toBe( "class1 class2" );  // (class3 didn't exist in the `str`, so no removal)
+				expect( Css.removeCls( "class1 class2 class3", "class3" ) ).toBe( "class1 class2" );
+			} );
+			
+
+			it( "should handle extra spaces in the arguments where they don't really belong", function() {
+				expect( Css.removeCls( "   ", "   " ) ).toBe( "" );
+				expect( Css.removeCls( "   ", "class1" ) ).toBe( "" );
+				expect( Css.removeCls( "class1", "   " ) ).toBe( "class1" );
+				expect( Css.removeCls( "  class1 class2", "class1   " ) ).toBe( "class2" );
+				expect( Css.removeCls( " class1    class2", "class1   class2" ) ).toBe( "" );
+				expect( Css.removeCls( "class1 class2   class3  ", " class1    class2" ) ).toBe( "class3" );
+				expect( Css.removeCls( "   class1   class2   class3  ", "  class3   " ) ).toBe( "class1 class2" );
+			} );
+			
+		} );
+		
 	
 		describe( 'mapToString()', function() {
 			

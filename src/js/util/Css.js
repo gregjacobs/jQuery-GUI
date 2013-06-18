@@ -6,6 +6,9 @@ define( [
 ],
 function( jQuery, _, Jqc ) {
 	
+	var spacesRe = /\s+/g;
+	
+	
 	/**
 	 * @class jqc.util.Css
 	 * @singleton
@@ -31,6 +34,59 @@ function( jQuery, _, Jqc ) {
 		
 		
 		// ------------------------------------
+		
+		
+		/**
+		 * Adds a CSS class to a string of space-delimited CSS classes. Only adds the CSS class if the CSS class
+		 * does not already exist in the string.
+		 * 
+		 * For example:
+		 *     
+		 *     Css.addCls( "class1 class2", "class3" );  // -> "class1 class2 class3"
+		 *     Css.addCls( "class1 class2", "class2" );  // -> "class1 class2" (no duplicate CSS classes)
+		 *     Css.addCls( "", "class1" );               // -> "class1"
+		 *     Css.addCls( "class1", "class2 class3" );  // -> "class1 class2 class3"
+		 * 
+		 * @param {String} str The string with the space-delimited CSS classes to add the `cssClass` to.
+		 * @param {String} cssClass The CSS class(es) to add to the `str`. If adding multiple CSS classes, they 
+		 *   must be separated by a space.
+		 * @return {String} The `str`, with the `cssClass` added.
+		 */
+		addCls : function( str, cssClass ) {
+			str = jQuery.trim( str );
+			cssClass = jQuery.trim( cssClass );
+			
+			var origClasses = ( str ) ? str.split( spacesRe ) : [],           // only split if the arg is not an empty string
+			    newClasses = ( cssClass ) ? cssClass.split( spacesRe ) : [];  // only split if the arg is not an empty string
+			
+			return _.unique( origClasses.concat( newClasses ) ).join( ' ' );
+		},
+		
+		
+		/**
+		 * Removes a CSS class from a string of space-delimited CSS classes. 
+		 * 
+		 * For example:
+		 *     
+		 *     Css.removeCls( "class1 class2", "class1" );  // -> "class2"
+		 *     Css.removeCls( "class1 class2", "class2" );  // -> "class1"
+		 *     Css.removeCls( "class1 class2", "class3" );  // -> "class1 class2" (class3 didn't exist in the `str`, so no removal)
+		 *     Css.removeCls( "class1 class2 class3", "class1 class2" );  // -> "class3"
+		 * 
+		 * @param {String} str The string with the space-delimited CSS classes to remove the `cssClass` from.
+		 * @param {String} cssClass The CSS class(es) to remove from the `str`. If removing multiple CSS classes, they 
+		 *   must be separated by a space.
+		 * @return {String} The `str`, with the `cssClass` removed.
+		 */
+		removeCls : function( str, cssClass ) {
+			str = jQuery.trim( str );
+			cssClass = jQuery.trim( cssClass );
+			
+			var origClasses = ( str ) ? str.split( spacesRe ) : [],              // only split if the arg is not an empty string
+			    removeClasses = ( cssClass ) ? cssClass.split( spacesRe ) : [];  // only split if the arg is not an empty string
+			
+			return _.without.apply( null, [ origClasses ].concat( removeClasses ) ).join( ' ' );
+		},
 		
 		
 		/**
