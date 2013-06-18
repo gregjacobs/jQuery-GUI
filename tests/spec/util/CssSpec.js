@@ -70,6 +70,56 @@ function( Css ) {
 			
 		} );
 		
+		
+		describe( 'hasCls()', function() {
+			
+			it( "should return true if the given CSS class exists in the string of CSS classes", function() {
+				expect( Css.hasCls( "class1", "class1" ) ).toBe( true );
+				expect( Css.hasCls( "class1 class2", "class1" ) ).toBe( true );
+				expect( Css.hasCls( "class1 class2", "class2" ) ).toBe( true );
+				expect( Css.hasCls( "class1 class2 class3", "class1" ) ).toBe( true );
+				expect( Css.hasCls( "class1 class2 class3", "class2" ) ).toBe( true );
+				expect( Css.hasCls( "class1 class2 class3", "class3" ) ).toBe( true );
+			} );
+			
+			
+			it( "should return false if the given CSS class does not exist in the string of CSS classes", function() {
+				expect( Css.hasCls( "class1", "class2" ) ).toBe( false );
+				expect( Css.hasCls( "class1 class2", "class3" ) ).toBe( false );
+				expect( Css.hasCls( "class1 class2", "class3" ) ).toBe( false );
+				expect( Css.hasCls( "class1 class2 class3", "class4" ) ).toBe( false );
+				
+				// Test the cssClass being a substring of a CSS class in the string
+				expect( Css.hasCls( "class1", "class" ) ).toBe( false );
+				expect( Css.hasCls( "class1 class2", "class" ) ).toBe( false );
+				expect( Css.hasCls( "class1 class2", "class" ) ).toBe( false );
+				expect( Css.hasCls( "class1 class2 class3", "class" ) ).toBe( false );
+			} );
+			
+			
+			it( "should return false if there are no CSS classes in the CSS class string, or if the CSS class provided is the empty string", function() {
+				expect( Css.hasCls( "", "" ) ).toBe( false );
+				expect( Css.hasCls( "", "class1" ) ).toBe( false );
+				expect( Css.hasCls( "class1", "" ) ).toBe( false );
+			} );
+			
+			
+			it( "should handle extra whitespace arguments", function() {
+				expect( Css.hasCls( "  ", " " ) ).toBe( false );
+				expect( Css.hasCls( "  ", "  " ) ).toBe( false );
+				expect( Css.hasCls( " ", "  class1  " ) ).toBe( false );
+				expect( Css.hasCls( "  class1  ", "  " ) ).toBe( false );
+				
+				expect( Css.hasCls( "  class1    class2", "class1" ) ).toBe( true );
+				expect( Css.hasCls( "class1    class2  ", "class1" ) ).toBe( true );
+				expect( Css.hasCls( "  class1    class2", "class2" ) ).toBe( true );
+				expect( Css.hasCls( "class1    class2  ", "class2" ) ).toBe( true );
+				expect( Css.hasCls( "  class1    class2  class3", "class3" ) ).toBe( true );
+				expect( Css.hasCls( "class1    class2  class3  ", "class3" ) ).toBe( true );
+			} );
+			
+		} );
+		
 	
 		describe( 'mapToString()', function() {
 			

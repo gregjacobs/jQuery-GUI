@@ -90,6 +90,31 @@ function( jQuery, _, Jqc ) {
 		
 		
 		/**
+		 * Determines if a CSS class exists within a string of CSS classes. For example:
+		 *     
+		 *     Css.hasCls( "class1 class2", "class1" );  // -> true
+		 *     Css.hasCls( "class1 class2", "class3" );  // -> false
+		 *     Css.hasCls( "", "class1" );               // -> false
+		 *     Css.hasCls( "class1 class2 class3", "class2" );  // -> true
+		 * 
+		 * @param {String} str The string of CSS class(es) to query. Ex: "class1 class2"
+		 * @param {String} cssClass The CSS class to test for. Ex: "class2"
+		 * @return {Boolean} True if the `str` has the given `cssClass`, false otherwise.
+		 */
+		hasCls : function( str, cssClass ) {
+			str = jQuery.trim( str );
+			cssClass = jQuery.trim( cssClass );
+			
+			if( !str || !cssClass ) {
+				return false;
+			} else {
+				var regex = new RegExp( '(^| )' + cssClass + '( |$)' );
+				return regex.test( str );
+			}
+		},
+		
+		
+		/**
 		 * Given an Object (map) of CSS property/value pairs, will return a string that can be placed directly
 		 * into the "style" attribute of an element. camelCased CSS property names will be converted to 
 		 * dashes. Ex: "fontSize" will be converted to "font-size".
