@@ -104,6 +104,13 @@ function( Css ) {
 			} );
 			
 			
+			it( "should return false if just a substring of a full CSS class is checked for", function() {
+				expect( Css.hasCls( "class", "las" ) ).toBe( false );
+				expect( Css.hasCls( "class", "clas" ) ).toBe( false );
+				expect( Css.hasCls( "class", "lass" ) ).toBe( false );
+			} );
+			
+			
 			it( "should handle extra whitespace arguments", function() {
 				expect( Css.hasCls( "  ", " " ) ).toBe( false );
 				expect( Css.hasCls( "  ", "  " ) ).toBe( false );
