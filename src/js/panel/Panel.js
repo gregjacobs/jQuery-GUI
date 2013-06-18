@@ -19,6 +19,16 @@ define( [
 	 * {@link #toolButtons}.
 	 */
 	var Panel = Container.extend( {
+
+		/**
+		 * @cfg {String} bodyCls
+		 * 
+		 * Any additional CSS class(es) to add to the Panel's {@link #$bodyEl body} element. If multiple CSS classes
+		 * are added, they should each be separated by a space. Ex:
+		 * 
+		 *     bodyCls : 'bodyClass1 bodyClass2'
+		 */
+		bodyCls: '',
 		
 		/**
 		 * @cfg {Object} bodyStyle
@@ -72,7 +82,11 @@ define( [
 		 * @inheritdoc
 		 */
 		renderTpl : new LoDashTpl( [
-			'<div id="<%= elId %>-body" class="<%= baseCls %>-body" <% if( bodyStyle ) { %>style="<%= bodyStyle %>"<% } %>></div>'
+			'<div',
+				' id="<%= elId %>-body"',
+				' class="<%= baseCls %>-body<% if( bodyCls ) { %> <%= bodyCls %><% } %>"',
+				'<% if( bodyStyle ) { %> style="<%= bodyStyle %>"<% } %>>',
+			'</div>'
 		] ),
 		
 		
@@ -142,8 +156,20 @@ define( [
 			var bodyStyle = Css.mapToString( this.bodyStyle || {} );
 			
 			return _.assign( this._super( arguments ), {
+				bodyCls   : this.bodyCls,
 				bodyStyle : bodyStyle
 			} );
+		},
+		
+		
+		/**
+		 * Returns the body element for the Panel, wrapped in a jQuery object.  This element will only be available after the 
+		 * Panel has been rendered by the {@link #method-render} method.  
+		 * 
+		 * @return {jQuery}
+		 */
+		getBodyEl : function() {
+			return this.$bodyEl;  // created when rendered
 		},
 		
 		
@@ -154,7 +180,7 @@ define( [
 		 * @return {jQuery}
 		 */
 		getContentTarget : function() {
-			return this.$bodyEl;  // created when rendered
+			return this.getBodyEl();
 		},
 		
 		
@@ -299,6 +325,81 @@ define( [
 				this.headerHidden = true;  // in case the header hasn't been created yet, we'll use this for when it is
 			}
 			
+			return this;
+		},
+		
+		
+		// ---------------------------------
+		
+		// Panel's Body Styling Functionality
+		
+		/**
+		 * Adds one or more CSS classes to the Panel's {@link #$bodyEl body} element.
+		 * 
+		 * @param {String} cssClass One or more CSS classes to add to the Panel's {@link #$bodyEl body} element. If specifying 
+		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
+		 * @return {jqc.panel.Panel} This Panel, to allow method chaining.
+		 */
+		addBodyCls : function( cssClass ) {
+			if( !this.rendered ) {
+				this.bodyCls = Css.addCls( this.bodyCls, cssClass );  // update the `bodyCls` config in the unrendered state
+			} else {
+				this.$bodyEl.addClass( cssClass ); // delegate to jQuery in this case
+			}
+			return this;
+		},
+		
+		
+		/**
+		 * Removes one or more CSS classes from the Panel's {@link #$bodyEl body} element.
+		 * 
+		 * @param {String} cssClass One or more CSS classes to remove from the Panel's {@link #$bodyEl body} element. If specifying 
+		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
+		 * @return {jqc.panel.Panel} This Panel, to allow method chaining.
+		 */
+		removeBodyCls : function( cssClass ) {
+			if( !this.rendered ) {
+				this.bodyCls = Css.removeCls( this.bodyCls, cssClass );  // update the `bodyCls` config in the unrendered state
+			} else {
+				this.$bodyEl.removeClass( cssClass ); // delegate to jQuery in this case
+			}
+			return this;
+		},
+		
+		
+		/**
+		 * Determines if the Panel's {@link #$bodyEl body} element has the given `cssClass`.
+		 * 
+		 * @param {String} cssClass The CSS class to test for.
+		 * @return {Boolean} True if the Panel's {@link #$bodyEl body} element has the given `cssClass`, false otherwise.
+		 */
+		hasBodyCls : function( cssClass ) {
+			// Check the `bodyCls` config in the unrendered state, or the body element itself in the rendered state
+			return ( !this.rendered ) ? Css.hasCls( this.bodyCls, cssClass ) : this.$bodyEl.hasClass( cssClass );
+		},
+		
+		
+		/**
+		 * Sets a CSS style property on the Panel's {@link #$bodyEl body} element.
+		 * 
+		 * @param {String/Object} name The CSS property name. This first argument may also be provided as an Object of key/value
+		 *   pairs for CSS property names/values to apply to the Panel's {@link #$bodyEl body} element.
+		 * @param {String} value The value for the CSS property. Optional if the first argument is an Object.
+		 * @return {jqc.panel.Panel} This Panel, to allow method chaining.
+		 */
+		setBodyStyle : function( name, value ) {
+			if( !this.rendered ) {
+				this.bodyStyle = this.bodyStyle || {};
+				
+				if( typeof name === 'object' ) {
+					_.assign( this.bodyStyle, name );  // apply each of the properties on the provided 'styles' object onto the Panel's bodyStyle
+				} else {
+					this.bodyStyle[ name ] = value;
+				}
+				
+			} else {
+				this.$bodyEl.css( name, value );  // will work for both method signatures (i.e. when `name` is an object, and when provided both name / value)
+			}
 			return this;
 		}
 		

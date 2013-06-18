@@ -5,6 +5,10 @@
 
 	<link rel="stylesheet" href="../../../dist/css/base/base.css" />
 	<link rel="stylesheet" href="../../../dist/css/theme/basic/basic.css" />
+	
+	<style>
+		.redBackground { background-color: red; }
+	</style>
 
 	<script type="text/javascript" src="../../../vendor/require/require.js"></script>
 	<script type="text/javascript">
@@ -77,6 +81,18 @@
 					toolButtons : { toolType: 'close' },
 					
 					html: "Shown Header Panel w/ Tool Buttons Body"
+				} );
+				jQuery( '<br>' ).appendTo( 'body' );
+				
+
+				var panelWithBodyClsAndStyle = new Panel( {
+					renderTo : 'body',
+					
+					title: "Panel with bodyCls and bodyStyle",
+					bodyCls : 'redBackground',
+					bodyStyle : { 'color': 'blue' },
+					
+					html: "Panel with bodyCls and bodyStyle (should be red background, and blue text)"
 				} );
 				jQuery( '<br>' ).appendTo( 'body' );
 			} );
