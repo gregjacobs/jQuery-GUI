@@ -301,16 +301,32 @@ define( [
 				} );
 				
 				
+				it( "should add the 'childPanelCls' to the added child Panels, which signify that they are direct children of a TabPanel. isRendered = " + !!render, function() {
+					if( render ) tabPanel.render( 'body' );
+					
+					var childPanelCls = tabPanel.childPanelCls;
+					expect( childPanelCls ).not.toBeFalsy();  // make sure this exists. If it doesn't, the cfg name might have been changed.
+
+					expect( panels[ 0 ].hasCls( childPanelCls ) ).toBe( false );                // initial condition
+					expect( panels[ 0 ].hasBodyCls( childPanelCls + '-body' ) ).toBe( false );  // initial condition
+					
+					tabPanel.add( panels[ 0 ] );
+					expect( panels[ 0 ].hasCls( childPanelCls ) ).toBe( true );
+					expect( panels[ 0 ].hasBodyCls( childPanelCls + '-body' ) ).toBe( true );
+				} );
+				
+				
+				
 				it( "should throw an Error if a non-Panel instance or Panel subclass was added to the TabPanel. isRendered = " + !!render, function() {
 					if( render ) tabPanel.render( 'body' );
 					
 					expect( function() {
 						tabPanel.add( { type: 'component' } );  // test with config object
-					} ).toThrow( "Child components added to the TabPanel must be a jqc.panel.Panel instance, or subclass" );
+					} ).toThrow( "A Component added to the Container was not of the correct class type ('acceptType' config)" );
 					
 					expect( function() {
 						tabPanel.add( new Component() );        // test with instance
-					} ).toThrow( "Child components added to the TabPanel must be a jqc.panel.Panel instance, or subclass" );
+					} ).toThrow( "A Component added to the Container was not of the correct class type ('acceptType' config)" );
 				} );
 			}
 			
@@ -355,6 +371,22 @@ define( [
 					
 					tabPanel.remove( panels[ 0 ] );
 					expect( tabBar.getItems().length ).toBe( 0 );					
+				} );
+				
+				
+				it( "should remove the 'childPanelCls' to the removed child Panels, which were added to signify that they were direct children of a TabPanel. isRendered = " + !!render, function() {
+					if( render ) tabPanel.render( 'body' );
+					
+					var childPanelCls = tabPanel.childPanelCls;
+					expect( childPanelCls ).not.toBeFalsy();  // make sure this exists. If it doesn't, the cfg name might have been changed.
+
+					tabPanel.add( panels[ 0 ] );
+					expect( panels[ 0 ].hasCls( childPanelCls ) ).toBe( true );                // initial condition
+					expect( panels[ 0 ].hasBodyCls( childPanelCls + '-body' ) ).toBe( true );  // initial condition
+					
+					tabPanel.remove( panels[ 0 ], /* destroyRemoved */ false );  // don't destroy the Panel upon removal, as we need to check its elements' CSS classes
+					expect( panels[ 0 ].hasCls( childPanelCls ) ).toBe( false );
+					expect( panels[ 0 ].hasBodyCls( childPanelCls + '-body' ) ).toBe( false );
 				} );
 				
 			}

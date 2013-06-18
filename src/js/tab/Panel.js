@@ -56,6 +56,12 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
+		acceptType : Panel,
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
 		layout : 'card',
 		
 		/**
@@ -63,6 +69,18 @@ define( [
 		 * @inheritdoc
 		 */
 		baseCls : 'jqc-TabPanel',
+		
+		/**
+		 * @cfg {String} childPanelCls
+		 * 
+		 * The CSS class to add to the *child* {@link jqc.panel.Panel Panels} of this TabPanel, when they are added.
+		 * This allows for custom styling of the Panels which are direct children of the TabPanel.
+		 * 
+		 * This CSS class, plus the string '-body' is also added to the child Panel's {@link jqc.panel.Panel#$bodyEl body}
+		 * element. An example of this would be if this config was 'jqc-tabpanel-child', then the body element of the child
+		 * Panel would get the CSS class: 'jqc-tabpanel-child-body'.
+		 */
+		childPanelCls : 'jqc-tabpanel-child',
 		
 		
 		/**
@@ -151,23 +169,21 @@ define( [
 		
 		
 		/**
+		 * Handler for when a child Panel is added to the TabPanel.
+		 * 
 		 * @inheritdoc
 		 */
 		onAdd : function( panel, idx ) {
 			this._super( arguments );
 			
-			// <debug>
-			if( !( panel instanceof Panel ) ) {
-				throw new Error( "Child components added to the TabPanel must be a jqc.panel.Panel instance, or subclass" );
-			}
-			// </debug>
-			
-			
 			// Create a Tab for the panel
 			var tab = this.createTab( panel );
 			tab.on( 'click', this.onTabClick, this );
-			
 			this.tabBar.insert( tab, idx );
+			
+			// Add the "Tab Panel Child" CSS classes to the Panel
+			panel.addCls( this.childPanelCls );
+			panel.addBodyCls( this.childPanelCls + '-body' );
 			
 			// And finally, hide the panel's header (which is done by default)
 			if( this.hideChildPanelHeaders ) {
@@ -177,11 +193,17 @@ define( [
 		
 		
 		/**
+		 * Handler for when a child Panel is removed from the TabPanel.
+		 * 
 		 * @inheritdoc
 		 */
 		onRemove : function( panel, idx ) {
 			// Remove the tab that corresponds to the panel from the TabBar
-			var tab = this.tabBar.removeAt( idx );
+			this.tabBar.removeAt( idx );
+			
+			// Remove the "Tab Panel Child" CSS classes from the Panel
+			panel.removeCls( this.childPanelCls );
+			panel.removeBodyCls( this.childPanelCls + '-body' );
 			
 			this._super( arguments );
 		},
