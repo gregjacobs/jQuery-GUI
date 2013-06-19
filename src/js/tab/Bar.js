@@ -24,7 +24,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-tabpanel-Bar',
+		componentCls : 'jqc-tabPanel-Bar',
 		
 		
 		/**

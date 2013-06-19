@@ -991,7 +991,7 @@
 }
 
 /* line 1, ../../../../src/css/theme/basic/panel/_Panel.scss */
-.jqc-panel, .jqc-tabpanel {
+.jqc-panel, .jqc-tabPanel {
   border: 1px solid #000;
 }
 
@@ -1013,7 +1013,7 @@
 }
 
 /* line 2, ../../../../src/css/theme/basic/tab/_Tab.scss */
-.jqc-tabpanel-tab-active {
+.jqc-tabPanel-tab-active {
   background-color: #DDD;
 }
 

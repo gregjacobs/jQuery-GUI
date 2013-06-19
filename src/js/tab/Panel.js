@@ -68,7 +68,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-tabpanel',
+		baseCls : 'jqc-tabPanel',
 		
 		/**
 		 * @cfg {String} childPanelCls
@@ -77,10 +77,10 @@ define( [
 		 * This allows for custom styling of the Panels which are direct children of the TabPanel.
 		 * 
 		 * This CSS class, plus the string '-body' is also added to the child Panel's {@link jqc.panel.Panel#$bodyEl body}
-		 * element. An example of this would be if this config was 'jqc-tabpanel-child', then the body element of the child
-		 * Panel would get the CSS class: 'jqc-tabpanel-child-body'.
+		 * element. An example of this would be if this config was 'jqc-tabPanel-childPanel', then the body element of the child
+		 * Panel would get the CSS class: 'jqc-tabPanel-childPanel-body'.
 		 */
-		childPanelCls : 'jqc-tabpanel-child',
+		childPanelCls : 'jqc-tabPanel-childPanel',
 		
 		
 		/**
