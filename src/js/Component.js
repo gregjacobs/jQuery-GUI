@@ -82,7 +82,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * created (which is a subclass of {@link jqc.panel.Panel Panel}, the value is 'jqc-window', and the header and body become 
 		 * 'jqc-window-header' and 'jqc-window-body' instead.
 		 */
-		baseCls : 'jqc-Component',
+		baseCls : 'jqc-component',
 		
 		/**
 		 * @protected

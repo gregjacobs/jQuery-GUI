@@ -32,7 +32,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Image',
+		baseCls : 'jqc-image',
 		
 		
 		/**

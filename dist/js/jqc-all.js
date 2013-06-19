@@ -1561,7 +1561,7 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * created (which is a subclass of {@link jqc.panel.Panel Panel}, the value is 'jqc-window', and the header and body become 
 		 * 'jqc-window-header' and 'jqc-window-body' instead.
 		 */
-		baseCls : 'jqc-Component',
+		baseCls : 'jqc-component',
 		
 		/**
 		 * @protected
@@ -3738,7 +3738,7 @@ define('jqc/Anchor', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Anchor',
+		baseCls : 'jqc-anchor',
 	
 	
 		// protected
@@ -4372,7 +4372,7 @@ define('jqc/Container', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Container',
+		baseCls : 'jqc-container',
 	
 	
 		/**
@@ -5466,7 +5466,7 @@ define('jqc/Image', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Image',
+		baseCls : 'jqc-image',
 		
 		
 		/**
@@ -5656,7 +5656,7 @@ define('jqc/Label', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Label',
+		baseCls : 'jqc-label',
 		
 	
 		/**

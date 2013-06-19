@@ -169,11 +169,11 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			it( "CSS class names given to the `baseCls` config should be applied to the element", function() {
 				var component = new Component( {
 					renderTo : document.body,   // to cause it to render
-					baseCls: 'jqc-TestComponent'
+					baseCls: 'jqc-testComponent'
 				} );
 				
 				var $el = component.getEl();
-				expect( $el.hasClass( "jqc-TestComponent" ) ).toBe( true );
+				expect( $el.hasClass( "jqc-testComponent" ) ).toBe( true );
 				
 				component.destroy();
 			} );
@@ -182,11 +182,12 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			it( "CSS class names given to the `componentCls` config should be applied to the element", function() {
 				var component = new Component( {
 					renderTo : document.body,   // to cause it to render
-					componentCls: 'jqc-TestComponent'
+					componentCls: 'jqc-testComponent'
 				} );
 				
 				var $el = component.getEl();
-				expect( $el.hasClass( "jqc-Component" ) ).toBe( true );
+				expect( $el.hasClass( "jqc-component" ) ).toBe( true );
+				expect( $el.hasClass( "jqc-testComponent" ) ).toBe( true );
 				
 				component.destroy();
 			} );

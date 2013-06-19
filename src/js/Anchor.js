@@ -73,7 +73,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Anchor',
+		baseCls : 'jqc-anchor',
 	
 	
 		// protected

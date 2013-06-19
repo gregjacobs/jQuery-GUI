@@ -98,7 +98,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Container',
+		baseCls : 'jqc-container',
 	
 	
 		/**

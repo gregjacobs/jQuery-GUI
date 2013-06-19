@@ -24,7 +24,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Label',
+		baseCls : 'jqc-label',
 		
 	
 		/**
