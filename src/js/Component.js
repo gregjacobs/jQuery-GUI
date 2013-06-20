@@ -93,10 +93,10 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 * themselves. 
 		 * 
 		 * For example, the base form {@link jqc.form.field.Field Field} class adds the {@link #baseCls} 'jqc-form-field', and
-		 * the {@link jqc.form.field.Text Text} field subclass wants to keep that class, and also add 'jqc-form-field-text'
-		 * to allow for any different styling of that particular subclass component. The result is two css classes:
-		 * 'jqc-form-field' and 'jqc-form-field-text'. In the case of {@link jqc.form.field.TextArea TextArea} (a subclass
-		 * of the Text field}, its componentCls is 'jqc-form-field-textarea', which overrides Text field's componentCls.
+		 * the {@link jqc.form.field.Text TextField} subclass wants to keep that class, and also add 'jqc-form-field-text'
+		 * to allow for any different styling of that particular subclass. The result is two css classes: 'jqc-form-field' 
+		 * and 'jqc-form-field-text'. In the case of {@link jqc.form.field.TextArea TextAreaField} (a subclass of TextField}, 
+		 * its componentCls is 'jqc-form-field-textarea', which overrides TextField's componentCls.
 		 */
 		
 		/**
@@ -1201,6 +1201,28 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 		 */
 		getId : function() {
 			return this.id;
+		},
+		
+		
+		/**
+		 * Returns the {@link #baseCls} of this Component. This is a useful accessor for classes collaborating with the
+		 * Component, to use the same {@link #baseCls} where appropriate.
+		 * 
+		 * @return {String}
+		 */
+		getBaseCls : function() {
+			return this.baseCls;
+		},
+		
+		
+		/**
+		 * Returns the {@link #componentCls} of this Component. This is a useful accessor for classes collaborating with the
+		 * Component, to use the same {@link #componentCls} where appropriate.
+		 * 
+		 * @return {String}
+		 */
+		getComponentCls : function() {
+			return this.componentCls;
 		},
 		
 		
