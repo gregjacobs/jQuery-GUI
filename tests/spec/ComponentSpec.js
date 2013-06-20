@@ -487,7 +487,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 		} );		
 		
 		
-		describe( "update()", function() {
+		describe( 'update()', function() {
 			var component;
 			
 			beforeEach( function() {
@@ -560,7 +560,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 			
-			it( "should cause the component to be rendered with the provided HTML content, but not delete the `tpl` config so that it may be used at a later time", function() {
+			it( "should cause the component to be rendered with the provided HTML content (over a `tplData` object), but not delete the `tpl` config so that it may be used at a later time", function() {
 				// Update with direct HTML content while the Component is in its unrendered state
 				component.update( "newHtmlConfig" );
 				
@@ -571,6 +571,15 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				component.update( { thing: "World" } );
 				expect( component.getEl().html() ).toMatch( "Hello, World" );
 				expect( component.getEl().html() ).not.toMatch( "newHtmlConfig" );   // the old content provided to the previous update() method call
+			} );
+			
+			
+			it( "should properly handle a string update() call, followed by a `tplData` update() call before the Component is rendered, by displaying the `tplData` and using the `tpl` when the Component is finally rendered", function() {
+				component.update( "newHtmlConfig" );     // First update with direct HTML content,
+				component.update( { thing: "World" } );  // and then update with a `tplData` object
+				
+				component.render( 'body' );  // now render
+				expect( component.getEl().html() ).toMatch( "World" );  // The new `tplData` object was used to render the Component (correct)
 			} );
 			
 		} );

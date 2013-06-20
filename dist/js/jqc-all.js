@@ -2437,6 +2437,9 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 			if( !this.rendered ) {
 				if( isTplData ) {
 					this.tplData = content;
+					this.updateCalledWithContent = false; // in case update() was previously called with `html` (string) content,
+					                                      // and this flag was set to true, then we must set it back to false. See
+					                                      // case below where it is set to `true` for more details.
 					
 				} else {  // Not a plain JavaScript Object, must be HTML content
 					// Remove this config, just in case it was specified. Setting the 'html' config (next) has the same effect as 'contentEl'.
@@ -2444,9 +2447,9 @@ function( require, jQuery, _, Class, Jqc, Observable, Css, Html, Mask, Animation
 					
 					// Set the 'html' config, for when the Component is rendered.
 					this.html = content;
-					this.updateCalledWithContent = true;  // in case there is a `tpl` config, this flag tells render() to use the `html` config instead 
-                                                          // of `tpl` when it renders. We don't want to delete the `tpl` config, since it may be used with
-                                                          // data provided to this method at a later time.
+					this.updateCalledWithContent = true;  // in case there is a `tpl` config, this flag tells render() to use the `html` 
+                                                          // config instead of `tpl` when it renders. We don't want to delete the `tpl`
+                                                          // config, since it may be used with data provided to this method at a later time.
 				}
 			} else {
 				this.getContentTarget()
