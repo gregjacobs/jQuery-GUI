@@ -1018,7 +1018,7 @@ define( [
 				var container = new Container();
 				expect( function() {
 					container.setLayout( 'non-existent-layout' );
-				} ).toThrow( "layout type 'non-existent-layout' is not a registered layout type." );
+				} ).toThrow( "Layout type 'non-existent-layout' is not a registered layout type." );
 			} );
 			
 			

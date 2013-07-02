@@ -38,11 +38,11 @@ define( [
 		
 	} );
 	
-	
 	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
-	require( [ 'jqc/Container' ], function( Container ) {
-		Container.registerLayout( 'auto', AutoLayout );
-	} );
+	// NOTE: Due to circular dependency issues with RequireJS, jqc.Container automatically considers this class as "registered" with
+	// the type string 'auto'. Leaving below line commented as a reminder. Even if we add an async require() call here,
+	// it is possible that the AutoLayout class is still not registered in time for use.
+	//Container.registerLayout( 'auto', AutoLayout );   -- leave as reminder
 
 	return AutoLayout;
 } );

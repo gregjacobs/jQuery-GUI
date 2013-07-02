@@ -3877,10 +3877,9 @@ define('jqc/Anchor', [
 /*global define */
 define('jqc/layout/Layout', [
 	'lodash',
-	'Class',
-	'jqc/Jqc',
-	'Observable'
-], function( _, Class, Jqc, Observable ) {
+	'Observable',
+	'jqc/Jqc'
+], function( _, Observable, Jqc ) {
 	
 	/**
 	 * @abstract 
@@ -3925,7 +3924,7 @@ define('jqc/layout/Layout', [
 	 * Note that a layout may be destroyed by a {@link jqc.Container} if another layout is set to it, and therefore
 	 * it cannot be relied on that the Container will clean up any stray elements that a Layout has created.
 	 */
-	var Layout = Class.extend( Observable, {
+	var Layout = Observable.extend( {
 		abstractClass : true,
 		
 		
@@ -4289,11 +4288,11 @@ define('jqc/layout/Auto', [
 		
 	} );
 	
-	
 	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
-	require( [ 'jqc/Container' ], function( Container ) {
-		Container.registerLayout( 'auto', AutoLayout );
-	} );
+	// NOTE: Due to circular dependency issues with RequireJS, jqc.Container automatically considers this class as "registered" with
+	// the type string 'auto'. Leaving below line commented as a reminder. Even if we add an async require() call here,
+	// it is possible that the AutoLayout class is still not registered in time for use.
+	//Container.registerLayout( 'auto', AutoLayout );   -- leave as reminder
 
 	return AutoLayout;
 } );
@@ -4324,23 +4323,50 @@ define('jqc/Container', [
 			/**
 			 * @private
 			 * @static
-			 * @property {Object} LAYOUTS
-			 * Hash object that stores "registered" layout types. The layouts are in the `jqc.layout` package, and each
+			 * @property {Object} layouts
+			 * 
+			 * Map that stores "registered" layout types. The layouts are in the `jqc.layout` package, and each
 			 * specifies a type name that is used to instantiate them.
 			 */
-			LAYOUTS : {},
+			layouts : {},
 			
 			/**
 			 * Registers a {@link jqc.layout.Layout Layout} with the Container class, allowing {@link #layout layouts}
 			 * to be specified by their string `typeName`.
 			 *
 			 * @static
-			 * @method registerLayout
 			 * @param {String} typeName The type name for the Layout.
-			 * @param {Function} layoutClass A jqc.layout.Layout subclass.
+			 * @param {Function} layoutClass A {@link jqc.layout.Layout} subclass.
 			 */
 			registerLayout : function( typeName, layoutClass ) {
-				this.LAYOUTS[ typeName.toLowerCase() ] = layoutClass;
+				Container.layouts[ typeName.toLowerCase() ] = layoutClass;
+			},
+			
+			/**
+			 * Retrieves a registered {@link jqc.layout.Layout Layout} class by "type" name.
+			 * 
+			 * @static
+			 * @protected
+			 * @param {String} typeName The type name that the layout was registered with. This is case-insensitive.
+			 * @return {Function} The {@link jqc.layout.Layout Layout} that was registered with the
+			 *   given `typeName`.
+			 * @throws {Error} If the `typeName` did not resolve to a registered {@link jqc.layout.Layout Layout}.
+			 */
+			getLayoutType : function( typeName ) {
+				typeName = typeName.toLowerCase();
+				
+				// <debug>
+				// Check that the layout type given is a registered layout type (or 'auto', as the AutoLayout
+				// is assumed to be loaded as a workaround for the circular dependency of this class requiring it)
+				if( typeName !== 'auto' && !Container.layouts[ typeName ] ) {
+					throw new Error( "Layout type '" + typeName + "' is not a registered layout type." );
+				}
+				// </debug>
+				
+				// Return the AutoLayout explicitly if asked for, since that class is not registered due to issues 
+				// with RequireJS and the circular dependency of this class requiring it. Other Layout classes are 
+				// registered normally. 
+				return ( typeName === 'auto' ) ? require( 'jqc/layout/Auto' ) : Container.layouts[ typeName ];
 			}
 			
 		},
@@ -5130,20 +5156,20 @@ define('jqc/Container', [
 
 	
 			if( layout instanceof Layout ) {
-				// The new layout is already an AbstractLayout instance
+				// The new layout is already a Layout instance
 				this.layout = layout;
 				layout.setContainer( this );
 	
 			} else {
 				// The new layout is a string or config object
-				var layoutType,
+				var layoutTypeName,
 				    layoutConfig = { container: this };
 	
 				if( typeof layout === 'string' ) {
-					layoutType = layout;
+					layoutTypeName = layout;
 	
 				} else if( typeof layout === 'object' ) { // config object
-					layoutType = layout.type || 'auto';   // default to 'auto' layout
+					layoutTypeName = layout.type || 'auto';   // default to 'auto' layout
 					layoutConfig = _.defaults( _.clone( layoutConfig ), layout );
 					delete layoutConfig.type;  // remove the 'type' property from the config object now, as to not shadow the Layout object's prototype 'type' property when applied
 	
@@ -5151,17 +5177,10 @@ define('jqc/Container', [
 					// Not a jqc.layout.Layout, String, or Object...
 					throw new Error( "Invalid layout argument provided to setLayout. See method description in docs." );
 				}
-	
-				// Layout types should be case-insensitive
-				layoutType = layoutType.toLowerCase();
-	
-				// Check that the layout type given is a registered layout type
-				if( !Container.LAYOUTS[ layoutType ] ) {
-					throw new Error( "layout type '" + layoutType + "' is not a registered layout type." );
-				}
-	
-				// Create the layout strategy object if all is well
-				this.layout = new Container.LAYOUTS[ layoutType ]( layoutConfig );
+
+				// Create the layout strategy object from its type name if all is well
+				var LayoutClass = Container.getLayoutType( layoutTypeName );
+				this.layout = new LayoutClass( layoutConfig );
 			}
 		},
 	

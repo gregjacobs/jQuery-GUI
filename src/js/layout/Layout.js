@@ -1,10 +1,9 @@
 /*global define */
 define( [
 	'lodash',
-	'Class',
-	'jqc/Jqc',
-	'Observable'
-], function( _, Class, Jqc, Observable ) {
+	'Observable',
+	'jqc/Jqc'
+], function( _, Observable, Jqc ) {
 	
 	/**
 	 * @abstract 
@@ -49,7 +48,7 @@ define( [
 	 * Note that a layout may be destroyed by a {@link jqc.Container} if another layout is set to it, and therefore
 	 * it cannot be relied on that the Container will clean up any stray elements that a Layout has created.
 	 */
-	var Layout = Class.extend( Observable, {
+	var Layout = Observable.extend( {
 		abstractClass : true,
 		
 		
