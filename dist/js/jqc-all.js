@@ -6648,8 +6648,9 @@ define('jqc/panel/Panel', [
 		 */
 		createHeader : function() {
 			return new PanelHeader( {
-				title       : this.title,
-				toolButtons : this.toolButtons
+				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'jqc-panel-header'. For Window, 'jqc-window-header'
+				title        : this.title,
+				toolButtons  : this.toolButtons
 			} );
 		},
 		
