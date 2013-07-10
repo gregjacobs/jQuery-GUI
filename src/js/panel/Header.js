@@ -1,10 +1,11 @@
 /*global define */
 define( [
 	'lodash',
+	'jqc/ComponentManager',
 	'jqc/Container',
 	'jqc/Label',
 	'jqc/layout/HBox'
-], function( _, Container, Label ) {
+], function( _, ComponentManager, Container, Label ) {
 	
 	/**
 	 * @class jqc.panel.Header
@@ -157,6 +158,8 @@ define( [
 		}
 		
 	} );
+	
+	ComponentManager.registerType( 'panelheader', PanelHeader );
 	
 	return PanelHeader;
 	

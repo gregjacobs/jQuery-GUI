@@ -5926,10 +5926,11 @@ define('jqc/layout/HBox', [
 /*global define */
 define('jqc/panel/Header', [
 	'lodash',
+	'jqc/ComponentManager',
 	'jqc/Container',
 	'jqc/Label',
 	'jqc/layout/HBox'
-], function( _, Container, Label ) {
+], function( _, ComponentManager, Container, Label ) {
 	
 	/**
 	 * @class jqc.panel.Header
@@ -6082,6 +6083,8 @@ define('jqc/panel/Header', [
 		}
 		
 	} );
+	
+	ComponentManager.registerType( 'panelheader', PanelHeader );
 	
 	return PanelHeader;
 	
@@ -6668,6 +6671,7 @@ define('jqc/panel/Panel', [
 		 */
 		doCreateHeader : function() {
 			this.header = this.createHeader( _.defaults( {}, this.header, {
+				type         : 'panelheader',
 				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'jqc-panel-header'. For Window, 'jqc-window-header'
 				title        : this.title,
 				toolButtons  : this.toolButtons
@@ -6685,11 +6689,11 @@ define('jqc/panel/Panel', [
 		 * Creates the {@link #property-header}, which contains the {@link #title} and any {@link #toolButtons} configured.
 		 * 
 		 * @protected
-		 * @param {Object} headerConfig The 
+		 * @param {Object} headerConfig The configuration for the header, with defaults applied from the Panel.
 		 * @return {jqc.panel.Header}
 		 */
 		createHeader : function( headerConfig ) {
-			return new PanelHeader( headerConfig );
+			return ComponentManager.create( headerConfig );
 		},
 		
 		
