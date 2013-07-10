@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Panel Visual Tests</title>
+	<title>Panel Visual Tests</title>
 
 	<link rel="stylesheet" href="../../../dist/css/base/base.css" />
 	<link rel="stylesheet" href="../../../dist/css/theme/basic/basic.css" />
@@ -36,7 +36,10 @@
 		
 		require( [
 			'jquery',
-			'jqc/panel/Panel'
+			'jqc/panel/Panel',
+			
+			'jqc/Anchor',
+			'jqc/button/Button'
 		], function( $, Panel ) {
 			$( document ).ready( function() {
 				
@@ -95,6 +98,76 @@
 					html: "Panel with bodyCls and bodyStyle (should be red background, and blue text)"
 				} );
 				jQuery( '<br>' ).appendTo( 'body' );
+				
+				var panelWithHeaderComponents = new Panel( {
+					renderTo : 'body',
+					
+					title: "Panel with Header Components",
+					header : {
+						items : [
+							{
+								type : 'anchor',
+								text : "Testing 123"
+							},
+							{
+								type : 'button',
+								text : "Test 1"
+							},
+							{
+								type : 'button',
+								text : "Test 2"
+							}
+						],
+						
+						toolButtons : [
+							{
+								toolType : 'close'
+							}
+						]
+					}
+				} );
+				jQuery( '<br>' ).appendTo( 'body' );
+
+				var panelWithHeaderComponentsAndTitleAfter = new Panel( {
+					renderTo : 'body',
+					
+					title: "Panel with Header Components, with this Panel title after them",
+					header : {
+						items : [
+							{
+								type : 'anchor',
+								text : "Testing 123"
+							},
+							{
+								type : 'button',
+								text : "Test 1"
+							},
+							{
+								type : 'button',
+								text : "Test 2"
+							}
+						],
+						
+						titlePosition: 3
+					}
+				} );
+				jQuery( '<br>' ).appendTo( 'body' );
+				
+				var panelWithHeaderButNoTitle = new Panel( {
+					renderTo : 'body',
+					
+					//title: "Panel with header but no title!" -- leaving as reminder
+					header : {
+						items : [
+							{
+								type : 'anchor',
+								text : "Panel with Custom Anchor Title Only (no actual `title` config)"
+							}
+						]
+					}
+				} );
+				jQuery( '<br>' ).appendTo( 'body' );
+				
 			} );
 		} );
 	</script>

@@ -5925,10 +5925,11 @@ define('jqc/layout/HBox', [
 
 /*global define */
 define('jqc/panel/Header', [
+	'lodash',
 	'jqc/Container',
 	'jqc/Label',
 	'jqc/layout/HBox'
-], function( Container, Label ) {
+], function( _, Container, Label ) {
 	
 	/**
 	 * @class jqc.panel.Header
@@ -5942,6 +5943,27 @@ define('jqc/panel/Header', [
 		 * @cfg {String} title
 		 * 
 		 * The title of the Panel, which is placed in the {@link #titleLabel}.
+		 */
+		
+		/**
+		 * @cfg {Number} titlePosition
+		 * 
+		 * The index in the Header's {@link #items} array where the {@link #title} component should be
+		 * placed. This is most useful when providing the {@link #items} config to place other components
+		 * in the Header.
+		 * 
+		 * Defaults to 0, making the {@link #title} component the first component.
+		 */
+		titlePosition : 0,
+		
+		/**
+		 * @cfg {Object/Object[]} items
+		 * 
+		 * Any component(s) to place into the Header. The {@link #title} component is automatically
+		 * added to this array at the index specified by the {@link #titlePosition}, and any {@link #toolButtons}
+		 * are automatically appended as well.
+		 * 
+		 * See this config in the superclass for more details.
 		 */
 		
 		/**
@@ -5986,7 +6008,7 @@ define('jqc/panel/Header', [
 			this.titleLabel = this.createTitleLabel();
 			this.toolButtonsCt = this.createToolButtonsCt();
 			
-			this.items = this.buildItems();
+			this.items = this.buildItems();  // note: if an `items` config was passed to the Header, it will be handled in buildItems()
 			
 			this._super( arguments );
 		},
@@ -5999,16 +6021,24 @@ define('jqc/panel/Header', [
 		 * @return {Object/Object[]} The child item(s).
 		 */
 		buildItems : function() {
-			return [
-				this.titleLabel,
-				
+			var items = this.items || [];  // start with any custom items, or an empty array
+			if( !_.isArray( items ) )  // the `items` config may have been a single object, in which case, wrap in an array
+				items = [ items ];
+			
+			// Add the title component at the appropriate position
+			var titlePosition = Math.min( this.titlePosition, items.length );  // append if at a position greater than the number of items
+			items.splice( titlePosition, 0, this.titleLabel );
+			
+			// Add the toolbuttons, right aligned
+			items.push( 
 				{ type: 'component', flex: 1 },  // take up the middle space, to effectively right-align the tool buttons
-				
 				this.toolButtonsCt
-			];
+			);
+			
+			return items;
 		},
-			
-			
+		
+		
 		/**
 		 * Creates the title component. This is the component that the {@link #title}
 		 * config will be applied to, by default.
@@ -6489,6 +6519,13 @@ define('jqc/panel/Panel', [
 		 */
 		
 		/**
+		 * @cfg {Object} header
+		 * 
+		 * Any configuration options to pass to the {@link #property-header} component. This may include
+		 * a `type` property to specify a different Header subclass than the default {@link jqc.panel.Header}.
+		 */
+		
+		/**
 		 * @cfg {Object/Object[]/jqc.button.Button/jqc.button.Button[]} buttons
 		 * 
 		 * One or more {@link jqc.button.Button Buttons} or Button config objects for buttons to place
@@ -6499,7 +6536,7 @@ define('jqc/panel/Panel', [
 		/**
 		 * @cfg {Boolean} headerHidden
 		 * 
-		 * `true` to initially hide the Panel's {@link #header}. Can be shown using {@link #showHeader}. 
+		 * `true` to initially hide the Panel's {@link #property-header}. Can be shown using {@link #showHeader}. 
 		 */
 		
 		
@@ -6552,10 +6589,10 @@ define('jqc/panel/Panel', [
 		/**
 		 * @inheritdoc
 		 */
-		initComponent : function() {		
+		initComponent : function() {
 			this._super( arguments );
 			
-			if( this.title || this.toolButtons ) {
+			if( this.title || this.toolButtons || this.header ) {  // last condition is if there was a `header` config object provided for the header
 				this.doCreateHeader();
 			}
 			if( this.buttons ) {
@@ -6620,17 +6657,21 @@ define('jqc/panel/Panel', [
 		
 		
 		/**
-		 * Performs the creation of the {@link #header}, by calling {@link #createHeader}, and then applying 
+		 * Performs the creation of the {@link #property-header}, by calling {@link #createHeader}, and then applying 
 		 * any post-processing required (which includes rendering it as the first element in the Panel
 		 * itself if it is already rendered).
 		 * 
-		 * To create a different {@link #header} in a subclass, override {@link #createHeader} instead of this 
+		 * To create a different {@link #property-header} in a subclass, override {@link #createHeader} instead of this 
 		 * method.
 		 * 
 		 * @protected
 		 */
 		doCreateHeader : function() {
-			this.header = this.createHeader();
+			this.header = this.createHeader( _.defaults( {}, this.header, {
+				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'jqc-panel-header'. For Window, 'jqc-window-header'
+				title        : this.title,
+				toolButtons  : this.toolButtons
+			} ) );
 			this.header.setVisible( !this.headerHidden );
 			delete this.headerHidden;
 			
@@ -6641,17 +6682,14 @@ define('jqc/panel/Panel', [
 		
 		
 		/**
-		 * Creates the {@link #header}, which contains the {@link #title} and any {@link #toolButtons} configured.
+		 * Creates the {@link #property-header}, which contains the {@link #title} and any {@link #toolButtons} configured.
 		 * 
 		 * @protected
+		 * @param {Object} headerConfig The 
 		 * @return {jqc.panel.Header}
 		 */
-		createHeader : function() {
-			return new PanelHeader( {
-				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'jqc-panel-header'. For Window, 'jqc-window-header'
-				title        : this.title,
-				toolButtons  : this.toolButtons
-			} );
+		createHeader : function( headerConfig ) {
+			return new PanelHeader( headerConfig );
 		},
 		
 		
@@ -6660,7 +6698,7 @@ define('jqc/panel/Panel', [
 		 * any post-processing required (which includes rendering it as the last element in the Panel
 		 * itself if it is already rendered).
 		 * 
-		 * To create a different {@link #header} in a subclass, override {@link #createHeader} instead of this 
+		 * To create a different {@link #property-header} in a subclass, override {@link #createHeader} instead of this 
 		 * method.
 		 * 
 		 * @protected
@@ -6731,7 +6769,7 @@ define('jqc/panel/Panel', [
 		
 		
 		/**
-		 * Shows the Panel's {@link #header}, if it is currently hidden.
+		 * Shows the Panel's {@link #property-header}, if it is currently hidden.
 		 * 
 		 * @chainable
 		 */
@@ -6747,7 +6785,7 @@ define('jqc/panel/Panel', [
 		
 		
 		/**
-		 * Hides the Panel's {@link #header}, if it is currently visible.
+		 * Hides the Panel's {@link #property-header}, if it is currently visible.
 		 * 
 		 * @chainable
 		 */
@@ -11626,7 +11664,7 @@ define('jqc/tab/Panel', [
 		/**
 		 * @cfg {Boolean} hideChildPanelHeaders
 		 * 
-		 * `true` to hide each child panel's {@link jqc.panel.Panel#header header} when added to the Tab Panel.
+		 * `true` to hide each child panel's {@link jqc.panel.Panel#property-header header} when added to the Tab Panel.
 		 * The headers are hidden because the tabs that are created will have the panels' titles, and having
 		 * the header would just be showing that information twice. Set to `false` to disable this behavior.
 		 */

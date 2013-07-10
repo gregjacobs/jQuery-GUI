@@ -57,6 +57,13 @@ define( [
 		 */
 		
 		/**
+		 * @cfg {Object} header
+		 * 
+		 * Any configuration options to pass to the {@link #property-header} component. This may include
+		 * a `type` property to specify a different Header subclass than the default {@link jqc.panel.Header}.
+		 */
+		
+		/**
 		 * @cfg {Object/Object[]/jqc.button.Button/jqc.button.Button[]} buttons
 		 * 
 		 * One or more {@link jqc.button.Button Buttons} or Button config objects for buttons to place
@@ -67,7 +74,7 @@ define( [
 		/**
 		 * @cfg {Boolean} headerHidden
 		 * 
-		 * `true` to initially hide the Panel's {@link #header}. Can be shown using {@link #showHeader}. 
+		 * `true` to initially hide the Panel's {@link #property-header}. Can be shown using {@link #showHeader}. 
 		 */
 		
 		
@@ -120,10 +127,10 @@ define( [
 		/**
 		 * @inheritdoc
 		 */
-		initComponent : function() {		
+		initComponent : function() {
 			this._super( arguments );
 			
-			if( this.title || this.toolButtons ) {
+			if( this.title || this.toolButtons || this.header ) {  // last condition is if there was a `header` config object provided for the header
 				this.doCreateHeader();
 			}
 			if( this.buttons ) {
@@ -188,17 +195,21 @@ define( [
 		
 		
 		/**
-		 * Performs the creation of the {@link #header}, by calling {@link #createHeader}, and then applying 
+		 * Performs the creation of the {@link #property-header}, by calling {@link #createHeader}, and then applying 
 		 * any post-processing required (which includes rendering it as the first element in the Panel
 		 * itself if it is already rendered).
 		 * 
-		 * To create a different {@link #header} in a subclass, override {@link #createHeader} instead of this 
+		 * To create a different {@link #property-header} in a subclass, override {@link #createHeader} instead of this 
 		 * method.
 		 * 
 		 * @protected
 		 */
 		doCreateHeader : function() {
-			this.header = this.createHeader();
+			this.header = this.createHeader( _.defaults( {}, this.header, {
+				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'jqc-panel-header'. For Window, 'jqc-window-header'
+				title        : this.title,
+				toolButtons  : this.toolButtons
+			} ) );
 			this.header.setVisible( !this.headerHidden );
 			delete this.headerHidden;
 			
@@ -209,17 +220,14 @@ define( [
 		
 		
 		/**
-		 * Creates the {@link #header}, which contains the {@link #title} and any {@link #toolButtons} configured.
+		 * Creates the {@link #property-header}, which contains the {@link #title} and any {@link #toolButtons} configured.
 		 * 
 		 * @protected
+		 * @param {Object} headerConfig The 
 		 * @return {jqc.panel.Header}
 		 */
-		createHeader : function() {
-			return new PanelHeader( {
-				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'jqc-panel-header'. For Window, 'jqc-window-header'
-				title        : this.title,
-				toolButtons  : this.toolButtons
-			} );
+		createHeader : function( headerConfig ) {
+			return new PanelHeader( headerConfig );
 		},
 		
 		
@@ -228,7 +236,7 @@ define( [
 		 * any post-processing required (which includes rendering it as the last element in the Panel
 		 * itself if it is already rendered).
 		 * 
-		 * To create a different {@link #header} in a subclass, override {@link #createHeader} instead of this 
+		 * To create a different {@link #property-header} in a subclass, override {@link #createHeader} instead of this 
 		 * method.
 		 * 
 		 * @protected
@@ -299,7 +307,7 @@ define( [
 		
 		
 		/**
-		 * Shows the Panel's {@link #header}, if it is currently hidden.
+		 * Shows the Panel's {@link #property-header}, if it is currently hidden.
 		 * 
 		 * @chainable
 		 */
@@ -315,7 +323,7 @@ define( [
 		
 		
 		/**
-		 * Hides the Panel's {@link #header}, if it is currently visible.
+		 * Hides the Panel's {@link #property-header}, if it is currently visible.
 		 * 
 		 * @chainable
 		 */

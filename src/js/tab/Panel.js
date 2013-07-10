@@ -40,7 +40,7 @@ define( [
 		/**
 		 * @cfg {Boolean} hideChildPanelHeaders
 		 * 
-		 * `true` to hide each child panel's {@link jqc.panel.Panel#header header} when added to the Tab Panel.
+		 * `true` to hide each child panel's {@link jqc.panel.Panel#property-header header} when added to the Tab Panel.
 		 * The headers are hidden because the tabs that are created will have the panels' titles, and having
 		 * the header would just be showing that information twice. Set to `false` to disable this behavior.
 		 */
