@@ -1,8 +1,10 @@
 /*global define */
 define( [
+	'jquery',
+	'lodash',
 	'jqc/ComponentManager',
 	'jqc/Overlay'
-], function( ComponentManager, Overlay ) {
+], function( jQuery, _, ComponentManager, Overlay ) {
 	
 	/**
 	 * @class jqc.window.Window
@@ -20,6 +22,15 @@ define( [
 		 * `true` to show the close button on the top right, `false` to hide it.
 		 */
 		closeButton : true,
+		
+		/**
+		 * @cfg {Boolean} modal
+		 * 
+		 * `true` to make this window a modal window (as opposed to a modeless window). When the Window is modal,
+		 * a mask is placed behind it, covering the rest of the document as to force the user to interact with 
+		 * the Window until it is hidden.
+		 */
+		modal : false,
 		
 		/**
 		 * @cfg {String} closeAction
@@ -63,6 +74,23 @@ define( [
 		
 		
 		/**
+		 * @protected
+		 * @property {jQuery} $modalMaskEl
+		 * 
+		 * The element that is used to mask the document when the Window is shown, and {@link #modal} is enabled.
+		 * This will only be created when the Window is shown the first time.
+		 */
+		
+		/**
+		 * @private
+		 * @property {Function} maskResizeHandler
+		 * 
+		 * The bound handler function that is a handler of the window resize event, which resizes the {@link #$modalMaskEl}
+		 * when the browser window is resized.
+		 */
+		
+		
+		/**
 		 * @inheritdoc
 		 */
 		initComponent : function() {
@@ -95,6 +123,80 @@ define( [
 					}
 				} );
 			}
+			
+			// Set up a handler to resize the modal mask, if enabled
+			if( this.modal ) {
+				this.maskResizeHandler = _.debounce( _.bind( this.resizeModalMask, this ), 100, { maxWait: 300 } );
+				jQuery( window ).on( 'resize', this.maskResizeHandler );
+			}
+		},
+		
+		
+		/**
+		 * Extension of hook method from superclass, which shows the {@link #modal} mask, if enabled.
+		 * 
+		 * @protected
+		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
+		 */
+		onShow : function( options ) {
+			this._super( arguments );
+			
+			if( this.modal ) {
+				var $modalMaskEl = this.$modalMaskEl;
+				
+				if( !$modalMaskEl ) {
+					$modalMaskEl = this.$modalMaskEl = this.createModalMaskEl();
+				}
+				$modalMaskEl.appendTo( 'body' );  // make sure it is appended to the body (it is detached on hide)
+				this.resizeModalMask();
+				
+				$modalMaskEl.show();
+			}
+		},
+		
+		
+		/**
+		 * Sizes the modal mask to the browser window's size.
+		 * 
+		 * @protected
+		 */
+		resizeModalMask : function() {
+			var $modalMaskEl = this.$modalMaskEl;
+			
+			// Only size it if the window is shown, and the element has been created
+			if( this.isVisible() && $modalMaskEl ) {
+				var $window = jQuery( window );
+				this.$modalMaskEl.css( {
+					width  : $window.width(),
+					height : $window.height()
+				} );
+			}
+		},
+		
+
+		/**
+		 * Extension of hook method from superclass, which hides the {@link #modal} mask, if enabled.
+		 * 
+		 * @protected
+		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
+		 */
+		onHide : function( options ) {
+			if( this.modal ) {
+				this.$modalMaskEl.detach();
+			}
+			
+			this._super( arguments );
+		},
+		
+		
+		/**
+		 * Creates the {@link #$modalMaskEl}, for use when the Window is set to be {@link #modal}.
+		 * 
+		 * @protected
+		 * @return {jQuery} The modal masking element, which is appended to the document body.
+		 */
+		createModalMaskEl : function() {
+			return jQuery( '<div class="' + this.baseCls + '-modalMask" />' );
 		},
 		
 		
@@ -112,6 +214,25 @@ define( [
 				else 
 					this.destroy();
 			}
+		},
+		
+		
+		// -----------------------------------
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onDestroy : function() {
+			if( this.$modalMaskEl ) {
+				this.$modalMaskEl.remove();
+			}
+			
+			if( this.maskResizeHandler ) {
+				jQuery( window ).off( 'resize', this.maskResizeHandler );
+			}
+			
+			this._super( arguments );
 		}
 		
 	} );

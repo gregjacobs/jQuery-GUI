@@ -1045,3 +1045,10 @@
   border-width: 1px 0 0 0;
   background-color: #FFF;
 }
+
+/* line 12, ../../../../src/css/theme/basic/window/_Window.scss */
+.jqc-window-modalMask {
+  background-color: #CCC;
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
+  opacity: 0.5;
+}

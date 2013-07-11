@@ -7,3 +7,6 @@
 }
 
 .jqc-window-body { border-color: #000; border-style: solid; border-width: 1px 0 0 0; background-color: #FFF; }
+
+
+.jqc-window-modalMask { background-color: #CCC; @include opacity( 0.5 ); }

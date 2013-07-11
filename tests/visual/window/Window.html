@@ -30,17 +30,36 @@
 		} );
 		
 		
+		// Global vars so they can be accessed from the console
+		var modelessWindow,
+		    modalWindow;
+		
 		require( [
 			'jquery',
 			'jqc/window/Window'
 		], function( $, Window ) {
 			$( document ).ready( function() {
 				
-				var window = new Window( {
-					title: "Test Window",
-					html: "Test Body"
+				modelessWindow = new Window( {
+					title : "Modeless Window",
+					html  : "Modeless Window Body",
+					
+					closeAction : 'hide'
 				} );
-				window.show();
+				
+				
+				modalWindow = new Window( {
+					title : "Modal Window",
+					html  : "Modal Window Body",
+					modal : true,
+					
+					closeAction : 'hide'
+				} );
+				
+
+				$( '#showModelessWindow' ).on( 'click', function() { modelessWindow.show(); } );
+				$( '#showModalWindow' ).on( 'click', function() { modalWindow.show(); } );
+				
 			} );
 		} );
 	</script>
@@ -48,5 +67,9 @@
 </head>
 
 <body>
+
+<a id="showModelessWindow" href="javascript:;">Show Modeless Window</a> |
+<a id="showModalWindow" href="javascript:;">Show Modal Window</a>
+
 </body>
 </html>

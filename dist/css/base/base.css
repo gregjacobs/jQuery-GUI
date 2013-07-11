@@ -245,6 +245,13 @@ iframe.jqc-form-field-dropdown-shim {
   float: right;
 }
 
+/* line 13, ../../../src/css/base/window/_Window.scss */
+.jqc-window-modalMask {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 /* General Styles */
 /* line 23, ../../../src/css/base/base.scss */
 .jqc-clear {
