@@ -155,6 +155,7 @@ define( [
 		 */
 		setTitle : function( title ) {
 			this.titleLabel.setText( title );
+			this.doLayout();  // Update the Header's layout for the new text size
 		}
 		
 	} );
