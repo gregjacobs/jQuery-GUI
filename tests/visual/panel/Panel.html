@@ -153,6 +153,7 @@
 				} );
 				jQuery( '<br>' ).appendTo( 'body' );
 				
+				
 				var panelWithHeaderButNoTitle = new Panel( {
 					renderTo : 'body',
 					
@@ -166,6 +167,18 @@
 						]
 					}
 				} );
+				jQuery( '<br>' ).appendTo( 'body' );
+				
+				
+				var panelWithHeaderComponentsInjectedAfterwards = new Panel( {
+					renderTo : 'body',
+					html : "Panel with header components injected after instantiation"
+				} );
+				var header = panelWithHeaderComponentsInjectedAfterwards.getHeader();
+				header.insert( {
+					type : 'anchor',
+					text : "Component injected into header after instantiation"
+				}, 0 );
 				jQuery( '<br>' ).appendTo( 'body' );
 				
 			} );
