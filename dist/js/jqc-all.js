@@ -11839,7 +11839,7 @@ define('jqc/tab/Panel', [
 		 */
 		createTab : function( panel ) {
 			return new Tab( {
-				text  : panel.getTitle(),
+				text : panel.getTitle(),
 				correspondingPanel : panel
 			} );
 		},
