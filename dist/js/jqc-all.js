@@ -6596,7 +6596,11 @@ define('jqc/panel/Panel', [
 		initComponent : function() {
 			this._super( arguments );
 			
-			if( this.title || this.toolButtons || this.header ) {  // last condition is if there was a `header` config object provided for the header
+			// Move the `header` config to `headerCfg`, as to not be confusing when an actual jqc.panel.Header is created in the `header` property
+			this.headerCfg = this.header;
+			delete this.header;
+			
+			if( this.title || this.toolButtons || this.headerCfg ) {
 				this.doCreateHeader();
 			}
 			if( this.buttons ) {
@@ -6671,7 +6675,7 @@ define('jqc/panel/Panel', [
 		 * @protected
 		 */
 		doCreateHeader : function() {
-			this.header = this.createHeader( _.defaults( {}, this.header, {
+			this.header = this.createHeader( _.defaults( {}, this.headerCfg, {
 				type         : 'panelheader',
 				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'jqc-panel-header'. For Window, 'jqc-window-header'
 				title        : this.title,
@@ -6743,6 +6747,28 @@ define('jqc/panel/Panel', [
 		
 		
 		// -----------------------------------
+		
+		
+		/**
+		 * Gets the {@link #property-header} of the Panel. If the {@link #property-header} has not been created yet,
+		 * it will be instantiated before it is returned.
+		 * 
+		 * In most cases, you will not need to directly access the Panel's {@link #property-header} component. Most of 
+		 * the time, you will set the {@link #cfg-header} config options, and if the Panel's title needs to be changed,
+		 * you will use the {@link #setTitle} method.
+		 * 
+		 * However, this method is provided for more advanced operations, such as if components need to be injected into
+		 * the header. In this case, be aware that the header is created with components of its own, and you will need
+		 * to inject yours at the correct indexes.
+		 * 
+		 * @return {jqc.panel.Header}
+		 */
+		getHeader : function() {
+			if( !this.header ) {
+				this.doCreateHeader();
+			}
+			return this.header;
+		},
 		
 		
 		/**
@@ -6877,6 +6903,20 @@ define('jqc/panel/Panel', [
 				this.$bodyEl.css( name, value );  // will work for both method signatures (i.e. when `name` is an object, and when provided both name / value)
 			}
 			return this;
+		},
+
+		
+		// ---------------------------------
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onDestroy : function() {
+			if( this.header ) this.header.destroy();
+			if( this.footer ) this.footer.destroy();
+			
+			this._super( arguments );
 		}
 		
 	} );
@@ -11776,6 +11816,17 @@ define('jqc/tab/Panel', [
 		 */
 		createTabBar : function() {
 			return new TabBar();
+		},
+		
+		
+		/**
+		 * Retrieves the TabPanel's internal {@link jqc.tab.Bar TabBar} instance. 
+		 * 
+		 * Normally, the {@link #tabBar} is managed solely by the TabPanel itself, but this accessor allows for 
+		 * the ability to manipulate the {@link #tabBar} directly to support certain scenarios.
+		 */
+		getTabBar : function() {
+			return this.tabBar;
 		},
 		
 		

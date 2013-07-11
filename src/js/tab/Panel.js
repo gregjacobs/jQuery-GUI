@@ -151,6 +151,17 @@ define( [
 		
 		
 		/**
+		 * Retrieves the TabPanel's internal {@link jqc.tab.Bar TabBar} instance. 
+		 * 
+		 * Normally, the {@link #tabBar} is managed solely by the TabPanel itself, but this accessor allows for 
+		 * the ability to manipulate the {@link #tabBar} directly to support certain scenarios.
+		 */
+		getTabBar : function() {
+			return this.tabBar;
+		},
+		
+		
+		/**
 		 * Factory method used to create a {@link jqc.tab.Tab Tab} for the {@link #tabBar}.
 		 * 
 		 * @protected
