@@ -4,7 +4,7 @@ define( [
 	'lodash',
 	'jqc/ComponentManager',
 	'jqc/Container',
-	'jqc/layout/Fit'  // used by layout 'type'
+	'jqc/layout/Fit'  // default layout
 ], function( jQuery, _, ComponentManager, Container ) {
 
 	/**
