@@ -7305,7 +7305,7 @@ define('jqc/Overlay', [
 					}
 					
 					of = anchor.element || anchor.of;  // accept either 'element' or 'of' from the anchor config
-					collision = anchor.collision || 'flip';  // even though this seems to be the default 'collision' value in jQuery UI, we need this default value for a later if statement to check if 'flip' was used (as a short circuit to checking the classes on the element itself)
+					collision = anchor.collision || 'flipfit';
 	
 					// Handle the anchor element being a jqc.Component, by grabbing the Component's DOM element
 					if( of instanceof Component ) {
@@ -7495,7 +7495,7 @@ define('jqc/Viewport', [
 	'lodash',
 	'jqc/ComponentManager',
 	'jqc/Container',
-	'jqc/layout/Fit'  // used by layout 'type'
+	'jqc/layout/Fit'  // default layout
 ], function( jQuery, _, ComponentManager, Container ) {
 
 	/**
