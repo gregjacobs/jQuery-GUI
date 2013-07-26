@@ -12943,7 +12943,7 @@ define('jqc/view/Collection', [
 				this.collectModelElements( this.collectModels() );  // need to determine the initial set of models that were rendered (if any)
 				
 				// Mask the view if the Collection is currently loading when the view is rendered
-				if( collection.isLoading() ) {
+				if( this.maskOnLoad && collection.isLoading() ) {
 					this.applyLoadingHeight();
 					this.mask();
 				}
