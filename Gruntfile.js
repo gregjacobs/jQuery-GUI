@@ -94,13 +94,7 @@ module.exports = function( grunt ) {
 		copy : {
 			'afterRequirejs' : {
 				files : [
-					{ src : [ 'vendor/require/**' ],            dest: 'dist/' },
-					{ src : [ 'vendor/jquery/**' ],             dest: 'dist/' },
-					{ src : [ 'vendor/lodash/**' ],             dest: 'dist/' },
-					{ src : [ 'vendor/jquery-ui.position/**' ], dest: 'dist/' },
-					{ src : [ 'vendor/class/**' ],              dest: 'dist/' },
-					{ src : [ 'vendor/observable/**' ],         dest: 'dist/' },
-					{ src : [ 'vendor/data/**' ],               dest: 'dist/' }
+					{ src : [ 'vendor/jquery-ui.position/**' ], dest: 'dist/' }
 				]
 			}
 		},
@@ -162,9 +156,9 @@ module.exports = function( grunt ) {
 			'--title=jQuery-Component API Docs',
 			
 			'src/js',
-			'vendor/class/',
-			'vendor/observable/',
-			'vendor/data/'
+			'bower_components/Class-js/src/',
+			'bower_components/Observable-js/src/',
+			'bower_components/Data-js/src/'
 		];
 		
 		execFile( executable, args, function( err, stdout, stderr ) {

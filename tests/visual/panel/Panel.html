@@ -10,19 +10,19 @@
 		.redBackground { background-color: red; }
 	</style>
 
-	<script type="text/javascript" src="../../../vendor/require/require.js"></script>
+	<script type="text/javascript" src="../../../bower_components/requirejs/require.js"></script>
 	<script type="text/javascript">
 		require.config( {
 			baseUrl : '../../../',
 			
 			paths : {
 				// General dependencies
-				'jquery'             : 'vendor/jquery/jquery',
+				'jquery'             : 'bower_components/jquery/jquery',
 				'jquery-ui.position' : 'vendor/jquery-ui.position/jquery-ui.position',
-				'lodash'             : 'vendor/lodash/lodash',
-				'Class'              : 'vendor/class/Class',
-				'Observable'         : 'vendor/observable/Observable',
-				'data'               : 'vendor/data',
+				'lodash'             : 'bower_components/lodash/dist/lodash.compat',
+				'Class'              : 'bower_components/Class-js/dist/Class',
+				'Observable'         : 'bower_components/Observable-js/dist/Observable',
+				'data'               : 'bower_components/Data-js/src',
 				
 				// jQuery-Component Library
 				'jqc' : 'src/js'

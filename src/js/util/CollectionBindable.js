@@ -220,7 +220,7 @@ define( [
 		 *         'jqc/util/CollectionBindable'
 		 *     ], function( Class, CollectionBindable ) {
 		 *         
-		 *         var MyBindableClass = new Class( {
+		 *         var MyBindableClass = Class.create( {
 		 *             mixins : [ CollectionBindable ],
 		 *             
 		 *             // ...

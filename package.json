@@ -26,6 +26,19 @@
     "grunt-contrib-requirejs": "~0.4.0"
   },
   "keywords": [
-    "jquery", "ui", "gui", "widget", "toolkit", "framework"
+    "UI",
+    "component",
+    "jQuery",
+    "GUI",
+    "window",
+    "panel",
+    "container",
+    "form",
+    "tabs",
+    "mask",
+    "template",
+    "layout",
+    "view",
+    "controller"
   ]
 }

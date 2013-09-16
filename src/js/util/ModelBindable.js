@@ -224,7 +224,7 @@ define( [
 		 *         'jqc/util/ModelBindable'
 		 *     ], function( Class, ModelBindable ) {
 		 *         
-		 *         var MyBindableClass = new Class( {
+		 *         var MyBindableClass = Class.create( {
 		 *             mixins : [ ModelBindable ],
 		 *             
 		 *             // ...

@@ -13,7 +13,7 @@ define( [
 	 * Singleton class which allows any subscriber to listen to all events from all {@link jqc.Component Component}
 	 * instances (including {@link jqc.Component Component} subclass instances).
 	 */
-	var EventBus = new Class( {
+	var EventBus = Class.create( {
 		
 		/**
 		 * @protected

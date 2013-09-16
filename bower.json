@@ -1,0 +1,45 @@
+{
+  "name": "jQuery-Component",
+  "version": "0.1.0",
+  "homepage": "https://github.com/gregjacobs/jQuery-Component",
+  "authors": [
+    "Gregory Jacobs <greg@greg-jacobs.com>"
+  ],
+  "description": "Class/Component-based UI library built using jQuery as its DOM abstraction.",
+  "keywords": [
+    "UI",
+    "component",
+    "jQuery",
+    "GUI",
+    "window",
+    "panel",
+    "container",
+    "form",
+    "tabs",
+    "mask",
+    "template",
+    "layout",
+    "view",
+    "controller"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "vendor/jsduck"
+  ],
+  "dependencies": {
+    "jquery": "~1.10.2",
+    "Class-js": "~0.5.0",
+    "lodash": "official-lodash#~2.0.0",
+    "Observable-js": "~0.1.0",
+    "requirejs": "~2.1.8",
+    "Data-js": "~0.1.0"
+  },
+  "devDependencies": {
+    "jasmine": "~1.3.1"
+  }
+}
