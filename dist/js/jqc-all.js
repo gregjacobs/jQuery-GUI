@@ -7638,7 +7638,7 @@ define('jqc/app/EventBus', [
 	 * Singleton class which allows any subscriber to listen to all events from all {@link jqc.Component Component}
 	 * instances (including {@link jqc.Component Component} subclass instances).
 	 */
-	var EventBus = new Class( {
+	var EventBus = Class.create( {
 		
 		/**
 		 * @protected
@@ -12376,7 +12376,7 @@ define('jqc/util/CollectionBindable', [
 		 *         'jqc/util/CollectionBindable'
 		 *     ], function( Class, CollectionBindable ) {
 		 *         
-		 *         var MyBindableClass = new Class( {
+		 *         var MyBindableClass = Class.create( {
 		 *             mixins : [ CollectionBindable ],
 		 *             
 		 *             // ...
@@ -12660,7 +12660,7 @@ define('jqc/util/ModelBindable', [
 		 *         'jqc/util/ModelBindable'
 		 *     ], function( Class, ModelBindable ) {
 		 *         
-		 *         var MyBindableClass = new Class( {
+		 *         var MyBindableClass = Class.create( {
 		 *             mixins : [ ModelBindable ],
 		 *             
 		 *             // ...

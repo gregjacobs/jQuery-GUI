@@ -70,8 +70,8 @@ module.exports = function( grunt ) {
 					// Note: Paths relative to the baseUrl, `src/js`. This is so that when the files
 					// are optimized, they are defined in the output file as 'jqc/Xyz', instead of 'src/jqc/Xyz'.
 					paths : {
-						'jquery'             : 'empty:',  // included separately
-						'lodash'             : 'empty:',  // included separately
+						'jquery'             : 'empty:',
+						'lodash'             : 'empty:',
 						'jquery-ui.position' : 'empty:',
 						'Class'              : 'empty:',
 						'Observable'         : 'empty:',
