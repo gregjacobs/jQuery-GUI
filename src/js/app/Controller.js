@@ -386,7 +386,7 @@ define( [
 			var ref = this.refs[ refName ];
 			
 			// <debug>
-			if( !ref ) throw new Error( "A ref with name: '" + refName + "' was not defined using addRef()" );
+			if( !ref ) throw new Error( "A ref with name: '" + refName + "' was not defined by the `refs` config, or using addRef()" );
 			// </debug>
 			
 			options = options || {};
