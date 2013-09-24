@@ -1,4 +1,4 @@
-jQuery-Component
-================
+jQuery-GUI
+==========
 
-[Docs](http://gregjacobs.github.com/jQuery-Component/docs/)
+[Docs](http://gregjacobs.github.com/jQuery-GUI/docs/)
