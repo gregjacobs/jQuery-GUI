@@ -2,14 +2,14 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqc/util/Html',
-	'jqc/ComponentManager',
-	'jqc/form/field/Field'
+	'jqGui/util/Html',
+	'jqGui/ComponentManager',
+	'jqGui/form/field/Field'
 ], function( jQuery, _, Html, ComponentManager, Field ) {
 	
 	/**
-	 * @class jqc.form.field.Text
-	 * @extends jqc.form.field.Field
+	 * @class jqGui.form.field.Text
+	 * @extends jqGui.form.field.Field
 	 * @alias type.textfield
 	 * 
 	 * Text field component.
@@ -52,7 +52,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-field-text',
+		componentCls : 'jqGui-form-field-text',
 		
 		
 		/**
@@ -90,7 +90,7 @@ define( [
 				 * Fires when a key is pressed down in the field.
 				 * 
 				 * @event keydown
-				 * @param {jqc.form.field.Field} field This TextField object.
+				 * @param {jqGui.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keydown',
@@ -99,7 +99,7 @@ define( [
 				 * Fires when a key is pressed and let up in the field.
 				 * 
 				 * @event keyup
-				 * @param {jqc.form.field.Field} field This TextField object.
+				 * @param {jqGui.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keyup',
@@ -108,7 +108,7 @@ define( [
 				 * Fires when a key is pressed in the field.
 				 * 
 				 * @event keypress
-				 * @param {jqc.form.field.Field} field This TextField object.
+				 * @param {jqGui.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keypress'
@@ -206,7 +206,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqc.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link jqGui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {String} value The value of the field.
 		 */
@@ -226,7 +226,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqc.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link jqGui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the field.
 		 */

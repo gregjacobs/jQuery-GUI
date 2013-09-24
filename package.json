@@ -1,17 +1,17 @@
 {
-  "name": "jQuery-Component",
+  "name": "jQuery-GUI",
   "description": "",
   "version": "0.1.0",
-  "homepage": "https://github.com/gregjacobs/jQuery-Component",
+  "homepage": "https://github.com/gregjacobs/jQuery-GUI",
   "author": {
     "name": "Gregory Jacobs"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gregjacobs/jQuery-Component.git"
+    "url": "https://github.com/gregjacobs/jQuery-GUI.git"
   },
   "bugs": {
-    "url": "https://github.com/gregjacobs/jQuery-Component/issues"
+    "url": "https://github.com/gregjacobs/jQuery-GUI/issues"
   },
   "main": "Gruntfile.js",
   "engines": {

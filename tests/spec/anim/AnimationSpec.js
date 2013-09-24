@@ -1,10 +1,10 @@
 /*global define, describe, beforeEach, it, expect */
 define( [
 	'jquery',
-	'jqc/anim/Animation'
+	'jqGui/anim/Animation'
 ], function( jQuery, Animation ) {
 	
-	describe( 'jqc.anim.Animation', function() {
+	describe( 'jqGui.anim.Animation', function() {
 		
 		describe( 'start()', function() {
 			var $targetEl;
@@ -19,7 +19,7 @@ define( [
 						// NOTE: no 'target' config
 					} );
 					anim.start();
-				} ).toThrow( "jqc.anim.Animation.start(): Error. No `target` config provided" );
+				} ).toThrow( "jqGui.anim.Animation.start(): Error. No `target` config provided" );
 			} );
 			
 			
@@ -30,7 +30,7 @@ define( [
 						// NOTE: no 'to' and 'effect' config
 					} );
 					anim.start();
-				} ).toThrow( "jqc.anim.Animation.start(): Error. No `to` or `effect` config provided" );
+				} ).toThrow( "jqGui.anim.Animation.start(): Error. No `to` or `effect` config provided" );
 			} );
 			
 			

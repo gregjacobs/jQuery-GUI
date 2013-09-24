@@ -1,15 +1,15 @@
-.jqc-mask-overlay {
+.jqGui-mask-overlay {
 	background-color: #000;
 	@include opacity( .40 );
 }
 
-.jqc-mask-content {
+.jqGui-mask-content {
 	background-color: #BBBBBB;
 	padding: 8px;
 	border: 1px solid black;
 }
 
-.jqc-mask-spinner {
+.jqGui-mask-spinner {
 	margin: 5px;
 	height: 16px;
 	width: 16px;

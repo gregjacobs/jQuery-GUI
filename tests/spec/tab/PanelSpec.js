@@ -1,14 +1,14 @@
 /*global define, describe, beforeEach, afterEach, it, expect, spyOn */
 /*jshint loopfunc:true */
 define( [
-	'jqc/Component',
-	'jqc/panel/Panel',
-	'jqc/tab/Panel',
-	'jqc/tab/Bar',
-	'jqc/tab/Tab'
+	'jqGui/Component',
+	'jqGui/panel/Panel',
+	'jqGui/tab/Panel',
+	'jqGui/tab/Bar',
+	'jqGui/tab/Tab'
 ], function( Component, Panel, TabPanel, TabBar, Tab ) {
 	
-	describe( 'jqc.tab.Panel', function() {
+	describe( 'jqGui.tab.Panel', function() {
 		var tabBar, tabs, panels;
 		
 		// Subclass used for testing.

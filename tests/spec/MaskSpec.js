@@ -1,11 +1,11 @@
 /*global define, describe, xdescribe, beforeEach, afterEach, it, expect */
 define( [
 	'jquery',
-	'jqc/Mask'
+	'jqGui/Mask'
 ],
 function( jQuery, Mask ) {
 	
-	describe( "jqc.Mask", function() {
+	describe( "jqGui.Mask", function() {
 		
 		describe( "sanity", function() {
 			

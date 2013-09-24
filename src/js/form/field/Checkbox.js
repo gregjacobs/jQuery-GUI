@@ -2,13 +2,13 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqc/ComponentManager',
-	'jqc/form/field/Field'
+	'jqGui/ComponentManager',
+	'jqGui/form/field/Field'
 ], function( jQuery, _, ComponentManager, Field ) {
 	
 	/**
-	 * @class jqc.form.field.Checkbox
-	 * @extends jqc.form.field.Field
+	 * @class jqGui.form.field.Checkbox
+	 * @extends jqGui.form.field.Field
 	 * @alias type.checkbox
 	 * @alias type.checkboxfield
 	 *  
@@ -20,11 +20,11 @@ define( [
 		 * @cfg {String} checkboxLabel
 		 * 
 		 * The label for the checkbox itself, which will be placed to the right of the checkbox. This config is to differentiate from
-		 * the {@link jqc.form.field.Field#label label} provided by {@link jqc.form.field.Field Field} (the one which
+		 * the {@link jqGui.form.field.Field#label label} provided by {@link jqGui.form.field.Field Field} (the one which
 		 * affects all form field components uniformly).  Defaults to an empty string.
 		 * 
 		 * Note that if the checkbox should be aligned with other form fields that have "left side" labels (see 
-		 * {@link jqc.form.field.Field#labelAlign}, then set its {@link jqc.form.field.Field#label label} config to
+		 * {@link jqGui.form.field.Field#labelAlign}, then set its {@link jqGui.form.field.Field#label label} config to
 		 * a non-breaking space (&amp;nbsp;).
 		 */
 		checkboxLabel : "",
@@ -39,7 +39,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-field-checkbox',
+		componentCls : 'jqGui-form-field-checkbox',
 		
 		
 		/**
@@ -67,7 +67,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqc.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link jqGui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {Boolean} value The value of the field. If truthy, the checkbox will be checked. If falsy, the checkbox will be unchecked.
 		 */
@@ -81,7 +81,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqc.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link jqGui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {Boolean} The value of the field (true if it's checked, false otherwise).
 		 */

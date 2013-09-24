@@ -1,4 +1,4 @@
-.jqc-button {
+.jqGui-button {
 	display: inline-block;
 	position: relative;
 	margin: 0;
@@ -12,15 +12,15 @@
 }
 
 /* General Button Styles */
-.jqc-button-hiddenEl { display: none !important; }
+.jqGui-button-hiddenEl { display: none !important; }
 
 /* Icons */
-.jqc-button-icon { display: inline-block; }
-.jqc-button-icon-left {}
-.jqc-button-icon-right {}
+.jqGui-button-icon { display: inline-block; }
+.jqGui-button-icon-left {}
+.jqGui-button-icon-right {}
 
 /* button text element */
-.jqc-button-text {
+.jqGui-button-text {
 	display: inline-block;
 	line-height: normal;
 }

@@ -1,13 +1,13 @@
-.jqc-window {
-  @extend .jqc-overlay;
+.jqGui-window {
+  @extend .jqGui-overlay;
 }
 
-.jqc-window-header {}
-.jqc-window-header-innerCt {}
-.jqc-window-header-title { float: left; }
-.jqc-window-header-toolButtons { float: right; }
+.jqGui-window-header {}
+.jqGui-window-header-innerCt {}
+.jqGui-window-header-title { float: left; }
+.jqGui-window-header-toolButtons { float: right; }
 
-.jqc-window-body {}
+.jqGui-window-body {}
 
 
-.jqc-window-modalMask { position: absolute; top: 0; left: 0; }
+.jqGui-window-modalMask { position: absolute; top: 0; left: 0; }

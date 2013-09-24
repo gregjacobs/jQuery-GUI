@@ -1,6 +1,6 @@
-.jqc-form-field-text {}
+.jqGui-form-field-text {}
 
-.jqc-form-field-text-input {
+.jqGui-form-field-text-input {
 	background: none transparent;
 	border: none;
 	width: 100%;
@@ -8,11 +8,11 @@
 	padding: 0;   /* Override some user agent style sheets, like Chrome which puts on 1px and can cause scroll bars to appear */
 }
 
-.jqc-form-field-text-input:focus {
+.jqGui-form-field-text-input:focus {
 	outline: 0;   /* Override some user agent style sheets, like Chrome which has a 5px outline */
 }
 
-.jqc-form-field-text-emptyText {
+.jqGui-form-field-text-emptyText {
 	position: absolute;  // absolutely positioned within the Field's input container
 	top: 0;
 	left: 0;

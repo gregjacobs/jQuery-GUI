@@ -1,15 +1,15 @@
 /*global define */
 define( [
-	'jqc/button/Button',
-	'jqc/ComponentManager'
+	'jqGui/button/Button',
+	'jqGui/ComponentManager'
 ], function( Button, ComponentManager ) {
 	
 	/**
-	 * @class jqc.panel.ToolButton
-	 * @extends jqc.button.Button
+	 * @class jqGui.panel.ToolButton
+	 * @extends jqGui.button.Button
 	 * @alias type.toolbutton
 	 * 
-	 * Small utility class for a button that can be used in a {@link jqc.panel.Panel Panel's} header.
+	 * Small utility class for a button that can be used in a {@link jqGui.panel.Panel Panel's} header.
 	 */
 	var ToolButton = Button.extend( {
 		
@@ -26,7 +26,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-panel-toolbutton',
+		componentCls : 'jqGui-panel-toolbutton',
 		
 		
 		/**
@@ -41,7 +41,7 @@ define( [
 			    toolType = this.toolType;
 			
 			this.iconCls = [
-				'jqc-icon-' + toolType,
+				'jqGui-icon-' + toolType,
 				componentCls + '-icon',
 				componentCls + '-icon-' + toolType
 			].join( " " );

@@ -2,12 +2,12 @@
 /*jshint sub: true */
 define( [
 	'Class',
-	'jqc/ComponentManager',
-	'jqc/Component',
-	'jqc/Container'
+	'jqGui/ComponentManager',
+	'jqGui/Component',
+	'jqGui/Container'
 ], function( Class, ComponentManager, Component, Container ) {
 	
-	describe( 'jqc.ComponentManager', function() {
+	describe( 'jqGui.ComponentManager', function() {
 		var componentClasses;   // for restoring the previous list of component classes that have been registered, after the tests
 		
 		
@@ -49,7 +49,7 @@ define( [
 				expect( function() {
 					ComponentManager.registerType( 'someClass', class2 );  // try to register the second class under the same "type" name. This should throw an error
 					
-				} ).toThrow( "Error: jqc.ComponentManager already has a type 'someclass'" );
+				} ).toThrow( "Error: jqGui.ComponentManager already has a type 'someclass'" );
 			} );
 		
 		} );
@@ -121,7 +121,7 @@ define( [
 				expect( cmp ).toBe( myComponent );  // create() did not return already-instantiated Component directly.
 			} );
 			
-			it( "should simply return an already-instantiated component, if the component is a subclass of jqc.Component", function() {
+			it( "should simply return an already-instantiated component, if the component is a subclass of jqGui.Component", function() {
 				// Test that subclasses of Component are returned directly
 				var MyComponentSubclass = Class.extend( Component, {
 					init : function() {}
@@ -146,7 +146,7 @@ define( [
 				expect( cmp instanceof Component ).toBe( true );  // create() did not instantiate 'someClass' via config object.
 			} );
 			
-			it( "should create the type `jqc.Container` when no 'type' config is specified in the anonymous config object", function() { 
+			it( "should create the type `jqGui.Container` when no 'type' config is specified in the anonymous config object", function() { 
 				ComponentManager.registerType( 'container', Container );  // need to re-register the Container class for this test.
 				
 				var cmp = ComponentManager.create( {} );

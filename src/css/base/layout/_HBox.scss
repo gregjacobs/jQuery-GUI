@@ -1,10 +1,10 @@
 // CSS class which is added to Components which have been placed into an HBox layout
-.jqc-layout-hbox-component {
+.jqGui-layout-hbox-component {
 	float: left;
 	min-height: 1px;  // Empty components need to have at least 1px of height, or they will not be sized by width.
 	                  // This is useful to have empty components take up space to right-align other components.
 }
 
-.jqc-layout-hbox-clear {
+.jqGui-layout-hbox-clear {
 	clear: both;
 }

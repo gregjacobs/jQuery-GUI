@@ -1,9 +1,9 @@
 /*global define, describe, beforeEach, afterEach, it, expect */
 define( [
-	'jqc/button/Button'
+	'jqGui/button/Button'
 ], function( Button ) {
 	
-	describe( 'jqc.button.Button', function() {
+	describe( 'jqGui.button.Button', function() {
 		
 		describe( "sanity", function() {
 			

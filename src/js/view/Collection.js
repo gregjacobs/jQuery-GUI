@@ -2,15 +2,15 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqc/ComponentManager',
-	'jqc/Component',
-	'jqc/util/CollectionBindable'
+	'jqGui/ComponentManager',
+	'jqGui/Component',
+	'jqGui/util/CollectionBindable'
 ], function( jQuery, _, ComponentManager, Component, CollectionBindable ) {
 	
 	/**
-	 * @class jqc.view.Collection
-	 * @extends jqc.Component
-	 * @mixins jqc.util.CollectionBindable
+	 * @class jqGui.view.Collection
+	 * @extends jqGui.Component
+	 * @mixins jqGui.util.CollectionBindable
 	 * @alias type.collectionview
 	 * 
 	 * A view of the {@link data.Model Models} in a {@link data.Collection}. The view uses the {@link #tpl} config, which 
@@ -18,7 +18,7 @@ define( [
 	 * {@link #collection} changes, or any of its {@link data.Model Models} change, the Collection View is 
 	 * automatically refreshed to reflect the change.  
 	 * 
-	 * This view is similar to the {@link jqc.view.Model Model View}, but instead of showing a single {@link data.Model Model},
+	 * This view is similar to the {@link jqGui.view.Model Model View}, but instead of showing a single {@link data.Model Model},
 	 * it shows a {@link data.Collection Collection} of them.
 	 */
 	var CollectionView = Component.extend( {
@@ -36,7 +36,7 @@ define( [
 		 */
 		
 		/**
-		 * @cfg {String/String[]/Function/jqc.template.Template} tpl (required)
+		 * @cfg {String/String[]/Function/jqGui.template.Template} tpl (required)
 		 * 
 		 * The template which will be used to populate the Collection View. By default, this template will be provided
 		 * the variable `models`, which is an array of the {@link data.Model Models} that should be rendered
@@ -46,7 +46,7 @@ define( [
 		 * that holds the models may be configured using the {@link #modelsVar} config.
 		 * 
 		 * For example, if we had a "User" model, which had fields `id`, `firstName`, and `lastName`, then we
-		 * might want to display this information in a template as such: (using a {@link jqc.template.LoDash Lo-Dash template}
+		 * might want to display this information in a template as such: (using a {@link jqGui.template.LoDash Lo-Dash template}
 		 * in this case)
 		 * 
 		 *     tpl : new LoDashTpl( [
@@ -85,8 +85,8 @@ define( [
 		 *    That is, do not use `if` statements to filter out certain models. If this needs to be done, do so in an overridden
 		 *    {@link #collectModels} method instead, so the Collection View knows what it's working with.
 		 * 
-		 * For more information on templates themselves, see the {@link jqc.Component#tpl tpl} config in the superclass, 
-		 * {@link jqc.Component Component}.
+		 * For more information on templates themselves, see the {@link jqGui.Component#tpl tpl} config in the superclass, 
+		 * {@link jqGui.Component Component}.
 		 */
 		
 		/**
@@ -125,7 +125,7 @@ define( [
 		 * 
 		 * This may be used to provide a variable name that makes more sense inside the template for the type of models 
 		 * being used. For example, if the Collection View is working with "User" models, one might want to
-		 * set this config to `users`. Example: (using a {@link jqc.template.LoDash Lo-Dash template} in this case)
+		 * set this config to `users`. Example: (using a {@link jqGui.template.LoDash Lo-Dash template} in this case)
 		 * 
 		 *     modelsVar : 'users',
 		 *     tpl : new LoDashTpl( [
@@ -231,7 +231,7 @@ define( [
 		// Implementation of CollectionBindable mixin methods
 		
 		/**
-		 * Implementation of {@link jqc.util.CollectionBindable} mixin method used to retrieve the Object (map) of the listeners 
+		 * Implementation of {@link jqGui.util.CollectionBindable} mixin method used to retrieve the Object (map) of the listeners 
 		 * that should be set up on the {@link #collection}, when a {@link data.Collection} is bound to the view. This method may 
 		 * be overridden in a subclass to add events that should be listened for.
 		 * 
@@ -253,7 +253,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqc.util.CollectionBindable} mixin method. Handles when a new {@link #collection} has been 
+		 * Implementation of {@link jqGui.util.CollectionBindable} mixin method. Handles when a new {@link #collection} has been 
 		 * bound to the view.
 		 * 
 		 * @protected
@@ -362,7 +362,7 @@ define( [
 		
 		
 		/**
-		 * Retrieves the data that will be {@link jqc.template.Template#apply applied} to the {@link #tpl} upon 
+		 * Retrieves the data that will be {@link jqGui.template.Template#apply applied} to the {@link #tpl} upon 
 		 * {@link #refresh}. 
 		 * 
 		 * This method may be overridden by subclasses to add additional properties which will be provided
@@ -371,7 +371,7 @@ define( [
 		 * @protected
 		 * @param {data.Model[]} models The models that are to be rendered by the {@link #tpl} (collected from 
 		 *   {@link #collectModels}).
-		 * @return {Object} An Object (map) of the properties which will be {@link jqc.template.Template#apply applied}
+		 * @return {Object} An Object (map) of the properties which will be {@link jqGui.template.Template#apply applied}
 		 *   to the {@link #tpl}, to produce the output.
 		 */
 		prepareTplData : function( models ) {

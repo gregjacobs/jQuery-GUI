@@ -24,8 +24,8 @@
 				'Observable'         : 'bower_components/Observable-js/dist/Observable',
 				'data'               : 'bower_components/Data-js/src',
 				
-				// jQuery-Component Library
-				'jqc' : 'src/js'
+				// jQuery-GUI Library
+				'jqGui' : 'src/js'
 			},
 			
 			shim : {
@@ -36,10 +36,10 @@
 		
 		require( [
 			'jquery',
-			'jqc/panel/Panel',
+			'jqGui/panel/Panel',
 			
-			'jqc/Anchor',
-			'jqc/button/Button'
+			'jqGui/Anchor',
+			'jqGui/button/Button'
 		], function( $, Panel ) {
 			$( document ).ready( function() {
 				

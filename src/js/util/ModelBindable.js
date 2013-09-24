@@ -2,11 +2,11 @@
 define( [
 	'lodash',
 	'Class',
-	'jqc/Jqc'
-], function( _, Class, Jqc ) {
+	'jqGui/JqGui'
+], function( _, Class, JqGui ) {
 	
 	/**
-	 * @class jqc.util.ModelBindable
+	 * @class jqGui.util.ModelBindable
 	 * @extends Object
 	 * 
 	 * This class is intended to be used as a mixin. It allows any class that it is mixed into (the "target" class in these docs) to have 
@@ -21,11 +21,11 @@ define( [
 	 * The target class may also implement the {@link #onModelBind} method, to detect and handle when a new {@link data.Model} has
 	 * been bound, and/or when the currently-bound model has been unbound.
 	 * 
-	 * Here is an example of mixing this class into a {@link jqc.Component Component}, to make the Component data-bound to a Model:
+	 * Here is an example of mixing this class into a {@link jqGui.Component Component}, to make the Component data-bound to a Model:
 	 * 
 	 *     define( [
-	 *         'jqc/Component',
-	 *         'jqc/util/ModelBindable'
+	 *         'jqGui/Component',
+	 *         'jqGui/util/ModelBindable'
 	 *     ], function( Component, ModelBindable ) {
 	 *         
 	 *         var MyBindableComponent = Component.extend( {
@@ -185,7 +185,7 @@ define( [
 		 * @param {data.Model} oldModel The model that was just unbound. Will be `null` if there was no
 		 *   previously-bound model.
 		 */
-		onModelBind : Jqc.emptyFn,
+		onModelBind : JqGui.emptyFn,
 		
 		
 		/**
@@ -221,7 +221,7 @@ define( [
 		 * 
 		 *     require( [
 		 *         'Class',
-		 *         'jqc/util/ModelBindable'
+		 *         'jqGui/util/ModelBindable'
 		 *     ], function( Class, ModelBindable ) {
 		 *         
 		 *         var MyBindableClass = Class.create( {

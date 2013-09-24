@@ -1,11 +1,11 @@
 /*global define, describe, beforeEach, afterEach, it, expect, spyOn */
 define( [
 	'data/Collection',
-	'jqc/util/CollectionBindable'
+	'jqGui/util/CollectionBindable'
 ], 
 function( Collection, CollectionBindable ) {
 	
-	describe( 'jqc.util.CollectionBindable', function() {
+	describe( 'jqGui.util.CollectionBindable', function() {
 		var TestCollectionBindable = CollectionBindable.extend( {
 			collectionProp : 'myCollection',  // to test this config with all methods
 			

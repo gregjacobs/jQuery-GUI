@@ -2,15 +2,15 @@
 /*jshint sub:true */
 define( [
 	'lodash',
-	'jqc/ComponentQuery',
-	'jqc/app/Controller',
+	'jqGui/ComponentQuery',
+	'jqGui/app/Controller',
 	
-	'jqc/Component',     // type: 'component'
-	'jqc/Container',     // type: 'container'
-	'jqc/panel/Panel'    // type: 'panel'
+	'jqGui/Component',     // type: 'component'
+	'jqGui/Container',     // type: 'container'
+	'jqGui/panel/Panel'    // type: 'panel'
 ], function( _, ComponentQuery, Controller, Component, Container, Panel ) {
 	
-	describe( 'jqc.app.Controller', function() {
+	describe( 'jqGui.app.Controller', function() {
 		
 		describe( "configuration options", function() {
 			var view, controller;

@@ -1,7 +1,7 @@
 {
-  "name": "jQuery-Component",
+  "name": "jQuery-GUI",
   "version": "0.1.0",
-  "homepage": "https://github.com/gregjacobs/jQuery-Component",
+  "homepage": "https://github.com/gregjacobs/jQuery-GUI",
   "authors": [
     "Gregory Jacobs <greg@greg-jacobs.com>"
   ],
@@ -33,11 +33,11 @@
   ],
   "dependencies": {
     "jquery": "~1.10.2",
-    "Class-js": "~0.5.0",
-    "lodash": "official-lodash#~2.0.0",
-    "Observable-js": "~0.1.0",
+    "Class-js": "~0.5.1",
+    "lodash": "~2.1.0",
+    "Observable-js": "~0.1.2",
     "requirejs": "~2.1.8",
-    "Data-js": "~0.1.0"
+    "Data-js": "~0.1.2"
   },
   "devDependencies": {
     "jasmine": "~1.3.1"

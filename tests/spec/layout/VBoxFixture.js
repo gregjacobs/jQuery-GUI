@@ -1,6 +1,6 @@
 /*global define */
 define( [
-	'jqc/layout/VBox',
+	'jqGui/layout/VBox',
 	'spec/layout/LayoutFixture'
 ], function( VBoxLayout, LayoutFixture ) {
 	
@@ -8,7 +8,7 @@ define( [
 	 * @class spec.layout.VBoxFixture
 	 * @extends spec.layout.LayoutFixture
 	 * 
-	 * Fixture class for the {@link jqc.layout.VBox VBox} layout's tests.
+	 * Fixture class for the {@link jqGui.layout.VBox VBox} layout's tests.
 	 */
 	var VBoxLayoutFixture = LayoutFixture.extend( {		
 		
@@ -23,9 +23,9 @@ define( [
 		
 		
 		/**
-		 * Overridden method to create the {@link jqc.layout.VBox VBox} layout.
+		 * Overridden method to create the {@link jqGui.layout.VBox VBox} layout.
 		 * 
-		 * @return {jqc.layout.VBox}
+		 * @return {jqGui.layout.VBox}
 		 */
 		createLayout : function() {
 			return new VBoxLayout();

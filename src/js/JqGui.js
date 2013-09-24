@@ -1,9 +1,9 @@
 /*!
- * jQuery-Component
+ * jQuery-GUI
  * Copyright(c) 2013 Gregory Jacobs.
  * 
  * MIT Licensed. http://www.opensource.org/licenses/mit-license.php
- * https://github.com/gregjacobs/jQuery-Component
+ * https://github.com/gregjacobs/jQuery-GUI
  */
 
 /*global define */
@@ -14,18 +14,18 @@ define( [
 ], function( Class, jQuery, _ ) {
 
 	/**
-	 * @class jqc.Jqc
+	 * @class jqGui.JqGui
 	 * @singleton
 	 * 
-	 * Main singleton class of the jQuery-Component library, with a few base utility functions. 
+	 * Main singleton class of the jQuery-GUI library, with a few base utility functions. 
 	 * 
-	 * This class can be included in implementations by using the RequireJS path of 'jqc/Jqc'. Ex:
+	 * This class can be included in implementations by using the RequireJS path of 'jqGui/JqGui'. Ex:
 	 * 
-	 *     require( [ 'jqc/Jqc' ], function( Jqc ) {
-	 *         console.log( "This browser's scrollbar width: ", Jqc.getScrollbarWidth(), "px" );
+	 *     require( [ 'jqGui/JqGui' ], function( JqGui ) {
+	 *         console.log( "This browser's scrollbar width: ", JqGui.getScrollbarWidth(), "px" );
 	 *     } );
 	 */
-	var Jqc = Class.extend( Object, {
+	var JqGui = Class.extend( Object, {
 
 		/**
 		 * @readonly
@@ -71,7 +71,7 @@ define( [
 		 * This may be placed into CSS styles as such:
 		 * 
 		 *     var $div = jQuery( '<div />' );
-		 *     $div.css( 'background-image', 'url(' + Jqc.getBlankImgUrl() + ')' );
+		 *     $div.css( 'background-image', 'url(' + JqGui.getBlankImgUrl() + ')' );
 		 * 
 		 * @method getBlankImgUrl
 		 * @return {String}
@@ -195,6 +195,6 @@ define( [
 	
 	
 	// Return singleton instance
-	return new Jqc();
+	return new JqGui();
 	
 } );

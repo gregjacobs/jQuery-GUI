@@ -1,5 +1,5 @@
 /* line 1, ../../../src/css/base/_Overlay.scss */
-.jqc-overlay, .jqc-window {
+.jqGui-overlay, .jqGui-window {
   position: absolute;
   top: 0;
   left: 0;
@@ -7,7 +7,7 @@
 }
 
 /* line 1, ../../../src/css/base/_Mask.scss */
-.jqc-mask-overlay {
+.jqGui-mask-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -18,7 +18,7 @@
 }
 
 /* line 11, ../../../src/css/base/_Mask.scss */
-.jqc-mask-content {
+.jqGui-mask-content {
   position: absolute;
   top: 0;
   left: 0;
@@ -27,49 +27,49 @@
   display: none;
 }
 /* line 19, ../../../src/css/base/_Mask.scss */
-.jqc-mask-content.jqc-mask-spinner-visible {
+.jqGui-mask-content.jqGui-mask-spinner-visible {
   display: block;
 }
 /* line 20, ../../../src/css/base/_Mask.scss */
-.jqc-mask-content.jqc-mask-msg-visible {
+.jqGui-mask-content.jqGui-mask-msg-visible {
   display: block;
 }
 
 /* line 23, ../../../src/css/base/_Mask.scss */
-.jqc-mask-spinner {
+.jqGui-mask-spinner {
   display: none;
   vertical-align: middle;
 }
 /* line 27, ../../../src/css/base/_Mask.scss */
-.jqc-mask-spinner-visible .jqc-mask-spinner {
+.jqGui-mask-spinner-visible .jqGui-mask-spinner {
   display: inline-block;
 }
 
 /* line 30, ../../../src/css/base/_Mask.scss */
-.jqc-mask-msg {
+.jqGui-mask-msg {
   display: none;
   vertical-align: middle;
 }
 /* line 34, ../../../src/css/base/_Mask.scss */
-.jqc-mask-msg-visible .jqc-mask-msg {
+.jqGui-mask-msg-visible .jqGui-mask-msg {
   display: inline-block;
 }
 
 /* For elements that are masked, they should have their overflow hidden to remove scroll bars */
 /* Note: the uses of !important are necessary to override more specific css classes! */
 /* line 39, ../../../src/css/base/_Mask.scss */
-.jqc-masked {
+.jqGui-masked {
   overflow: hidden !important;
 }
 
 /* For elements that are masked, they need a positioning context. This will only be added if they don't have a positioning context. */
 /* line 44, ../../../src/css/base/_Mask.scss */
-.jqc-masked-relative {
+.jqGui-masked-relative {
   position: relative !important;
 }
 
 /* line 1, ../../../src/css/base/button/_Button.scss */
-.jqc-button {
+.jqGui-button {
   display: inline-block;
   position: relative;
   margin: 0;
@@ -85,66 +85,66 @@
 
 /* General Button Styles */
 /* line 15, ../../../src/css/base/button/_Button.scss */
-.jqc-button-hiddenEl {
+.jqGui-button-hiddenEl {
   display: none !important;
 }
 
 /* Icons */
 /* line 18, ../../../src/css/base/button/_Button.scss */
-.jqc-button-icon {
+.jqGui-button-icon {
   display: inline-block;
 }
 
 /* button text element */
 /* line 23, ../../../src/css/base/button/_Button.scss */
-.jqc-button-text {
+.jqGui-button-text {
   display: inline-block;
   line-height: normal;
 }
 
 /* line 1, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-field {
+.jqGui-form-field {
   margin: 0;
   padding: 0;
   width: 100%;
   border-collapse: collapse;
 }
 /* line 7, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-field tbody, .jqc-form-field tr, .jqc-form-field th {
+.jqGui-form-field tbody, .jqGui-form-field tr, .jqGui-form-field th {
   margin: 0;
   padding: 0;
 }
 /* line 9, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-field.jqc-form-field-leftLabel {
+.jqGui-form-field.jqGui-form-field-leftLabel {
   table-layout: fixed;
 }
 /* line 10, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-field.jqc-form-field-topLabel {
+.jqGui-form-field.jqGui-form-field-topLabel {
   table-layout: auto;
 }
 
 /* line 14, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-field-leftLabelCell {
+.jqGui-form-field-leftLabelCell {
   margin: 0;
   padding: 0;
   vertical-align: top;
 }
 
 /* line 18, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-field-inputCell {
+.jqGui-form-field-inputCell {
   vertical-align: top;
   width: 100%;
 }
 
 /* line 19, ../../../src/css/base/form/field/_Field.scss */
-.jqc-form-field-inputContainer {
+.jqGui-form-field-inputContainer {
   position: relative;
 }
 
 /* This is for the custom implementation of dropdowns, which don't use the html <select> element 
 ============================================================================================== */
 /* line 3, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqc-form-field-dropdown {
+.jqGui-form-field-dropdown {
   position: relative;
   left: 0px;
   top: 0px;
@@ -152,7 +152,7 @@
 
 /* For IE, need an iframe to cover certain elements */
 /* line 10, ../../../src/css/base/form/field/_Dropdown.scss */
-iframe.jqc-form-field-dropdown-shim {
+iframe.jqGui-form-field-dropdown-shim {
   position: absolute;
   z-index: 1;
   width: 100%;
@@ -162,7 +162,7 @@ iframe.jqc-form-field-dropdown-shim {
 
 /* The box that shows the selected option's text */
 /* line 15, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqc-form-field-dropdown-selectText {
+.jqGui-form-field-dropdown-selectText {
   overflow-x: hidden;
   white-space: nowrap;
   background: none transparent;
@@ -170,7 +170,7 @@ iframe.jqc-form-field-dropdown-shim {
 }
 
 /* line 22, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqc-form-field-dropdown-openButton {
+.jqGui-form-field-dropdown-openButton {
   position: absolute;
   top: 0;
   right: 0;
@@ -179,7 +179,7 @@ iframe.jqc-form-field-dropdown-shim {
 }
 
 /* line 32, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqc-form-field-dropdown-menu {
+.jqGui-form-field-dropdown-menu {
   position: absolute;
   list-style: none;
   display: none;
@@ -190,12 +190,12 @@ iframe.jqc-form-field-dropdown-shim {
 }
 
 /* line 42, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqc-form-field-dropdown-menu-item {
+.jqGui-form-field-dropdown-menu-item {
   cursor: pointer;
 }
 
 /* line 3, ../../../src/css/base/form/field/_Text.scss */
-.jqc-form-field-text-input, .jqc-form-field-textarea-input {
+.jqGui-form-field-text-input, .jqGui-form-field-textarea-input {
   background: none transparent;
   border: none;
   width: 100%;
@@ -205,13 +205,13 @@ iframe.jqc-form-field-dropdown-shim {
 }
 
 /* line 11, ../../../src/css/base/form/field/_Text.scss */
-.jqc-form-field-text-input:focus, .jqc-form-field-textarea-input:focus {
+.jqGui-form-field-text-input:focus, .jqGui-form-field-textarea-input:focus {
   outline: 0;
   /* Override some user agent style sheets, like Chrome which has a 5px outline */
 }
 
 /* line 15, ../../../src/css/base/form/field/_Text.scss */
-.jqc-form-field-text-emptyText, .jqc-form-field-textarea-emptyText {
+.jqGui-form-field-text-emptyText, .jqGui-form-field-textarea-emptyText {
   position: absolute;
   top: 0;
   left: 0;
@@ -219,34 +219,34 @@ iframe.jqc-form-field-dropdown-shim {
 }
 
 /* line 2, ../../../src/css/base/layout/_Hbox.scss */
-.jqc-layout-hbox-component {
+.jqGui-layout-hbox-component {
   float: left;
   min-height: 1px;
 }
 
 /* line 8, ../../../src/css/base/layout/_Hbox.scss */
-.jqc-layout-hbox-clear {
+.jqGui-layout-hbox-clear {
   clear: both;
 }
 
 /* line 3, ../../../src/css/base/panel/_ToolButton.scss */
-.jqc-panel-toolbutton .jqc-button-text {
+.jqGui-panel-toolbutton .jqGui-button-text {
   padding: 0;
   line-height: 0;
 }
 
 /* line 7, ../../../src/css/base/window/_Window.scss */
-.jqc-window-header-title {
+.jqGui-window-header-title {
   float: left;
 }
 
 /* line 8, ../../../src/css/base/window/_Window.scss */
-.jqc-window-header-toolButtons {
+.jqGui-window-header-toolButtons {
   float: right;
 }
 
 /* line 13, ../../../src/css/base/window/_Window.scss */
-.jqc-window-modalMask {
+.jqGui-window-modalMask {
   position: absolute;
   top: 0;
   left: 0;
@@ -254,6 +254,6 @@ iframe.jqc-form-field-dropdown-shim {
 
 /* General Styles */
 /* line 23, ../../../src/css/base/base.scss */
-.jqc-clear {
+.jqGui-clear {
   clear: both;
 }

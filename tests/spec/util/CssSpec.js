@@ -1,10 +1,10 @@
 /*global define, describe, it, expect */
 define( [
-	'jqc/util/Css'
+	'jqGui/util/Css'
 ], 
 function( Css ) {
 	
-	describe( 'jqc.util.Css', function() {
+	describe( 'jqGui.util.Css', function() {
 		
 		describe( 'addCls()', function() {
 			

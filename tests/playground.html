@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>jQuery-Component Playground</title>
+<title>jQuery-GUI Playground</title>
 
 	<link rel="stylesheet" href="../dist/css/base/base.css" />
 	<link rel="stylesheet" href="../dist/css/theme/basic/basic.css" />
@@ -24,8 +24,8 @@
 				'Observable'         : 'bower_components/Observable-js/dist/Observable',
 				'data'               : 'bower_components/Data-js/src',
 				
-				// jQuery-Component Library
-				'jqc' : 'src/js'
+				// jQuery-GUI Library
+				'jqGui' : 'src/js'
 			},
 			
 			shim : {
@@ -36,17 +36,17 @@
 		var win;
 		require( [
 			'jquery',
-			'jqc/panel/Panel',
-			'jqc/Overlay',
-			'jqc/button/Button',
-			'jqc/window/Window',
+			'jqGui/panel/Panel',
+			'jqGui/Overlay',
+			'jqGui/button/Button',
+			'jqGui/window/Window',
 			'data/Collection',
 			
 			// Dependencies used by type name
-			'jqc/form/field/Text',
-			'jqc/form/field/TextArea',
-			'jqc/layout/HBox',
-			'jqc/layout/VBox'
+			'jqGui/form/field/Text',
+			'jqGui/form/field/TextArea',
+			'jqGui/layout/HBox',
+			'jqGui/layout/VBox'
 		], function( $, Panel, Overlay, Button, Window, Collection ) {
 			$( document ).ready( function() {
 				$( 'body' ).html( "Hello, Playground!" );

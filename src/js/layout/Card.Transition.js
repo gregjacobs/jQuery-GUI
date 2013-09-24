@@ -1,15 +1,15 @@
 /*global define */
 define( [
 	'Class',
-	'jqc/Jqc'
-], function( Class, Jqc ) {
+	'jqGui/JqGui'
+], function( Class, JqGui ) {
 	
 	/**
 	 * @abstract
-	 * @class jqc.layout.Card.AbstractTransition
+	 * @class jqGui.layout.Card.AbstractTransition
 	 * @extends Object
 	 * 
-	 * Defines the interface for all {@link jqc.layout.Card} strategies for changing the active card.
+	 * Defines the interface for all {@link jqGui.layout.Card} strategies for changing the active card.
 	 */
 	var CardTransition = Class.extend( Object, {
 		abstractClass : true,
@@ -20,9 +20,9 @@ define( [
 		 * 
 		 * @abstract
 		 * @method setActiveItem
-		 * @param {jqc.layout.Card} cardsLayout The CardsLayout instance that is using this transition strategy.
-		 * @param {jqc.Component} currentItem The currently active item. This may be null if the CardsLayout does not currently have an active item.
-		 * @param {jqc.Component} newItem The item to activate. This may be null if there is no new item to activate (for just hiding the currentItem).
+		 * @param {jqGui.layout.Card} cardsLayout The CardsLayout instance that is using this transition strategy.
+		 * @param {jqGui.Component} currentItem The currently active item. This may be null if the CardsLayout does not currently have an active item.
+		 * @param {jqGui.Component} newItem The item to activate. This may be null if there is no new item to activate (for just hiding the currentItem).
 		 * @param {Object} options An object which may contain options for the given AbstractTransition subclass that is being used.
 		 */
 		setActiveItem : Class.abstractMethod,
@@ -46,7 +46,7 @@ define( [
 		 * @template
 		 * @method onDestroy
 		 */
-		onDestroy : Jqc.emptyFn
+		onDestroy : JqGui.emptyFn
 		
 	} );
 	

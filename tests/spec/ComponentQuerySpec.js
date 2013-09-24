@@ -1,15 +1,15 @@
 /*global define, describe, beforeEach, afterEach, it, expect, spyOn */
 define( [
 	'lodash',
-	'jqc/ComponentQuery',
+	'jqGui/ComponentQuery',
 	
-	'jqc/Component',     // type: 'component'
-	'jqc/Container',     // type: 'container'
-	'jqc/panel/Panel',   // type: 'panel'
-	'jqc/button/Button'  // type: 'button'
+	'jqGui/Component',     // type: 'component'
+	'jqGui/Container',     // type: 'container'
+	'jqGui/panel/Panel',   // type: 'panel'
+	'jqGui/button/Button'  // type: 'button'
 ], function( _, ComponentQuery, Component, Container, Panel, Button ) {
 	
-	describe( 'jqc.ComponentQuery', function() {
+	describe( 'jqGui.ComponentQuery', function() {
 		
 		describe( 'query()', function() {
 			var cmps, nestedContainer;

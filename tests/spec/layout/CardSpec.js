@@ -1,11 +1,11 @@
 /*global define, describe, beforeEach, afterEach, it, expect */
 define( [
-	'jqc/Component',
-	'jqc/Container',
-	'jqc/layout/Card'
+	'jqGui/Component',
+	'jqGui/Container',
+	'jqGui/layout/Card'
 ], function( Component, Container, CardLayout ) {
 	
-	describe( 'jqc.layout.Card', function() {
+	describe( 'jqGui.layout.Card', function() {
 		
 		describe( "Test setActiveItem()", function() {
 			

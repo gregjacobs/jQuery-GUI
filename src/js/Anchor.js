@@ -3,13 +3,13 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqc/ComponentManager',
-	'jqc/Component'
+	'jqGui/ComponentManager',
+	'jqGui/Component'
 ], function( jQuery, _, ComponentManager, Component ) {
 	
 	/**
-	 * @class jqc.Anchor
-	 * @extends jqc.Component
+	 * @class jqGui.Anchor
+	 * @extends jqGui.Component
 	 * @alias type.anchor
 	 *
 	 * A simple anchor component. This component can be used as a standard anchor (&lt;a&gt; tag) by setting
@@ -18,7 +18,7 @@ define( [
 	 * 
 	 *     @example
 	 *     require( [
-	 *         'jqc/Anchor'
+	 *         'jqGui/Anchor'
 	 *     ], function( Anchor ) {
 	 *     
 	 *         var standardAnchor = new Anchor( {
@@ -73,7 +73,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-anchor',
+		baseCls : 'jqGui-anchor',
 	
 	
 		// protected
@@ -83,7 +83,7 @@ define( [
 				 * Fires before the Anchor is clicked. Handlers may return false to cancel the action of the anchor.
 				 * 
 				 * @event beforeclick
-				 * @param {jqc.Anchor} anchor This Anchor instance.
+				 * @param {jqGui.Anchor} anchor This Anchor instance.
 				 * @preventable
 				 */
 				'beforeclick',
@@ -92,7 +92,7 @@ define( [
 				 * Fires when the Anchor is clicked.
 				 * 
 				 * @event click
-				 * @param {jqc.Anchor} anchor This Anchor instance.
+				 * @param {jqGui.Anchor} anchor This Anchor instance.
 				 */
 				'click'
 			);

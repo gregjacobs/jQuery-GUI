@@ -1,14 +1,14 @@
 /*global define */
 define( [
 	'require',
-	'jqc/Component'  // loaded via require() call in the code below, as it is a circular dependency
+	'jqGui/Component'  // loaded via require() call in the code below, as it is a circular dependency
 ], function( require ) {
 	
 	/**
-	 * @class jqc.ComponentManager
+	 * @class jqGui.ComponentManager
 	 * @singleton
 	 *
-	 * Object used to manage {@link jqc.Component} "types", and handles instantiating them based on the string that is specified
+	 * Object used to manage {@link jqGui.Component} "types", and handles instantiating them based on the string that is specified
 	 * for them in the manifest.
 	 */
 	var ComponentManager = {
@@ -17,7 +17,7 @@ define( [
 		 * @private
 		 * @property {Object} componentClasses
 		 * 
-		 * An Object (map) of the {@link jqc.Component} classes which have been {@link #registerType registered}, 
+		 * An Object (map) of the {@link jqGui.Component} classes which have been {@link #registerType registered}, 
 		 * keyed by their type name. 
 		 */
 		componentClasses : {},
@@ -40,7 +40,7 @@ define( [
 				this.componentClasses[ type ] = jsClass;
 			// <debug>
 			} else {
-				throw new Error( "Error: jqc.ComponentManager already has a type '" + type + "'" );
+				throw new Error( "Error: jqGui.ComponentManager already has a type '" + type + "'" );
 			// </debug>
 			}
 		},
@@ -56,8 +56,8 @@ define( [
 			type = type.toLowerCase();
 			
 			// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
-			// jqc.Component can't register itself with the ComponentManager
-			var jsClass = ( type === 'component' ) ? require( 'jqc/Component' ) : this.componentClasses[ type ];
+			// jqGui.Component can't register itself with the ComponentManager
+			var jsClass = ( type === 'component' ) ? require( 'jqGui/Component' ) : this.componentClasses[ type ];
 			
 			// <debug>
 			if( !jsClass ) 
@@ -89,19 +89,19 @@ define( [
 		
 		
 		/**
-		 * Creates (instantiates) a {@link jqc.Component Component} based on its type name, given
+		 * Creates (instantiates) a {@link jqGui.Component Component} based on its type name, given
 		 * a configuration object that has a `type` property. If an already-instantiated 
-		 * {@link jqc.Component Component} is provided, it will simply be returned unchanged.
+		 * {@link jqGui.Component Component} is provided, it will simply be returned unchanged.
 		 * 
 		 * @param {Object} config The configuration object for the Component. Config objects should have the property `type`, 
-		 *   which determines which type of {@link jqc.Component Component} will be instantiated. If the object does not
+		 *   which determines which type of {@link jqGui.Component Component} will be instantiated. If the object does not
 		 *   have a `type` property, it will default to "container", which makes it simple to create things like tab containers. 
-		 *   Note that already-instantiated {@link jqc.Component Components} will simply be returned unchanged. 
-		 * @return {jqc.Component} The instantiated Component.
+		 *   Note that already-instantiated {@link jqGui.Component Components} will simply be returned unchanged. 
+		 * @return {jqGui.Component} The instantiated Component.
 		 */
 		create : function( config ) {
 			var type = config.type ? config.type.toLowerCase() : undefined,
-			    Component = require( 'jqc/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (jqc.Component depends on jqc.ComponentManager)
+			    Component = require( 'jqGui/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (jqGui.Component depends on jqGui.ComponentManager)
 			
 			if( config instanceof Component ) {
 				// Already a Component instance, return it

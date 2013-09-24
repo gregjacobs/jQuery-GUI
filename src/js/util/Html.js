@@ -4,7 +4,7 @@ define( [
 ], function( _ ) {
 	
 	/**
-	 * @class jqc.util.Html
+	 * @class jqGui.util.Html
 	 * @singleton
 	 * 
 	 * Utility class for doing html/text transformations.

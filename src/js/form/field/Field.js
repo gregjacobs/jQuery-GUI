@@ -3,15 +3,15 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'jqc/Component',
-	'jqc/template/Template',
-	'jqc/template/LoDash'
+	'jqGui/Component',
+	'jqGui/template/Template',
+	'jqGui/template/LoDash'
 ], function( jQuery, _, Class, Component, Template, LoDashTpl ) {
 	
 	/**
 	 * @abstract
-	 * @class jqc.form.field.Field
-	 * @extends jqc.Component
+	 * @class jqGui.form.field.Field
+	 * @extends jqGui.Component
 	 * 
 	 * Abstract base class for form fields, which lays out a label and a container for form field(s), while also 
 	 * providing the base functionality and other common field related tasks.
@@ -76,7 +76,7 @@ define( [
 		 * @property {String} inputId
 		 * 
 		 * The ID that will be used for the Component's input element. This is a combination of the Component's
-		 * {@link jqc.Component#elId elId} and, the suffix "-input". The label element (if {@link #label} is specified) 
+		 * {@link jqGui.Component#elId elId} and, the suffix "-input". The label element (if {@link #label} is specified) 
 		 * will be created with a `for` attribute with this id.
 		 */
 		
@@ -115,7 +115,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-form-field',
+		baseCls : 'jqGui-form-field',
 		
 		/**
 		 * @cfg
@@ -125,13 +125,13 @@ define( [
 		
 		
 		/**
-		 * @cfg {String/String[]/Function/jqc.template.Template} labelRenderTpl
+		 * @cfg {String/String[]/Function/jqGui.template.Template} labelRenderTpl
 		 * 
 		 * The template to use as the HTML template for the Field's label.
 		 * 
-		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqc.template.Template} 
-		 * instance. For the string, array of strings, or function form, a {@link jqc.template.LoDash LoDash template} instance will be 
-		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqc.template.Template} 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqGui.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link jqGui.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqGui.template.Template} 
 		 * subclass to this config. 
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template) 
@@ -182,7 +182,7 @@ define( [
 				 * Fires when the input field has been changed.
 				 * 
 				 * @event change
-				 * @param {jqc.form.field.Field} field This Field object.
+				 * @param {jqGui.form.field.Field} field This Field object.
 				 * @param {Object} newValue The new value of the field.
 				 */
 				'change',
@@ -191,7 +191,7 @@ define( [
 				 * Fires when the input field has been focused.
 				 * 
 				 * @event focus
-				 * @param {jqc.form.field.Field} field This Field object.
+				 * @param {jqGui.form.field.Field} field This Field object.
 				 */
 				'focus',
 				
@@ -199,7 +199,7 @@ define( [
 				 * Fires when the input field has been blurred.
 				 * 
 				 * @event blur
-				 * @param {jqc.form.field.Field} field This Field object.
+				 * @param {jqGui.form.field.Field} field This Field object.
 				 */
 				'blur'
 			);
@@ -210,7 +210,7 @@ define( [
 			// Fix labelAlign to be lowercase for use with setting the class name (just in case),
 			// and apply the appropriate CSS class for the label state
 			var labelAlign = this.labelAlign = this.labelAlign.toLowerCase(),
-			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'jqc-form-field-noLabel' if there is no label, or 'jqc-form-field-leftLabel' or 'jqc-form-field-topLabel' if there is one
+			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'jqGui-form-field-noLabel' if there is no label, or 'jqGui-form-field-leftLabel' or 'jqGui-form-field-topLabel' if there is one
 			this.addCls( labelCls );
 			
 			

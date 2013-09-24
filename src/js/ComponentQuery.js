@@ -2,12 +2,12 @@
 define( [
 	'lodash',
 	'Class',
-	'jqc/Container',
-	'jqc/ComponentManager'
+	'jqGui/Container',
+	'jqGui/ComponentManager'
 ], function( _, Class, Container, ComponentManager ) {
 	
 	/**
-	 * @class jqc.ComponentQuery
+	 * @class jqGui.ComponentQuery
 	 * @extends Object
 	 * @singleton
 	 * 
@@ -15,9 +15,9 @@ define( [
 	 * 
 	 * At this time, the selectors that are available are limited to:
 	 * 
-	 * - **id** : For referencing a Component by {@link jqc.Component#id}. Example: "#myComponent".
+	 * - **id** : For referencing a Component by {@link jqGui.Component#id}. Example: "#myComponent".
 	 * - **type** : For referencing one or more Components by their string 'type' name. Example: "button" would
-	 *   find all {@link jqc.button.Button} instances, and any subclasses of Button instances. It will also find
+	 *   find all {@link jqGui.button.Button} instances, and any subclasses of Button instances. It will also find
 	 *   instances which implementing the type name as a mixin.
 	 * 
 	 * No child or descendant selectors are available yet at this time, but this class will be extended to do
@@ -30,9 +30,9 @@ define( [
 		 * components. See the description of this class for valid selectors.
 		 * 
 		 * @param {String} selector The selector to query components by.
-		 * @param {jqc.Component/jqc.Component[]} context The component(s) to query the `selector` for. If one
+		 * @param {jqGui.Component/jqGui.Component[]} context The component(s) to query the `selector` for. If one
 		 *   or more of the components match the selector, they will be included. Components that are 
-		 *   {@link jqc.Container Containers} will be recursively queried to determine if their descendant 
+		 *   {@link jqGui.Container Containers} will be recursively queried to determine if their descendant 
 		 *   components match the `selector` as well.
 		 */
 		query : function( selector, context ) {
@@ -55,7 +55,7 @@ define( [
 		/**
 		 * Determines if a given `component` is matched by the provided `selector`.
 		 * 
-		 * @param {jqc.Component} component The Component(s) to test.
+		 * @param {jqGui.Component} component The Component(s) to test.
 		 * @param {String} selector The selector string to test the `component` against.
 		 * @return {Boolean} `true` if the Component matches the selector, `false` otherwise.
 		 */
@@ -70,9 +70,9 @@ define( [
 		 * on the selector, and the resulting array returned.
 		 * 
 		 * @protected
-		 * @param {jqc.Component[]} The list of components which is to be filtered by the selector.
+		 * @param {jqGui.Component[]} The list of components which is to be filtered by the selector.
 		 * @param {String} selector The selector string to apply to the set of components.
-		 * @return {jqc.Component[]} The unique set of Components that matched the selector. Duplicates are removed.
+		 * @return {jqGui.Component[]} The unique set of Components that matched the selector. Duplicates are removed.
 		 */
 		filterBySelector : function( components, selector ) {
 			if( selector.charAt( 0 ) === '#' ) {  // ID selector
@@ -85,13 +85,13 @@ define( [
 		
 		
 		/**
-		 * Filters the given set of `components` by returning only the ones that have an {@link jqc.Component#id id}
+		 * Filters the given set of `components` by returning only the ones that have an {@link jqGui.Component#id id}
 		 * matching the provided `id`.
 		 * 
 		 * @protected
-		 * @param {jqc.Component[]} components
+		 * @param {jqGui.Component[]} components
 		 * @param {String} id The ID of the component to return.
-		 * @return {jqc.Component[]} The filtered array of components.
+		 * @return {jqGui.Component[]} The filtered array of components.
 		 */
 		filterById : function( components, id ) {
 			return _.filter( components, function( component ) { return ( component.getId() === id ); } );
@@ -107,13 +107,13 @@ define( [
 		 * If the `type` provided is not a registered type name, then an empty array is returned, as no component
 		 * could possibly match it. This is done instead of throwing an error for the case that a certain type has 
 		 * not yet been loaded in yet when using the {@link #query} or {@link #is} methods, or when a
-		 * {@link jqc.app.Controller} listens for events on a certain component type which hasn't been loaded yet.
+		 * {@link jqGui.app.Controller} listens for events on a certain component type which hasn't been loaded yet.
 		 * 
 		 * @protected
-		 * @param {jqc.Component[]} components
+		 * @param {jqGui.Component[]} components
 		 * @param {String} type The component `type`, which will be resolved to a component class to test each
 		 *   component against.
-		 * @return {jqc.Component[]} The filtered array of components.
+		 * @return {jqGui.Component[]} The filtered array of components.
 		 */
 		filterByType : function( components, type ) {
 			if( !ComponentManager.hasType( type ) ) {
@@ -130,11 +130,11 @@ define( [
 		
 		
 		/**
-		 * Retrieves the descendants of the provided {@link jqc.Container Container}.
+		 * Retrieves the descendants of the provided {@link jqGui.Container Container}.
 		 * 
 		 * @protected
-		 * @param {jqc.Container} container
-		 * @param {jqc.Component[]} All of the descendant components of the `container`. 
+		 * @param {jqGui.Container} container
+		 * @param {jqGui.Component[]} All of the descendant components of the `container`. 
 		 */
 		getDescendants : function( container ) {
 			var items = container.getItems(),

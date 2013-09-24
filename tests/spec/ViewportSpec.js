@@ -1,9 +1,9 @@
 /*global define, describe, it, xit, expect, JsMockito */
 define( [
-	'jqc/Viewport'
+	'jqGui/Viewport'
 ], function( Viewport ) {
 	
-	describe( 'jqc.Viewport', function() {
+	describe( 'jqGui.Viewport', function() {
 		
 		describe( "sanity", function() {
 			
