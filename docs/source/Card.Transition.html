@@ -18,34 +18,34 @@
   <pre class="prettyprint lang-js">/*global define */
 define( [
 	'Class',
-	'jqc/Jqc'
-], function( Class, Jqc ) {
+	'jqGui/JqGui'
+], function( Class, JqGui ) {
 	
-<span id='jqc-layout-Card-AbstractTransition'>	/**
+<span id='jqGui-layout-Card-AbstractTransition'>	/**
 </span>	 * @abstract
-	 * @class jqc.layout.Card.AbstractTransition
+	 * @class jqGui.layout.Card.AbstractTransition
 	 * @extends Object
 	 * 
-	 * Defines the interface for all {@link jqc.layout.Card} strategies for changing the active card.
+	 * Defines the interface for all {@link jqGui.layout.Card} strategies for changing the active card.
 	 */
 	var CardTransition = Class.extend( Object, {
 		abstractClass : true,
 		
 		
-<span id='jqc-layout-Card-AbstractTransition-method-setActiveItem'>		/**
+<span id='jqGui-layout-Card-AbstractTransition-method-setActiveItem'>		/**
 </span>		 * Sets the active item that should be transitioned to.
 		 * 
 		 * @abstract
 		 * @method setActiveItem
-		 * @param {jqc.layout.Card} cardsLayout The CardsLayout instance that is using this transition strategy.
-		 * @param {jqc.Component} currentItem The currently active item. This may be null if the CardsLayout does not currently have an active item.
-		 * @param {jqc.Component} newItem The item to activate. This may be null if there is no new item to activate (for just hiding the currentItem).
+		 * @param {jqGui.layout.Card} cardsLayout The CardsLayout instance that is using this transition strategy.
+		 * @param {jqGui.Component} currentItem The currently active item. This may be null if the CardsLayout does not currently have an active item.
+		 * @param {jqGui.Component} newItem The item to activate. This may be null if there is no new item to activate (for just hiding the currentItem).
 		 * @param {Object} options An object which may contain options for the given AbstractTransition subclass that is being used.
 		 */
 		setActiveItem : Class.abstractMethod,
 		
 		
-<span id='jqc-layout-Card-AbstractTransition-method-destroy'>		/**
+<span id='jqGui-layout-Card-AbstractTransition-method-destroy'>		/**
 </span>		 * Destroys the CardsLayout transition strategy. Subclasses should extend the onDestroy method to implement 
 		 * any destruction process they specifically need.
 		 * 
@@ -56,14 +56,14 @@ define( [
 		},
 		
 		
-<span id='jqc-layout-Card-AbstractTransition-method-onDestroy'>		/**
+<span id='jqGui-layout-Card-AbstractTransition-method-onDestroy'>		/**
 </span>		 * Template method that subclasses should extend to implement their own destruction process.
 		 * 
 		 * @protected
 		 * @template
 		 * @method onDestroy
 		 */
-		onDestroy : Jqc.emptyFn
+		onDestroy : JqGui.emptyFn
 		
 	} );
 	

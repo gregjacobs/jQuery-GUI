@@ -28,7 +28,7 @@ define( [
 </span>	 * @class data.persistence.proxy.Ajax
 	 * @extends data.persistence.proxy.Proxy
 	 * 
-	 * Ajax proxy is responsible for performing CRUD operations through standard AJAX, using the url(s) configured,
+	 * Ajax proxy is responsible for performing CRUD requests through standard AJAX, using the url(s) configured,
 	 * and providing any parameters and such which are required for the backend service.
 	 * 
 	 * The Ajax proxy must be configured with the appropriate parameter names in order for it to automatically supply
@@ -72,33 +72,53 @@ define( [
 		 * will be used instead. This allows the {@link #url} config to be used for all api methods.
 		 */
 		
-<span id='data-persistence-proxy-Ajax-cfg-extraParams'>		/**
-</span>		 * @cfg {Object} extraParams
+<span id='data-persistence-proxy-Ajax-cfg-defaultParams'>		/**
+</span>		 * @cfg {Object} defaultParams
 		 * 
-		 * An Object (map) of any extra parameters to include with every request. Params provided to individual
-		 * requests will override these params of the same name.
+		 * An Object (map) of any default parameters to include with every request. `params` provided to individual
+		 * requests will override default parameters of the same name.
 		 * 
 		 * Ex:
 		 * 
-		 *     extraParams : {
+		 *     defaultParams : {
 		 *         returnType : 'json'
 		 *     }
 		 *     
-		 * Note that the values of these parameters will be URL encoded.
+		 * Note that the values of these parameters will be URL encoded, if the default behavior of serializing the
+		 * parameters as a query string is not overridden by a new {@link #serializeParams} implementation.
 		 */
 		
-<span id='data-persistence-proxy-Ajax-cfg-actionMethods'>		/**
-</span>		 * @cfg {Object} actionMethods
+<span id='data-persistence-proxy-Ajax-cfg-createMethod'>		/**
+</span>		 * @cfg {String} createMethod
 		 * 
-		 * A mapping of the HTTP method to use for each CRUD (create, read, update, destroy) action. This may be 
+		 * The HTTP method to use to when creating a {@link data.Model Model} on the server. This may be 
 		 * overridden for custom implementations.
 		 */
-		actionMethods : {
-			create  : 'POST',
-			read    : 'GET',
-			update  : 'POST',
-			destroy : 'POST'
-		},
+		createMethod : 'POST',
+		
+<span id='data-persistence-proxy-Ajax-cfg-readMethod'>		/**
+</span>		 * @cfg {String} readMethod
+		 * 
+		 * The HTTP method to use to when reading a {@link data.Model Model} or {@link data.Collection} 
+		 * from the server. This may be overridden for custom implementations.
+		 */
+		readMethod : 'GET',
+		
+<span id='data-persistence-proxy-Ajax-cfg-updateMethod'>		/**
+</span>		 * @cfg {String} updateMethod
+		 * 
+		 * The HTTP method to use to when updating a {@link data.Model Model} on the server. This may be 
+		 * overridden for custom implementations.
+		 */
+		updateMethod : 'POST',
+		
+<span id='data-persistence-proxy-Ajax-cfg-destroyMethod'>		/**
+</span>		 * @cfg {String} destroyMethod
+		 * 
+		 * The HTTP method to use to when destroying a {@link data.Model Model} on the server. This may be 
+		 * overridden for custom implementations.
+		 */
+		destroyMethod : 'POST',
 		
 <span id='data-persistence-proxy-Ajax-cfg-idParam'>		/**
 </span>		 * @cfg {String} idParam
@@ -150,7 +170,7 @@ define( [
 			this._super( arguments );
 			
 			this.api = this.api || {};
-			this.extraParams = this.extraParams || {};
+			this.defaultParams = this.defaultParams || {};
 		},
 		
 		
@@ -158,13 +178,13 @@ define( [
 <span id='data-persistence-proxy-Ajax-method-create'>		/**
 </span>		 * Creates the Model on the server.
 		 * 
-		 * @param {data.persistence.operation.Write} operation The WriteOperation instance that holds the model(s) 
-		 *   to be created on the REST server.
-		 * @return {jQuery.Promise} A Promise object which is resolved when the operation is complete.
-		 *   `done`, `fail`, and `always` callbacks are called with the `operation` object provided to 
+		 * @param {data.persistence.request.Create} request The CreateRequest instance that holds the model(s) 
+		 *   to be created on the server.
+		 * @return {jQuery.Promise} A Promise object which is resolved when the request is complete.
+		 *   `done`, `fail`, and `always` callbacks are called with the `request` object provided to 
 		 *   this method as the first argument.
 		 */
-		create : function( operation ) {
+		create : function( request ) {
 			throw new Error( &quot;create() not yet implemented&quot; );
 		},
 		
@@ -172,29 +192,31 @@ define( [
 <span id='data-persistence-proxy-Ajax-method-read'>		/**
 </span>		 * Reads one or more {@link data.Model Models} from the server.
 		 * 
-		 * @param {data.persistence.operation.Read} operation The ReadOperation instance that describes the 
+		 * @param {data.persistence.request.Read} request The ReadRequest instance that describes the 
 		 *   model(s) to be read from the server.
-		 * @return {jQuery.Promise} A Promise object which is resolved when the operation is complete.
-		 *   `done`, `fail`, and `always` callbacks are called with the `operation` object provided to 
+		 * @return {jQuery.Promise} A Promise object which is resolved when the request is complete.
+		 *   `done`, `fail`, and `always` callbacks are called with the `request` object provided to 
 		 *   this method as the first argument.
 		 */
-		read : function( operation ) {
+		read : function( request ) {
 			var me = this,  // for closures
+			    paramsObj = this.buildParams( 'read', request ),
 			    deferred = new jQuery.Deferred();
 			
 			this.ajax( {
-				url      : this.buildUrl( 'read', operation ),
+				url      : this.buildUrl( request ),
 				type     : this.getHttpMethod( 'read' ),
+				data     : this.serializeParams( paramsObj, 'read', request ),  // params will be appended to URL on 'GET' requests, or put into the request body on 'POST' requests (dependent on `readMethod` config)
 				dataType : 'text'
 			} ).then(
 				function( data, textStatus, jqXHR ) {
-					operation.setResultSet( me.reader.read( data ) );
-					operation.setSuccess();
-					deferred.resolve( operation );
+					request.setResultSet( me.reader.read( data ) );
+					request.setSuccess();
+					deferred.resolve( request );
 				},
 				function( jqXHR, textStatus, errorThrown ) {
-					operation.setException( { textStatus: textStatus, errorThrown: errorThrown } );
-					deferred.reject( operation );
+					request.setException( { textStatus: textStatus, errorThrown: errorThrown } );
+					deferred.reject( request );
 				}
 			);
 			
@@ -206,13 +228,13 @@ define( [
 </span>		 * Updates the given Model on the server.  This method uses &quot;incremental&quot; updates, in which only the changed attributes of the `model`
 		 * are persisted.
 		 * 
-		 * @param {data.persistence.operation.Write} operation The WriteOperation instance that holds the model(s) 
-		 *   to be updated on the REST server.
-		 * @return {jQuery.Promise} A Promise object which is resolved when the operation is complete.
-		 *   `done`, `fail`, and `always` callbacks are called with the `operation` object provided to 
+		 * @param {data.persistence.request.Update} request The UpdateRequest instance that holds the model(s) 
+		 *   to be updated on the server.
+		 * @return {jQuery.Promise} A Promise object which is resolved when the request is complete.
+		 *   `done`, `fail`, and `always` callbacks are called with the `request` object provided to 
 		 *   this method as the first argument.
 		 */
-		update : function( operation, options ) {
+		update : function( request ) {
 			throw new Error( &quot;update() not yet implemented&quot; );
 		},
 		
@@ -222,63 +244,104 @@ define( [
 		 * 
 		 * Note that this method is not named &quot;delete&quot; as &quot;delete&quot; is a JavaScript reserved word.
 		 * 
-		 * @param {data.persistence.operation.Write} operation The WriteOperation instance that holds the model(s) 
-		 *   to be destroyed on the REST server.
-		 * @return {jQuery.Promise} A Promise object which is resolved when the operation is complete.
-		 *   `done`, `fail`, and `always` callbacks are called with the `operation` object provided to 
+		 * @param {data.persistence.request.Destroy} request The DestroyRequest instance that holds the model(s) 
+		 *   to be destroyed on the server.
+		 * @return {jQuery.Promise} A Promise object which is resolved when the request is complete.
+		 *   `done`, `fail`, and `always` callbacks are called with the `request` object provided to 
 		 *   this method as the first argument.
 		 */
-		destroy : function( operation ) {
+		destroy : function( request ) {
 			throw new Error( &quot;destroy() not yet implemented&quot; );
 		},
 		
 		
 		// -----------------------------------
 		
+		// Note: No setDefaultParams() method so that the Proxy is immutable, and can be shared between many Model
+		//       and Collection instances.
+		
 		
 <span id='data-persistence-proxy-Ajax-method-buildUrl'>		/**
 </span>		 * Builds the full URL that will be used for any given CRUD (create, read, update, destroy) request. This will
 		 * be the base url provided by either the {@link #api} or {@link #url} configs, plus any parameters that need
-		 * to be added based on the `operation` provided.
+		 * to be added based on the `request` provided.
 		 * 
 		 * @protected
-		 * @param {String} action The action that is being taken. Should be 'create', 'read', 'update', or 'destroy'.
-		 * @param {data.persistence.operation.Read/data.persistence.operation.Write} operation
+		 * @param {data.persistence.request.Request} request The Request being made.
 		 * @return {String} The full URL, with all parameters.
 		 */
-		buildUrl : function( action, operation ) {
-			var params = _.assign( {}, this.extraParams, operation.getParams() || {} );   // build the params map
+		buildUrl : function( request ) {
+			var action = request.getAction(),  // The CRUD action name. Ex: 'create', 'read', 'update', 'destroy'
+			    url = this.getUrl( action );
 			
-			if( action === 'read' ) {
-				var modelId = operation.getModelId(),
-				    page = operation.getPage(),
-				    pageSize = operation.getPageSize(),
-				    pageParam = this.pageParam,
-				    pageSizeParam = this.pageSizeParam;
+			// Only add params explicitly to the URL when doing a create/update/destroy request. For a 'read' 
+			// request, params will be added conditionally to either the url or the post body based on the http 
+			// method being used ('GET' or 'POST', handled in the read() method itself). 
+			if( action !== 'read' ) {
+				var params = this.buildParams( action, request );
 				
-				if( modelId !== null ) 
-					params[ this.idParam ] = modelId;
-				
-				if( page &gt; 0 &amp;&amp; pageParam ) {   // an actual page was requested, and there is a pageParam config defined
-					params[ pageParam ] = page;
-					
-					if( pageSize &gt; 0 &amp;&amp; pageSizeParam ) {
-						params[ pageSizeParam ] = pageSize;
-					}
-				}
+				url = this.urlAppend( url, this.serializeParams( params, action, request ) );
 			}
-			
-			// Map the params object to an array of query string params
-			params = _.map( params, function( value, prop ) {
-				return prop + '=' + encodeURIComponent( value );
-			} );
-			return this.urlAppend( this.getUrl( action ), params.join( '&amp;' ) );
+			return url;
 		},
 		
 		
+<span id='data-persistence-proxy-Ajax-method-buildParams'>		/**
+</span>		 * Builds the parameters for a given `request`. By default, the `request`'s params are combined
+		 * with the Proxy's {@link #defaultParams}, and then any additional parameters for paging and such are
+		 * added.
+		 * 
+		 * @protected
+		 * @param {String} action The action that is being taken. Should be 'create', 'read', 'update', or 'destroy'.
+		 * @param {data.persistence.request.Read/data.persistence.request.Write} request
+		 * @return {Object} An Object (map) of the parameters, where the keys are the parameter names,
+		 *   and the values are the parameter values.
+		 */
+		buildParams : function( action, request ) {
+			var params = _.assign( {}, this.defaultParams, request.getParams() || {} );   // build the params map
+			
+			// Add the model's `id` and the paging parameters for 'read' requests only
+			if( action === 'read' ) {
+				var modelId = request.getModelId(),
+				    idParam = this.idParam,
+				    page = request.getPage(),
+				    pageSize = request.getPageSize(),
+				    pageParam = this.pageParam,
+				    pageSizeParam = this.pageSizeParam;
+				
+				if( modelId !== undefined &amp;&amp; idParam ) 
+					params[ idParam ] = modelId;
+				
+				if( page &gt; 0 &amp;&amp; pageParam ) {   // an actual page was requested, and there is a pageParam config defined
+					params[ pageParam ] = page;
+				}
+				if( pageSize &gt; 0 &amp;&amp; pageSizeParam ) {
+					params[ pageSizeParam ] = pageSize;
+				}
+			}
+			
+			return params;
+		},
+		
+		
+<span id='data-persistence-proxy-Ajax-method-serializeParams'>		/**
+</span>		 * Serializes the parameters for an request. The default implementation of this method is to serialize
+		 * them into a query string, but may be overridden to support other formats.
+		 * 
+		 * @protected
+		 * @param {Object} params The Object (map) of parameters to serialize. The keys of this map are the parameter names,
+		 *   and the values are the parameter values.
+		 * @param {String} action The action that is being taken. One of: 'create', 'read', 'update', or 'destroy'.
+		 * @param {data.persistence.request.Read/data.persistence.request.Write} request
+		 * @return {String} The serialized string of parameters.
+		 */
+		serializeParams : function( params, action, request ) {
+			return this.objToQueryString( params );
+		},
+		
 		
 <span id='data-persistence-proxy-Ajax-method-getUrl'>		/**
-</span>		 * Retrieves the base URL to use for the given CRUD (create, read, update, destroy) operation. This is based on 
+</span>		 * Retrieves the URL to use for the given CRUD (create, read, update, destroy) request. This is based on 
 		 * either the {@link #api} (if there is a URL defined for the given `action`), or otherwise, the {@link #url} config.
 		 * 
 		 * @protected
@@ -298,16 +361,20 @@ define( [
 		
 		
 <span id='data-persistence-proxy-Ajax-method-getHttpMethod'>		/**
-</span>		 * Retrieves the HTTP method that should be used for a given action. This is, by default, done via 
-		 * a lookup to the {@link #actionMethods} config object.
+</span>		 * Retrieves the HTTP method that should be used for a given action ('create', 'read', 'update', or 'destroy'). 
+		 * The return value is dependent on the values of the {@link #createMethod}, {@link #readMethod}, 
+		 * {@link #updateMethod}, and {@link #destroyMethod} configs.
 		 * 
 		 * @protected
 		 * @param {String} action The action that is being taken. Should be 'create', 'read', 'update', or 'destroy'.
-		 * @return {String} The HTTP method that should be used, based on the {@link #actionMethods} config.
+		 * @return {String} The HTTP method that should be used, based on the appropriate config (see above).
 		 */
 		getHttpMethod : function( action ) {
-			return this.actionMethods[ action ];
+			return this[ action + 'Method' ];  // ex: this.createMethod, this.readMethod, this.updateMethod, or this.destroyMethod
 		},
+		
+		
+		// -------------------------------------
 		
 		
 <span id='data-persistence-proxy-Ajax-method-urlAppend'>		/**
@@ -323,18 +390,43 @@ define( [
 		 *     this.urlAppend( 'http://www.yahoo.com/?x=1', 'y=2&amp;z=3' );
 		 *     // &lt;- http://www.yahoo.com/?x=1&amp;y=2&amp;z=3
 		 *     
-		 * @param {String} baseUrl The base url to append to.
+		 * @param {String} url The url string to append to.
 		 * @param {String} queryString The query string to append.
-		 * @return The baseUrl + queryString, with the correct separator character.
+		 * @return The `url` + `queryString`, with the correct separator character.
 		 */
-		urlAppend : function( baseUrl, queryString ) {
-			var url = baseUrl;
-			
+		urlAppend : function( url, queryString ) {
 			if( queryString ) {
-				var sepChar = ( baseUrl.indexOf( '?' ) === -1 ) ? '?' : '&amp;';
-				url += sepChar + queryString;
+				var indexOfQuestionMark = url.indexOf( '?' ),
+				    separatorChar = '';
+				
+				if( indexOfQuestionMark === -1 ) {
+					separatorChar = '?';
+				} else if( indexOfQuestionMark &lt; url.length - 1 ) {
+					// Only adding the '&amp;' separator char if the the '?' is in the string, but is *not* the last char (i.e. there is 
+					// no query string value yet, but the url already has the correct '?' separator char)
+					separatorChar = '&amp;';
+				}
+				
+				url += separatorChar + queryString;
 			}
+			
 			return url;
+		},
+		
+		
+<span id='data-persistence-proxy-Ajax-method-objToQueryString'>		/**
+</span>		 * Converts an Object (map) of properties and values into a query string.
+		 * 
+		 * @protected
+		 * @param {Object} obj
+		 * @return {String} The keys/values of the `obj` in the format &quot;key=value&amp;key2=value2&quot;.
+		 */
+		objToQueryString : function( obj ) {
+			// Map the object to an array of query string params
+			var arr = _.map( obj, function( value, prop ) {
+				return prop + '=' + encodeURIComponent( value );
+			} );
+			return arr.join( '&amp;' );
 		}
 		
 	} );

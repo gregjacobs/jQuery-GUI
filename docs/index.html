@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>jQuery-Component API Docs</title>
+  <title>jQuery-GUI API Docs</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
   <meta name="fragment" content="!">
@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="resources/css/app-d837b293d081641aaa2111b87080b6d6.css" type="text/css" />
 
   <script type="text/javascript" src="extjs/ext-all.js"></script>
-  <script type="text/javascript" src="data-4ce60da0ec00c68fd71a26c58775acf8.js"></script>
+  <script type="text/javascript" src="data-a44bd0241807d5d8fe4208ff3aa42d10.js"></script>
 
   <script type="text/javascript" src="app-7fc6c2bdfb9b1df401e1a5eab418fd71.js"></script>
 
@@ -21,9 +21,9 @@
 </head>
 <body id="ext-body">
 
-  <div id="loading"><span class="title">jQuery-Component API Docs</span><span class="logo"></span></div>
+  <div id="loading"><span class="title">jQuery-GUI API Docs</span><span class="logo"></span></div>
 
-  <div id="header-content">jQuery-Component API Docs</div>
+  <div id="header-content">jQuery-GUI API Docs</div>
   
           <div id='categories-content' style='display:none'>
             <div class='section'>
@@ -50,15 +50,26 @@
 <h3>persistence</h3>
 <ul class='links'>
 <li><a href="#!/api/data.persistence.ResultSet" rel="data.persistence.ResultSet" class="docClass">data.persistence.ResultSet</a></li>
-<li><a href="#!/api/data.persistence.operation.Batch" rel="data.persistence.operation.Batch" class="docClass">data.persistence.operation.Batch</a></li>
+<li><a href="#!/api/data.persistence.operation.Destroy" rel="data.persistence.operation.Destroy" class="docClass">data.persistence.operation.Destroy</a></li>
+<li><a href="#!/api/data.persistence.operation.Load" rel="data.persistence.operation.Load" class="docClass">data.persistence.operation.Load</a></li>
 <li><a href="#!/api/data.persistence.operation.Operation" rel="data.persistence.operation.Operation" class="docClass">data.persistence.operation.Operation</a></li>
-<li><a href="#!/api/data.persistence.operation.Read" rel="data.persistence.operation.Read" class="docClass">data.persistence.operation.Read</a></li>
-<li><a href="#!/api/data.persistence.operation.Write" rel="data.persistence.operation.Write" class="docClass">data.persistence.operation.Write</a></li>
+<li><a href="#!/api/data.persistence.operation.Promise" rel="data.persistence.operation.Promise" class="docClass">data.persistence.operation.Promise</a></li>
+<li><a href="#!/api/data.persistence.operation.Save" rel="data.persistence.operation.Save" class="docClass">data.persistence.operation.Save</a></li>
 <li><a href="#!/api/data.persistence.proxy.Ajax" rel="data.persistence.proxy.Ajax" class="docClass">data.persistence.proxy.Ajax</a></li>
+<li><a href="#!/api/data.persistence.proxy.LocalStorage" rel="data.persistence.proxy.LocalStorage" class="docClass">data.persistence.proxy.LocalStorage</a></li>
 <li><a href="#!/api/data.persistence.proxy.Proxy" rel="data.persistence.proxy.Proxy" class="docClass">data.persistence.proxy.Proxy</a></li>
 <li><a href="#!/api/data.persistence.proxy.Rest" rel="data.persistence.proxy.Rest" class="docClass">data.persistence.proxy.Rest</a></li>
+<li><a href="#!/api/data.persistence.proxy.SessionStorage" rel="data.persistence.proxy.SessionStorage" class="docClass">data.persistence.proxy.SessionStorage</a></li>
+<li><a href="#!/api/data.persistence.proxy.WebStorage" rel="data.persistence.proxy.WebStorage" class="docClass">data.persistence.proxy.WebStorage</a></li>
 <li><a href="#!/api/data.persistence.reader.Json" rel="data.persistence.reader.Json" class="docClass">data.persistence.reader.Json</a></li>
 <li><a href="#!/api/data.persistence.reader.Reader" rel="data.persistence.reader.Reader" class="docClass">data.persistence.reader.Reader</a></li>
+<li><a href="#!/api/data.persistence.request.Batch" rel="data.persistence.request.Batch" class="docClass">data.persistence.request.Batch</a></li>
+<li><a href="#!/api/data.persistence.request.Create" rel="data.persistence.request.Create" class="docClass">data.persistence.request.Create</a></li>
+<li><a href="#!/api/data.persistence.request.Destroy" rel="data.persistence.request.Destroy" class="docClass">data.persistence.request.Destroy</a></li>
+<li><a href="#!/api/data.persistence.request.Read" rel="data.persistence.request.Read" class="docClass">data.persistence.request.Read</a></li>
+<li><a href="#!/api/data.persistence.request.Request" rel="data.persistence.request.Request" class="docClass">data.persistence.request.Request</a></li>
+<li><a href="#!/api/data.persistence.request.Update" rel="data.persistence.request.Update" class="docClass">data.persistence.request.Update</a></li>
+<li><a href="#!/api/data.persistence.request.Write" rel="data.persistence.request.Write" class="docClass">data.persistence.request.Write</a></li>
 </ul>
 </div>
 <div class='right-column'>
@@ -72,69 +83,87 @@
 <div style='clear:both'></div>
 </div>
 <div class='section'>
-<h1>jqc</h1>
+<h1>jqGui</h1>
 <div class='left-column'>
+<h3>app</h3>
+<ul class='links'>
+<li><a href="#!/api/jqGui.app.Controller" rel="jqGui.app.Controller" class="docClass">jqGui.app.Controller</a></li>
+<li><a href="#!/api/jqGui.app.EventBus" rel="jqGui.app.EventBus" class="docClass">jqGui.app.EventBus</a></li>
+</ul>
 <h3>form</h3>
 <ul class='links'>
-<li><a href="#!/api/jqc.form.field.Checkbox" rel="jqc.form.field.Checkbox" class="docClass">jqc.form.field.Checkbox</a></li>
-<li><a href="#!/api/jqc.form.field.Dropdown" rel="jqc.form.field.Dropdown" class="docClass">jqc.form.field.Dropdown</a></li>
-<li><a href="#!/api/jqc.form.field.Field" rel="jqc.form.field.Field" class="docClass">jqc.form.field.Field</a></li>
-<li><a href="#!/api/jqc.form.field.Hidden" rel="jqc.form.field.Hidden" class="docClass">jqc.form.field.Hidden</a></li>
-<li><a href="#!/api/jqc.form.field.Radio" rel="jqc.form.field.Radio" class="docClass">jqc.form.field.Radio</a></li>
-<li><a href="#!/api/jqc.form.field.Text" rel="jqc.form.field.Text" class="docClass">jqc.form.field.Text</a></li>
-<li><a href="#!/api/jqc.form.field.Text.Behavior" rel="jqc.form.field.Text.Behavior" class="docClass">jqc.form.field.Text.Behavior</a></li>
-<li><a href="#!/api/jqc.form.field.Text.EmptyTextBehavior" rel="jqc.form.field.Text.EmptyTextBehavior" class="docClass">jqc.form.field.Text.EmptyTextBehavior</a></li>
-<li><a href="#!/api/jqc.form.field.Text.InfieldLabelBehavior" rel="jqc.form.field.Text.InfieldLabelBehavior" class="docClass">jqc.form.field.Text.InfieldLabelBehavior</a></li>
-<li><a href="#!/api/jqc.form.field.TextArea" rel="jqc.form.field.TextArea" class="docClass">jqc.form.field.TextArea</a></li>
+<li><a href="#!/api/jqGui.form.field.Checkbox" rel="jqGui.form.field.Checkbox" class="docClass">jqGui.form.field.Checkbox</a></li>
+<li><a href="#!/api/jqGui.form.field.Dropdown" rel="jqGui.form.field.Dropdown" class="docClass">jqGui.form.field.Dropdown</a></li>
+<li><a href="#!/api/jqGui.form.field.Field" rel="jqGui.form.field.Field" class="docClass">jqGui.form.field.Field</a></li>
+<li><a href="#!/api/jqGui.form.field.Hidden" rel="jqGui.form.field.Hidden" class="docClass">jqGui.form.field.Hidden</a></li>
+<li><a href="#!/api/jqGui.form.field.Radio" rel="jqGui.form.field.Radio" class="docClass">jqGui.form.field.Radio</a></li>
+<li><a href="#!/api/jqGui.form.field.Text" rel="jqGui.form.field.Text" class="docClass">jqGui.form.field.Text</a></li>
+<li><a href="#!/api/jqGui.form.field.TextArea" rel="jqGui.form.field.TextArea" class="docClass">jqGui.form.field.TextArea</a></li>
+</ul>
+<h3>layout</h3>
+<ul class='links'>
+<li><a href="#!/api/jqGui.layout.Auto" rel="jqGui.layout.Auto" class="docClass">jqGui.layout.Auto</a></li>
+<li><a href="#!/api/jqGui.layout.Card" rel="jqGui.layout.Card" class="docClass">jqGui.layout.Card</a></li>
+<li><a href="#!/api/jqGui.layout.Card.AbstractTransition" rel="jqGui.layout.Card.AbstractTransition" class="docClass">jqGui.layout.Card.AbstractTransition</a></li>
+<li><a href="#!/api/jqGui.layout.Card.SwitchTransition" rel="jqGui.layout.Card.SwitchTransition" class="docClass">jqGui.layout.Card.SwitchTransition</a></li>
+<li><a href="#!/api/jqGui.layout.Column" rel="jqGui.layout.Column" class="docClass">jqGui.layout.Column</a></li>
+<li><a href="#!/api/jqGui.layout.Fit" rel="jqGui.layout.Fit" class="docClass">jqGui.layout.Fit</a></li>
+<li><a href="#!/api/jqGui.layout.HBox" rel="jqGui.layout.HBox" class="docClass">jqGui.layout.HBox</a></li>
+<li><a href="#!/api/jqGui.layout.Layout" rel="jqGui.layout.Layout" class="docClass">jqGui.layout.Layout</a></li>
+<li><a href="#!/api/jqGui.layout.VBox" rel="jqGui.layout.VBox" class="docClass">jqGui.layout.VBox</a></li>
 </ul>
 </div>
 <div class='middle-column'>
-<h3>layout</h3>
-<ul class='links'>
-<li><a href="#!/api/jqc.layout.Auto" rel="jqc.layout.Auto" class="docClass">jqc.layout.Auto</a></li>
-<li><a href="#!/api/jqc.layout.Card" rel="jqc.layout.Card" class="docClass">jqc.layout.Card</a></li>
-<li><a href="#!/api/jqc.layout.Card.AbstractTransition" rel="jqc.layout.Card.AbstractTransition" class="docClass">jqc.layout.Card.AbstractTransition</a></li>
-<li><a href="#!/api/jqc.layout.Card.SwitchTransition" rel="jqc.layout.Card.SwitchTransition" class="docClass">jqc.layout.Card.SwitchTransition</a></li>
-<li><a href="#!/api/jqc.layout.Column" rel="jqc.layout.Column" class="docClass">jqc.layout.Column</a></li>
-<li><a href="#!/api/jqc.layout.Fit" rel="jqc.layout.Fit" class="docClass">jqc.layout.Fit</a></li>
-<li><a href="#!/api/jqc.layout.HBox" rel="jqc.layout.HBox" class="docClass">jqc.layout.HBox</a></li>
-<li><a href="#!/api/jqc.layout.Layout" rel="jqc.layout.Layout" class="docClass">jqc.layout.Layout</a></li>
-<li><a href="#!/api/jqc.layout.VBox" rel="jqc.layout.VBox" class="docClass">jqc.layout.VBox</a></li>
-</ul>
 <h3>panel</h3>
 <ul class='links'>
-<li><a href="#!/api/jqc.panel.Panel" rel="jqc.panel.Panel" class="docClass">jqc.panel.Panel</a></li>
-<li><a href="#!/api/jqc.panel.ToolButton" rel="jqc.panel.ToolButton" class="docClass">jqc.panel.ToolButton</a></li>
+<li><a href="#!/api/jqGui.panel.Header" rel="jqGui.panel.Header" class="docClass">jqGui.panel.Header</a></li>
+<li><a href="#!/api/jqGui.panel.Panel" rel="jqGui.panel.Panel" class="docClass">jqGui.panel.Panel</a></li>
+<li><a href="#!/api/jqGui.panel.ToolButton" rel="jqGui.panel.ToolButton" class="docClass">jqGui.panel.ToolButton</a></li>
+</ul>
+<h3>tab</h3>
+<ul class='links'>
+<li><a href="#!/api/jqGui.tab.Bar" rel="jqGui.tab.Bar" class="docClass">jqGui.tab.Bar</a></li>
+<li><a href="#!/api/jqGui.tab.Panel" rel="jqGui.tab.Panel" class="docClass">jqGui.tab.Panel</a></li>
+<li><a href="#!/api/jqGui.tab.Tab" rel="jqGui.tab.Tab" class="docClass">jqGui.tab.Tab</a></li>
 </ul>
 <h3>template</h3>
 <ul class='links'>
-<li><a href="#!/api/jqc.template.LoDash" rel="jqc.template.LoDash" class="docClass">jqc.template.LoDash</a></li>
-<li><a href="#!/api/jqc.template.Template" rel="jqc.template.Template" class="docClass">jqc.template.Template</a></li>
+<li><a href="#!/api/jqGui.template.LoDash" rel="jqGui.template.LoDash" class="docClass">jqGui.template.LoDash</a></li>
+<li><a href="#!/api/jqGui.template.Template" rel="jqGui.template.Template" class="docClass">jqGui.template.Template</a></li>
+</ul>
+<h3>util</h3>
+<ul class='links'>
+<li><a href="#!/api/jqGui.util.CallbackList" rel="jqGui.util.CallbackList" class="docClass">jqGui.util.CallbackList</a></li>
+<li><a href="#!/api/jqGui.util.CollectionBindable" rel="jqGui.util.CollectionBindable" class="docClass">jqGui.util.CollectionBindable</a></li>
+<li><a href="#!/api/jqGui.util.Css" rel="jqGui.util.Css" class="docClass">jqGui.util.Css</a></li>
+<li><a href="#!/api/jqGui.util.Html" rel="jqGui.util.Html" class="docClass">jqGui.util.Html</a></li>
+<li><a href="#!/api/jqGui.util.ModelBindable" rel="jqGui.util.ModelBindable" class="docClass">jqGui.util.ModelBindable</a></li>
+<li><a href="#!/api/jqGui.util.OptionsStore" rel="jqGui.util.OptionsStore" class="docClass">jqGui.util.OptionsStore</a></li>
 </ul>
 </div>
 <div class='right-column'>
-<h3>util</h3>
+<h3>view</h3>
 <ul class='links'>
-<li><a href="#!/api/jqc.util.Css" rel="jqc.util.Css" class="docClass">jqc.util.Css</a></li>
-<li><a href="#!/api/jqc.util.Html" rel="jqc.util.Html" class="docClass">jqc.util.Html</a></li>
-<li><a href="#!/api/jqc.util.OptionsStore" rel="jqc.util.OptionsStore" class="docClass">jqc.util.OptionsStore</a></li>
+<li><a href="#!/api/jqGui.view.Collection" rel="jqGui.view.Collection" class="docClass">jqGui.view.Collection</a></li>
+<li><a href="#!/api/jqGui.view.Model" rel="jqGui.view.Model" class="docClass">jqGui.view.Model</a></li>
 </ul>
 <h3>Others...</h3>
 <ul class='links'>
-<li><a href="#!/api/jqc.Component" rel="jqc.Component" class="docClass">jqc.Component</a></li>
-<li><a href="#!/api/jqc.ComponentManager" rel="jqc.ComponentManager" class="docClass">jqc.ComponentManager</a></li>
-<li><a href="#!/api/jqc.Container" rel="jqc.Container" class="docClass">jqc.Container</a></li>
-<li><a href="#!/api/jqc.Image" rel="jqc.Image" class="docClass">jqc.Image</a></li>
-<li><a href="#!/api/jqc.Jqc" rel="jqc.Jqc" class="docClass">jqc.Jqc</a></li>
-<li><a href="#!/api/jqc.Label" rel="jqc.Label" class="docClass">jqc.Label</a></li>
-<li><a href="#!/api/jqc.Mask" rel="jqc.Mask" class="docClass">jqc.Mask</a></li>
-<li><a href="#!/api/jqc.Overlay" rel="jqc.Overlay" class="docClass">jqc.Overlay</a></li>
-<li><a href="#!/api/jqc.Viewport" rel="jqc.Viewport" class="docClass">jqc.Viewport</a></li>
-<li><a href="#!/api/jqc.anim.Animation" rel="jqc.anim.Animation" class="docClass">jqc.anim.Animation</a></li>
-<li><a href="#!/api/jqc.button.Button" rel="jqc.button.Button" class="docClass">jqc.button.Button</a></li>
-<li><a href="#!/api/jqc.plugin.Plugin" rel="jqc.plugin.Plugin" class="docClass">jqc.plugin.Plugin</a></li>
-<li><a href="#!/api/jqc.view.Collection" rel="jqc.view.Collection" class="docClass">jqc.view.Collection</a></li>
-<li><a href="#!/api/jqc.window.Window" rel="jqc.window.Window" class="docClass">jqc.window.Window</a></li>
+<li><a href="#!/api/jqGui.Anchor" rel="jqGui.Anchor" class="docClass">jqGui.Anchor</a></li>
+<li><a href="#!/api/jqGui.Component" rel="jqGui.Component" class="docClass">jqGui.Component</a></li>
+<li><a href="#!/api/jqGui.ComponentManager" rel="jqGui.ComponentManager" class="docClass">jqGui.ComponentManager</a></li>
+<li><a href="#!/api/jqGui.ComponentQuery" rel="jqGui.ComponentQuery" class="docClass">jqGui.ComponentQuery</a></li>
+<li><a href="#!/api/jqGui.Container" rel="jqGui.Container" class="docClass">jqGui.Container</a></li>
+<li><a href="#!/api/jqGui.Image" rel="jqGui.Image" class="docClass">jqGui.Image</a></li>
+<li><a href="#!/api/jqGui.JqGui" rel="jqGui.JqGui" class="docClass">jqGui.JqGui</a></li>
+<li><a href="#!/api/jqGui.Label" rel="jqGui.Label" class="docClass">jqGui.Label</a></li>
+<li><a href="#!/api/jqGui.Mask" rel="jqGui.Mask" class="docClass">jqGui.Mask</a></li>
+<li><a href="#!/api/jqGui.Overlay" rel="jqGui.Overlay" class="docClass">jqGui.Overlay</a></li>
+<li><a href="#!/api/jqGui.Viewport" rel="jqGui.Viewport" class="docClass">jqGui.Viewport</a></li>
+<li><a href="#!/api/jqGui.anim.Animation" rel="jqGui.anim.Animation" class="docClass">jqGui.anim.Animation</a></li>
+<li><a href="#!/api/jqGui.button.Button" rel="jqGui.button.Button" class="docClass">jqGui.button.Button</a></li>
+<li><a href="#!/api/jqGui.plugin.Plugin" rel="jqGui.plugin.Plugin" class="docClass">jqGui.plugin.Plugin</a></li>
+<li><a href="#!/api/jqGui.window.Window" rel="jqGui.window.Window" class="docClass">jqGui.window.Window</a></li>
 </ul>
 </div>
 <div style='clear:both'></div>
@@ -157,7 +186,7 @@
         </div>
 
   
-  <div id='footer-content' style='display: none'>Generated on Mon 08 Apr 2013 23:38:21 by <a href='https://github.com/senchalabs/jsduck'>JSDuck</a> 4.7.1.</div>
+  <div id='footer-content' style='display: none'>Generated on Mon 23 Sep 2013 23:52:31 by <a href='https://github.com/senchalabs/jsduck'>JSDuck</a> 4.7.1.</div>
 
   
 

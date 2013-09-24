@@ -19,149 +19,124 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqc/util/Html',
-	'jqc/ComponentManager',
-	'jqc/form/field/Field',
-	'jqc/form/field/Text.EmptyTextBehavior',
-	'jqc/form/field/Text.InfieldLabelBehavior'
-], function( jQuery, _, Html, ComponentManager, Field, EmptyTextBehavior, InfieldLabelBehavior ) {
+	'jqGui/util/Html',
+	'jqGui/ComponentManager',
+	'jqGui/form/field/Field'
+], function( jQuery, _, Html, ComponentManager, Field ) {
 	
-<span id='jqc-form-field-Text'>	/**
-</span>	 * @class jqc.form.field.Text
-	 * @extends jqc.form.field.Field
+<span id='jqGui-form-field-Text'>	/**
+</span>	 * @class jqGui.form.field.Text
+	 * @extends jqGui.form.field.Field
+	 * @alias type.textfield
 	 * 
-	 * Text (string) field component for the editor.
+	 * Text field component.
 	 */
 	var TextField = Field.extend( {
 		
-<span id='jqc-form-field-Text-cfg-selectOnFocus'>		/**
+<span id='jqGui-form-field-Text-cfg-selectOnFocus'>		/**
 </span>		 * @cfg {Boolean} selectOnFocus
+		 * 
 		 * True to have the field's text automatically selected when the field is focused. Defaults to false. 
 		 */
 		selectOnFocus : false,
 		
-<span id='jqc-form-field-Text-cfg-labelAlign'>		/**
-</span>		 * @cfg {String} labelAlign
-		 * A string that specifies where the field's label should be placed. Valid values are: &quot;left&quot;, &quot;top&quot;, 
-		 * and &quot;infield&quot;. The &quot;infield&quot; label position places the label inside the text field itself, which 
-		 * is then hidden when the user starts typing into the field. Defaults to 'left'.
-		 * 
-		 * Note that a labelAlign set to &quot;infield&quot; is not compatible with the {@link #emptyText} 
-		 * config. The provided {@link #emptyText} will not be used in this case. 
-		 */
-		
-<span id='jqc-form-field-Text-cfg-emptyText'>		/**
+<span id='jqGui-form-field-Text-cfg-emptyText'>		/**
 </span>		 * @cfg {String} emptyText
-		 * The text to show in the field when the field is empty. When the user focuses the field, this text
-		 * will be removed, allowing the user to type their value. If provided, and no {@link #value} is provided,
-		 * the {@link #value} will be set to this.
 		 * 
-		 * Note that this is not compatible with the {@link #labelAlign} config set to &quot;infield&quot;. See the description of {@link #labelAlign}.
-		 */
-		
-<span id='jqc-form-field-Text-cfg-restoreEmptyText'>		/**
-</span>		 * @cfg {Boolean} restoreEmptyText
-		 * True to enable the restoration of the {@link #emptyText} (if any) when the field loses focus (is blurred), and is empty.
-		 * If this is true, the {@link #emptyText} will be re-applied to the field when it has no value (i.e. it's an
-		 * empty string).  If this is false, the {@link #emptyText} will not be re-applied to the field when it loses 
-		 * focus. Defaults to true.
+		 * The text to show in the field when the field is empty. When the user enters something into the field, this 
+		 * text will be removed. If the field becomes empty again, this text will be re-shown.
 		 * 
-		 * Note: This only applies when the {@link #labelAlign} config is not &quot;infield&quot;. Infield labels cannot have
-		 * an {@link #emptyText} value.
+		 * The implementation of the emptyText itself is an element that is placed over the field when the field is empty.
+		 * This is done instead of putting in &quot;placeholder&quot; text so that the emptyText can easily be styled, and so that
+		 * on older browsers that don't support the HTML5 &quot;placeholder&quot; attribute (IE8), the field doesn't need to have a
+		 * value of the {@link #emptyText}.
 		 */
-		restoreEmptyText : true,
+		emptyText : &quot;&quot;,
 		
-<span id='jqc-form-field-Text-cfg-value'>		/**
+<span id='jqGui-form-field-Text-cfg-value'>		/**
 </span>		 * @cfg {String} value
+		 * 
 		 * The initial value for the field, if any.
 		 */
 		
-<span id='jqc-form-field-Text-cfg-readOnly'>		/**
+<span id='jqGui-form-field-Text-cfg-readOnly'>		/**
 </span>		 * @cfg {Boolean} readOnly
 		 * 
 		 * True to mark the Field as &quot;read only&quot; in the HTML. This prevents the user from editing the Field.
 		 */
 		
-<span id='jqc-form-field-Text-cfg-componentCls'>		/**
+<span id='jqGui-form-field-Text-cfg-componentCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-TextField',
+		componentCls : 'jqGui-form-field-text',
 		
 		
-<span id='jqc-form-field-Text-property-S-inputEl'>		/**
+<span id='jqGui-form-field-Text-property-S-inputEl'>		/**
 </span>		 * @protected
 		 * @property {jQuery} $inputEl
 		 * 
 		 * The &amp;lt;input&amp;gt; element; the text field. Will only be available after render.
 		 */
 		
-<span id='jqc-form-field-Text-property-behaviorState'>		/**
-</span>		 * @private
-		 * @property {jqc.form.field.Text.Behavior} behaviorState
+<span id='jqGui-form-field-Text-property-focused'>		/**
+</span>		 * @protected
+		 * @property {Boolean} focused
 		 * 
-		 * The {@link jqc.form.field.Text.Behavior} object that governs the TextField's behavior.
-		 * This currently applies to either the TextField having an {@link #emptyText} value, 
-		 * or the TextField having an &quot;infield&quot; {@link #labelAlign}.
+		 * Flag which is set to `true` while the TextField is focused.
+		 */
+		focused : false,
+		
+<span id='jqGui-form-field-Text-property-S-emptyTextEl'>		/**
+</span>		 * @protected
+		 * @property {jQuery} $emptyTextEl
+		 * 
+		 * The element that holds the {@link #emptyText}, which is shown over the {@link #$inputEl}
+		 * when the field is empty.
 		 */
 		
 		
-<span id='jqc-form-field-Text-method-initComponent'>		/**
+<span id='jqGui-form-field-Text-method-initComponent'>		/**
 </span>		 * @inheritdoc
 		 */
 		initComponent : function() {
 			this._super( arguments );
 			
 			this.addEvents(
-<span id='jqc-form-field-Text-event-keydown'>				/**
+<span id='jqGui-form-field-Text-event-keydown'>				/**
 </span>				 * Fires when a key is pressed down in the field.
 				 * 
 				 * @event keydown
-				 * @param {jqc.form.field.Field} field This TextField object.
+				 * @param {jqGui.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keydown',
 				
-<span id='jqc-form-field-Text-event-keyup'>				/**
+<span id='jqGui-form-field-Text-event-keyup'>				/**
 </span>				 * Fires when a key is pressed and let up in the field.
 				 * 
 				 * @event keyup
-				 * @param {jqc.form.field.Field} field This TextField object.
+				 * @param {jqGui.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keyup',
 				
-<span id='jqc-form-field-Text-event-keypress'>				/**
+<span id='jqGui-form-field-Text-event-keypress'>				/**
 </span>				 * Fires when a key is pressed in the field.
 				 * 
 				 * @event keypress
-				 * @param {jqc.form.field.Field} field This TextField object.
+				 * @param {jqGui.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keypress'
 			);
 			
-			// Set the TextField's behavior &quot;state&quot;, based on if it is set to have an &quot;infield&quot; label or not.
-			// &quot;infield&quot; labels are incompatible with having a regular default value (i.e. the default showing on top
-			// of the &quot;infield&quot; label does not look right), and thus are mutually exclusive behaviors.
-			if( this.labelAlign === 'infield' ) {
-				this.behaviorState = new InfieldLabelBehavior();
-			} else {
-				this.behaviorState = new EmptyTextBehavior();
-			}
-			
 			// If a value was provided, and it is not a string, convert it to one now. normalizeValue handles all datatypes.
 			this.value = this.normalizeValue( this.value );
-			
-			// If the value is an empty string, and there was emptyText provided, initialize it to the emptyText.
-			// That is what will be displayed in the field (with the appropriate CSS class to make it look like the emptyText).
-			if( this.value === &quot;&quot; &amp;&amp; this.emptyText ) {
-				this.value = this.emptyText;
-			}
 		},
 		
 		
-<span id='jqc-form-field-Text-method-onRender'>		/**
+<span id='jqGui-form-field-Text-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function( container ) {
@@ -181,12 +156,16 @@ define( [
 				keypress : _.bind( this.onKeyPress, this )
 			} );
 			
-			// Call state object's onRender to allow it to implement whatever processing is necessary
-			this.behaviorState.onRender( this );
+			// Set up the empty text element. This element is absolutely positioned in the inputContainer, and is initially hidden.
+			this.$emptyTextEl = jQuery( '&lt;div class=&quot;' + this.componentCls + '-emptyText&quot;&gt;' + this.emptyText + '&lt;/div&gt;' )
+				.on( 'click', function() { $inputEl.focus(); } )  // when the emptyText itself is clicked, focus the text field
+				.appendTo( this.$inputContainerEl );
+			
+			this.handleEmptyText();
 		},
 		
 		
-<span id='jqc-form-field-Text-method-createInputEl'>		/**
+<span id='jqGui-form-field-Text-method-createInputEl'>		/**
 </span>		 * Overridable method for creating the input element for the TextField. This may be overrided in a subclass for
 		 * a different implementation than the regular &amp;lt;input type=&quot;text&quot;&amp;gt; element.  The implementation should
 		 * add the field's &quot;id&quot; ({@link #inputId}) and &quot;name&quot; ({@link #inputName}) properties, and populate the field's
@@ -209,7 +188,7 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Text-method-getInputEl'>		/**
+<span id='jqGui-form-field-Text-method-getInputEl'>		/**
 </span>		 * Retrieves the input element from the TextField. Use only if absolutely needed however, otherwise relying on the public
 		 * interface to this class to perform common tasks such as getting/setting the value, or focusing/blurring the field.  
 		 * This is mainly an accessor for the bevhavior state objects that operate on this class. The input element will not be
@@ -222,7 +201,7 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Text-method-normalizeValue'>		/**
+<span id='jqGui-form-field-Text-method-normalizeValue'>		/**
 </span>		 * Normalizes the value provided to a valid TextField value. Converts undefined/null into an empty string,
 		 * and numbers/booleans/objects into their string form.
 		 * 
@@ -243,8 +222,8 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Text-method-setValue'>		/**
-</span>		 * Implementation of {@link jqc.form.field.Field Field}'s setValue() method, which sets the value to the field.
+<span id='jqGui-form-field-Text-method-setValue'>		/**
+</span>		 * Implementation of {@link jqGui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {String} value The value of the field.
 		 */
@@ -256,9 +235,6 @@ define( [
 				
 			} else {
 				this.$inputEl.val( value );
-				
-				// Allow the TextField's behaviorState to handle the value being set
-				this.behaviorState.onSetValue( this, value );
 			}
 			
 			// Run onchange, to notify listeners of a change
@@ -266,8 +242,8 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Text-method-getValue'>		/**
-</span>		 * Implementation of {@link jqc.form.field.Field Field}'s getValue() method, which returns the value of the field.
+<span id='jqGui-form-field-Text-method-getValue'>		/**
+</span>		 * Implementation of {@link jqGui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the field.
 		 */
@@ -282,17 +258,21 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Text-method-setEmptyText'>		/**
+<span id='jqGui-form-field-Text-method-setEmptyText'>		/**
 </span>		 * Sets the {@link #emptyText} for the Field.
 		 * 
 		 * @param {Mixed} emptyText The empty text to set to the Field.
 		 */
 		setEmptyText : function( emptyText ) {
 			this.emptyText = emptyText;
+			
+			if( this.rendered ) {
+				this.$emptyTextEl.html( emptyText );
+			}
 		},
 		
 		
-<span id='jqc-form-field-Text-method-getEmptyText'>		/**
+<span id='jqGui-form-field-Text-method-getEmptyText'>		/**
 </span>		 * Retrieves the {@link #emptyText} of the Field.
 		 * 
 		 * @return {Mixed} The {@link #emptyText} that was specified for the Field, or set using {@link #setEmptyText}.
@@ -302,7 +282,7 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Text-method-select'>		/**
+<span id='jqGui-form-field-Text-method-select'>		/**
 </span>		 * Selects the text in the TextField.
 		 */
 		select : function() {
@@ -310,21 +290,19 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Text-method-onChange'>		/**
-</span>		 * Extension of onChange template method used to allow the {@link #behaviorState} to handle
-		 * the change event.
+<span id='jqGui-form-field-Text-method-onChange'>		/**
+</span>		 * Extension of onChange template method used to handle the {@link #emptyText}.
 		 *
 		 * @protected
 		 */
 		onChange : function() {
-			// Allow the TextField's behaviorState to handle the change event
-			this.behaviorState.onChange( this );
+			this.handleEmptyText();
 			
 			this._super( arguments );
 		},
 		
 		
-<span id='jqc-form-field-Text-method-focus'>		/**
+<span id='jqGui-form-field-Text-method-focus'>		/**
 </span>		 * Focuses the text field.
 		 * 
 		 * @chainable
@@ -336,7 +314,7 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Text-method-blur'>		/**
+<span id='jqGui-form-field-Text-method-blur'>		/**
 </span>		 * Blurs the text field.
 		 * 
 		 * @chainable
@@ -348,12 +326,12 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Text-method-onFocus'>		/**
+<span id='jqGui-form-field-Text-method-onFocus'>		/**
 </span>		 * @inheritdoc
 		 */
 		onFocus : function() {
-			// Allow the TextField's behaviorState to handle the focus event
-			this.behaviorState.onFocus( this );
+			this.focused = true;
+			this.handleEmptyText();
 			
 			// If the selectOnFocus config is true, select the text
 			if( this.selectOnFocus ) {
@@ -364,62 +342,79 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Text-method-onBlur'>		/**
+<span id='jqGui-form-field-Text-method-onBlur'>		/**
 </span>		 * @inheritdoc
 		 */
 		onBlur : function() {
-			// Allow the TextField's behaviorState to handle the blur event
-			this.behaviorState.onBlur( this );
+			this.focused = false;
+			this.handleEmptyText();
 			
 			this._super( arguments );
 		},
 		
 		
-<span id='jqc-form-field-Text-method-onKeyDown'>		/**
+<span id='jqGui-form-field-Text-method-isFocused'>		/**
+</span>		 * Determines if the TextField is currently focused.
+		 * 
+		 * @return {Boolean} `true` if the TextField is currently focused, false otherwise.
+		 */
+		isFocused : function() {
+			return this.focused;
+		},
+		
+		
+<span id='jqGui-form-field-Text-method-onKeyDown'>		/**
 </span>		 * Handles a keydown event in the text field. 
 		 * 
 		 * @protected
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyDown : function( evt ) {
-			// Allow the TextField's behaviorState to handle the keydown event
-			this.behaviorState.onKeyDown( this, evt );
-			
 			this.fireEvent( 'keydown', this, evt ); 
 		},
 		
 		
-<span id='jqc-form-field-Text-method-onKeyUp'>		/**
+<span id='jqGui-form-field-Text-method-onKeyUp'>		/**
 </span>		 * Handles a keyup event in the text field. 
 		 * 
 		 * @protected
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyUp : function( evt ) {
-			// Allow the TextField's behaviorState to handle the keyup event
-			this.behaviorState.onKeyUp( this, evt );
-			
 			this.fireEvent( 'keyup', this, evt );
 		},
 		
 		
-<span id='jqc-form-field-Text-method-onKeyPress'>		/**
+<span id='jqGui-form-field-Text-method-onKeyPress'>		/**
 </span>		 * Handles a keypress in the text field. 
 		 * 
 		 * @protected
 		 * @param {jQuery.Event} evt The jQuery event object for the event.
 		 */
 		onKeyPress : function( evt ) {
-			// Allow the TextField's behaviorState to handle the keypress event
-			this.behaviorState.onKeyPress( this, evt );
-			
 			this.fireEvent( 'keypress', this, evt ); 
+		},
+		
+		
+		// ---------------------------------------
+		
+		// Empty Text Handling Utility Methods
+		
+<span id='jqGui-form-field-Text-method-handleEmptyText'>		/**
+</span>		 * Checks the TextField to see if it's empty, and if so shows the {@link #emptyText}.
+		 * 
+		 * @protected
+		 */
+		handleEmptyText : function() {
+			if( this.rendered ) {
+				// Field is not focused and its value is empty, show the empty text. Otherwise, hide it.
+				this.$emptyTextEl[ ( !this.focused &amp;&amp; this.getValue() === &quot;&quot; ) ? 'show' : 'hide' ]();
+			}
 		}
 		
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'textfield'
 	ComponentManager.registerType( 'textfield', TextField );
 
 	return TextField;

@@ -17,32 +17,34 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">/*global define */
 define( [
+	'require',
 	'jquery',
 	'lodash',
 	'Class',
-	'jqc/Jqc',
+	'jqGui/JqGui',
 	'Observable',
-	'jqc/ComponentManager',
-	'jqc/util/Css',
-	'jqc/util/Html',
-	'jqc/Mask',
-	'jqc/anim/Animation',
-	'jqc/plugin/Plugin',
-	'jqc/template/Template',
-	'jqc/template/LoDash'
+	'jqGui/util/Css',
+	'jqGui/util/Html',
+	'jqGui/Mask',
+	'jqGui/anim/Animation',
+	'jqGui/plugin/Plugin',
+	'jqGui/template/Template',
+	'jqGui/template/LoDash',
+	'jqGui/ComponentManager'   // circular dependency. used via require() call in code below
 ],
-function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
+function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
 
-<span id='jqc-Component'>	/**
-</span>	 * @class jqc.Component
+<span id='jqGui-Component'>	/**
+</span>	 * @class jqGui.Component
 	 * @extends Observable
+	 * @alias type.component
 	 * 
 	 * Generalized component that defines a displayable item that can be placed onto a page. Provides a base element (by default, a div),
 	 * and a framework for the instantiation, rendering, and (eventually) the destruction process, with events that can be listened to
 	 * each step of the way.
 	 * 
 	 * Components can be constructed via anonymous config objects, based on their `type` property. This is useful for defining components in
-	 * an anonymous object, when added as items of a {@link jqc.Container}.
+	 * an anonymous object, when added as items of a {@link jqGui.Container}.
 	 * 
 	 * Some other things to note about Component and its subclasses are:
 	 * 
@@ -55,21 +57,13 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 	 */
 	var Component = Class.extend( Observable, { 
 		
-<span id='jqc-Component-cfg-id'>		/**
+<span id='jqGui-Component-cfg-id'>		/**
 </span>		 * @cfg {String} id
 		 *  
-		 * The id that identifies this Component instance. Defaults to a unique id, and may be retrieved by {@link #getId}. 
-		 * This component is retrievable from a {@link jqc.Container} via {@link jqc.Container#findById}.
-		 */
-		 
-<span id='jqc-Component-cfg-elId'>		/**
-</span>		 * @cfg {String} elId
-		 * 
-		 * The id that should be used for the Component's element. Defaults to a unique id.
-		 * If this config is not provided, the unique id is generated when the Component is {@link #method-render rendered}.
+		 * The id that identifies this Component instance. Defaults to a unique id, and may be retrieved by {@link #getId}.
 		 */
 		
-<span id='jqc-Component-cfg-elType'>		/**
+<span id='jqGui-Component-cfg-elType'>		/**
 </span>		 * @cfg {String} elType
 		 * 
 		 * The element type that should be created as the Component's HTML element. For example, the string
@@ -78,21 +72,21 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 */
 		elType : 'div',
 		 
-<span id='jqc-Component-cfg-renderTo'>		/**
+<span id='jqGui-Component-cfg-renderTo'>		/**
 </span>		 * @cfg {jQuery/HTMLElement} renderTo 
 		 * 
 		 * The HTML element to render this component to. If specified, the component will be rendered immediately 
 		 * upon creation.
 		 */
 		
-<span id='jqc-Component-cfg-hidden'>		/**
+<span id='jqGui-Component-cfg-hidden'>		/**
 </span>		 * @cfg {Boolean} hidden
 		 * 
 		 * True to initially render the Component hidden.
 		 */
 		hidden : false,
 		
-<span id='jqc-Component-cfg-baseCls'>		/**
+<span id='jqGui-Component-cfg-baseCls'>		/**
 </span>		 * @protected
 		 * @cfg {String} baseCls
 		 * 
@@ -100,14 +94,14 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * is applied to the Component's {@link #$el element}. 
 		 * 
 		 * The value of this config, by convention, is also used to prefix descendent elements of a Component subclass. For 
-		 * example, {@link jqc.panel.Panel Panel} sets this config to 'jqc-Panel', and its header and body elements are prefixed with 
-		 * this to become 'jqc-Panel-header' and 'jqc-Panel-body', respectively. However when a {@link jqc.window.Window Window} is 
-		 * created (which is a subclass of {@link jqc.panel.Panel Panel}, the value is 'jqc-Window', and the header and body become 
-		 * 'jqc-Window-header' and 'jqc-Window-body' instead.
+		 * example, {@link jqGui.panel.Panel Panel} sets this config to 'jqGui-panel', and its header and body elements are prefixed with 
+		 * this to become 'jqGui-panel-header' and 'jqGui-panel-body', respectively. However when a {@link jqGui.window.Window Window} is 
+		 * created (which is a subclass of {@link jqGui.panel.Panel Panel}, the value is 'jqGui-window', and the header and body become 
+		 * 'jqGui-window-header' and 'jqGui-window-body' instead.
 		 */
-		baseCls : 'jqc-Component',
+		baseCls : 'jqGui-component',
 		
-<span id='jqc-Component-cfg-componentCls'>		/**
+<span id='jqGui-Component-cfg-componentCls'>		/**
 </span>		 * @protected
 		 * @cfg {String} componentCls
 		 * 
@@ -115,14 +109,14 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * This is used for subclasses whose parent defines a {@link #baseCls}, but then have to add additional styling
 		 * themselves. 
 		 * 
-		 * For example, the base form {@link jqc.form.field.Field Field} class adds the {@link #baseCls} 'jqc-form-Field', and
-		 * the {@link jqc.form.field.Text Text} field subclass wants to keep that class, and also add 'jqc-form-TextField'
-		 * to allow for any different styling of that particular subclass component. The result is two css classes:
-		 * 'jqc-form-Field' and 'jqc-form-TextField'. In the case of {@link jqc.form.field.TextArea TextArea} (a subclass
-		 * of the Text field}, its componentCls is 'jqc-form-TextAreaField', which overrides Text field's componentCls.
+		 * For example, the base form {@link jqGui.form.field.Field Field} class adds the {@link #baseCls} 'jqGui-form-field', and
+		 * the {@link jqGui.form.field.Text TextField} subclass wants to keep that class, and also add 'jqGui-form-field-text'
+		 * to allow for any different styling of that particular subclass. The result is two css classes: 'jqGui-form-field' 
+		 * and 'jqGui-form-field-text'. In the case of {@link jqGui.form.field.TextArea TextAreaField} (a subclass of TextField}, 
+		 * its componentCls is 'jqGui-form-field-textarea', which overrides TextField's componentCls.
 		 */
 		
-<span id='jqc-Component-cfg-cls'>		/**
+<span id='jqGui-Component-cfg-cls'>		/**
 </span>		 * @cfg {String} cls
 		 * 
 		 * Any additional CSS class(es) to add to this component's element. If multiple, they should be separated by a space. 
@@ -131,7 +125,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 */
 		cls: '',
 		
-<span id='jqc-Component-cfg-style'>		/**
+<span id='jqGui-Component-cfg-style'>		/**
 </span>		 * @cfg {Object} style
 		 * 
 		 * Any additional CSS style(s) to apply to the outer div element. Should be an object where the keys are the CSS 
@@ -144,7 +138,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 *     }
 		 */
 		
-<span id='jqc-Component-cfg-attr'>		/**
+<span id='jqGui-Component-cfg-attr'>		/**
 </span>		 * @cfg {Object} attr
 		 * 
 		 * Any additional html attributes to apply to the outer div element. Should be an object where the keys are the attribute names, and the values are the 
@@ -152,9 +146,9 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 */
 		
 		
-<span id='jqc-Component-cfg-renderTpl'>		/**
+<span id='jqGui-Component-cfg-renderTpl'>		/**
 </span>		 * @protected
-		 * @cfg {String/String[]/Function/jqc.template.LoDash} renderTpl
+		 * @cfg {String/String[]/Function/jqGui.template.LoDash} renderTpl
 		 * 
 		 * The template to use to render the Component's **internal** structure. This is used for Component subclasses to
 		 * generate the markup that will make up the Component's structure that does not change. This is opposed to the {@link #tpl}
@@ -168,7 +162,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * that should be the target of the {@link #html}, {@link #contentEl}, and {@link #tpl} configs. For example:
 		 * 
 		 *     renderTpl : new LoDashTpl( [
-		 *         '&lt;div id=&quot;&lt;%= elId %&gt;-titlebar&quot;&gt;',  // `elId` var is automatically provided in the {@link #renderTplData}, from the {@link #elId} config - See {@link #renderTplData}
+		 *         '&lt;div id=&quot;&lt;%= elId %&gt;-titlebar&quot;&gt;',  // `elId` var is automatically provided in the {@link #renderTplData}, from the unique {@link #elId} property - See {@link #renderTplData}
 		 *             '&lt;%= title %&gt;',                 // `title` var would need to be provided in the {@link #renderTplData} by subclass
 		 *         '&lt;/div&gt;',
 		 *         '&lt;div id=&quot;&lt;%= elId %&gt;-body&quot;&gt;&lt;/div&gt;'
@@ -181,15 +175,15 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * If, for example, the {@link #html} config is provided, then the value of the config will be placed into the &quot;body&quot; div.
 		 * 
 		 * 
-		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqc.template.Template} 
-		 * instance. For the string, array of strings, or function form, a {@link jqc.template.LoDash LoDash template} instance will be 
-		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqc.template.Template} 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqGui.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link jqGui.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqGui.template.Template} 
 		 * subclass to this config. 
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
 		 */
 		
-<span id='jqc-Component-cfg-renderTplData'>		/**
+<span id='jqGui-Component-cfg-renderTplData'>		/**
 </span>		 * @protected
 		 * @cfg {Object} renderTplData
 		 * 
@@ -213,16 +207,16 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * A set of common properties will always be available on this object for the {@link #renderTpl} (which are supplied by the 
 		 * {@link #getRenderTplData} method), including:
 		 * 
-		 * - **elId**: The value of the {@link #elId} config, or its auto-generated value.
+		 * - **elId**: The value of the {@link #elId} property (an auto-generated, unique value).
 		 * - **baseCls**: The {@link #baseCls} config, which is the base CSS class to prefix descendent elements' CSS
-		 *   classes with. Ex: a {@link #baseCls} of 'jqc-Panel' is used to prefix a {@link jqc.panel.Panel Panel's} body
-		 *   element to become 'jqc-Panel-body', but when a {@link jqc.window.Window Window} is created, the value is
-		 *   'jqc-Window', and the body becomes 'jqc-Window-body' instead. 
+		 *   classes with. Ex: a {@link #baseCls} of 'jqGui-panel' is used to prefix a {@link jqGui.panel.Panel Panel's} body
+		 *   element to become 'jqGui-panel-body', but when a {@link jqGui.window.Window Window} is created, the value is
+		 *   'jqGui-window', and the body becomes 'jqGui-window-body' instead. 
 		 * - **componentCls**: The {@link #componentCls} config.
 		 */
 		
 		
-<span id='jqc-Component-cfg-html'>		/**
+<span id='jqGui-Component-cfg-html'>		/**
 </span>		 * @cfg {String} html
 		 * Any explicit HTML to attach to the Component at render time.
 		 * 
@@ -230,7 +224,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * from the client code's side for adding explict HTML to the Component.
 		 */
 		
-<span id='jqc-Component-cfg-contentEl'>		/**
+<span id='jqGui-Component-cfg-contentEl'>		/**
 </span>		 * @cfg {HTMLElement/jQuery} contentEl
 		 * An existing element or jQuery wrapped set to place into the Component when it is rendered, which will become
 		 * the &quot;content&quot; of the Component.  The element will be moved from its current location in the DOM to inside this
@@ -240,8 +234,8 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * client code's side for adding DOM elements to the Component.
 		 */
 		
-<span id='jqc-Component-cfg-tpl'>		/**
-</span>		 * @cfg {String/String[]/Function/jqc.template.Template} tpl
+<span id='jqGui-Component-cfg-tpl'>		/**
+</span>		 * @cfg {String/String[]/Function/jqGui.template.Template} tpl
 		 * 
 		 * The template to use as the HTML template of the Component. 
 		 * 
@@ -253,15 +247,15 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * outputs can be updated with new data by using the {@link #update} method, and providing an Object as its first argument.
 		 * 
 		 * 
-		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqc.template.Template} 
-		 * instance. For the string, array of strings, or function form, a {@link jqc.template.LoDash LoDash template} instance will be 
-		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqc.template.Template} 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqGui.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link jqGui.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqGui.template.Template} 
 		 * subclass to this config. 
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
 		 */
 		
-<span id='jqc-Component-cfg-tplData'>		/**
+<span id='jqGui-Component-cfg-tplData'>		/**
 </span>		 * @cfg {Object} tplData
 		 * 
 		 * The data to provide to the {@link #tpl} when initially rendering the Component. If this config is not
@@ -274,58 +268,58 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 */
 		
 		
-<span id='jqc-Component-cfg-height'>		/**
+<span id='jqGui-Component-cfg-height'>		/**
 </span>		 * @cfg {Number/String} height
 		 * A height to give the Component. Accepts a number (for the number of pixels) or any valid CSS string. Defaults to automatic sizing. 
 		 */
 		
-<span id='jqc-Component-cfg-width'>		/**
+<span id='jqGui-Component-cfg-width'>		/**
 </span>		 * @cfg {Number/String} width
 		 * A width to give the Component. Accepts a number (for the number of pixels) or any valid CSS string. Defaults to automatic sizing. 
 		 */
 		
-<span id='jqc-Component-cfg-minHeight'>		/**
+<span id='jqGui-Component-cfg-minHeight'>		/**
 </span>		 * @cfg {Number/String} minHeight
 		 * A minimum height to give the Component. Accepts a number (for the number of pixels) or any valid CSS string. Defaults to automatic sizing. 
 		 */
 		
-<span id='jqc-Component-cfg-minWidth'>		/**
+<span id='jqGui-Component-cfg-minWidth'>		/**
 </span>		 * @cfg {Number/String} minWidth
 		 * A minimum width to give the Component. Accepts a number (for the number of pixels) or any valid CSS string. Defaults to automatic sizing. 
 		 */
 		
-<span id='jqc-Component-cfg-maxHeight'>		/**
+<span id='jqGui-Component-cfg-maxHeight'>		/**
 </span>		 * @cfg {Number/String} maxHeight
 		 * A maximum height to give the Component. Accepts a number (for the number of pixels) or any valid CSS string. Defaults to automatic sizing. 
 		 */
 		
-<span id='jqc-Component-cfg-maxWidth'>		/**
+<span id='jqGui-Component-cfg-maxWidth'>		/**
 </span>		 * @cfg {Number/String} maxWidth
 		 * A maximum width to give the Component. Accepts a number (for the number of pixels) or any valid CSS string. Defaults to automatic sizing. 
 		 */
 		
 		
-<span id='jqc-Component-cfg-maskConfig'>		/**
+<span id='jqGui-Component-cfg-maskConfig'>		/**
 </span>		 * @cfg {Object} maskConfig A configuration object for the default mask that will be shown when the {@link #mask} method is called (if {@link #mask mask's}
 		 * argument is omitted), or if the {@link #cfg-masked} configuration option is true (in which a mask will be shown over the Component, using this maskConfig, 
 		 * when it is first rendered).  This default maskConfig can be overrided when calling {@link #mask} by passing a configuration object for its argument.
 		 * 
 		 * Masks are shown and hidden using the {@link #mask} and {@link #unMask} methods. If this configuration option is not provided, the configuration
-		 * options default to the default values of the configuration options for {@link jqc.Mask}.
+		 * options default to the default values of the configuration options for {@link jqGui.Mask}.
 		 */
 		
-<span id='jqc-Component-cfg-masked'>		/**
+<span id='jqGui-Component-cfg-masked'>		/**
 </span>		 * @cfg {Boolean} masked True to instantiate the Component with its mask shown (the {@link #mask} method is automatically run when the Component
 		 * is rendered).
 		 */
 		masked : false,
 		
 		
-<span id='jqc-Component-cfg-plugins'>		/**
-</span>		 * @cfg {jqc.plugin.Plugin/jqc.plugin.Plugin[]} plugins
+<span id='jqGui-Component-cfg-plugins'>		/**
+</span>		 * @cfg {jqGui.plugin.Plugin/jqGui.plugin.Plugin[]} plugins
 		 * 
-		 * A single plugin or array of plugins to attach to the Component. Plugins must extend the class {@link jqc.plugin.Plugin}.
-		 * See {@link jqc.plugin.Plugin} for details on creating plugins.
+		 * A single plugin or array of plugins to attach to the Component. Plugins must extend the class {@link jqGui.plugin.Plugin}.
+		 * See {@link jqGui.plugin.Plugin} for details on creating plugins.
 		 * 
 		 * Note that Component will normalize this config into an array, converting a single plugin into a one-element array, or creating
 		 * an empty array if no plugins were provided.  This is done so that subclasses may add plugins by pushing them directly
@@ -333,24 +327,38 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 */
 		
 		
-		
-<span id='jqc-Component-property-uuid'>		/**
-</span>		 * @private
-		 * @property {Number} uuid
+<span id='jqGui-Component-cfg-parentContainer'>		/**
+</span>		 * @protected
+		 * @cfg {jqGui.Container} parentContainer
 		 * 
-		 * A globally unique identifier for the Component, which is different between all {@link jqc.Container} heirarchies.
-		 */
-		
-<span id='jqc-Component-cfg-parentContainer'>		/**
-</span>		 * @private
-		 * @cfg {jqc.Container} parentContainer
-		 * 
-		 * The parent {@link jqc.Container Container} of this Component (if any). This is set by the {@link jqc.Container} that is adding this Component
-		 * as a child, and should not be supplied directly.
+		 * The parent {@link jqGui.Container Container} of this Component (if any), which this Component is a child of. This is set 
+		 * by the {@link jqGui.Container Container} that is adding this Component as a child, and should not be supplied directly.
 		 */
 		parentContainer: null,
-	 
-<span id='jqc-Component-property-rendered'>		/**
+		
+		
+<span id='jqGui-Component-property-uuid'>		/**
+</span>		 * @private
+		 * @property {String} uuid (readonly)
+		 * 
+		 * A unique identifier for the Component, which is unique among all Components on a given page. Can be
+		 * retrieved with {@link #getUuid}.
+		 */
+		 
+<span id='jqGui-Component-property-elId'>		/**
+</span>		 * @protected
+		 * @property {String} elId (readonly)
+		 * 
+		 * The unique id that is generated for the Component's {@link #$el element}. This is different than {@link #id} so that 
+		 * each Component is always guaranteed to have a unique ID for its {@link #$el element}. 
+		 * 
+		 * Component subclasses often query the DOM for the elements that they create in a {@link #renderTpl} based on this elId. 
+		 * If we only used {@link #id} to uniquely identify elements, then there would be the possibility that the user could
+		 * accidentally create two components with the same {@link #id}, in which case the second Component would actually 
+		 * query and be operating on the DOM elements created for the first Component by mistake.
+		 */
+		
+<span id='jqGui-Component-property-rendered'>		/**
 </span>		 * @protected
 		 * @property {Boolean} rendered
 		 * 
@@ -359,10 +367,15 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 */
 		rendered: false,
 		
+<span id='jqGui-Component-property-S-el'>		/**
+</span>		 * @protected
+		 * @property {jQuery} $el
+		 * 
+		 * The main element that is created for the Component (determined by the {@link #elType} config). 
+		 * This will be available after the Component is rendered, and may be retrieved using {@link #getEl}
+		 */
 		
-		
-		
-<span id='jqc-Component-property-hidden'>		/**
+<span id='jqGui-Component-property-hidden'>		/**
 </span>		 * @private
 		 * @property {Boolean} hidden
 		 * 
@@ -375,7 +388,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * may be tested for with the `checkDom` parameter that {@link #isHidden} provides.
 		 */
 	
-<span id='jqc-Component-property-showing'>		/**
+<span id='jqGui-Component-property-showing'>		/**
 </span>		 * @private
 		 * @property {Boolean} showing
 		 * 
@@ -384,7 +397,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 */
 		showing : false,
 	
-<span id='jqc-Component-property-hiding'>		/**
+<span id='jqGui-Component-property-hiding'>		/**
 </span>		 * @private
 		 * @property {Boolean} hiding
 		 * 
@@ -393,9 +406,9 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 */
 		hiding : false,
 	
-<span id='jqc-Component-property-currentAnimation'>		/**
+<span id='jqGui-Component-property-currentAnimation'>		/**
 </span>		 * @private
-		 * @property {jqc.anim.Animation} currentAnimation
+		 * @property {jqGui.anim.Animation} currentAnimation
 		 * 
 		 * The currently running {@link #method-show}/{@link #method-hide} animation, if any. Will be null if the Component
 		 * is not currently in the process of showing or hiding. This is only relevant when {@link #method-show} or
@@ -404,33 +417,33 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		currentAnimation : null,
 		
 		
-<span id='jqc-Component-property-masked'>		/**
+<span id='jqGui-Component-property-masked'>		/**
 </span>		 * @protected
 		 * @property {Boolean} masked
 		 * 
 		 * Flag to store the current state of if the Component is masked or not. This is also a config option.
 		 */
 		
-<span id='jqc-Component-property-deferMaskShow'>		/**
+<span id='jqGui-Component-property-deferMaskShow'>		/**
 </span>		 * @private
 		 * @property {Boolean} deferMaskShow
 		 * 
 		 * Flag that is set to true if the {@link #mask} method is run, but the Component is currently hidden.
-		 * The Component must be in a visible state to show the mask, as the jqc.Mask class makes a calculation of 
+		 * The Component must be in a visible state to show the mask, as the jqGui.Mask class makes a calculation of 
 		 * the height of the mask target element.  When the Component's {@link #method-show} method runs, this flag will be
 		 * tested to see if it is true, and if so, will run the {@link #mask} method at that time.
 		 */
 		deferMaskShow : false,
 		
-<span id='jqc-Component-property-_mask'>		/**
+<span id='jqGui-Component-property-_mask'>		/**
 </span>		 * @private
-		 * @property {jqc.Mask} _mask
+		 * @property {jqGui.Mask} _mask
 		 * 
-		 * The jqc.Mask instance that the Component is currently using to mask over the Component. This will be null
-		 * if no jqc.Mask has been created (i.e. the {@link #mask} method has never been called). 
+		 * The jqGui.Mask instance that the Component is currently using to mask over the Component. This will be null
+		 * if no jqGui.Mask has been created (i.e. the {@link #mask} method has never been called). 
 		 */
 		
-<span id='jqc-Component-property-deferredMaskConfig'>		/**
+<span id='jqGui-Component-property-deferredMaskConfig'>		/**
 </span>		 * @private
 		 * @property {Object} deferredMaskConfig
 		 * 
@@ -439,7 +452,8 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * for when the mask does in fact get shown.
 		 */
 		
-<span id='jqc-Component-property-updateCalledWithContent'>		/**
+		
+<span id='jqGui-Component-property-updateCalledWithContent'>		/**
 </span>		 * @protected
 		 * @property {Boolean} updateCalledWithContent
 		 * 
@@ -448,26 +462,32 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * value of `true` tells the {@link #method-render} method to skip rendering the {@link #tpl}, and instead use the direct 
 		 * {@link #html} content that was provided to the call to {@link #update}.
 		 */
+
 		
+<span id='jqGui-Component-property-destroying'>		/**
+</span>		 * @protected
+		 * @property {Boolean} destroying
+		 * 
+		 * Property which is set to `true` while the {@link #method-destroy} method executes. This is mainly for the
+		 * {@link #onDestroy} hook method, which may call other methods that may want to determine if the Component is 
+		 * destroying itself, in order to avoid doing unnecessary work.
+		 * 
+		 * An example of this would be a method that resets the Component's element to an &quot;empty&quot; state due to unbinding
+		 * itself from a data entity, but really shouldn't do so when the Component's element is just going to be removed 
+		 * from the DOM anyway. 
+		 */
+		destroying: false,
 		
-<span id='jqc-Component-property-destroyed'>		/**
+<span id='jqGui-Component-property-destroyed'>		/**
 </span>		 * @protected
 		 * @property {Boolean} destroyed
 		 * 
-		 * Initially false, and will be set to true after the {@link #method-destroy} method executes.
+		 * Initially `false`, and will be set to `true` after the {@link #method-destroy} method executes.
 		 */
 		destroyed: false,
 		
-<span id='jqc-Component-property-S-el'>		/**
-</span>		 * @protected
-		 * @property {jQuery} $el
-		 * 
-		 * The main element that is created for the Component (determined by the {@link #elType} config). 
-		 * This will be available after the Component is rendered, and may be retrieved using {@link #getEl}
-		 */	
 		
-		
-<span id='jqc-Component-method-constructor'>		/**
+<span id='jqGui-Component-method-constructor'>		/**
 </span>		 * @constructor
 		 * @param {Object} config The configuration options for this Component, specified in an object (hash).
 		 */
@@ -482,27 +502,27 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 	        
 			// Add events that this class will fire
 			this.addEvents( 
-<span id='jqc-Component-event-render'>				/**
+<span id='jqGui-Component-event-render'>				/**
 </span>				 * Fires when this Component has been {@link #method-render rendered}.
 				 * 
 				 * @event render
-				 * @param {jqc.Component} component This Component instance.
+				 * @param {jqGui.Component} component This Component instance.
 				 */
 				'render',
 				
-<span id='jqc-Component-event-beforeshow'>				/**
+<span id='jqGui-Component-event-beforeshow'>				/**
 </span>				 * Fires before the Component is shown. Handlers of this event may cancel the showing of the Component by 
 				 * returning false.
 				 * 
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event beforeshow
-				 * @param {jqc.Component} component This Component instance.
+				 * @param {jqGui.Component} component This Component instance.
 				 * @preventable
 				 */
 				'beforeshow',
 				
-<span id='jqc-Component-event-show'>				/**
+<span id='jqGui-Component-event-show'>				/**
 </span>				 * Fires when the Component has been shown, using the {@link #method-show} method. If an `anim` option
 				 * was passed to the {@link #method-show} method, this event fires immediately, just after the beginning of the
 				 * animation. To find out when the animation is complete, listen to the {@link #aftershow} event.
@@ -515,45 +535,45 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 * 
 				 * @event show
-				 * @param {jqc.Component} component This Component instance.
+				 * @param {jqGui.Component} component This Component instance.
 				 */
 				'show',
 	
-<span id='jqc-Component-event-showbegin'>				/**
+<span id='jqGui-Component-event-showbegin'>				/**
 </span>				 * An alias of the {@link #event-show} event, which can make handler-adding code more consistent and clear
 				 * when running animations. Also, having a 'begin' event for 'show' also maintains consistency with {@link #hidebegin}.
 				 * 
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event showbegin
-				 * @param {jqc.Component} component This Component instance.
+				 * @param {jqGui.Component} component This Component instance.
 				 */
 				'showbegin',
 	
-<span id='jqc-Component-event-aftershow'>				/**
+<span id='jqGui-Component-event-aftershow'>				/**
 </span>				 * Fires when the Component has fully shown, after any animation has finished. Note that this
 				 * event will fire regardless of if an `anim` option was provided to the {@link #method-show} method or not.
 				 * 
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event aftershow
-				 * @param {jqc.Component} component This Component instance.
+				 * @param {jqGui.Component} component This Component instance.
 				 */
 				'aftershow',
 				
-<span id='jqc-Component-event-beforehide'>				/**
+<span id='jqGui-Component-event-beforehide'>				/**
 </span>				 * Fires before the Component is hidden. Handlers of this event may cancel the hiding of the Component by 
 				 * returning false.
 				 * 
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event beforehide
-				 * @param {jqc.Component} component This Component instance.
+				 * @param {jqGui.Component} component This Component instance.
 				 * @preventable
 				 */
 				'beforehide',
 	
-<span id='jqc-Component-event-hide'>				/**
+<span id='jqGui-Component-event-hide'>				/**
 </span>				 * Fires when the Component has been hidden, using the {@link #method-hide} method. If an `anim` option was passed
 				 * to the {@link #method-hide} method, this event fires *after* the animation has finished hiding the Component. 
 				 * To find out when a hide animation has started, listen to the {@link #hidebegin} event.
@@ -566,11 +586,11 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 * 
 				 * @event hide
-				 * @param {jqc.Component} component This Component instance.
+				 * @param {jqGui.Component} component This Component instance.
 				 */
 				'hide',
 	
-<span id='jqc-Component-event-hidebegin'>				/**
+<span id='jqGui-Component-event-hidebegin'>				/**
 </span>				 * Fires when the Component is beginning to hide. This event is useful if an `anim` option is specified to the
 				 * {@link #method-hide} method, as it fires just before the animation starts. The {@link #event-hide} 
 				 * (and {@link #afterhide}) event will fire when the animation is complete, and the Component has been completely 
@@ -580,48 +600,46 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event hidebegin
-				 * @param {jqc.Component} component This Component instance.
+				 * @param {jqGui.Component} component This Component instance.
 				 */
 				'hidebegin',
 	
-<span id='jqc-Component-event-afterhide'>				/**
+<span id='jqGui-Component-event-afterhide'>				/**
 </span>				 * An alias of the {@link #event-hide} event, which can make handler-adding code more consistent and clear.
 				 * Having a 'complete' event for 'hide' also maintains consistency with {@link #aftershow}.
 				 * 
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event afterhide
-				 * @param {jqc.Component} component This Component instance.
+				 * @param {jqGui.Component} component This Component instance.
 				 */
 				'afterhide',
 				
-<span id='jqc-Component-event-beforedestroy'>				/**
+<span id='jqGui-Component-event-beforedestroy'>				/**
 </span>				 * Fires just before this Component is destroyed. A handler of this event may return false to cancel 
 				 * the destruction process for the Component.
 				 * 
 				 * @event beforedestroy
-				 * @param {jqc.Component} component This Component instance. 
+				 * @param {jqGui.Component} component This Component instance. 
 				 * @preventable
 				 */
 				'beforedestroy',
 				
-<span id='jqc-Component-event-destroy'>				/**
+<span id='jqGui-Component-event-destroy'>				/**
 </span>				 * Fires when this Component has been destroyed.
 				 * 
 				 * @event destroy
-				 * @param {jqc.Component} component This Component instance.
+				 * @param {jqGui.Component} component This Component instance.
 				 */
 				'destroy'
 			);
 			
 			
-			// Generate a globally unique identifier for the Component, which is unique between all Container hierarchies on the page
-			this.uuid = _.uniqueId();
+			// Generate a globally unique identifier for the Component, which is unique for all Components on the page.
+			// This will also be used as the `elId`, and the default value for the `id` config if one was not provided.
+			this.uuid = this.elId = 'jqGui-cmp-' + _.uniqueId();
+			this.id = this.id || this.uuid;  // default the Component's id to the uuid if not provided
 			
-			
-			// Generate a unique ID for this component (which is the ID for a component in a given Container hierarchy). A unique element 
-			// ID for the component's div element will be created (if not provided) in render().
-			this.id = this.id || 'jqc-cmp-' + _.uniqueId();
 			
 			// Normalize the 'plugins' config into an array before calling initComponent, so that subclasses may just push any
 			// plugins that they wish directly onto the array without extra processing.
@@ -648,22 +666,21 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-initComponent'>		/**
+<span id='jqGui-Component-method-initComponent'>		/**
 </span>		 * Hook method for initialization. This method should replace constructor for subclasses
 		 * of Component.
 		 * 
 		 * @protected
 		 * @method initComponent
 		 */
-		initComponent : Jqc.emptyFn,
+		initComponent : JqGui.emptyFn,
 		
 		
-<span id='jqc-Component-method-initPlugins'>		/**
+<span id='jqGui-Component-method-initPlugins'>		/**
 </span>		 * Initializes the plugins for the Component.
 		 * 
 		 * @private
-		 * @method initPlugins
-		 * @param {jqc.plugin.Plugin/jqc.plugin.Plugin[]} plugin A single plugin, or array of plugins to initialize.
+		 * @param {jqGui.plugin.Plugin/jqGui.plugin.Plugin[]} plugin A single plugin, or array of plugins to initialize.
 		 */
 		initPlugins : function( plugin ) {
 			if( _.isArray( plugin ) ) {
@@ -674,7 +691,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 			}
 			
 			if( !( plugin instanceof Plugin ) ) {
-				throw new Error( &quot;error: a plugin provided to this Component was not of type jqc.plugin.Plugin&quot; );
+				throw new Error( &quot;error: a plugin provided to this Component was not of type jqGui.plugin.Plugin&quot; );
 			}
 			
 			// Initialize the plugin, passing a reference to this Component into it.
@@ -682,13 +699,12 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-render'>		/**
+<span id='jqGui-Component-method-render'>		/**
 </span>		 * Renders the component into a containing HTML element.  Starts by creating the base div element for this component, and then 
 		 * calls the hook method {@link #onRender} to allow subclasses to add their own functionality/elements into the rendering process.
 		 * When fully complete, the {@link #event-render render event is fired}, and then {@link #doLayout} is executed (if the `deferLayout` 
 		 * option is not provided as `true`).
 		 *
-		 * @method render
 		 * @param {HTMLElement/jQuery} containerEl The HTML element to render this component into.
 		 * @param {Object} [options] Any of the following options. (Note: for backward compatibility, this argument may be the `position` option below.)
 		 * @param {String/Number/HTMLElement/jQuery} [options.position] The index, element id, or element that the component should be inserted before.
@@ -742,9 +758,6 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 				}
 				
 			} else {
-				// First, generate an element ID for the component's element, if one has not been provided as a config
-				this.elId = this.elId || 'jqc-cmp-' + _.uniqueId();
-				
 				// Handle any additional attributes (the `attr` config) that were specified to add (or any attributes
 				// added by subclass implementations of getRenderAttributes())
 				var attr = Html.attrMapToString( this.getRenderAttributes() );
@@ -838,7 +851,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 				this.fireEvent( 'render', this );
 				
 				// Finally, if the deferLayout option was not provided as true, run the layout on the Component (or Container, 
-				// if it's a jqc.Container subclass!)
+				// if it's a jqGui.Container subclass!)
 				if( !options.deferLayout ) {
 					this.doLayout();
 				}
@@ -846,7 +859,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getRenderAttributes'>		/**
+<span id='jqGui-Component-method-getRenderAttributes'>		/**
 </span>		 * Retrieves the additional attributes that are used to render the Component's {@link #$el element} with.
 		 * This method is called from {@link #method-render} when initially rendering the component.
 		 * 
@@ -859,7 +872,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getRenderStyle'>		/**
+<span id='jqGui-Component-method-getRenderStyle'>		/**
 </span>		 * Retrieves the style properties that are used to render the Component's {@link #$el element} with. This method 
 		 * is called from {@link #method-render} when initially rendering the component.
 		 * 
@@ -891,7 +904,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getRenderTplData'>		/**
+<span id='jqGui-Component-method-getRenderTplData'>		/**
 </span>		 * Retrieves the data to be used by the {@link #renderTpl}. Adds the common properties to any {@link #renderTplData} config
 		 * provided before returning. These properties are enumerated in the {@link #renderTplData} config doc.
 		 * 
@@ -910,10 +923,9 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-isRendered'>		/**
+<span id='jqGui-Component-method-isRendered'>		/**
 </span>		 * Determines if the Component is currently {@link #rendered}.
 		 * 
-		 * @method isRendered
 		 * @return {Boolean} True if the Component is rendered, false otherwise.
 		 */
 		isRendered : function() {
@@ -921,7 +933,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-onRender'>		/**
+<span id='jqGui-Component-method-onRender'>		/**
 </span>		 * Hook method that runs when a Component is being rendered, after the Component's base element has been created, its
 		 * {@link #renderTpl} has been processed and appended, and the element has been appended to its parent element.
 		 * 
@@ -930,10 +942,10 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component is being rendered into.
 		 * @param {Object} options The options provided to {@link #method-render}.
 		 */
-		onRender : Jqc.emptyFn,
+		onRender : JqGui.emptyFn,
 		
 		
-<span id='jqc-Component-method-onAfterRender'>		/**
+<span id='jqGui-Component-method-onAfterRender'>		/**
 </span>		 * Hook method that runs when a Component has been completely rendered. This includes everything up to the point of
 		 * when the {@link #onRender} hook method has been called, and after the {@link #html}, {@link #contentEl}, and 
 		 * {@link #tpl} configs have been processed and their content has been added to the Component's {@link #$el element}.
@@ -945,10 +957,10 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component has been rendered into.
 		 * @param {Object} options The options provided to {@link #method-render}.
 		 */
-		onAfterRender : Jqc.emptyFn,
+		onAfterRender : JqGui.emptyFn,
 		
 		
-<span id='jqc-Component-method-update'>		/**
+<span id='jqGui-Component-method-update'>		/**
 </span>		 * Updates the HTML of the component directly, or re-runs the {@link #tpl} to update the HTML if {@link #tplData template data}
 		 * (an Object) is provided. Will handle the unrendered and rendered states of the Component.
 		 *
@@ -963,6 +975,9 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 			if( !this.rendered ) {
 				if( isTplData ) {
 					this.tplData = content;
+					this.updateCalledWithContent = false; // in case update() was previously called with `html` (string) content,
+					                                      // and this flag was set to true, then we must set it back to false. See
+					                                      // case below where it is set to `true` for more details.
 					
 				} else {  // Not a plain JavaScript Object, must be HTML content
 					// Remove this config, just in case it was specified. Setting the 'html' config (next) has the same effect as 'contentEl'.
@@ -970,9 +985,9 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 					
 					// Set the 'html' config, for when the Component is rendered.
 					this.html = content;
-					this.updateCalledWithContent = true;  // in case there is a `tpl` config, this flag tells render() to use the `html` config instead 
-                                                          // of `tpl` when it renders. We don't want to delete the `tpl` config, since it may be used with
-                                                          // data provided to this method at a later time.
+					this.updateCalledWithContent = true;  // in case there is a `tpl` config, this flag tells render() to use the `html` 
+                                                          // config instead of `tpl` when it renders. We don't want to delete the `tpl`
+                                                          // config, since it may be used with data provided to this method at a later time.
 				}
 			} else {
 				this.getContentTarget()
@@ -985,28 +1000,26 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		
 		// Layout Functionality
 		
-<span id='jqc-Component-method-doLayout'>		/**
-</span>		 * This method was initially intended to bring Component layouts into the mix (instead of only having {@link jqc.Container Container}
-		 * layouts, which lay out {@link jqc.Container#items child components}). A Component layout was going to size and position the HTML 
+<span id='jqGui-Component-method-doLayout'>		/**
+</span>		 * This method was initially intended to bring Component layouts into the mix (instead of only having {@link jqGui.Container Container}
+		 * layouts, which lay out {@link jqGui.Container#items child components}). A Component layout was going to size and position the HTML 
 		 * elements that a particular Component had created in its {@link #onRender} method.
 		 * 
-		 * However, at the time of this writing, we never got around to implementing this feature, and {@link jqc.Container} extends
-		 * this method for its {@link jqc.Container#layout layout} of {@link jqc.Container#items child components}. This method was added into 
+		 * However, at the time of this writing, we never got around to implementing this feature, and {@link jqGui.Container} extends
+		 * this method for its {@link jqGui.Container#layout layout} of {@link jqGui.Container#items child components}. This method was added into 
 		 * the Component class (this class) later though, in an effort to allow Components to respond to being laid out by their {@link #parentContainer}.
-		 * When the Component's {@link #parentContainer} runs its {@link jqc.Container#layout layout}, this method is executed from it. A 
+		 * When the Component's {@link #parentContainer} runs its {@link jqGui.Container#layout layout}, this method is executed from it. A 
 		 * Component author may implement an extension of the {@link #onComponentLayout} hook method to respond to the Component being laid 
 		 * out by its {@link #parentContainer}, such as to implement updating the size or positioning of its child elements upon being laid out.
 		 * Note that {@link #onComponentLayout} will eventually be called just from the Component's initial {@link #method-render rendering} 
 		 * process as well, if the Component is not being rendered by a {@link #parentContainer} layout (i.e. it is a standalone Component,
-		 * not part of a {@link jqc.Container Container}/Component hierarchy).
+		 * not part of a {@link jqGui.Container Container}/Component hierarchy).
 		 * 
 		 * So, bottom line, if you wish for your Component to do something when it is laid out by its {@link #parentContainer},
 		 * implement the {@link #onComponentLayout} method. See {@link #onComponentLayout} for details.
-		 * 
-		 * @method doLayout
 		 */
 		doLayout : function() {
-			// Note: this method is extended in the jqc.Container subclass. Keep this in mind if ever implementing Component
+			// Note: this method is extended in the jqGui.Container subclass. Keep this in mind if ever implementing Component
 			// layouts properly, which should both run both the Component's layout, *and* the Container's layout (in that order).
 			
 			// Simply call the hook method to allow subclasses to participate in the Component being laid out, and fire the event.
@@ -1014,16 +1027,16 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-onComponentLayout'>		/**
+<span id='jqGui-Component-method-onComponentLayout'>		/**
 </span>		 * Hook method that is executed when {@link #doLayout} has executed. Extend this method (calling the superclass method first)
 		 * to implement any logic that the Component subclass should perform when it is either: 
 		 * 
-		 * a) Initially rendered (as a standalone component, not part of a {@link jqc.Container Container}/Component hierarchy), or
+		 * a) Initially rendered (as a standalone component, not part of a {@link jqGui.Container Container}/Component hierarchy), or
 		 * b) Has been laid out by its {@link #parentContainer}. If initially rendered by its {@link #parentContainer parent container's}
 		 * layout, then this will be the same event.
 		 * 
 		 * For example, a Component could resize its inner elements for new dimensions set on the Component by its 
-		 * {@link #parentContainer parentContainer's} {@link jqc.Container#layout layout} algorithm. The layout may size the Component
+		 * {@link #parentContainer parentContainer's} {@link jqGui.Container#layout layout} algorithm. The layout may size the Component
 		 * upon its initial rendering, an update to the child components of the {@link #parentContainer}, or from say, a browser resize
 		 * where the layout runs again.
 		 *
@@ -1031,17 +1044,15 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * @template
 		 * @method onComponentLayout
 		 */
-		onComponentLayout : Jqc.emptyFn,
+		onComponentLayout : JqGui.emptyFn,
 		
 		
-<span id='jqc-Component-method-updateLayout'>		/**
-</span>		 * When called on the Component, this method bubbles up to the top of the {@link jqc.Container Container}/Component hierarchy,
+<span id='jqGui-Component-method-updateLayout'>		/**
+</span>		 * When called on the Component, this method bubbles up to the top of the {@link jqGui.Container Container}/Component hierarchy,
 		 * and runs {@link #doLayout} on the top-most component. This has the effect of re-doing the layout for all Containers/Components
 		 * in that particular hierarchy. As such, this may be an expensive operation; use with care. This may be useful however for components
 		 * that are sized based on their content, and when their content size changes, they should force a layout to adjust for the new
 		 * content size.
-		 * 
-		 * @method updateLayout
 		 */
 		updateLayout : function() {
 			// Bubble up to the top level parent container of this Component's hierarchy, and then call doLayout() on it
@@ -1057,14 +1068,13 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		
 		// Attribute, CSS Class, and Element Style related functionality
 		
-<span id='jqc-Component-method-setAttr'>		/**
+<span id='jqGui-Component-method-setAttr'>		/**
 </span>		 * Sets an attribute on the Component's {@link #$el element}.
 		 * 
-		 * @method setAttr
 		 * @param {String/Object} name The attribute name. This first argument may also be provided as an Object of key/value
 		 *   pairs for attribute names/values to apply to the Component's {@link #$el element}.
 		 * @param {String} value The value for the attribute. Optional if the first argument is an Object.
-		 * @return {jqc.Component} This Component, to allow method chaining.
+		 * @return {jqGui.Component} This Component, to allow method chaining.
 		 */
 		setAttr : function( name, value ) {
 			if( !this.rendered ) {
@@ -1083,27 +1093,16 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-addCls'>		/**
+<span id='jqGui-Component-method-addCls'>		/**
 </span>		 * Adds a CSS class to the Component's {@link #$el element}.
 		 * 
-		 * @method addCls
 		 * @param {String} cssClass One or more CSS classes to add to the Component's element. If specifying multiple CSS classes,
 		 *   they should be separated with a space. Ex: &quot;class1 class2&quot;
-		 * @return {jqc.Component} This Component, to allow method chaining.
+		 * @return {jqGui.Component} This Component, to allow method chaining.
 		 */
 		addCls : function( cssClass ) {
 			if( !this.rendered ) {
-				var cssClasses = cssClass.split( ' ' );
-				for( var i = 0, len = cssClasses.length; i &lt; len; i++ ) {
-					var cls = cssClasses[ i ],
-					    regex = new RegExp( '(^| )' + cls + '( |$)' );
-					    
-					if( !regex.test( this.cls ) ) {
-						this.cls += ' ' + cls;
-					}
-				}
-				this.cls = jQuery.trim( this.cls );
-				
+				this.cls = Css.addCls( this.cls, cssClass );  // update the `cls` config in the unrendered state
 			} else {
 				this.$el.addClass( cssClass ); // delegate to jQuery in this case
 			}
@@ -1111,28 +1110,16 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-removeCls'>		/**
+<span id='jqGui-Component-method-removeCls'>		/**
 </span>		 * Removes a CSS class from the Component's {@link #$el element}.
 		 * 
-		 * @method removeCls
 		 * @param {String} cssClass One or more CSS classes to remove from the Component's element. If specifying multiple CSS classes,
 		 *   they should be separated with a space. Ex: &quot;class1 class2&quot;
-		 * @return {jqc.Component} This Component, to allow method chaining.
+		 * @return {jqGui.Component} This Component, to allow method chaining.
 		 */
 		removeCls : function( cssClass ) {
 			if( !this.rendered ) {
-				var cssClasses = cssClass.split( ' ' );
-				var replaceFn = function( match, $1, $2 ) {
-					return ( $1 === &quot; &quot; &amp;&amp; $2 === &quot; &quot; ) ? &quot; &quot; : &quot;&quot;;  // if the css class was padded with spaces on both sides, replace with a single space. Otherwise, we can replace with nothing.
-				};
-				
-				for( var i = 0, len = cssClasses.length; i &lt; len; i++ ) {
-					var cls = cssClasses[ i ],
-					    regex = new RegExp( '(^| )' + cls + '( |$)', 'g' );
-									
-					this.cls = this.cls.replace( regex, replaceFn );
-				}
-				
+				this.cls = Css.removeCls( this.cls, cssClass );  // update the `cls` config in the unrendered state
 			} else {
 				this.$el.removeClass( cssClass ); // delegate to jQuery in this case
 			}
@@ -1140,16 +1127,15 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 	
 	
-<span id='jqc-Component-method-toggleCls'>		/**
+<span id='jqGui-Component-method-toggleCls'>		/**
 </span>		 * Adds or removes a CSS class from the Component's {@link #$el element}, based on if the CSS class already exists on the element
 		 * or not. If providing the `flag` argument, the `cssClass` will be added or removed based on if `flag` is true or false.
 		 * 
-		 * @method toggleCls
 		 * @param {String} cssClass One or more CSS classes to remove from the Component's element. If specifying multiple CSS classes,
 		 *   they should be separated with a space. Ex: &quot;class1 class2&quot;
 		 * @param {Boolean} [flag] True if the class(es) should be added, false if they should be removed. This argument is optional,
 		 *   and if provided, determines if the class should be added or removed.
-		 * @return {jqc.Component} This Component, to allow method chaining.
+		 * @return {jqGui.Component} This Component, to allow method chaining.
 		 */
 		toggleCls : function( cssClass, flag ) {
 			if( typeof flag === 'undefined' ) {
@@ -1161,32 +1147,28 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-hasCls'>		/**
+<span id='jqGui-Component-method-hasCls'>		/**
 </span>		 * Determines if the Component's {@link #$el element} has the given `cssClass`.
 		 * 
-		 * @method hasCls
 		 * @param {String} cssClass The CSS class to test for.
 		 * @return {Boolean} True if the {@link #$el element} has the given `cssClass`, false otherwise.
 		 */
 		hasCls : function( cssClass ) {
 			if( !this.rendered ) {
-				var regex = new RegExp( '(^| )' + cssClass + '( |$)', 'g' );
-				return regex.test( this.cls );
-				
+				return Css.hasCls( this.cls, cssClass );  // check the `cls` config in the unrendered state
 			} else {
 				return this.$el.hasClass( cssClass );
 			}
 		},
 		
 		
-<span id='jqc-Component-method-setStyle'>		/**
+<span id='jqGui-Component-method-setStyle'>		/**
 </span>		 * Sets a CSS style property on the Component's {@link #$el element}.
 		 * 
-		 * @method setStyle
 		 * @param {String/Object} name The CSS property name. This first argument may also be provided as an Object of key/value
 		 *   pairs for CSS property names/values to apply to the Component's {@link #$el element}.
 		 * @param {String} value The value for the CSS property. Optional if the first argument is an Object.
-		 * @return {jqc.Component} This Component, to allow method chaining.
+		 * @return {jqGui.Component} This Component, to allow method chaining.
 		 */
 		setStyle : function( name, value ) {
 			if( !this.rendered ) {
@@ -1208,12 +1190,12 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		// ----------------------------
 		
 		
-<span id='jqc-Component-method-getContentTarget'>		/**
-</span>		 * Retrieves the element that should be the target for the Component's content (html).  For jqc.Component, this is just the Component's
+<span id='jqGui-Component-method-getContentTarget'>		/**
+</span>		 * Retrieves the element that should be the target for the Component's content (html).  For jqGui.Component, this is just the Component's
 		 * base element (see {@link #$el}), but this method can be overridden in subclasses that define a more complex structure, where their
 		 * content should be placed elsewhere. 
 		 * 
-		 * @method getContentTarget
+		 * @protected
 		 * @return {jQuery} The element (jQuery wrapped set) where HTML content should be placed. The {@link #html} and {@link #contentEl} 
 		 *   configs will be attached to this element.
 		 */
@@ -1222,21 +1204,19 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getUuid'>		/**
+<span id='jqGui-Component-method-getUuid'>		/**
 </span>		 * Returns the globally unique {@link #uuid} of this Component.
 		 * 
-		 * @method getUuid
-		 * @return {Number}
+		 * @return {String}
 		 */
 		getUuid : function() {
 			return this.uuid;
 		},
 		
 		
-<span id='jqc-Component-method-getId'>		/**
+<span id='jqGui-Component-method-getId'>		/**
 </span>		 * Returns the {@link #id} of this Component.
 		 * 
-		 * @method getId
 		 * @return {String}
 		 */
 		getId : function() {
@@ -1244,13 +1224,34 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getEl'>		/**
+<span id='jqGui-Component-method-getBaseCls'>		/**
+</span>		 * Returns the {@link #baseCls} of this Component. This is a useful accessor for classes collaborating with the
+		 * Component, to use the same {@link #baseCls} where appropriate.
+		 * 
+		 * @return {String}
+		 */
+		getBaseCls : function() {
+			return this.baseCls;
+		},
+		
+		
+<span id='jqGui-Component-method-getComponentCls'>		/**
+</span>		 * Returns the {@link #componentCls} of this Component. This is a useful accessor for classes collaborating with the
+		 * Component, to use the same {@link #componentCls} where appropriate.
+		 * 
+		 * @return {String}
+		 */
+		getComponentCls : function() {
+			return this.componentCls;
+		},
+		
+		
+<span id='jqGui-Component-method-getEl'>		/**
 </span>		 * Returns the container element for this component, wrapped in a jQuery object.  This element will only
 		 * be available after the component has been rendered by {@link #method-render}.  The element that will be returned
 		 * will be the one created for the Component in the {@link #method-render} method, and its type is dependent on the
 		 * {@link #elType} config.
 		 * 
-		 * @method getEl
 		 * @return {jQuery}
 		 */
 		getEl : function() {
@@ -1258,10 +1259,9 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-setSize'>		/**
+<span id='jqGui-Component-method-setSize'>		/**
 </span>		 * Sets the size of the element.
 		 * 
-		 * @method setSize
 		 * @param {Number} width The width, in pixels, for the Component. If undefined, no width will be set.
 		 * @param {Number} height The height, in pixels, for the Component. If undefined, no height will be set.
 		 */
@@ -1283,10 +1283,9 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-setWidth'>		/**
+<span id='jqGui-Component-method-setWidth'>		/**
 </span>		 * Sets the width of the element.
 		 *
-		 * @method setWidth
 		 * @param {Number/String} width The width. If a number, assumes pixels, otherwise uses the exact string.
 		 */
 		setWidth : function( width ) {
@@ -1294,12 +1293,11 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getWidth'>		/**
+<span id='jqGui-Component-method-getWidth'>		/**
 </span>		 * Returns the width of the Component. 
 		 * 
 		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 *
-		 * @method getWidth
 		 * @return {Number}
 		 */
 		getWidth : function() {
@@ -1307,13 +1305,12 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getInnerWidth'>		/** 
+<span id='jqGui-Component-method-getInnerWidth'>		/** 
 </span>		 * Returns the inner width of the Component. The inner width of the Component is the Component's width, plus
 		 * its padding.
 		 * 
 		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 * 
-		 * @method getInnerWidth
 		 * @return {Number}
 		 */
 		getInnerWidth : function() {
@@ -1321,14 +1318,13 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getOuterWidth'>		/**
+<span id='jqGui-Component-method-getOuterWidth'>		/**
 </span>		 * Returns the outer width of the Component. The outer width of the Component is the Component's width, plus
 		 * its padding, plus its border width. Provide the optional argument `includeMargin` as true to include the margin
 		 * as well.
 		 * 
 		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 * 
-		 * @method getOuterWidth
 		 * @param {Boolean} [includeMargin=false]
 		 * @return {Number}
 		 */
@@ -1337,10 +1333,9 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 	
 		
-<span id='jqc-Component-method-setHeight'>		/**
+<span id='jqGui-Component-method-setHeight'>		/**
 </span>		 * Sets the height of the element.
 		 *
-		 * @method setHeight
 		 * @param {Number/String} height The height. If a number, assumes pixels, otherwise uses the exact string.
 		 */
 		setHeight : function( height ) {
@@ -1348,12 +1343,11 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 	
-<span id='jqc-Component-method-getHeight'>		/**
+<span id='jqGui-Component-method-getHeight'>		/**
 </span>		 * Returns the height of the Component. 
 		 * 
 		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 *
-		 * @method getHeight
 		 * @return {Number}
 		 */
 		getHeight : function() {
@@ -1361,13 +1355,12 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getInnerHeight'>		/** 
+<span id='jqGui-Component-method-getInnerHeight'>		/** 
 </span>		 * Returns the inner height of the Component. The inner height of the Component is the Component's height, plus
 		 * its padding.
 		 * 
 		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 * 
-		 * @method getInnerHeight
 		 * @return {Number}
 		 */
 		getInnerHeight : function() {
@@ -1375,14 +1368,13 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getOuterHeight'>		/** 
+<span id='jqGui-Component-method-getOuterHeight'>		/** 
 </span>		 * Returns the outer height of the Component. The outer height of the Component is the Component's height, plus
 		 * its padding, plus its border width. Provide the optional argument `includeMargin` as true to include the margin
 		 * as well.
 		 * 
 		 * Note: this may only be called after the component has been {@link #method-render rendered}.
 		 * 
-		 * @method getOuterHeight
 		 * @param {Boolean} [includeMargin=false]
 		 * @return {Number}
 		 */
@@ -1391,10 +1383,9 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 	
 		
-<span id='jqc-Component-method-getConfiguredWidth'>		/**
+<span id='jqGui-Component-method-getConfiguredWidth'>		/**
 </span>		 * Returns the configured width of the component.
 		 *
-		 * @method getConfiguredWidth
 		 * @return {Number}
 		 */
 		getConfiguredWidth : function() {
@@ -1402,10 +1393,9 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 	
 		
-<span id='jqc-Component-method-getConfiguredHeight'>		/**
+<span id='jqGui-Component-method-getConfiguredHeight'>		/**
 </span>		 * Returns the configured height of the component.
 		 *
-		 * @method getConfiguredHeight
 		 * @return {Number}
 		 */
 		getConfiguredHeight : function() {
@@ -1413,7 +1403,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getPadding'>		/**
+<span id='jqGui-Component-method-getPadding'>		/**
 </span>		 * Retrieves the width of the padding for the given `sides` of the component's {@link #$el element}. 
 		 * `sides` can be either 't', 'r', 'b', 'l' for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;, *or* it can be a 
 		 * combination of more than one to add the widths together. Ex: 'lr' would add the left and right padding 
@@ -1421,7 +1411,6 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * 
 		 * Note: This method can only be run after the Component has been {@link #rendered}.
 		 * 
-		 * @method getPadding
 		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
 		 *   See the description in this method.
 		 * @return {Number} The width of the padding for the given `sides`.
@@ -1431,7 +1420,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},	
 		
 		
-<span id='jqc-Component-method-getMargin'>		/**
+<span id='jqGui-Component-method-getMargin'>		/**
 </span>		 * Retrieves the width of the margin for the given `sides` of the component's {@link #$el element}. 
 		 * `sides` can be either 't', 'r', 'b', 'l' for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;, *or* it can be a 
 		 * combination of more than one to add the widths together. Ex: 'lr' would add the left and right margin 
@@ -1439,7 +1428,6 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * 
 		 * Note: This method can only be run after the Component has been {@link #rendered}.
 		 * 
-		 * @method getMargin
 		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
 		 *   See the description in this method.
 		 * @return {Number} The width of the margin for the given `sides`.
@@ -1449,7 +1437,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getBorderWidth'>		/**
+<span id='jqGui-Component-method-getBorderWidth'>		/**
 </span>		 * Retrieves the width of the border for the given `sides` of the component's {@link #$el element}. 
 		 * `sides` can be either 't', 'r', 'b', 'l' for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;, *or* it can be a 
 		 * combination of more than one to add the widths together. Ex: 'lr' would add the left and right border 
@@ -1457,7 +1445,6 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * 
 		 * Note: This method can only be run after the Component has been {@link #rendered}.
 		 * 
-		 * @method getBorderWidth
 		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
 		 *   See the description in this method.
 		 * @return {Number} The width of the border for the given `sides`.
@@ -1467,13 +1454,12 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getFrameSize'>		/**
+<span id='jqGui-Component-method-getFrameSize'>		/**
 </span>		 * Retrieves the &quot;frame&quot; size of the component's {@link #$el element}, which is the sum of the width of the padding, margin, and border, 
 		 * for the given `sides` of the `element`. `sides` can be either 't', 'r', 'b', or 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* 
 		 * it can be a combination of more than one to add the padding widths together. Ex: 'rl' would add the right and left padding/border/margin 
 		 * together and return that number.
 		 * 
-		 * @method getFrameSize
 		 * @param {String} sides 't', 'r', 'b', 'l', or a combination of multiple sides put together. Ex: 'lr'. 
 		 *   See the description in this method.
 		 * @return {Number} The sum total of the width of the border, plus padding, plus margin, for the given `sides`.
@@ -1486,25 +1472,23 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		// ------------------------------------
 		
 		
-<span id='jqc-Component-method-setVisible'>		/**
+<span id='jqGui-Component-method-setVisible'>		/**
 </span>		 * Convenience method to show or hide the Component using a boolean.
 		 * 
-		 * @method setVisible
 		 * @param {Boolean} visible True to show the Component, false to hide it.
-		 * @return {jqc.Component} This Component, to allow method chaining.
+		 * @return {jqGui.Component} This Component, to allow method chaining.
 		 */
 		setVisible : function( visible ) {
 			return this[ visible ? 'show' : 'hide' ]();
 		},
 		
 		
-<span id='jqc-Component-method-show'>		/**
+<span id='jqGui-Component-method-show'>		/**
 </span>		 * Shows the Component. 
 		 *
-		 * @method show
 		 * @param {Object} [options] An object which may contain the following options:
-		 * @param {Object} [options.anim] An {@link jqc.anim.Animation Animation} config object (minus the 
-		 *   {@link jqc.anim.Animation#target target} property) for animating the showing of the Component. 
+		 * @param {Object} [options.anim] An {@link jqGui.anim.Animation Animation} config object (minus the 
+		 *   {@link jqGui.anim.Animation#target target} property) for animating the showing of the Component. 
 		 *   Note that this will only be run if the Component is currently {@link #rendered}.
 		 * @chainable
 		 */
@@ -1562,7 +1546,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 	
 	
-<span id='jqc-Component-method-onShowComplete'>		/**
+<span id='jqGui-Component-method-onShowComplete'>		/**
 </span>		 * Private method that handles when the Component has been fully shown. This may be delayed from the call to {@link #method-show} 
 		 * if an animation was run, or may be called immediately (synchronously) if not. Sets private properties to the state they 
 		 * should be in when the Component has been fully shown, calls the {@link #onAfterShow} hook method, and fires the 
@@ -1570,7 +1554,6 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 *
 		 * @private
 		 * @template
-		 * @method onShowComplete
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
 		onShowComplete : function( options ) {
@@ -1582,7 +1565,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-onBeforeShow'>		/**
+<span id='jqGui-Component-method-onBeforeShow'>		/**
 </span>		 * Hook method that is run before the Component has been shown (before an animation has started, if any).
 		 *
 		 * @protected
@@ -1590,10 +1573,10 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * @method onBeforeShow
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onBeforeShow : Jqc.emptyFn,
+		onBeforeShow : JqGui.emptyFn,
 		
 		
-<span id='jqc-Component-method-onShow'>		/**
+<span id='jqGui-Component-method-onShow'>		/**
 </span>		 * Hook method for handling the component being shown. This will only be called when the 
 		 * Component is shown after it is rendered. Note that this method is called immediately after
 		 * any animation is started by providing the `animConfig` argument to {@link #method-show}.
@@ -1603,10 +1586,10 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * @method onShow
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onShow : Jqc.emptyFn,
+		onShow : JqGui.emptyFn,
 		
 		
-<span id='jqc-Component-method-onAfterShow'>		/**
+<span id='jqGui-Component-method-onAfterShow'>		/**
 </span>		 * Hook method that is run when the Component has been fully shown. This may be delayed from the call to {@link #method-show} 
 		 * if an animation was run, or may be called immediately (synchronously) if not. 
 		 *
@@ -1615,17 +1598,16 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * @method onAfterShow
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onAfterShow : Jqc.emptyFn,
+		onAfterShow : JqGui.emptyFn,
 		
 		
 		
-<span id='jqc-Component-method-hide'>		/**
+<span id='jqGui-Component-method-hide'>		/**
 </span>		 * Hides the Component.
 		 *
-		 * @method hide
 		 * @param {Object} [options] An object which may contain the following options:
-		 * @param {Object} [options.anim] An {@link jqc.anim.Animation Animation} config object (minus the 
-		 *   {@link jqc.anim.Animation#target target) property) for animating the showing of the Component. 
+		 * @param {Object} [options.anim] An {@link jqGui.anim.Animation Animation} config object (minus the 
+		 *   {@link jqGui.anim.Animation#target target) property) for animating the showing of the Component. 
 		 *   Note that this will only be run if the Component is currently {@link #rendered}.
 		 * @chainable
 		 */
@@ -1669,7 +1651,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 	
 	
-<span id='jqc-Component-method-onHideComplete'>		/**
+<span id='jqGui-Component-method-onHideComplete'>		/**
 </span>		 * Private method that is run when the Component has fully hidden. This may be delayed from the call to {@link #method-hide} if a
 		 * animation is run, or may be called immediately if not. Hides the Component (if it is not already hidden), runs the 
 		 * {@link #onHide} hook method, and fires the {@link #event-hide} event.
@@ -1691,7 +1673,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-onBeforeHide'>		/**
+<span id='jqGui-Component-method-onBeforeHide'>		/**
 </span>		 * Hook method that is run just before the Component it to be hidden (before an animation has started, if any).
 		 *
 		 * @protected
@@ -1699,10 +1681,10 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * @method onBeforeHide
 		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
-		onBeforeHide : Jqc.emptyFn,
+		onBeforeHide : JqGui.emptyFn,
 		
 		
-<span id='jqc-Component-method-onHide'>		/**
+<span id='jqGui-Component-method-onHide'>		/**
 </span>		 * Hook method that is run when the Component has fully hidden. This will only be called when the Component is hidden after it 
 		 * is rendered. This may be delayed from the call to {@link #method-hide} if a animation is run, or may be called immediately 
 		 * if not.
@@ -1712,10 +1694,10 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * @method onHide
 		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
-		onHide : Jqc.emptyFn,
+		onHide : JqGui.emptyFn,
 	
 	
-<span id='jqc-Component-method-onAfterHide'>		/**
+<span id='jqGui-Component-method-onAfterHide'>		/**
 </span>		 * Hook method that is run when the Component has fully hidden. This will only be called when the Component is hidden after it 
 		 * is rendered. This may be delayed from the call to {@link #method-hide} if a animation is run, or may be called immediately 
 		 * if not.
@@ -1725,10 +1707,10 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 * @method onAfterHide
 		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
-		onAfterHide : Jqc.emptyFn,
+		onAfterHide : JqGui.emptyFn,
 		
 		
-<span id='jqc-Component-method-isHidden'>		/**
+<span id='jqGui-Component-method-isHidden'>		/**
 </span>		 * Determines if the Component is hidden.
 		 * 
 		 * If the `checkDom` flag is not passed or is `false`, then this method simply returns the value of the {@link #property-hidden}
@@ -1758,7 +1740,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-isVisible'>		/**
+<span id='jqGui-Component-method-isVisible'>		/**
 </span>		 * Tests to see if the Component is visible.
 		 * 
 		 * If the `domVisible` flag is not passed or is `false`, then this method simply returns the opposite state of the internal
@@ -1777,7 +1759,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-isDomVisible'>		/**
+<span id='jqGui-Component-method-isDomVisible'>		/**
 </span>		 * Utility method which determines if the Component's {@link #$el element} is visible in the DOM. Runs an 
 		 * algorithm to check:
 		 * 
@@ -1831,15 +1813,13 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-detach'>		/**
+<span id='jqGui-Component-method-detach'>		/**
 </span>		 * Detaches the Component from the DOM, if it is currently rendered and in the DOM. This method can be used
 		 * for performance reasons, to completely remove the element from the DOM when it is unnecessary for the 
 		 * Component to be in it.
 		 * 
 		 * The Component may be re-attached to the DOM by calling {@link #method-render} again on it (with the new container
-		 * element to append/insert it into). 
-		 * 
-		 * @method detach
+		 * element to append/insert it into).
 		 */
 		detach : function() {
 			if( this.rendered ) {
@@ -1851,12 +1831,11 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		// -------------------------------------
 		
 		
-<span id='jqc-Component-method-mask'>		/**
-</span>		 * Masks the component with a {@link jqc.Mask}. Uses the default mask configuration provided by the {@link #maskConfig} configuration object,
+<span id='jqGui-Component-method-mask'>		/**
+</span>		 * Masks the component with a {@link jqGui.Mask}. Uses the default mask configuration provided by the {@link #maskConfig} configuration object,
 		 * or optionally, the provided `maskConfig` argument.
 		 * 
-		 * @method mask
-		 * @param {Object} maskConfig (optional) The explicit configuration options to set the {@link jqc.Mask} that will mask over the Component.
+		 * @param {Object} maskConfig (optional) The explicit configuration options to set the {@link jqGui.Mask} that will mask over the Component.
 		 *   If not provided, will use the default options provided by the {@link #maskConfig} configuration option.
 		 */
 		mask : function( maskConfig ) {
@@ -1870,7 +1849,7 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 				
 			} else {
 				// If the Component is currently hidden when the mask() request is made, we need to defer
-				// it to when the Component's show() method is run. This is because jqc.Mask has to make a calculation
+				// it to when the Component's show() method is run. This is because jqGui.Mask has to make a calculation
 				// of the mask target's height. 
 				if( this.isHidden() ) {
 					this.deferMaskShow = true;
@@ -1896,10 +1875,8 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-unMask'>		/**
+<span id='jqGui-Component-method-unMask'>		/**
 </span>		 * Hides the mask (shown with the {@link #mask} method) from the Component's element.
-		 * 
-		 * @method unMask
 		 */
 		unMask : function() {
 			this.masked = false;
@@ -1914,10 +1891,9 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-isMasked'>		/**
+<span id='jqGui-Component-method-isMasked'>		/**
 </span>		 * Determines if the Component is currently masked.  See the {@link #mask} method for details on showing the Component's mask.
 		 * 
-		 * @method isMasked
 		 * @return {Boolean}
 		 */
 		isMasked : function() {
@@ -1925,12 +1901,11 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-getMaskTarget'>		/**
-</span>		 * Method that defines which element the Component's mask should be shown over. For jqc.Component,
+<span id='jqGui-Component-method-getMaskTarget'>		/**
+</span>		 * Method that defines which element the Component's mask should be shown over. For jqGui.Component,
 		 * this is the Component's base {@link #$el element}, but this may be redefined by subclasses.
 		 * 
 		 * @protected
-		 * @method getMaskTarget
 		 * @return {jQuery}
 		 */
 		getMaskTarget : function() {
@@ -1941,22 +1916,20 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		// -------------------------------------
 		
 		
-<span id='jqc-Component-method-setParentContainer'>		/**
+<span id='jqGui-Component-method-setParentContainer'>		/**
 </span>		 * Sets the Container that owns (i.e. is a parent of) this Component.
 		 * 
-		 * @method setParentContainer
-		 * @param {jqc.Container} container
+		 * @param {jqGui.Container} container
 		 */
 		setParentContainer : function( container ) {
 			this.parentContainer = container;
 		},
 		
 		
-<span id='jqc-Component-method-getParentContainer'>		/**
+<span id='jqGui-Component-method-getParentContainer'>		/**
 </span>		 * Gets the Container that owns (i.e. is a parent of) this Component.
 		 * 
-		 * @method getParentContainer
-		 * @return {jqc.Container} The Container that owns this Component, or null if there is none.
+		 * @return {jqGui.Container} The Container that owns this Component, or null if there is none.
 		 */
 		getParentContainer : function() {
 			return this.parentContainer;
@@ -1966,13 +1939,12 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		// -------------------------------------
 		
 		
-<span id='jqc-Component-method-bubble'>		/**
+<span id='jqGui-Component-method-bubble'>		/**
 </span>		 * Bubbles up the Component/Container heirarchy, calling the specified function with each parent Container, starting
 		 * with this Component. The scope (this) of function call will be the scope provided or the current Component. The arguments 
 		 * to the function will be the `args` provided or the current component. If the function returns false at any point,
 		 * the bubble is stopped.
 		 * 
-		 * @method bubble
 		 * @param {Function} fn The function to call.
 		 * @param {Object} scope (optional) The scope of the function (defaults to current node)
 		 * @param {Array} args (optional) The args to call the function with (default to passing the current component)
@@ -1988,13 +1960,12 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-findParentBy'>		/**
-</span>		 * Finds a {@link jqc.Container Container} above this Component at any level by a custom function. If the passed function returns
-		 * true, the {@link jqc.Container Container} will be returned.
+<span id='jqGui-Component-method-findParentBy'>		/**
+</span>		 * Finds a {@link jqGui.Container Container} above this Component at any level by a custom function. If the passed function returns
+		 * true, the {@link jqGui.Container Container} will be returned.
 		 * 
-		 * @method findParentBy
 		 * @param {Function} fn The custom function to call with the arguments (Container, this Component).
-		 * @return {jqc.Container} The first Container for which the custom function returns true.
+		 * @return {jqGui.Container} The first Container for which the custom function returns true.
 		 */
 		findParentBy : function( fn ) {
 			for( var p = this.parentContainer; (p !== null) &amp;&amp; !fn( p, this ); p = p.parentContainer );  // intentional semicolon, loop does the work
@@ -2002,13 +1973,12 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-findParentById'>		/**
-</span>		 * Finds a {@link jqc.Container Container} above this Component at any level by {@link #id}.  If there is no parent Container
+<span id='jqGui-Component-method-findParentById'>		/**
+</span>		 * Finds a {@link jqGui.Container Container} above this Component at any level by {@link #id}.  If there is no parent Container
 		 * with the supplied `id`, this method returns null.
 		 * 
-		 * @method findParentById
 		 * @param {String} id The {@link #id} of the parent Container to look for.
-		 * @return {jqc.Container} The first Container which matches the supplied {@link #id}.
+		 * @return {jqGui.Container} The first Container which matches the supplied {@link #id}.
 		 *   If no Container for the supplied {@link #id} is found, this method returns null.
 		 */
 		findParentById : function( id ) {
@@ -2017,18 +1987,17 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
-<span id='jqc-Component-method-findParentByType'>		/**
-</span>		 * Finds the closest {@link jqc.Container Container} above this Component by Container `type`.  The Container `type` can be either
-		 * the type name that is registered to the {@link jqc.ComponentManager ComponentManager} (see the description of this class), or the JavaScript
+<span id='jqGui-Component-method-findParentByType'>		/**
+</span>		 * Finds the closest {@link jqGui.Container Container} above this Component by Container `type`.  The Container `type` can be either
+		 * the type name that is registered to the {@link jqGui.ComponentManager ComponentManager} (see the description of this class), or the JavaScript
 		 * class (constructor function) of the Container.
 		 * 
-		 * @method findParentByType
-		 * @param {Function} type The type name registered with the {@link jqc.ComponentManager ComponentManager}, or the constructor function (class) of the Container.
-		 * @return {jqc.Container} The first Container which is an instance of the supplied type. 
+		 * @param {Function} type The type name registered with the {@link jqGui.ComponentManager ComponentManager}, or the constructor function (class) of the Container.
+		 * @return {jqGui.Container} The first Container which is an instance of the supplied type. 
 		 */
 		findParentByType : function( type ) {
 			if( typeof type === 'string' ) {
-				type = ComponentManager.getType( type );
+				type = require( 'jqGui/ComponentManager' ).getType( type );
 				
 				// No type found for the given type name, return null immediately
 				if( !type ) {
@@ -2042,10 +2011,22 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		},
 		
 		
+<span id='jqGui-Component-method-isDescendantOf'>		/**
+</span>		 * Determines if this Component is a descendent of the provided `container`.
+		 * 
+		 * @param {jqGui.Container} container
+		 * @return {Boolean} `true` if the Component is a descendant of the `container`, otherwise `false`.
+		 */
+		isDescendantOf : function( container ) {
+			for( var p = this.parentContainer; p &amp;&amp; p !== container; p = p.parentContainer );  // intentional semicolon, loop does the work
+			return !!p;
+		},
+		
+		
 		// -------------------------------------
 		
 		
-<span id='jqc-Component-method-destroy'>		/**
+<span id='jqGui-Component-method-destroy'>		/**
 </span>		 * Destroys the Component. Frees (i.e. deletes) all references that the Component held to HTMLElements or jQuery wrapped sets
 		 * (so as to prevent memory leaks) and removes them from the DOM, removes the Component's {@link #mask} if it has one, purges 
 		 * all event {@link #listeners} from the object, and removes the Component's element ({@link #$el}) from the DOM, if the Component 
@@ -2053,69 +2034,71 @@ function( jQuery, _, Class, Jqc, Observable, ComponentManager, Css, Html, Mask, 
 		 *
 		 * Fires the {@link #beforedestroy} event, which a handler can return false from to cancel the destruction process,
 		 * and the {@link #event-destroy} event.
-		 * 
-		 * @method destroy
 		 */
 		destroy : function() {
-			if( !this.destroyed ) {
-				if( this.fireEvent( 'beforedestroy', this ) !== false ) {
-					// Run template method for subclasses first, to allow them to handle their processing
-					// before the Component's element is removed
-					this.onDestroy();
-					
-					// If the Component is currently animating, end it
-					if( this.currentAnimation ) {
-						this.currentAnimation.end();
-					}
-					
-					// Destroy the mask, if it is an instantiated jqc.Mask object (it may not be if the mask was never used)
-					if( this._mask instanceof Mask ) {
-						this._mask.destroy();
-					}
-					
-					// Remove any HTMLElement or jQuery wrapped sets used by the Component from the DOM, and free 
-					// the references so that we prevent memory leaks.
-					// Note: This includes the Component's $el reference (if it has been created by the Component being rendered).
-					for( var prop in this ) {
-						if( this.hasOwnProperty( prop ) ) {
-							var propValue = this[ prop ];
-							
-							if( _.isElement( propValue ) ) {
-								// First, wrap the raw HTMLElement in a jQuery object, for easy removal. Then delete the reference.
-								jQuery( propValue ).remove();
-								delete this[ prop ];
-							} else if( propValue instanceof jQuery ) {
-								propValue.remove();
-								delete this[ prop ];
-							}
+			if( !this.destroyed &amp;&amp; this.fireEvent( 'beforedestroy', this ) !== false ) {
+				this.destroying = true;
+				
+				// Run template method for subclasses first, to allow them to handle their processing
+				// before the Component's element is removed
+				this.onDestroy();
+				
+				// If the Component is currently animating, end it
+				if( this.currentAnimation ) {
+					this.currentAnimation.end();
+				}
+				
+				// Destroy the mask, if it is an instantiated jqGui.Mask object (it may not be if the mask was never used)
+				if( this._mask instanceof Mask ) {
+					this._mask.destroy();
+				}
+				
+				// Remove any HTMLElement or jQuery wrapped sets used by the Component from the DOM, and free 
+				// the references so that we prevent memory leaks.
+				// Note: This includes the Component's $el reference (if it has been created by the Component being rendered).
+				for( var prop in this ) {
+					if( this.hasOwnProperty( prop ) ) {
+						var propValue = this[ prop ];
+						
+						if( _.isElement( propValue ) ) {
+							// First, wrap the raw HTMLElement in a jQuery object, for easy removal. Then delete the reference.
+							jQuery( propValue ).remove();
+							delete this[ prop ];
+						} else if( propValue instanceof jQuery ) {
+							propValue.remove();
+							delete this[ prop ];
 						}
 					}
-					
-					this.rendered = false;  // the Component is no longer rendered; it's $el has been removed (above)
-					this.destroyed = true;
-					this.fireEvent( 'destroy', this );
-					this.purgeListeners();  // Note: Purge listeners must be called after 'destroy' event fires!
 				}
+				
+				this.rendered = false;  // the Component is no longer rendered; it's $el has been removed (above)
+				this.destroying = false;
+				this.destroyed = true;
+				this.fireEvent( 'destroy', this );
+				this.purgeListeners();  // Note: Purge listeners must be called after 'destroy' event fires!
 			}
 		},
 		
 		
-<span id='jqc-Component-method-onDestroy'>		/**
+<span id='jqGui-Component-method-onDestroy'>		/**
 </span>		 * Template method for subclasses to extend that is called during the Component's destruction process.
 		 * 
 		 * @protected
 		 * @method onDestroy
 		 */
-		onDestroy : Jqc.emptyFn
+		onDestroy : JqGui.emptyFn
 	
 	} );
 	
 	
-	// Register the type so it can be created by the string 'component' in an anonymous config object
-	ComponentManager.registerType( 'component', Component );
+	// NOTE: Due to circular dependency issues with RequireJS, ComponentManager automatically registers this class with
+	// the type string 'component'. Leaving below line commented as a reminder. Even if we add an async require() call here,
+	// it is possible that the Component class is still not registered in time for use.
+	//ComponentManager.registerType( 'component', Component );   -- leave as reminder
 
 	return Component;
 	
-} );</pre>
+} );
+</pre>
 </body>
 </html>

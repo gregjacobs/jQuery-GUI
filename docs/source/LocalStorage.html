@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'data/persistence/proxy/Proxy',  // for registering the proxy
+	'data/persistence/proxy/WebStorage'
+], function( Proxy, WebStorageProxy ) {
+	
+<span id='data-persistence-proxy-LocalStorage'>	/**
+</span>	 * @class data.persistence.proxy.LocalStorage
+	 * @extends data.persistence.proxy.WebStorage
+	 * @alias type.localstorage
+	 * 
+	 * The LocalStorage proxy is used for storing models using the HTML5 local storage mechanism.
+	 * 
+	 * ## Example
+	 * 
+	 * The proxy may be used as such:
+	 * 
+	 *     define( [
+	 *         'data/Model',
+	 *         'data/persistence/proxy/LocalStorage'
+	 *     ], function( Model, LocalStorageProxy ) {
+	 *     
+	 *          var MyModel = Model.extend( {
+	 *              attributes : [ ... ],
+	 *              
+	 *              proxy : new LocalStorageProxy( {
+	 *                  storageKey : 'MyModel'
+	 *              } );
+	 *          } );
+	 * 
+	 *          return MyModel;
+	 *          
+	 *     } );
+	 * 
+	 * ## Limitations
+	 * 
+	 * At this time, the LocalStorage proxy will only store nested data with no circular references. Circular
+	 * reference support will be added in a later release.
+	 * 
+	 * See the superclass, {@link data.persistence.proxy.WebStorage WebStorage}, for details on browser support. 
+	 */
+	var LocalStorageProxy = WebStorageProxy.extend( {
+		
+<span id='data-persistence-proxy-LocalStorage-method-getStorageMedium'>		/**
+</span>		 * Retrieves the WebStorage medium to use.
+		 * 
+		 * @protected
+		 * @abstract
+		 * @return {Object} The `window.localStorage` object, or `undefined` if local storage is unavailable.
+		 */
+		getStorageMedium : function() {
+			return window.localStorage;
+		}
+		
+	} );
+	
+	// Register the persistence proxy so that it can be created by an object literal with a `type` property
+	Proxy.register( 'localstorage', LocalStorageProxy );
+	
+	return LocalStorageProxy;
+	
+} );</pre>
+</body>
+</html>

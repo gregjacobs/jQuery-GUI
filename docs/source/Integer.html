@@ -32,23 +32,15 @@ define( [
 	 */
 	var IntegerAttribute = Class.extend( NumberAttribute, {
 		
-<span id='data-attribute-Integer-method-beforeSet'>		/**
-</span>		 * Converts the provided data value into an integer. If {@link #useNull} is true, undefined/null/empty string 
-		 * values will return null, or else will otherwise be converted to 0. If the number is simply not parsable, will 
-		 * return NaN. 
+<span id='data-attribute-Integer-method-parseNumber'>		/**
+</span>		 * Implementation of abstract superclass method, which parses the number as an integer.
 		 * 
-		 * This method will strip off any decimal value from a provided number.
-		 * 
-		 * @method beforeSet
-		 * @param {data.Model} model The Model instance that is providing the value. This is normally not used,
-		 *   but is provided in case any model processing is needed.
-		 * @param {Mixed} newValue The new value provided to the {@link data.Model#set} method.
-		 * @param {Mixed} oldValue The old (previous) value that the model held (if any).
-		 * @return {Boolean} The converted value.
+		 * @protected
+		 * @param {String} input The input value to convert.
+		 * @return {Number} The converted value as an integer, or NaN if the value was unparsable.
 		 */
-		beforeSet : function( model, newValue, oldValue ) {
-			var defaultValue = ( this.useNull ) ? null : 0;
-			return ( newValue !== undefined &amp;&amp; newValue !== null &amp;&amp; newValue !== '' ) ? parseInt( String( newValue ).replace( this.stripCharsRegex, '' ), 10 ) : defaultValue;
+		parseNumber : function( value ) {
+			return parseInt( value, 10 );
 		}
 		
 	} );
@@ -57,7 +49,6 @@ define( [
 	// Register the Attribute type
 	Attribute.registerType( 'int', IntegerAttribute );
 	Attribute.registerType( 'integer', IntegerAttribute );
-	
 	
 	return IntegerAttribute;
 	

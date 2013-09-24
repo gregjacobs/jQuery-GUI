@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'jqGui/ComponentManager',
+	'jqGui/Container',
+	'jqGui/tab/Tab'
+], function( ComponentManager, Container, Tab ) {
+	
+<span id='jqGui-tab-Bar'>	/**
+</span>	 * @class jqGui.tab.Bar
+	 * @extends jqGui.Container
+	 * @alias type.tabbar
+	 * 
+	 * Specialized container for a {@link jqGui.tab.Panel Tab Panel's} tabs.
+	 */
+	var TabBar = Container.extend( {
+		
+<span id='jqGui-tab-Bar-cfg-defaultType'>		/**
+</span>		 * @cfg
+		 * @inheritdoc
+		 */
+		defaultType : 'tab',
+		
+<span id='jqGui-tab-Bar-cfg-componentCls'>		/**
+</span>		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'jqGui-tabPanel-bar',
+		
+		
+<span id='jqGui-tab-Bar-method-setActiveTab'>		/**
+</span>		 * Sets the &quot;active&quot; tab based on the given activated {@link jqGui.panel.Panel Panel} which corresponds
+		 * to it. All other tabs will be set to &quot;inactive&quot;.
+		 * 
+		 * @param {jqGui.panel.Panel} panel The Panel that corresponds to the Tab that should be made active.
+		 *   If `null` is provided, or a Panel that does not have a corresponding Tab, then all tabs will
+		 *   be set to their &quot;inactive&quot; state.
+		 * @chainable
+		 */
+		setActiveTab : function( panel ) {
+			var tabs = this.getItems(), 
+			    tab;
+			
+			for( var i = 0, len = tabs.length; i &lt; len; i++ ) {
+				tab = tabs[ i ];
+				
+				tab[ ( tab.getCorrespondingPanel() === panel ) ? 'setActive' : 'setInactive' ]();
+			}
+			return this;
+		}
+		
+	} );
+	
+	
+	ComponentManager.registerType( 'tabbar', TabBar );
+	
+	return TabBar;
+	
+} );</pre>
+</body>
+</html>

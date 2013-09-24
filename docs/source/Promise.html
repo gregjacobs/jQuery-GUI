@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'lodash',
+	'Class'
+], function( _, Class ) {
+	
+<span id='data-persistence-operation-Promise'>	/**
+</span>	 * @class data.persistence.operation.Promise
+	 * 
+	 * Promise object which is returned to clients to allow them to respond to the completion of an 
+	 * {@link data.persistence.operation.Operation Operation}. The Operation is the akin to a jQuery Deferred,
+	 * while this object is akin to the Deferred's Promise object.
+	 * 
+	 * This class is instantiated from a parent {@link data.persistence.operation.Operation Operation} object, and provides
+	 * the interface that is available to client code, which is a &quot;view&quot; of the parent Operation. This interface includes 
+	 * most of the jQuery Promise interface, which includes: {@link #done}, {@link #fail}, {@link #then}, and {@link #always}.
+	 * See http://api.jquery.com/deferred.promise/ for details on these methods.
+	 * 
+	 * This class also includes an extra method, {@link #abort}, which may be used to abort (cancel) the parent Operation.
+	 * Handlers for the Operation being canceled may be added with the {@link #cancel} method.
+	 */
+	var OperationPromise = Class.create( {
+		
+<span id='data-persistence-operation-Promise-cfg-operation'>		/**
+</span>		 * @cfg {data.persistence.operation.Operation} operation
+		 * 
+		 * The Operation that this Promise is a view of.
+		 */
+		
+		
+<span id='data-persistence-operation-Promise-method-constructor'>		/**
+</span>		 * Creates an OperationPromise instance.
+		 * 
+		 * @constructor
+		 * @param {Object} [cfg] The configuration options for this class.
+		 */
+		constructor : function( cfg ) {
+			_.assign( this, cfg );
+			
+			// &lt;debug&gt;
+			if( !this.operation ) throw new Error( &quot;`operation` cfg required&quot; );
+			// &lt;/debug&gt;
+		},
+		
+		
+<span id='data-persistence-operation-Promise-method-abort'>		/**
+</span>		 * Aborts the parent Operation of this OperationPromise, if it is still in progress.
+		 */
+		abort : function() {
+			this.operation.abort();
+		},
+		
+		
+		// -----------------------------------
+		
+		// Promise interface
+		
+<span id='data-persistence-operation-Promise-method-done'>		/**
+</span>		 * Adds a handler for when the Operation has completed successfully.
+		 * 
+		 * Handlers are called with the following two arguments when the Operation completes successfully:
+		 * 
+		 * - **dataComponent** ({@link data.DataComponent}): The Model or Collection that this Operation is operating on.
+		 * - **operation** (Operation): This Operation object.
+		 * 
+		 * @param {Function} handlerFn
+		 * @chainable
+		 */
+		done : function( handlerFn ) {
+			this.operation.done( handlerFn );
+			return this;
+		},
+		
+		
+<span id='data-persistence-operation-Promise-method-fail'>		/**
+</span>		 * Adds a handler for if the Operation fails to complete successfully.
+		 * 
+		 * Handlers are called with the following two arguments when the Operation fails to complete successfully:
+		 * 
+		 * - **dataComponent** ({@link data.DataComponent}): The Model or Collection that this Operation is operating on.
+		 * - **operation** (Operation): This Operation object.
+		 * 
+		 * @param {Function} handlerFn
+		 * @chainable
+		 */
+		fail : function( handlerFn ) {
+			this.operation.fail( handlerFn );
+			return this;
+		},
+		
+		
+<span id='data-persistence-operation-Promise-method-cancel'>		/**
+</span>		 * Adds a handler for if the Operation has been canceled, via the {@link #abort} method.
+		 * 
+		 * Handlers are called with the following two arguments when the Operation has been canceled (aborted):
+		 * 
+		 * - **dataComponent** ({@link data.DataComponent}): The Model or Collection that this Operation is operating on.
+		 * - **operation** (Operation): This Operation object.
+		 * 
+		 * @param {Function} handlerFn
+		 * @chainable
+		 */
+		cancel : function( handlerFn ) {
+			this.operation.cancel( handlerFn );
+			return this;
+		},
+		
+		
+<span id='data-persistence-operation-Promise-method-then'>		/**
+</span>		 * Adds handler functions for if the Operation completes successfully, or fails to complete successfully.
+		 * 
+		 * Note: This method does not support jQuery's &quot;filtering&quot; functionality.
+		 * 
+		 * Handlers are called with the following two arguments when the Operation has completed successfully or has failed:
+		 * 
+		 * - **dataComponent** ({@link data.DataComponent}): The Model or Collection that this Operation is operating on.
+		 * - **operation** (Operation): This Operation object.
+		 * 
+		 * @param {Function} successHandlerFn
+		 * @param {Function} failureHandlerFn
+		 * @chainable
+		 */
+		then : function( successHandlerFn, failureHandlerFn ) {
+			this.operation.then( successHandlerFn, failureHandlerFn );
+			return this;
+		},
+		
+		
+<span id='data-persistence-operation-Promise-method-always'>		/**
+</span>		 * Adds a handler for when the Operation completes, regardless of success or failure.
+		 * 
+		 * Handlers are called with the following two arguments when the Operation has completed successfully, has failed,
+		 * or has been canceled (aborted):
+		 * 
+		 * - **dataComponent** ({@link data.DataComponent}): The Model or Collection that this Operation is operating on.
+		 * - **operation** (Operation): This Operation object.
+		 * 
+		 * @param {Function} handlerFn
+		 * @chainable
+		 */
+		always : function( handlerFn ) {
+			this.operation.always( handlerFn );
+			return this;
+		}
+		
+	} );
+	
+	return OperationPromise;
+	
+} );</pre>
+</body>
+</html>

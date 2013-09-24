@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'data/persistence/operation/Operation'
+], function( Operation ) {
+	
+<span id='data-persistence-operation-Load'>	/**
+</span>	 * @class data.persistence.operation.Load
+	 * @extends data.persistence.operation.Operation
+	 *
+	 * Represents a high level Load operation performed on a {@link data.Model Model} or {@link data.Collection Collection}.
+	 * See the superclass for details.
+	 */
+	var LoadOperation = Operation.extend( {
+		
+<span id='data-persistence-operation-Load-cfg-addModels'>		/**
+</span>		 * @cfg {Boolean} addModels
+		 * 
+		 * This config is only relevant when loading a {@link data.Collection Collection}. Specifies if 
+		 * models loaded by this Operation should be added to the Collection (`true`), or should replace
+		 * the current contents of the Collection (`false`).
+		 */
+		addModels : false,
+		
+		
+<span id='data-persistence-operation-Load-method-isAddModels'>		/**
+</span>		 * Returns the value of the {@link #addModels} config. See {@link #addModels} for details.
+		 * 
+		 * @return {Boolean}
+		 */
+		isAddModels : function() {
+			return this.addModels;
+		}
+		
+	} );
+	
+	return LoadOperation;
+	
+} );</pre>
+</body>
+</html>

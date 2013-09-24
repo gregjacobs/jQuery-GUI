@@ -17,33 +17,34 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">/*global define */
 define( [
-	'jqc/ComponentManager',
-	'jqc/Component'
+	'jqGui/ComponentManager',
+	'jqGui/Component'
 ], function( ComponentManager, Component ) {
 	
-<span id='jqc-Label'>	/**
-</span>	 * @class jqc.Label
-	 * @extends jqc.Component
+<span id='jqGui-Label'>	/**
+</span>	 * @class jqGui.Label
+	 * @extends jqGui.Component
+	 * @alias type.label
 	 * 
 	 * Creates a label (piece of text).
 	 */
 	var Label = Component.extend( {
 	
-<span id='jqc-Label-cfg-text'>		/**
+<span id='jqGui-Label-cfg-text'>		/**
 </span>		 * @cfg {String/HTMLElement/jQuery} text
 		 * 
 		 * The label's text. Accepts HTML, DOM nodes, and jQuery wrapped sets as well.
 		 */
 		text : &quot;&quot;,
 		
-<span id='jqc-Label-cfg-baseCls'>		/**
+<span id='jqGui-Label-cfg-baseCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Label',
+		baseCls : 'jqGui-label',
 		
 	
-<span id='jqc-Label-method-onRender'>		/**
+<span id='jqGui-Label-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function() {
@@ -54,7 +55,7 @@ define( [
 		},
 		
 		
-<span id='jqc-Label-method-setText'>		/**
+<span id='jqGui-Label-method-setText'>		/**
 </span>		 * Sets the label's text.  Accepts HTML, DOM nodes, and jQuery wrapper objects as well.
 		 * 
 		 * @method setText
@@ -69,7 +70,7 @@ define( [
 		},
 		
 		
-<span id='jqc-Label-method-getText'>		/**
+<span id='jqGui-Label-method-getText'>		/**
 </span>		 * Gets the label's text.  Will return the HTML of the label if it has any.
 		 * 
 		 * @method getText

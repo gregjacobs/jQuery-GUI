@@ -20,7 +20,7 @@ define( [
 	'lodash',
 	'Class',
 	'Observable',
-	'data/persistence/reader/Json'
+	'data/persistence/reader/Json'  // default `reader` type
 ], function( _, Class, Observable, JsonReader ) {
 	
 <span id='data-persistence-proxy-Proxy'>	/**
@@ -28,7 +28,7 @@ define( [
 	 * @class data.persistence.proxy.Proxy
 	 * @extends Observable
 	 * 
-	 * Proxy is the base class for subclasses that perform CRUD (Create, Read, Update, and Delete) operations on
+	 * Proxy is the base class for subclasses that perform CRUD (Create, Read, Update, and Delete) requests on
 	 * some sort of persistence medium. This can be a backend server, a webservice, or a local storage data store,
 	 * to name a few examples.
 	 */
@@ -134,56 +134,66 @@ define( [
 		
 		
 <span id='data-persistence-proxy-Proxy-method-create'>		/**
-</span>		 * Creates a Model on the persistent storage.
+</span>		 * Creates one or more Models on the persistent storage medium.
 		 * 
 		 * @abstract
 		 * @method create
-		 * @param {data.persistence.operation.Write} operation The WriteOperation instance to represent
-		 *   the creation on the persistent storage.
-		 * @return {jQuery.Promise} A Promise object which is resolved when the operation is complete.
-		 *   `done`, `fail`, and `always` callbacks are called with the `operation` object provided to 
+		 * @param {data.persistence.request.Create} request The CreateRequest instance to represent
+		 *   the creation on the persistent storage medium.
+		 * @return {jQuery.Promise} A Promise object which is resolved when the request is complete.
+		 *   `done`, `fail`, and `always` callbacks are called with the `request` object provided to 
 		 *   this method as the first argument.
 		 */
 		create : Class.abstractMethod,
 		
 		
 <span id='data-persistence-proxy-Proxy-method-read'>		/**
-</span>		 * Reads a Model from the server.
+</span>		 * Reads one or more Models from the persistent storage medium.
+		 * 
+		 * Note that this method should support the configuration options of the {@link data.persistence.request.Read ReadRequest}
+		 * object. This includes handling the following configs as appropriate for the particular Proxy subclass:
+		 * 
+		 * - {@link data.persistence.request.Read#modelId modelId}
+		 * - {@link data.persistence.request.Read#page page}/{@link data.persistence.request.Read#pageSize pageSize}
+		 * - {@link data.persistence.request.Read#start start}/{@link data.persistence.request.Read#limit limit}
+		 * - {@link data.persistence.request.Read#params params} (if applicable)
 		 * 
 		 * @abstract
 		 * @method read
-		 * @param {data.persistence.operation.Read} operation The ReadOperation instance to represent
-		 *   the reading of data from the persistent storage.
-		 * @return {jQuery.Promise} A Promise object which is resolved when the operation is complete.
-		 *   `done`, `fail`, and `always` callbacks are called with the `operation` object provided to 
+		 * @param {data.persistence.request.Read} request The ReadRequest instance to represent
+		 *   the reading of data from the persistent storage medium.
+		 * @return {jQuery.Promise} A Promise object which is resolved when the request is complete.
+		 *   `done`, `fail`, and `always` callbacks are called with the `request` object provided to 
 		 *   this method as the first argument.
 		 */
 		read : Class.abstractMethod,
 		
 		
 <span id='data-persistence-proxy-Proxy-method-update'>		/**
-</span>		 * Updates the Model on the server, using the provided `data`.  
+</span>		 * Updates one or more Models on the persistent storage medium.  
 		 * 
 		 * @abstract
 		 * @method update
-		 * @param {data.persistence.operation.Write} operation The WriteOperation instance to represent
-		 *   the update on the persistent storage.
-		 * @return {jQuery.Promise} A Promise object which is resolved when the operation is complete.
-		 *   `done`, `fail`, and `always` callbacks are called with the `operation` object provided to 
+		 * @param {data.persistence.request.Update} request The UpdateRequest instance to represent
+		 *   the update on the persistent storage medium.
+		 * @return {jQuery.Promise} A Promise object which is resolved when the request is complete.
+		 *   `done`, `fail`, and `always` callbacks are called with the `request` object provided to 
 		 *   this method as the first argument.
 		 */
 		update : Class.abstractMethod,
 		
 		
 <span id='data-persistence-proxy-Proxy-method-destroy'>		/**
-</span>		 * Destroys (deletes) the Model on the server. This method is not named &quot;delete&quot; as &quot;delete&quot; is a JavaScript reserved word.
+</span>		 * Destroys (deletes) one or more Models on the persistent storage medium.
+		 * 
+		 * Note: This method is not named &quot;delete&quot;, as `delete` is a JavaScript keyword.
 		 * 
 		 * @abstract
 		 * @method destroy
-		 * @param {data.persistence.operation.Write} operation The WriteOperation instance to represent
-		 *   the destruction (deletion) on the persistent storage.
-		 * @return {jQuery.Promise} A Promise object which is resolved when the operation is complete.
-		 *   `done`, `fail`, and `always` callbacks are called with the `operation` object provided to 
+		 * @param {data.persistence.request.Destroy} request The DestroyRequest instance to represent
+		 *   the destruction (deletion) on the persistent storage medium.
+		 * @return {jQuery.Promise} A Promise object which is resolved when the request is complete.
+		 *   `done`, `fail`, and `always` callbacks are called with the `request` object provided to 
 		 *   this method as the first argument.
 		 */
 		destroy : Class.abstractMethod

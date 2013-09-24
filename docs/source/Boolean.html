@@ -16,6 +16,7 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">/*global define */
+/*jshint eqnull:true */
 define( [
 	'lodash',
 	'Class',
@@ -38,13 +39,14 @@ define( [
 		 * The Boolean Attribute defaults to `false`, unless the {@link #useNull} config is set to `true`, 
 		 * in which case it defaults to `null` (to denote the Attribute being &quot;unset&quot;).
 		 */
-		defaultValue: function( attribute ) {
-			return attribute.useNull ? null : false;
+		defaultValue: function() {
+			return this.useNull ? null : false;
 		},
 		
 		
 <span id='data-attribute-Boolean-cfg-useNull'>		/**
 </span>		 * @cfg {Boolean} useNull
+		 * 
 		 * True to allow `null` to be set to the Attribute (which is usually used to denote that the 
 		 * Attribute is &quot;unset&quot;, and it shouldn't take an actual default value).
 		 * 
@@ -54,22 +56,20 @@ define( [
 		 */
 		
 		
-<span id='data-attribute-Boolean-method-beforeSet'>		/**
-</span>		 * Converts the provided data value into a Boolean. If {@link #useNull} is true, &quot;unparsable&quot; values
-		 * will return null. 
+<span id='data-attribute-Boolean-method-convert'>		/**
+</span>		 * Override of superclass method, which converts the provided data value into a Boolean. If {@link #useNull} is true, 
+		 * &quot;unparsable&quot; values will return `null`. See {@link #useNull} for details.
 		 * 
-		 * @method beforeSet
-		 * @param {data.Model} model The Model instance that is providing the value. This is normally not used,
-		 *   but is provided in case any model processing is needed.
-		 * @param {Mixed} newValue The new value provided to the {@link data.Model#set} method.
-		 * @param {Mixed} oldValue The old (previous) value that the model held (if any).
+		 * @param {Mixed} value The value to convert.
 		 * @return {Boolean} The converted value.
 		 */
-		beforeSet : function( model, newValue, oldValue ) {
-			if( this.useNull &amp;&amp; ( newValue === undefined || newValue === null || newValue === '' ) ) {
+		convert : function( value ) {
+			value = this._super( arguments );
+			
+			if( this.useNull &amp;&amp; ( value == null || value === '' ) ) {
 				return null;
 			}
-			return newValue === true || newValue === 'true' || newValue === 1 || newValue === &quot;1&quot;;
+			return value === true || value === 'true' || value === 1 || value === &quot;1&quot;;
 		}
 		
 	} );

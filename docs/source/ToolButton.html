@@ -17,19 +17,20 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">/*global define */
 define( [
-	'jqc/button/Button',
-	'jqc/ComponentManager'
+	'jqGui/button/Button',
+	'jqGui/ComponentManager'
 ], function( Button, ComponentManager ) {
 	
-<span id='jqc-panel-ToolButton'>	/**
-</span>	 * @class jqc.panel.ToolButton
-	 * @extends jqc.button.Button
+<span id='jqGui-panel-ToolButton'>	/**
+</span>	 * @class jqGui.panel.ToolButton
+	 * @extends jqGui.button.Button
+	 * @alias type.toolbutton
 	 * 
-	 * Small utility class for a button that can be used in a {@link jqc.panel.Panel Panel's} header.
+	 * Small utility class for a button that can be used in a {@link jqGui.panel.Panel Panel's} header.
 	 */
 	var ToolButton = Button.extend( {
 		
-<span id='jqc-panel-ToolButton-cfg-toolType'>		/**
+<span id='jqGui-panel-ToolButton-cfg-toolType'>		/**
 </span>		 * @cfg {String} toolType (required)
 		 * 
 		 * The tool button type. Currently accepts the strings:
@@ -38,14 +39,14 @@ define( [
 		 * - closethick
 		 */
 		
-<span id='jqc-panel-ToolButton-cfg-componentCls'>		/**
+<span id='jqGui-panel-ToolButton-cfg-componentCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-ToolButton',
+		componentCls : 'jqGui-panel-toolbutton',
 		
 		
-<span id='jqc-panel-ToolButton-method-initComponent'>		/**
+<span id='jqGui-panel-ToolButton-method-initComponent'>		/**
 </span>		 * @inheritdoc
 		 */
 		initComponent : function() {
@@ -57,8 +58,7 @@ define( [
 			    toolType = this.toolType;
 			
 			this.iconCls = [
-				'jqc-icon',
-				'jqc-icon-' + toolType,
+				'jqGui-icon-' + toolType,
 				componentCls + '-icon',
 				componentCls + '-icon-' + toolType
 			].join( &quot; &quot; );
@@ -69,7 +69,6 @@ define( [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'toolbutton'
 	ComponentManager.registerType( 'toolbutton', ToolButton );
 	
 	return ToolButton;

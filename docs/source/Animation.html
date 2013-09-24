@@ -22,28 +22,28 @@ define( [
 	'lodash',
 	'Class',
 	'Observable',
-	'jqc/Component'
+	'jqGui/Component'
 ], function( require, jQuery, _, Class, Observable, Component ) {
 	
-<span id='jqc-anim-Animation'>	/**
-</span>	 * @class jqc.anim.Animation
+<span id='jqGui-anim-Animation'>	/**
+</span>	 * @class jqGui.anim.Animation
 	 * @extends Observable
 	 * 
-	 * A class that encapsulates a single animation of a given HTMLElement, jQuery wrapped set, or {@link jqc.Component}.
+	 * A class that encapsulates a single animation of a given HTMLElement, jQuery wrapped set, or {@link jqGui.Component}.
 	 */
 	var Animation = Class.extend( Observable, {
 		
-<span id='jqc-anim-Animation-cfg-target'>		/**
-</span>		 * @cfg {HTMLElement/jQuery/jqc.Component} target (required)
+<span id='jqGui-anim-Animation-cfg-target'>		/**
+</span>		 * @cfg {HTMLElement/jQuery/jqGui.Component} target (required)
 		 * 
-		 * The target element(s) to animate. In the case of a {@link jqc.Component}, the Component's {@link jqc.Component#getEl getEl}
+		 * The target element(s) to animate. In the case of a {@link jqGui.Component}, the Component's {@link jqGui.Component#getEl getEl}
 		 * method is run to retrieve the element to animate.
 		 * 
 		 * Note that this config is not required upon instantiation of the Animation, but must be present at the time that
 		 * {@link #start} is executed. The target may be set after instantiation time using {@link #setTarget}.
 		 */
 		
-<span id='jqc-anim-Animation-cfg-effect'>		/**
+<span id='jqGui-anim-Animation-cfg-effect'>		/**
 </span>		 * @cfg {String/Object} effect (required)
 		 * 
 		 * One of the jQuery UI effects to use for the animation. See 
@@ -59,28 +59,28 @@ define( [
 		 * Note: This config is mutually exclusive with the {@link #to} config, and override it if provided.
 		 */
 		
-<span id='jqc-anim-Animation-cfg-from'>		/**
+<span id='jqGui-anim-Animation-cfg-from'>		/**
 </span>		 * @cfg {Object} from
 		 * 
 		 * A hash of CSS properties to start the animation from (i.e. these are set at the start of the animation). If
 		 * none are provided, the animation animates from the element's current CSS state. 
 		 */
 		
-<span id='jqc-anim-Animation-cfg-to'>		/**
+<span id='jqGui-anim-Animation-cfg-to'>		/**
 </span>		 * @cfg {Object} to (required)
 		 * 
 		 * A hash of CSS properties to animate to. Note: this config is mutually exclusive with the {@link #effect} 
 		 * config, and will be overridden if an {@link #effect} config is provided.
 		 */
 		
-<span id='jqc-anim-Animation-cfg-duration'>		/**
+<span id='jqGui-anim-Animation-cfg-duration'>		/**
 </span>		 * @cfg {Number} duration
 		 * 
 		 * The duration in milliseconds to run the animation.
 		 */
 		duration : 250,
 		
-<span id='jqc-anim-Animation-cfg-easing'>		/**
+<span id='jqGui-anim-Animation-cfg-easing'>		/**
 </span>		 * @cfg {String} easing
 		 * 
 		 * The name of the easing to use to run the animation. Only used if using the {@link #to} config. For a full list 
@@ -88,27 +88,27 @@ define( [
 		 */
 		easing : 'linear',
 		
-<span id='jqc-anim-Animation-cfg-callback'>		/**
+<span id='jqGui-anim-Animation-cfg-callback'>		/**
 </span>		 * @cfg {Function} callback
 		 * 
 		 * Callback to run when the animation is complete. This function is called with this Animation instance as its first argument.
 		 */
 		
-<span id='jqc-anim-Animation-cfg-scope'>		/**
+<span id='jqGui-anim-Animation-cfg-scope'>		/**
 </span>		 * @cfg {Object} scope
 		 * 
 		 * The scope to run the {@link #callback} in. Defaults to `window`.
 		 */
 		
 		
-<span id='jqc-anim-Animation-property-S-target'>		/**
+<span id='jqGui-anim-Animation-property-S-target'>		/**
 </span>		 * @private
 		 * @property {jQuery} $target
 		 * 
 		 * The jQuery wrapped set for the {@link #target}, after being resolved by {@link #resolveTarget}.
 		 */
 		
-<span id='jqc-anim-Animation-property-running'>		/**
+<span id='jqGui-anim-Animation-property-running'>		/**
 </span>		 * @private
 		 * @property {Boolean} running
 		 * 
@@ -119,7 +119,7 @@ define( [
 		 */
 		running : false,
 		
-<span id='jqc-anim-Animation-property-complete'>		/**
+<span id='jqGui-anim-Animation-property-complete'>		/**
 </span>		 * @private
 		 * @property {Boolean} complete
 		 * 
@@ -128,7 +128,7 @@ define( [
 		complete : false,
 		
 		
-<span id='jqc-anim-Animation-method-constructor'>		/**
+<span id='jqGui-anim-Animation-method-constructor'>		/**
 </span>		 * @constructor
 		 * @param {Object} [config] The configuration options for this instance.
 		 */
@@ -140,41 +140,41 @@ define( [
 			
 			
 			this.addEvents(
-<span id='jqc-anim-Animation-event-beforeanimate'>				/**
+<span id='jqGui-anim-Animation-event-beforeanimate'>				/**
 </span>				 * Fires just before the animation starts. Handlers of this event may return false to
 				 * prevent the animation from starting.
 				 * 
 				 * @event beforeanimate
-				 * @param {jqc.anim.Animation} animation This Animation instance.
+				 * @param {jqGui.anim.Animation} animation This Animation instance.
 				 * @preventable
 				 */
 				'beforeanimate',
 				
-<span id='jqc-anim-Animation-event-afteranimate'>				/**
+<span id='jqGui-anim-Animation-event-afteranimate'>				/**
 </span>				 * Fires when the animation completes.
 				 * 
 				 * @event afteranimate
-				 * @param {jqc.anim.Animation} animation This Animation instance.
+				 * @param {jqGui.anim.Animation} animation This Animation instance.
 				 */
 				'afteranimate',
 				
-<span id='jqc-anim-Animation-event-complete'>				/**
+<span id='jqGui-anim-Animation-event-complete'>				/**
 </span>				 * An alias of {@link #afteranimate}, fires when the animation completes.
 				 * 
 				 * @event complete
-				 * @param {jqc.anim.Animation} animation This Animation instance.
+				 * @param {jqGui.anim.Animation} animation This Animation instance.
 				 */
 				'complete'
 			);
 		},
 		
 		
-<span id='jqc-anim-Animation-method-setTarget'>		/**
+<span id='jqGui-anim-Animation-method-setTarget'>		/**
 </span>		 * Sets the {@link #target} for the Animation. This method allows it to be set after instantiation,
 		 * if the {@link #target} config was not provided.
 		 * 
-		 * @param {HTMLElement/jQuery/jqc.Component} target The target element(s) to animate. In the case of a {@link jqc.Component}, 
-		 *   the Component's {@link jqc.Component#getEl getEl} method is run to retrieve the element to animate.
+		 * @param {HTMLElement/jQuery/jqGui.Component} target The target element(s) to animate. In the case of a {@link jqGui.Component}, 
+		 *   the Component's {@link jqGui.Component#getEl getEl} method is run to retrieve the element to animate.
 		 * @chainable
 		 */
 		setTarget : function( target ) {
@@ -185,7 +185,7 @@ define( [
 		},
 		
 		
-<span id='jqc-anim-Animation-method-resolveTarget'>		/**
+<span id='jqGui-anim-Animation-method-resolveTarget'>		/**
 </span>		 * Normalizes the {@link #target} config that was provided upon instantiation, or provided from
 		 * {@link #setTarget}, and return the element that it refers to. If the t
 		 * 
@@ -200,7 +200,7 @@ define( [
 			// Make sure there is a 'target' config, and normalize it if need be
 			var target = this.target;
 			if( target ) {
-				if( target instanceof require( 'jqc/Component' ) ) {   // need to require() jqc.Component here, because it is a circular dependency
+				if( target instanceof require( 'jqGui/Component' ) ) {   // need to require() jqGui.Component here, because it is a circular dependency
 					$target = jQuery( target.getEl() );
 				} else {
 					$target = jQuery( target );
@@ -212,7 +212,7 @@ define( [
 		},
 		
 		
-<span id='jqc-anim-Animation-method-start'>		/**
+<span id='jqGui-anim-Animation-method-start'>		/**
 </span>		 * Starts the animation. The {@link #target} and either a {@link #to} or {@link #effect} config must be
 		 * set at this point to start the animation.
 		 */
@@ -227,10 +227,10 @@ define( [
 			// &lt;debug&gt;
 			// Make sure there is a target element, and either a 'to' config or an 'effect' config
 			if( !$target ) {
-				throw new Error( &quot;jqc.anim.Animation.start(): Error. No `target` config provided&quot; );
+				throw new Error( &quot;jqGui.anim.Animation.start(): Error. No `target` config provided&quot; );
 			}
 			if( !to &amp;&amp; !effect ) {
-				throw new Error( &quot;jqc.anim.Animation.start(): Error. No `to` or `effect` config provided&quot; );
+				throw new Error( &quot;jqGui.anim.Animation.start(): Error. No `to` or `effect` config provided&quot; );
 			}
 			// &lt;/debug&gt;
 			
@@ -268,7 +268,7 @@ define( [
 		},
 		
 		
-<span id='jqc-anim-Animation-method-isRunning'>		/**
+<span id='jqGui-anim-Animation-method-isRunning'>		/**
 </span>		 * Determines if the animation is currently running.
 		 * 
 		 * @return {Boolean} True if the animation is currently running, false otherwise.
@@ -278,7 +278,7 @@ define( [
 		},
 		
 		
-<span id='jqc-anim-Animation-method-isComplete'>		/**
+<span id='jqGui-anim-Animation-method-isComplete'>		/**
 </span>		 * Determines if the animation is complete.
 		 * 
 		 * @return {Boolean} True if the animation has completed.
@@ -288,7 +288,7 @@ define( [
 		},
 		
 		
-<span id='jqc-anim-Animation-method-end'>		/**
+<span id='jqGui-anim-Animation-method-end'>		/**
 </span>		 * Pre-emptively ends the animation, if it is running, jumping the {@link #target} element(s) to their 
 		 * &quot;end of animation&quot; state.
 		 */
@@ -301,7 +301,7 @@ define( [
 		},
 		
 		
-<span id='jqc-anim-Animation-method-onLastFrame'>		/**
+<span id='jqGui-anim-Animation-method-onLastFrame'>		/**
 </span>		 * Cleans up the Animation object after the last frame has been reached, and calls the {@link #callback} if one
 		 * was provided.
 		 * 

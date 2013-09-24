@@ -16,202 +16,269 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">/*global define */
-/*jshint newcap:false */  // For the dynamic constructor: new modelClass( ... );
 define( [
-	'require',
+	'jquery',
 	'lodash',
-	'Class',
-	'data/attribute/Attribute',
-	'data/attribute/DataComponent',
-	'data/Model'  // circular dependency, not included in args list
-], function( require, _, Class, Attribute, DataComponentAttribute ) {
+	'jqGui/ComponentManager',
+	'jqGui/Component',
+	'jqGui/util/ModelBindable'
+], function( jQuery, _, ComponentManager, Component, ModelBindable ) {
 	
-<span id='data-attribute-Model'>	/**
-</span>	 * @class data.attribute.Model
-	 * @extends data.attribute.DataComponent
+<span id='jqGui-view-Model'>	/**
+</span>	 * @class jqGui.view.Model
+	 * @extends jqGui.Component
+	 * @mixins jqGui.util.ModelBindable
+	 * @alias type.modelview
 	 * 
-	 * Attribute definition class for an Attribute that allows for a nested {@link data.Model} value.
+	 * A view of the data in a single {@link data.Model}. The view uses the {@link #tpl} config, which 
+	 * is automatically passed the {@link #model} to populate the template. When any of the {@link #model model's} 
+	 * attributes change, the Model View is automatically refreshed to reflect the change.  
 	 * 
-	 * This class enforces that the Attribute hold a {@link data.Model Model} value, or null. However, it will
-	 * automatically convert an anonymous data object into the appropriate {@link data.Model Model} subclass, using
-	 * the Model constructor function (class) provided to the {@link #model} config. 
-	 * 
-	 * Otherwise, you must either provide a {@link data.Model} subclass as the value, or use a custom {@link #cfg-set} 
-	 * function to convert any anonymous object to a Model in the appropriate way. 
+	 * This view is similar to the {@link jqGui.view.Collection Collection View}, which shows a {@link data.Collection Collection}
+	 * of {@link data.Model Models} instead of a single one.  
 	 */
-	var ModelAttribute = Class.extend( DataComponentAttribute, {
+	var ModelView = Component.extend( {
+		mixins : [ ModelBindable ],
 		
-<span id='data-attribute-Model-cfg-model'>		/**
-</span>		 * @cfg {data.Model/String/Function} model
+<span id='jqGui-view-Model-cfg-model'>		/**
+</span>		 * @cfg {data.Model} model (required)
 		 * 
-		 * The specific {@link data.Model} subclass that will be used in the Model Attribute. This config can be provided
-		 * to perform automatic conversion of anonymous data objects into the appropriate {@link data.Model Model} subclass.
+		 * The Model to work with. This is required to populate the Component's {@link #tpl}, but
+		 * does not need to be provided upon instantiation. It may be provided at a later time with the
+		 * {@link #bindModel} method.
 		 * 
-		 * This config may be provided as:
-		 * 
-		 * - A direct reference to a Model (ex: `myApp.models.MyModel`).
-		 * - A String which specifies the object path to the Model, which must be able to be referenced from the global scope. 
-		 *   Ex: &quot;myApp.models.MyModel&quot;.
-		 * - A function, which will return a reference to the Model subclass that should be used. 
-		 * 
-		 * The reason that this config may be specified as a String or a Function is to allow for &quot;very late binding&quot; to the Model 
-		 * subclass that is used, if the particular {@link data.Model} subclass is not yet available at the time of Attribute definition.
-		 * In this case, the Model subclass that is used does not need to exist until a value is actually set to the Attribute.
-		 * For example, using RequireJS, we may have a circular dependency that needs to be in-line required:
-		 *   
-		 *     model : function() {
-		 *         return require( 'myApp/model/MyOtherModel' );  // will only be resolved once a value is set to the ModelAttribute
-		 *     }
+		 * The Model is monitored for changes, and the view is refreshed when they occur.
 		 */
 		
-<span id='data-attribute-Model-cfg-embedded'>		/**
-</span>		 * @cfg {Boolean} embedded
+<span id='jqGui-view-Model-cfg-tpl'>		/**
+</span>		 * @cfg {String/String[]/Function/jqGui.template.Template} tpl (required)
 		 * 
-		 * Setting this config to true has the parent {@link data.Model Model} treat the child {@link data.Model Model} as if it is a part of itself. 
-		 * Normally, a child Model that is not embedded is treated as a &quot;relation&quot;, where it is considered as independent from the parent Model.
+		 * The template which will be used to populate the Model View. By default, this template will be provided
+		 * the variable `model`, which is the {@link #model} instance bound to this Model View. The name of the 
+		 * variable provided to the {@link #tpl} that holds the models may be configured using the {@link #modelVar} config.
 		 * 
-		 * What this means is that, when true:
+		 * For example, if we had a &quot;User&quot; model, which had fields `id`, `firstName`, and `lastName`, then we
+		 * might want to display this information in a template as such: (using a {@link jqGui.template.LoDash Lo-Dash template}
+		 * in this case)
 		 * 
-		 * - The parent Model is considered as &quot;changed&quot; when an attribute in the child Model is changed. This Attribute (the attribute that holds the child
-		 *   model) is the &quot;change&quot;.
-		 * - The parent Model's {@link data.Model#change change} event is fired when an attribute on the child Model has changed.
-		 * - The child Model's data is persisted with the parent Model's data, unless the {@link #persistIdOnly} config is set to true,
-		 *   in which case just the child Model's {@link data.Model#idAttribute id} is persisted with the parent Model.
+		 *     tpl : new LoDashTpl( [
+		 *         '&lt;div&gt;',
+		 *             'Current User: &lt;%= model.get( &quot;lastName&quot; ) %&gt;, &lt;%= model.get( &quot;firstName&quot; ) %&gt; (&lt;%= model.get( &quot;id&quot; ) %&gt;)',
+		 *         '&lt;/div&gt;'
+		 *     ] )
+		 *     
+		 * If we wanted to convert all of the {@link data.Model Model's} attributes to a plain JavaScript Object (map)
+		 * before working with them, we can call {@link data.Model#getData getData} on it beforehand. For example:
+		 * 
+		 *     tpl : new LoDashTpl( [
+		 *         '&lt;% var data = model.getData() %&gt;
+		 *         '&lt;div&gt;',
+		 *             'Current User: &lt;%= data.lastName %&gt;, &lt;%= data.firstName %&gt; (&lt;%= data.id %&gt;)',
+		 *         '&lt;/div&gt;'
+		 *     ] )
+		 * 
+		 * While the above example may be more readable than the example before it, it may involve more processing and
+		 * conversions being executed behind the scenes for attribute retrieval than are needed by the template. If only 
+		 * a subset of the attributes in the {@link data.Model Model} are needed for the template, it would be more efficient 
+		 * to only retrieve those particular attributes using {@link data.Model#get}.
+		 * 
+		 * For more information on templates themselves, see the {@link jqGui.Component#tpl tpl} config in the superclass, 
+		 * {@link jqGui.Component Component}.
 		 */
-		embedded : false,
 		
-<span id='data-attribute-Model-cfg-persistIdOnly'>		/**
-</span>		 * @cfg {Boolean} persistIdOnly
+<span id='jqGui-view-Model-cfg-modelVar'>		/**
+</span>		 * @cfg {String} modelVar
 		 * 
-		 * In the case that the {@link #embedded} config is true, set this to true to only have the {@link data.Model#idAttribute id} of the embedded 
-		 * model be persisted, rather than all of the Model data. Normally, when {@link #embedded} is false (the default), the child {@link data.Model Model}
-		 * is treated as a relation, and only its {@link data.Model#idAttribute id} is persisted.
+		 * The name of the variable that will be provided to the {@link #tpl} that holds the {@link #model} that
+		 * is to be rendered by it. 
+		 * 
+		 * This may be used to provide a variable name that makes more sense inside the template for the type of model 
+		 * being used. For example, if the Model View is working with a &quot;User&quot; model, one might want to
+		 * set this config to `user`. Example: (using a {@link jqGui.template.LoDash Lo-Dash template} in this case)
+		 * 
+		 *     modelVar : 'user',
+		 *     tpl : new LoDashTpl( [
+		 *         '&lt;span&gt;The current user is: &lt;%= user.get( &quot;name&quot; ) %&gt;&lt;/span&gt;',
+		 *     ] )
 		 */
-		persistIdOnly : false,
+		modelVar : 'model',
 		
-		
-		// -------------------------------
-		
-		
-<span id='data-attribute-Model-method-constructor'>		/**
-</span>		 * @constructor
+<span id='jqGui-view-Model-cfg-maskOnLoad'>		/**
+</span>		 * @cfg {Boolean} maskOnLoad
+		 * 
+		 * True to automatically mask the Model View while the backing {@link #model} is loading. The mask that is shown
+		 * can be configured with the {@link #maskConfig} configuration option, or defaults to showing the message &quot;Loading...&quot;
+		 * 
+		 * This really only applies to a {@link data.Model Model} that is being {@link data.Model#method-load reloaded} from 
+		 * its backing data source (ex: a web server).
 		 */
-		constructor : function() {
+		maskOnLoad : true,
+		
+		
+<span id='jqGui-view-Model-method-initComponent'>		/**
+</span>		 * @inheritdoc
+		 */
+		initComponent : function() {
+			// Call the ModelBindable constructor
+			ModelBindable.call( this );
+			
 			this._super( arguments );
-
+			
 			// &lt;debug&gt;
-			// Check if the user provided a `model`, but the value is undefined. This means that they specified
-			// a class that either doesn't exist, or doesn't exist yet, and we should give them a warning.
-			if( 'model' in this &amp;&amp; this.model === undefined ) {
-				throw new Error( &quot;The `model` config provided to a Model Attribute with the name '&quot; + this.getName() + &quot;' either doesn't exist, or doesn't &quot; +
-				                 &quot;exist just yet. Consider using the String or Function form of the `model` config for late binding, if needed.&quot; );
-			}
+			if( !this.tpl ) throw new Error( &quot;`tpl` config required&quot; );
 			// &lt;/debug&gt;
-		},
-		
-		
-<span id='data-attribute-Model-method-valuesAreEqual'>		/**
-</span>		 * Overridden method used to determine if two models are equal.
-		 * 
-		 * @inheritdoc
-		 * @param {Mixed} oldValue
-		 * @param {Mixed} newValue
-		 * @return {Boolean} True if the values are equal, and the Model should *not* consider the new value as a 
-		 *   change of the old value, or false if the values are different, and the new value should be taken as a change.
-		 */
-		valuesAreEqual : function( oldValue, newValue ) {
-			// We can't instantiate two different Models with the same id that have different references, so if the references are the same, they are equal
-			return oldValue === newValue;
-		},
-		
-		
-<span id='data-attribute-Model-method-beforeSet'>		/**
-</span>		 * Overridden `beforeSet` method used to convert any anonymous objects into the specified {@link #model} subclass. The anonymous 
-		 * object will be provided to the {@link #model} subclass's constructor.
-		 * 
-		 * @inheritdoc
-		 */
-		beforeSet : function( model, newValue, oldValue ) {
-			// Now, normalize the newValue to an object, or null
-			newValue = this._super( arguments );
 			
-			if( newValue !== null ) {
-				var modelClass = this.resolveModelClass();
-				
-				if( newValue &amp;&amp; typeof modelClass === 'function' &amp;&amp; !( newValue instanceof modelClass ) ) {
-					newValue = new modelClass( newValue );
-				}
+			if( this.model ) {
+				this.bindModel( this.model );
+			} else {
+				this.refresh();  // do an initial refresh if no model, which simply sets up the ModelView to not show anything (and not run the template, since we don't have a model to run it with)
 			}
 			
-			return newValue;
+			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
+			// while the model is loading.
+			this.maskConfig = this.maskConfig || { msg: &quot;Loading...&quot; };
 		},
 		
 		
-<span id='data-attribute-Model-method-afterSet'>		/**
-</span>		 * Overridden `afterSet` method used to subscribe to change events on a set child {@link data.Model Model}.
-		 * 
-		 * @inheritdoc
+<span id='jqGui-view-Model-method-onAfterRender'>		/**
+</span>		 * @inheritdoc
 		 */
-		afterSet : function( model, value ) {
-			var Model = require( 'data/Model' );
+		onAfterRender : function() {
+			this._super( arguments );
 			
-			// Enforce that the value is either null, or a data.Model
-			if( value !== null &amp;&amp; !( value instanceof Model ) ) {
-				throw new Error( &quot;A value set to the attribute '&quot; + this.getName() + &quot;' was not a data.Model subclass&quot; );
-			}
-			
-			return value;
+			// Mask the view if the Model is currently loading when the view is rendered
+			/*var model = this.model;
+			if( model &amp;&amp; this.maskOnLoad &amp;&amp; model.isLoading() ) {
+				this.mask();
+			}*/
 		},
 		
 		
-<span id='data-attribute-Model-method-resolveModelClass'>		/**
-</span>		 * Utility method used to retrieve the normalized {@link data.Model} subclass provided by the {@link #model} config.
-		 * 
-		 * - If the {@link #model} config was provided directly as a class (constructor function), this class is simply returned.
-		 * - If the {@link #model} config was a String, resolve the class (constructor function) by walking down the object tree 
-		 *   from the global object.
-		 * - If the {@link #model} config was a Function, resolve the class (constructor function) by executing the function, 
-		 *   and taking its return value as the class.
-		 * 
-		 * If the {@link #model} config was a String or Function, the resolved class is cached back into the {@link #model} config
-		 * for subsequent calls.
+		// -----------------------------------
+		
+		// Implementation of ModelBindable mixin methods
+		
+		
+<span id='jqGui-view-Model-method-getModelListeners'>		/**
+</span>		 * Implementation of {@link jqGui.util.ModelBindable} mixin method, which retrieves an Object (map) of the listeners that 
+		 * should be set up on the {@link #model}, when a {@link data.Model} is bound to the view. This method may be overridden 
+		 * in a subclass to add extra events that should be listened for.
 		 * 
 		 * @protected
-		 * @return {Function} The class (constructor function) for the {@link data.Model} subclass referenced by the {@link #model}
-		 *   config.
+		 * @param {data.Model} model The Model being bound.
+		 * @return {Object} An {@link Observable#addListener addListener} config object for the listeners.
 		 */
-		resolveModelClass : function() {
-			var modelClass = this.model,
-			    Model = require( 'data/Model' );  // the Model constructor function
-			
-			if( typeof modelClass === 'string' ) {
-				this.model = modelClass = this.resolveGlobalPath( modelClass );  // changes the string &quot;a.b.c&quot; into the value at `window.a.b.c`
-				
-				// &lt;debug&gt;
-				if( !modelClass ) {
-					throw new Error( &quot;The string value `model` config did not resolve to a Model subclass for attribute '&quot; + this.getName() + &quot;'&quot; );
-				}
-				// &lt;/debug&gt;
-			} else if( typeof modelClass === 'function' &amp;&amp; !Class.isSubclassOf( modelClass, Model ) ) {  // it's not a data.Model subclass, so it must be an anonymous function. Run it, so it returns the Model reference we need
-				this.model = modelClass = modelClass();
-				
-				// &lt;debug&gt;
-				if( !modelClass ) {
-					throw new Error( &quot;The function value `model` config did not resolve to a Model subclass for attribute '&quot; + this.getName() + &quot;'&quot; );
-				}
-				// &lt;/debug&gt;
+		getModelListeners : function( model ) {
+			return {
+				'loadbegin' : this.onLoadBegin,
+				'load'      : this.onLoadComplete,
+				'changeset' : this.refresh,
+				'rollback'  : this.refresh,
+				scope : this
+			};
+		},
+		
+		
+<span id='jqGui-view-Model-method-onModelBind'>		/**
+</span>		 * Implementation of {@link jqGui.util.ModelBindable} mixin method. Handles when a new {@link #model} has been 
+		 * bound to the view.
+		 * 
+		 * @protected
+		 * @param {data.Model} model The newly bound model. Will be `null` if the previous model was
+		 *   simply unbound (i.e. `null` was passed to {@link #bindModel}, or {@link #unbindModel} was called). 
+		 * @param {data.Model} oldModel The model that was just unbound. Will be `null` if there was no
+		 *   previously-bound model.
+		 */
+		onModelBind : function( model ) {
+			this.refresh();
+		},
+		
+		
+		// -----------------------------------
+		
+		
+<span id='jqGui-view-Model-method-onLoadBegin'>		/**
+</span>		 * Handles the {@link #model} starting to load, by displaying the &quot;loading&quot; mask over the Model View
+		 * if the {@link #maskOnLoad} config is true.
+		 * 
+		 * @protected
+		 */
+		onLoadBegin : function() {
+			if( this.maskOnLoad ) {
+				this.mask();
 			}
+		},
+		
+		
+<span id='jqGui-view-Model-method-onLoadComplete'>		/**
+</span>		 * Handles the {@link #model} completing its load, by removing the &quot;loading&quot; mask from the Model View,
+		 * which was shown by {@link #onLoadBegin} if the {@link #maskOnLoad} config was true.
+		 * 
+		 * Note: The view will be refreshed due to the addition/removal of models, and doesn't need to be refreshed
+		 * from this method.
+		 * 
+		 * @protected
+		 */
+		onLoadComplete : function() {
+			if( this.maskOnLoad ) {
+				this.unMask();
+			}
+		},
+		
+		
+<span id='jqGui-view-Model-method-refresh'>		/**
+</span>		 * Refreshes the view by {@link #update updating} the Component's markup, based on the {@link #tpl}
+		 * and the current state of the {@link #model}. This method should normally not need to be called 
+		 * directly, as the view will automatically be updated when changes are detected on the {@link #model}.
+		 */
+		refresh : function() {
+			if( !this.model ) {
+				this.update( &quot;&quot; );  // don't display anything
+				
+			} else {
+				this.update( this.prepareTplData( this.model ) );
+			}
+		},
+		
+		
+<span id='jqGui-view-Model-method-prepareTplData'>		/**
+</span>		 * Retrieves the data that will be {@link jqGui.template.Template#apply applied} to the {@link #tpl} upon 
+		 * {@link #refresh}. 
+		 * 
+		 * This method may be overridden by subclasses to add additional properties which will be provided
+		 * to the {@link #tpl}.
+		 * 
+		 * @protected
+		 * @param {data.Model} model The model that is to be rendered by the {@link #tpl}.
+		 * @return {Object} An Object (map) of the properties which will be {@link jqGui.template.Template#apply applied}
+		 *   to the {@link #tpl}, to produce the output.
+		 */
+		prepareTplData : function( model ) {
+			var data = {};
+			data[ this.modelVar ] = model;
 			
-			return modelClass;
+			return data;
+		},
+		
+		
+		// ---------------------------------------
+		
+		
+<span id='jqGui-view-Model-method-onDestroy'>		/**
+</span>		 * @inheritdoc
+		 */
+		onDestroy : function() {
+			this.unbindModel();
+			
+			this._super( arguments );
 		}
 		
 	} );
 	
 	
-	// Register the Attribute type
-	Attribute.registerType( 'model', ModelAttribute );
+	ComponentManager.registerType( 'modelview', ModelView );
 	
-	return ModelAttribute;
+	return ModelView;
 	
 } );</pre>
 </body>

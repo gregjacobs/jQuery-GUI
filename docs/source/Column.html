@@ -18,31 +18,32 @@
   <pre class="prettyprint lang-js">/*global define */
 define( [
 	'Class',
-	'jqc/Component',
-	'jqc/Container',
-	'jqc/layout/Layout'
+	'jqGui/Component',
+	'jqGui/Container',
+	'jqGui/layout/Layout'
 ], function( Class, Component, Container, Layout ) {
 
-<span id='jqc-layout-Column'>	/**
-</span>	 * @class jqc.layout.Column
-	 * @extends jqc.layout.Layout
+<span id='jqGui-layout-Column'>	/**
+</span>	 * @class jqGui.layout.Column
+	 * @extends jqGui.layout.Layout
+	 * @alias layout.column
 	 * 
-	 * A layout that renders a {@link jqc.Container Container's} child components into columns. Each child component
+	 * A layout that renders a {@link jqGui.Container Container's} child components into columns. Each child component
 	 * in the Container should have a special property named `columnWidth`, that determines how wide the column
 	 * should be.  This property can either be a number, or any css width value.
 	 * 
-	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'columns'.
+	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'column'.
 	 */
 	var ColumnLayout = Layout.extend( {
 		
-<span id='jqc-layout-Column-property-S-columnDivEls'>		/**
+<span id='jqGui-layout-Column-property-S-columnDivEls'>		/**
 </span>		 * @protected
 		 * @property {jQuery} $columnDivEls
 		 * 
 		 * The set of the divs created to place each of the child components into.
 		 */
 		
-<span id='jqc-layout-Column-property-columnsLayoutInitialized'>		/**
+<span id='jqGui-layout-Column-property-columnsLayoutInitialized'>		/**
 </span>		 * @protected
 		 * @property {Boolean} columnsLayoutInitialized
 		 * 
@@ -50,15 +51,15 @@ define( [
 		 */
 		
 		
-<span id='jqc-layout-Column-method-onLayout'>		/**
+<span id='jqGui-layout-Column-method-onLayout'>		/**
 </span>		 * Layout implementation for ColumnsLayout, which renders each child component as columns into the 
-		 * Container's content target (see {@link jqc.Component#getContentTarget).  Each child component in the
+		 * Container's content target (see {@link jqGui.Component#getContentTarget).  Each child component in the
 		 * Container should have a special property named `columnWidth`, that determines how wide the column
 		 * should be.  This property can either be a number, or any css width value.
 		 * 
 		 * @protected
 		 * @method onLayout
-		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jqGui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {		
@@ -73,12 +74,12 @@ define( [
 		},
 		
 		
-<span id='jqc-layout-Column-method-initColumnsLayout'>		/**
+<span id='jqGui-layout-Column-method-initColumnsLayout'>		/**
 </span>		 * Initializes the ColumnsLayout for its first layout run.  Subsequent layout runs
 		 * are handled by {@link #updateColumnsLayout}.
 		 * 
 		 * @method initColumnsLayout
-		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jqGui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		initColumnsLayout : function( childComponents, $targetEl ) {
@@ -119,11 +120,11 @@ define( [
 		
 		
 		
-<span id='jqc-layout-Column-method-updateColumnsLayout'>		/**
+<span id='jqGui-layout-Column-method-updateColumnsLayout'>		/**
 </span>		 * Updates the ColumnsLayout for each layout run after the first (which is handled by {@link #initColumnsLayout}.
 		 * 
 		 * @method updateColumnsLayout
-		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jqGui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		updateColumnsLayout : function( childComponents, $targetEl ) {
@@ -146,7 +147,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the jqGui.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'column', ColumnLayout );
 	
 	return ColumnLayout;

@@ -19,20 +19,22 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqc/util/Css',
-	'jqc/ComponentManager',
-	'jqc/form/field/Text'
+	'jqGui/util/Css',
+	'jqGui/ComponentManager',
+	'jqGui/form/field/Text'
 ], function( jQuery, _, Css, ComponentManager, TextField ) {
 	
-<span id='jqc-form-field-TextArea'>	/**
-</span>	 * @class jqc.form.field.TextArea
-	 * @extends jqc.form.field.Text
+<span id='jqGui-form-field-TextArea'>	/**
+</span>	 * @class jqGui.form.field.TextArea
+	 * @extends jqGui.form.field.Text
+	 * @alias type.textarea
+	 * @alias type.textareafield
 	 * 
 	 * TextArea field component.
 	 */
 	var TextAreaField = TextField.extend( {
 		
-<span id='jqc-form-field-TextArea-cfg-autoGrow'>		/**
+<span id='jqGui-form-field-TextArea-cfg-autoGrow'>		/**
 </span>		 * @cfg {Boolean} autoGrow
 		 * True to auto-grow the text field as the user types into it. Defaults to false.
 		 * 
@@ -43,21 +45,21 @@ define( [
 		 */
 		autoGrow : false,
 		
-<span id='jqc-form-field-TextArea-cfg-componentCls'>		/**
+<span id='jqGui-form-field-TextArea-cfg-componentCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-TextAreaField',
+		componentCls : 'jqGui-form-field-textarea',
 		
 		
-<span id='jqc-form-field-TextArea-property-S-inputEl'>		/**
+<span id='jqGui-form-field-TextArea-property-S-inputEl'>		/**
 </span>		 * @protected
 		 * @property {jQuery} $inputEl
 		 * 
 		 * The &amp;lt;input&amp;gt; element; the textarea field.
 		 */
 		
-<span id='jqc-form-field-TextArea-property-autoGrowMimicStyles'>		/**
+<span id='jqGui-form-field-TextArea-property-autoGrowMimicStyles'>		/**
 </span>		 * @private
 		 * @property {String[]} autoGrowMimicStyles
 		 * 
@@ -66,7 +68,7 @@ define( [
 		 */
 		autoGrowMimicStyles : [ 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'fontSize', 'lineHeight', 'fontFamily', 'width', 'fontWeight' ],
 		
-<span id='jqc-form-field-TextArea-property-S-autoGrowTwinDiv'>		/**
+<span id='jqGui-form-field-TextArea-property-S-autoGrowTwinDiv'>		/**
 </span>		 * @private
 		 * @property {jQuery} $autoGrowTwinDiv
 		 * 
@@ -74,14 +76,14 @@ define( [
 		 * this div so that it can be measured for its height, and then that height value can be applied to the textarea itself to &quot;autogrow&quot; it.
 		 */
 		
-<span id='jqc-form-field-TextArea-property-autoGrowComputedStyles'>		/**
+<span id='jqGui-form-field-TextArea-property-autoGrowComputedStyles'>		/**
 </span>		 * @private
 		 * @property {Object} autoGrowComputedStyles
 		 * 
 		 * An object that holds the computed styles for the {@link #autoGrow} feature.
 		 */
 		
-<span id='jqc-form-field-TextArea-property-autoGrowPasteHandler'>		/**
+<span id='jqGui-form-field-TextArea-property-autoGrowPasteHandler'>		/**
 </span>		 * @private 
 		 * @property {Function} autoGrowPasteHandler
 		 * 
@@ -91,7 +93,7 @@ define( [
 		
 		
 		
-<span id='jqc-form-field-TextArea-method-onRender'>		/**
+<span id='jqGui-form-field-TextArea-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function() {
@@ -185,9 +187,9 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-TextArea-method-createInputEl'>		/**
+<span id='jqGui-form-field-TextArea-method-createInputEl'>		/**
 </span>		 * Overridden method for creating the input element for the TextAreaField. This implementation
-		 * creates a &amp;lt;textarea&amp;gt; element. See {@link jqc.form.field.Text#createInputEl} for more information.
+		 * creates a &amp;lt;textarea&amp;gt; element. See {@link jqGui.form.field.Text#createInputEl} for more information.
 		 * 
 		 * @protected
 		 * @return {jQuery}
@@ -211,7 +213,7 @@ define( [
 		// AutoGrow Methods
 		
 		
-<span id='jqc-form-field-TextArea-method-setHeightAndOverflow'>		/**
+<span id='jqGui-form-field-TextArea-method-setHeightAndOverflow'>		/**
 </span>		 * Utility method for the {@link #autoGrow} functionality. Sets a given `height` and `overflow` state on the textarea.
 		 * 
 		 * @private
@@ -229,7 +231,7 @@ define( [
 		
 		
 		
-<span id='jqc-form-field-TextArea-method-updateAutoGrowHeight'>		/**
+<span id='jqGui-form-field-TextArea-method-updateAutoGrowHeight'>		/**
 </span>		 * Utility method for the {@link #autoGrow} functionality. Update the height of the textarea, if necessary.
 		 * 
 		 * @private
@@ -336,7 +338,7 @@ define( [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'textareafield'
+	ComponentManager.registerType( 'textarea', TextAreaField );
 	ComponentManager.registerType( 'textareafield', TextAreaField );
 	
 	return TextAreaField;

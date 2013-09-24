@@ -19,12 +19,15 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqc/Jqc'
+	'jqGui/JqGui'
 ],
-function( jQuery, _, Jqc ) {
+function( jQuery, _, JqGui ) {
 	
-<span id='jqc-util-Css'>	/**
-</span>	 * @class jqc.util.Css
+	var spacesRe = /\s+/g;
+	
+	
+<span id='jqGui-util-Css'>	/**
+</span>	 * @class jqGui.util.Css
 	 * @singleton
 	 * 
 	 * General CSS manipulation/reading functionality.  Allows the dynamic modification of 
@@ -32,7 +35,7 @@ function( jQuery, _, Jqc ) {
 	 */
 	var Css = {
 		
-<span id='jqc-util-Css-property-SIDES_MAP'>		/**
+<span id='jqGui-util-Css-property-SIDES_MAP'>		/**
 </span>		 * @private
 		 * @property {Object} SIDES_MAP
 		 * 
@@ -50,7 +53,85 @@ function( jQuery, _, Jqc ) {
 		// ------------------------------------
 		
 		
-<span id='jqc-util-Css-method-mapToString'>		/**
+<span id='jqGui-util-Css-method-addCls'>		/**
+</span>		 * Adds a CSS class to a string of space-delimited CSS classes. Only adds the CSS class if the CSS class
+		 * does not already exist in the string.
+		 * 
+		 * For example:
+		 *     
+		 *     Css.addCls( &quot;class1 class2&quot;, &quot;class3&quot; );  // -&gt; &quot;class1 class2 class3&quot;
+		 *     Css.addCls( &quot;class1 class2&quot;, &quot;class2&quot; );  // -&gt; &quot;class1 class2&quot; (no duplicate CSS classes)
+		 *     Css.addCls( &quot;&quot;, &quot;class1&quot; );               // -&gt; &quot;class1&quot;
+		 *     Css.addCls( &quot;class1&quot;, &quot;class2 class3&quot; );  // -&gt; &quot;class1 class2 class3&quot;
+		 * 
+		 * @param {String} str The string with the space-delimited CSS classes to add the `cssClass` to.
+		 * @param {String} cssClass The CSS class(es) to add to the `str`. If adding multiple CSS classes, they 
+		 *   must be separated by a space.
+		 * @return {String} The `str`, with the `cssClass` added.
+		 */
+		addCls : function( str, cssClass ) {
+			str = jQuery.trim( str );
+			cssClass = jQuery.trim( cssClass );
+			
+			var origClasses = ( str ) ? str.split( spacesRe ) : [],           // only split if the arg is not an empty string
+			    newClasses = ( cssClass ) ? cssClass.split( spacesRe ) : [];  // only split if the arg is not an empty string
+			
+			return _.unique( origClasses.concat( newClasses ) ).join( ' ' );
+		},
+		
+		
+<span id='jqGui-util-Css-method-removeCls'>		/**
+</span>		 * Removes a CSS class from a string of space-delimited CSS classes. 
+		 * 
+		 * For example:
+		 *     
+		 *     Css.removeCls( &quot;class1 class2&quot;, &quot;class1&quot; );  // -&gt; &quot;class2&quot;
+		 *     Css.removeCls( &quot;class1 class2&quot;, &quot;class2&quot; );  // -&gt; &quot;class1&quot;
+		 *     Css.removeCls( &quot;class1 class2&quot;, &quot;class3&quot; );  // -&gt; &quot;class1 class2&quot; (class3 didn't exist in the `str`, so no removal)
+		 *     Css.removeCls( &quot;class1 class2 class3&quot;, &quot;class1 class2&quot; );  // -&gt; &quot;class3&quot;
+		 * 
+		 * @param {String} str The string with the space-delimited CSS classes to remove the `cssClass` from.
+		 * @param {String} cssClass The CSS class(es) to remove from the `str`. If removing multiple CSS classes, they 
+		 *   must be separated by a space.
+		 * @return {String} The `str`, with the `cssClass` removed.
+		 */
+		removeCls : function( str, cssClass ) {
+			str = jQuery.trim( str );
+			cssClass = jQuery.trim( cssClass );
+			
+			var origClasses = ( str ) ? str.split( spacesRe ) : [],              // only split if the arg is not an empty string
+			    removeClasses = ( cssClass ) ? cssClass.split( spacesRe ) : [];  // only split if the arg is not an empty string
+			
+			return _.without.apply( null, [ origClasses ].concat( removeClasses ) ).join( ' ' );
+		},
+		
+		
+<span id='jqGui-util-Css-method-hasCls'>		/**
+</span>		 * Determines if a CSS class exists within a string of CSS classes. For example:
+		 *     
+		 *     Css.hasCls( &quot;class1 class2&quot;, &quot;class1&quot; );  // -&gt; true
+		 *     Css.hasCls( &quot;class1 class2&quot;, &quot;class3&quot; );  // -&gt; false
+		 *     Css.hasCls( &quot;&quot;, &quot;class1&quot; );               // -&gt; false
+		 *     Css.hasCls( &quot;class1 class2 class3&quot;, &quot;class2&quot; );  // -&gt; true
+		 * 
+		 * @param {String} str The string of CSS class(es) to query. Ex: &quot;class1 class2&quot;
+		 * @param {String} cssClass The CSS class to test for. Ex: &quot;class2&quot;
+		 * @return {Boolean} True if the `str` has the given `cssClass`, false otherwise.
+		 */
+		hasCls : function( str, cssClass ) {
+			str = jQuery.trim( str );
+			cssClass = jQuery.trim( cssClass );
+			
+			if( !str || !cssClass ) {
+				return false;
+			} else {
+				var regex = new RegExp( '(^| )' + cssClass + '( |$)' );
+				return regex.test( str );
+			}
+		},
+		
+		
+<span id='jqGui-util-Css-method-mapToString'>		/**
 </span>		 * Given an Object (map) of CSS property/value pairs, will return a string that can be placed directly
 		 * into the &quot;style&quot; attribute of an element. camelCased CSS property names will be converted to 
 		 * dashes. Ex: &quot;fontSize&quot; will be converted to &quot;font-size&quot;.
@@ -72,7 +153,7 @@ function( jQuery, _, Jqc ) {
 		},
 		
 		
-<span id='jqc-util-Css-method-updateStyleEl'>		/**
+<span id='jqGui-util-Css-method-updateStyleEl'>		/**
 </span>		 * Updates the given &amp;lt;style&amp;gt; element(s) with new CSS text. Handles the special case for IE.
 		 * 
 		 * @param {String/HTMLElement/jQuery} styleEl A selector, reference to an HTMLElement, or jQuery wrapped
@@ -82,7 +163,7 @@ function( jQuery, _, Jqc ) {
 		updateStyleEl : function( styleEl, cssText ) {
 			var $styleEl = jQuery( styleEl );
 			
-			if( Jqc.isIE ) {
+			if( JqGui.isIE ) {
 				for( var i = 0, len = $styleEl.length; i &lt; len; i++ ) {   // in case there is more than one element
 					$styleEl[ i ].styleSheet.cssText = cssText;  // special case for IE
 				}
@@ -92,7 +173,7 @@ function( jQuery, _, Jqc ) {
 		},
 		
 		
-<span id='jqc-util-Css-method-normalizeSizeValue'>		/**
+<span id='jqGui-util-Css-method-normalizeSizeValue'>		/**
 </span>		 * Normalizes a CSS &quot;size&quot; property value. When provided a number, or a string that converts to a number, this method adds 
 		 * the 'px' suffix. When provided any other string, it returns the string unchanged (for example, when providing a percentage 
 		 * size, such as &quot;50%&quot;).
@@ -113,7 +194,7 @@ function( jQuery, _, Jqc ) {
 		// Measurement Helpers
 		
 		
-<span id='jqc-util-Css-method-getPadding'>		/**
+<span id='jqGui-util-Css-method-getPadding'>		/**
 </span>		 * Retrieves the width of the padding for the given `sides` of the `element`. `sides` can be either 't', 'r', 'b', or 
 		 * 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* it can be a combination of more than one to add the padding widths
 		 * together. Ex: 'rl' would add the right and left padding together and return that number.
@@ -125,11 +206,11 @@ function( jQuery, _, Jqc ) {
 		 * @return {Number} The width of the padding for the given `sides`.
 		 */
 		getPadding : function( element, sides ) {
-			return this.sumSides( jQuery( element ), 'padding', sides );
+			return this.sumSides( element, 'padding', sides );
 		},
 		
 		
-<span id='jqc-util-Css-method-getMargin'>		/**
+<span id='jqGui-util-Css-method-getMargin'>		/**
 </span>		 * Retrieves the width of the margin for the given `sides` of the `element`. `sides` can be either 't', 'r', 'b', or 
 		 * 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* it can be a combination of more than one to add the margin widths
 		 * together. Ex: 'rl' would add the right and left margin together and return that number.
@@ -141,11 +222,11 @@ function( jQuery, _, Jqc ) {
 		 * @return {Number} The width of the margin for the given `sides`.
 		 */
 		getMargin : function( element, sides ) {
-			return this.sumSides( jQuery( element ), 'margin', sides );
+			return this.sumSides( element, 'margin', sides );
 		},
 		
 		
-<span id='jqc-util-Css-method-getBorderWidth'>		/**
+<span id='jqGui-util-Css-method-getBorderWidth'>		/**
 </span>		 * Retrieves the width of the border for the given `sides` of the `element`. `sides` can be either 't', 'r', 'b', or 
 		 * 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* it can be a combination of more than one to add the border widths
 		 * together. Ex: 'rl' would add the right and left border together and return that number.
@@ -157,12 +238,12 @@ function( jQuery, _, Jqc ) {
 		 * @return {Number} The width of the border for the given `sides`.
 		 */
 		getBorderWidth : function( element, sides ) {
-			return this.sumSides( jQuery( element ), 'border', sides, 'width' );
+			return this.sumSides( element, 'border', sides, 'width' );
 		},
 		
 		
 		
-<span id='jqc-util-Css-method-getFrameSize'>		/**
+<span id='jqGui-util-Css-method-getFrameSize'>		/**
 </span>		 * Retrieves the &quot;frame&quot; size, which is the sum of the width of the padding, margin, and border, for the given `sides` of the `element`. `sides` 
 		 * can be either 't', 'r', 'b', or 'l' (for &quot;top&quot;, &quot;right&quot;, &quot;bottom&quot;, or &quot;left&quot;), *or* it can be a combination of more than one to add the 
 		 * padding/border/margin widths together. Ex: 'rl' would add the right and left padding together and return that number.
@@ -178,7 +259,7 @@ function( jQuery, _, Jqc ) {
 		},
 		
 		
-<span id='jqc-util-Css-method-sumSides'>		/**
+<span id='jqGui-util-Css-method-sumSides'>		/**
 </span>		 * Private helper method to sum up the `sides` for a given `element` and `propertyName`.
 		 * 
 		 * @private
@@ -199,7 +280,14 @@ function( jQuery, _, Jqc ) {
 			propertyNameSuffix = ( propertyNameSuffix ) ? '-' + propertyNameSuffix : &quot;&quot;;
 			
 			for( var i = 0, len = sides.length; i &lt; len; i++ ) {
-				total += parseInt( $element.css( propertyName + '-' + SIDES_MAP[ sides.charAt( i ) ] + propertyNameSuffix ), 10 );
+				var style = $element.css( propertyName + '-' + SIDES_MAP[ sides.charAt( i ) ] + propertyNameSuffix ),
+				    intValue = parseInt( style, 10 );
+				
+				// Ignore the property if IE8&lt; returned &quot;auto&quot;, &quot;thin&quot;, &quot;medium&quot;, &quot;thick&quot;, etc. May need better method for checking 
+				// sizes in the future for when jQuery doesn't return a px value.
+				if( !isNaN( intValue ) ) {
+					total += intValue;
+				}
 			}
 			return total;
 		}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global define */
+define( [
+	'data/persistence/operation/Operation'
+], function( Operation ) {
+	
+<span id='data-persistence-operation-Destroy'>	/**
+</span>	 * @class data.persistence.operation.Destroy
+	 * @extends data.persistence.operation.Operation
+	 *
+	 * Represents a high level Destroy operation performed on a {@link data.Model Model}, or part of a
+	 * sync operation on a {@link data.Collection Collection}. See the superclass for details.
+	 */
+	var DestroyOperation = Operation.extend( {
+		
+	} );
+	
+	return DestroyOperation;
+	
+} );</pre>
+</body>
+</html>

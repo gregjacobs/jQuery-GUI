@@ -17,27 +17,39 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">/*global define */
 define( [
-	'jqc/ComponentManager',
-	'jqc/Overlay'
-], function( ComponentManager, Overlay ) {
+	'jquery',
+	'lodash',
+	'jqGui/ComponentManager',
+	'jqGui/Overlay'
+], function( jQuery, _, ComponentManager, Overlay ) {
 	
-<span id='jqc-window-Window'>	/**
-</span>	 * @class jqc.window.Window
-	 * @extends jqc.Overlay
+<span id='jqGui-window-Window'>	/**
+</span>	 * @class jqGui.window.Window
+	 * @extends jqGui.Overlay
+	 * @alias type.window
 	 * 
-	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link jqc.panel.Panel Panel}, the Window
+	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link jqGui.panel.Panel Panel}, the Window
 	 * may accept a {@link #title}, and it also adds a {@link #closeButton close button} to the top right  
 	 */
 	var Window = Overlay.extend( {
 		
-<span id='jqc-window-Window-cfg-closeButton'>		/**
+<span id='jqGui-window-Window-cfg-closeButton'>		/**
 </span>		 * @cfg {Boolean} closeButton
 		 * 
 		 * `true` to show the close button on the top right, `false` to hide it.
 		 */
 		closeButton : true,
 		
-<span id='jqc-window-Window-cfg-closeAction'>		/**
+<span id='jqGui-window-Window-cfg-modal'>		/**
+</span>		 * @cfg {Boolean} modal
+		 * 
+		 * `true` to make this window a modal window (as opposed to a modeless window). When the Window is modal,
+		 * a mask is placed behind it, covering the rest of the document as to force the user to interact with 
+		 * the Window until it is hidden.
+		 */
+		modal : false,
+		
+<span id='jqGui-window-Window-cfg-closeAction'>		/**
 </span>		 * @cfg {String} closeAction
 		 * 
 		 * The action to take when the {@link #closeButton} is clicked, or the Window is closed by the 'esc' button.
@@ -51,7 +63,7 @@ define( [
 		 */
 		closeAction : 'destroy',
 		
-<span id='jqc-window-Window-cfg-closeOnEscape'>		/**
+<span id='jqGui-window-Window-cfg-closeOnEscape'>		/**
 </span>		 * @cfg {Boolean} closeOnEscape
 		 * 
 		 * `true` to have the Window close when the 'esc' key is pressed. Set to `false` to disable this behavior. The action taken (whether
@@ -59,26 +71,43 @@ define( [
 		 */
 		closeOnEscape : true,
 		
-<span id='jqc-window-Window-cfg-baseCls'>		/**
+<span id='jqGui-window-Window-cfg-baseCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Window',
+		baseCls : 'jqGui-window',
 		
-<span id='jqc-window-Window-cfg-x'>		/**
+<span id='jqGui-window-Window-cfg-x'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
 		x : 'center',
 		
-<span id='jqc-window-Window-cfg-y'>		/**
+<span id='jqGui-window-Window-cfg-y'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
 		y : 'center',
 		
 		
-<span id='jqc-window-Window-method-initComponent'>		/**
+<span id='jqGui-window-Window-property-S-modalMaskEl'>		/**
+</span>		 * @protected
+		 * @property {jQuery} $modalMaskEl
+		 * 
+		 * The element that is used to mask the document when the Window is shown, and {@link #modal} is enabled.
+		 * This will only be created when the Window is shown the first time.
+		 */
+		
+<span id='jqGui-window-Window-property-maskResizeHandler'>		/**
+</span>		 * @private
+		 * @property {Function} maskResizeHandler
+		 * 
+		 * The bound handler function that is a handler of the window resize event, which resizes the {@link #$modalMaskEl}
+		 * when the browser window is resized.
+		 */
+		
+		
+<span id='jqGui-window-Window-method-initComponent'>		/**
 </span>		 * @inheritdoc
 		 */
 		initComponent : function() {
@@ -96,7 +125,7 @@ define( [
 		},
 		
 		
-<span id='jqc-window-Window-method-onRender'>		/**
+<span id='jqGui-window-Window-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function() {
@@ -111,10 +140,84 @@ define( [
 					}
 				} );
 			}
+			
+			// Set up a handler to resize the modal mask, if enabled
+			if( this.modal ) {
+				this.maskResizeHandler = _.debounce( _.bind( this.resizeModalMask, this ), 100, { maxWait: 300 } );
+				jQuery( window ).on( 'resize', this.maskResizeHandler );
+			}
 		},
 		
 		
-<span id='jqc-window-Window-method-doClose'>		/**
+<span id='jqGui-window-Window-method-onShow'>		/**
+</span>		 * Extension of hook method from superclass, which shows the {@link #modal} mask, if enabled.
+		 * 
+		 * @protected
+		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
+		 */
+		onShow : function( options ) {
+			this._super( arguments );
+			
+			if( this.modal ) {
+				var $modalMaskEl = this.$modalMaskEl;
+				
+				if( !$modalMaskEl ) {
+					$modalMaskEl = this.$modalMaskEl = this.createModalMaskEl();
+				}
+				$modalMaskEl.appendTo( 'body' );  // make sure it is appended to the body (it is detached on hide)
+				this.resizeModalMask();
+				
+				$modalMaskEl.show();
+			}
+		},
+		
+		
+<span id='jqGui-window-Window-method-resizeModalMask'>		/**
+</span>		 * Sizes the modal mask to the browser window's size.
+		 * 
+		 * @protected
+		 */
+		resizeModalMask : function() {
+			var $modalMaskEl = this.$modalMaskEl;
+			
+			// Only size it if the window is shown, and the element has been created
+			if( this.isVisible() &amp;&amp; $modalMaskEl ) {
+				var $window = jQuery( window );
+				this.$modalMaskEl.css( {
+					width  : $window.width(),
+					height : $window.height()
+				} );
+			}
+		},
+		
+
+<span id='jqGui-window-Window-method-onHide'>		/**
+</span>		 * Extension of hook method from superclass, which hides the {@link #modal} mask, if enabled.
+		 * 
+		 * @protected
+		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
+		 */
+		onHide : function( options ) {
+			if( this.modal ) {
+				this.$modalMaskEl.detach();
+			}
+			
+			this._super( arguments );
+		},
+		
+		
+<span id='jqGui-window-Window-method-createModalMaskEl'>		/**
+</span>		 * Creates the {@link #$modalMaskEl}, for use when the Window is set to be {@link #modal}.
+		 * 
+		 * @protected
+		 * @return {jQuery} The modal masking element, which is appended to the document body.
+		 */
+		createModalMaskEl : function() {
+			return jQuery( '&lt;div class=&quot;' + this.baseCls + '-modalMask&quot; /&gt;' );
+		},
+		
+		
+<span id='jqGui-window-Window-method-doClose'>		/**
 </span>		 * Protected method which handles the {@link #closeAction} of the Window.
 		 * 
 		 * @protected
@@ -128,12 +231,30 @@ define( [
 				else 
 					this.destroy();
 			}
+		},
+		
+		
+		// -----------------------------------
+		
+		
+<span id='jqGui-window-Window-method-onDestroy'>		/**
+</span>		 * @inheritdoc
+		 */
+		onDestroy : function() {
+			if( this.$modalMaskEl ) {
+				this.$modalMaskEl.remove();
+			}
+			
+			if( this.maskResizeHandler ) {
+				jQuery( window ).off( 'resize', this.maskResizeHandler );
+			}
+			
+			this._super( arguments );
 		}
 		
 	} );
 	
 	
-	// Register the type so that it can be created by the type string 'window'
 	ComponentManager.registerType( 'window', Window );
 	
 	return Window;

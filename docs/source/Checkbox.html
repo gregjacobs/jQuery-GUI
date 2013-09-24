@@ -19,45 +19,47 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqc/ComponentManager',
-	'jqc/form/field/Field'
+	'jqGui/ComponentManager',
+	'jqGui/form/field/Field'
 ], function( jQuery, _, ComponentManager, Field ) {
 	
-<span id='jqc-form-field-Checkbox'>	/**
-</span>	 * @class jqc.form.field.Checkbox
-	 * @extends jqc.form.field.Field
+<span id='jqGui-form-field-Checkbox'>	/**
+</span>	 * @class jqGui.form.field.Checkbox
+	 * @extends jqGui.form.field.Field
+	 * @alias type.checkbox
+	 * @alias type.checkboxfield
 	 *  
 	 * Checkbox field component.
 	 */
 	var CheckboxField = Field.extend( {
 		
-<span id='jqc-form-field-Checkbox-cfg-checkboxLabel'>		/**
+<span id='jqGui-form-field-Checkbox-cfg-checkboxLabel'>		/**
 </span>		 * @cfg {String} checkboxLabel
 		 * 
 		 * The label for the checkbox itself, which will be placed to the right of the checkbox. This config is to differentiate from
-		 * the {@link jqc.form.field.Field#label label} provided by {@link jqc.form.field.Field Field} (the one which
+		 * the {@link jqGui.form.field.Field#label label} provided by {@link jqGui.form.field.Field Field} (the one which
 		 * affects all form field components uniformly).  Defaults to an empty string.
 		 * 
 		 * Note that if the checkbox should be aligned with other form fields that have &quot;left side&quot; labels (see 
-		 * {@link jqc.form.field.Field#labelAlign}, then set its {@link jqc.form.field.Field#label label} config to
+		 * {@link jqGui.form.field.Field#labelAlign}, then set its {@link jqGui.form.field.Field#label label} config to
 		 * a non-breaking space (&amp;amp;nbsp;).
 		 */
 		checkboxLabel : &quot;&quot;,
 		
-<span id='jqc-form-field-Checkbox-cfg-value'>		/**
+<span id='jqGui-form-field-Checkbox-cfg-value'>		/**
 </span>		 * @cfg {String/Function} value
 		 * 
 		 * The initial value for the field, if any. Any truthy value will initialize the checkbox as checked.
 		 */
 		
-<span id='jqc-form-field-Checkbox-cfg-componentCls'>		/**
+<span id='jqGui-form-field-Checkbox-cfg-componentCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqc-form-CheckboxField',
+		componentCls : 'jqGui-form-field-checkbox',
 		
 		
-<span id='jqc-form-field-Checkbox-method-onRender'>		/**
+<span id='jqGui-form-field-Checkbox-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function() {
@@ -81,8 +83,8 @@ define( [
 		
 		
 		
-<span id='jqc-form-field-Checkbox-method-setValue'>		/**
-</span>		 * Implementation of {@link jqc.form.field.Field Field}'s setValue() method, which sets the value to the field.
+<span id='jqGui-form-field-Checkbox-method-setValue'>		/**
+</span>		 * Implementation of {@link jqGui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {Boolean} value The value of the field. If truthy, the checkbox will be checked. If falsy, the checkbox will be unchecked.
 		 */
@@ -95,8 +97,8 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Checkbox-method-getValue'>		/**
-</span>		 * Implementation of {@link jqc.form.field.Field Field}'s getValue() method, which returns the value of the field.
+<span id='jqGui-form-field-Checkbox-method-getValue'>		/**
+</span>		 * Implementation of {@link jqGui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {Boolean} The value of the field (true if it's checked, false otherwise).
 		 */
@@ -111,7 +113,7 @@ define( [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'checkboxfield'
+	ComponentManager.registerType( 'checkbox', CheckboxField );
 	ComponentManager.registerType( 'checkboxfield', CheckboxField );
 	
 	return CheckboxField;

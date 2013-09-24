@@ -18,14 +18,15 @@
   <pre class="prettyprint lang-js">/*global define */
 define( [
 	'jquery',
-	'jqc/Component',
-	'jqc/Container',
-	'jqc/layout/Layout'
+	'jqGui/Component',
+	'jqGui/Container',
+	'jqGui/layout/Layout'
 ], function( jQuery, Component, Container, Layout ) {
 
-<span id='jqc-layout-HBox'>	/**
-</span>	 * @class jqc.layout.HBox
-	 * @extends jqc.layout.Layout
+<span id='jqGui-layout-HBox'>	/**
+</span>	 * @class jqGui.layout.HBox
+	 * @extends jqGui.layout.Layout
+	 * @alias layout.hbox
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a &quot;flexbox&quot; scheme. Each child component
 	 * in the Container that should have a flexible width that proportionally should take up the remaining area of its parent
@@ -35,7 +36,7 @@ define( [
 	 */
 	var HBoxLayout = Layout.extend( {
 		
-<span id='jqc-layout-HBox-cfg-flex'>		/**
+<span id='jqGui-layout-HBox-cfg-flex'>		/**
 </span>		 * @cfg {Number} flex
 		 * This config is to be placed on **child components** of the {@link #container}. The number is a ratio
 		 * of how much space the child component should take up in relation to the remaining space in the target
@@ -74,7 +75,7 @@ define( [
 		 *     ]
 		 */
 		
-<span id='jqc-layout-HBox-property-S-clearEl'>		/**
+<span id='jqGui-layout-HBox-property-S-clearEl'>		/**
 </span>		 * @protected
 		 * @property {jQuery} $clearEl
 		 * 
@@ -82,19 +83,18 @@ define( [
 		 */
 		
 		
-<span id='jqc-layout-HBox-method-onLayout'>		/**
+<span id='jqGui-layout-HBox-method-onLayout'>		/**
 </span>		 * Hook method for subclasses to override to implement their layout strategy. Implements the HBoxLayout algorithm.
 		 * 
 		 * @protected
 		 * @template
-		 * @param {jqc.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jqGui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
 			this._super( arguments );
 			
 			
-			//debugger;
 			var flexedComponents = [],
 			    totalFlex = 0,
 			    totalUnflexedWidth = 0,
@@ -107,7 +107,7 @@ define( [
 				
 				// Add the CSS class to components to be able to place them in an HBox layout. This adds `float:left;`,
 				// and a few other fixing styles.
-				childComponent.addCls( 'jqc-layout-HBox-component' );
+				childComponent.addCls( 'jqGui-layout-hbox-component' );
 				
 				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
 				this.renderComponent( childComponent, $targetEl, { position: i } );
@@ -151,6 +151,7 @@ define( [
 					// If sizing the last component, add in (the smallest whole number of) the decimal value pixels that were trimmed from previous components
 					if( i === len - 1 ) {
 						newChildWidth += Math.floor( trimmedPixels );
+						newChildWidth--;  // and take off a pixel to attempt to fix the accidental browser wrapping issue with sub-pixel widths...
 					}
 					
 					this.sizeComponent( childComponent, newChildWidth, undefined );
@@ -158,13 +159,13 @@ define( [
 			}
 			
 			if( !this.$clearEl ) {
-				this.$clearEl = jQuery( '&lt;div class=&quot;jqc-layout-HBox-clear&quot; /&gt;' );  // to clear the floats
+				this.$clearEl = jQuery( '&lt;div class=&quot;jqGui-layout-hbox-clear&quot; /&gt;' );  // to clear the floats
 			}
 			$targetEl.append( this.$clearEl );
 		},
 		
 		
-<span id='jqc-layout-HBox-method-onDestroy'>		/**
+<span id='jqGui-layout-HBox-method-onDestroy'>		/**
 </span>		 * @inheritdoc
 		 */
 		onDestroy : function() {
@@ -178,7 +179,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the jqc.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the jqGui.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'hbox', HBoxLayout );
 	
 	return HBoxLayout;

@@ -21,63 +21,97 @@ define( [
 	'Class'
 ], function( _, Class ) {
 	
-<span id='data-persistence-operation-Batch'>	/**
-</span>	 * @class data.persistence.operation.Batch
+<span id='data-persistence-request-Batch'>	/**
+</span>	 * @class data.persistence.request.Batch
 	 * 
-	 * Represents one or more {@link data.persistence.operation.Operation Operations} which were executed in a logical
+	 * Represents one or more {@link data.persistence.request.Request Requests} which were executed in a logical
 	 * group.
 	 * 
-	 * The Batch object provides access to each {@link data.persistence.operation.Operation Operation}, and also provides
-	 * methods for determining the overall success or failure (error) state of the Operations within it.
-	 * 
-	 * This class is mainly used internally by the library, and is provided to client code at the times when multiple
-	 * {@link data.persistence.operation.Operation Operations} were needed to satisfy a request, so that it may be inspected
-	 * for any needed information.
+	 * The Batch object provides access to each internal {@link data.persistence.request.Request Request}, and provides
+	 * methods for determining the overall success or failure (error) state of the Requests within it. 
 	 */
-	var OperationBatch = Class.extend( Object, {
+	var RequestBatch = Class.extend( Object, {
 		
-<span id='data-persistence-operation-Batch-cfg-operations'>		/**
-</span>		 * @cfg {data.persistence.operation.Operation/data.persistence.operation.Operation[]} operations
+		statics : {
+			
+<span id='data-persistence-request-Batch-static-property-idCounter'>			/**
+</span>			 * @private
+			 * @static
+			 * @property {Number} idCounter
+			 * 
+			 * The counter used to create unique, increasing IDs for RequestBatch instances. 
+			 */
+			idCounter : 0
+			
+		},
+		
+		
+<span id='data-persistence-request-Batch-cfg-requests'>		/**
+</span>		 * @cfg {data.persistence.request.Request/data.persistence.request.Request[]} requests
 		 * 
-		 * One or more Operation(s) that make up the Batch.
+		 * One or more Request(s) that make up the Batch.
 		 */
 		
 		
-<span id='data-persistence-operation-Batch-method-constructor'>		/**
+<span id='data-persistence-request-Batch-property-id'>		/**
+</span>		 * @private
+		 * @property {Number} id
+		 * 
+		 * The RequestBatch's ID. This is a unique number for each RequestBatch that is created, and its value
+		 * is ever-increasing. This means that an RequestBatch object created after another RequestBatch
+		 * will have a higher ID value than the first RequestBatch. 
+		 * 
+		 * This property of the ID value is used to determine when an older request has completed after a newer one.
+		 */
+		
+		
+<span id='data-persistence-request-Batch-method-constructor'>		/**
 </span>		 * @constructor
 		 * @param {Object} [cfg] Any of the configuration options for this class, in an Object (map).
 		 */
 		constructor : function( cfg ) {
 			_.assign( this, cfg );
 			
-			// normalize the `operations` config to an array
-			this.operations = ( this.operations ) ? [].concat( this.operations ) : [];
+			this.id = ++RequestBatch.idCounter;
+			
+			// normalize the `requests` config to an array
+			this.requests = ( this.requests ) ? [].concat( this.requests ) : [];
 		},
 		
 		
-<span id='data-persistence-operation-Batch-method-getOperations'>		/**
-</span>		 * Retrieves all of the {@link #operations} for this Batch. 
+<span id='data-persistence-request-Batch-method-getId'>		/**
+</span>		 * Retrieves the RequestBatch's {@link #id}.
 		 * 
-		 * @return {data.persistence.operation.Operation[]}
+		 * @return {Number}
 		 */
-		getOperations : function() {
-			return this.operations;
+		getId : function() {
+			return this.id;
 		},
 		
 		
-<span id='data-persistence-operation-Batch-method-wasSuccessful'>		/**
-</span>		 * Determines if the Batch of {@link #operations} completed successfully. All {@link #operations}
+<span id='data-persistence-request-Batch-method-getRequests'>		/**
+</span>		 * Retrieves all of the {@link #requests} for this Batch. 
+		 * 
+		 * @return {data.persistence.request.Request[]}
+		 */
+		getRequests : function() {
+			return this.requests;
+		},
+		
+		
+<span id='data-persistence-request-Batch-method-wasSuccessful'>		/**
+</span>		 * Determines if the Batch of {@link #requests} completed successfully. All {@link #requests}
 		 * must have completed successfully for the Batch to be considered successful.
 		 * 
 		 * @return {Boolean}
 		 */
 		wasSuccessful : function() {
-			return !_.find( this.operations, function( op ) { return op.hasErrored(); } );  // _.find() returns `undefined` if no errored operations are found
+			return !_.find( this.requests, function( op ) { return op.hasErrored(); } );  // _.find() returns `undefined` if no errored requests are found
 		},
 		
 		
-<span id='data-persistence-operation-Batch-method-hasErrored'>		/**
-</span>		 * Determines if the Batch failed to complete successfully. If any of the {@link #operations}
+<span id='data-persistence-request-Batch-method-hasErrored'>		/**
+</span>		 * Determines if the Batch failed to complete successfully. If any of the {@link #requests}
 		 * has errored, this method returns true.
 		 * 
 		 * @return {Boolean}
@@ -87,40 +121,40 @@ define( [
 		},
 		
 		
-<span id='data-persistence-operation-Batch-method-getSuccessfulOperations'>		/**
-</span>		 * Retrieves each {@link data.persistence.operation.Operation Operation} object that has completed
+<span id='data-persistence-request-Batch-method-getSuccessfulRequests'>		/**
+</span>		 * Retrieves each {@link data.persistence.request.Request Request} object that has completed
 		 * successfully.
 		 * 
-		 * @return {data.persistence.operation.Operation[]} An array of the Operations which have completed
+		 * @return {data.persistence.request.Request[]} An array of the Requests which have completed
 		 *   successfully.
 		 */
-		getSuccessfulOperations : function() {
-			return _.filter( this.operations, function( op ) { return !op.hasErrored(); } );
+		getSuccessfulRequests : function() {
+			return _.filter( this.requests, function( op ) { return !op.hasErrored(); } );
 		},
 		
 		
-<span id='data-persistence-operation-Batch-method-getErroredOperations'>		/**
-</span>		 * Retrieves each {@link data.persistence.operation.Operation Operation} object that has errored.
+<span id='data-persistence-request-Batch-method-getErroredRequests'>		/**
+</span>		 * Retrieves each {@link data.persistence.request.Request Request} object that has errored.
 		 * 
-		 * @return {data.persistence.operation.Operation[]} An array of the Operations which have errored.
+		 * @return {data.persistence.request.Request[]} An array of the Requests which have errored.
 		 */
-		getErroredOperations : function() {
-			return _.filter( this.operations, function( op ) { return op.hasErrored(); } );
+		getErroredRequests : function() {
+			return _.filter( this.requests, function( op ) { return op.hasErrored(); } );
 		},
 		
 		
-<span id='data-persistence-operation-Batch-method-isComplete'>		/**
-</span>		 * Determines if all {@link data.persistence.operation.Operation Operations} in the batch are complete.
+<span id='data-persistence-request-Batch-method-isComplete'>		/**
+</span>		 * Determines if all {@link data.persistence.request.Request Requests} in the batch are complete.
 		 * 
-		 * @return {Boolean} `true` if all Operations are complete, `false` if any are not yet complete.
+		 * @return {Boolean} `true` if all Requests are complete, `false` if any are not yet complete.
 		 */
 		isComplete : function() {
-			return _.all( this.operations, function( op ) { return op.isComplete(); } );
+			return _.all( this.requests, function( op ) { return op.isComplete(); } );
 		}
 		
 	} );
 	
-	return OperationBatch;
+	return RequestBatch;
 	
 } );</pre>
 </body>

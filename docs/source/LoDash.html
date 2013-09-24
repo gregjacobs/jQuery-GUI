@@ -18,12 +18,12 @@
   <pre class="prettyprint lang-js">/*global define */
 define( [
 	'lodash',
-	'jqc/template/Template'
+	'jqGui/template/Template'
 ], function( _, Template ) {
 	
-<span id='jqc-template-LoDash'>	/**
-</span>	 * @class jqc.template.LoDash
-	 * @extends jqc.template.Template
+<span id='jqGui-template-LoDash'>	/**
+</span>	 * @class jqGui.template.LoDash
+	 * @extends jqGui.template.Template
 	 * 
 	 * A wrapper class for Lo-Dash templates which helps with a few normalization procedures, and
 	 * allows for lazy compilation of a template from its string source.
@@ -34,7 +34,7 @@ define( [
 	 */
 	var LoDashTpl = Template.extend( {
 		
-<span id='jqc-template-LoDash-cfg-compiled'>		/**
+<span id='jqGui-template-LoDash-cfg-compiled'>		/**
 </span>		 * @cfg {Boolean} compiled
 		 * 
 		 * `true` to compile the Lo-Dash template immediately when the LoDashTpl is instantiated. Defaults to false,
@@ -43,7 +43,7 @@ define( [
 		compiled : false,
 		
 		
-<span id='jqc-template-LoDash-property-tplSource'>		/**
+<span id='jqGui-template-LoDash-property-tplSource'>		/**
 </span>		 * @protected
 		 * @property {String} tplSource
 		 * 
@@ -51,7 +51,7 @@ define( [
 		 * if the constructor is called with a string or array of strings as its first argument.
 		 */
 		
-<span id='jqc-template-LoDash-property-tplOptions'>		/**
+<span id='jqGui-template-LoDash-property-tplOptions'>		/**
 </span>		 * @protected
 		 * @property {Object} tplOptions
 		 * 
@@ -60,7 +60,7 @@ define( [
 		 * or array of strings as its first argument.
 		 */
 		
-<span id='jqc-template-LoDash-property-compiledTplFn'>		/**
+<span id='jqGui-template-LoDash-property-compiledTplFn'>		/**
 </span>		 * @protected
 		 * @property {Function} compiledTplFn
 		 * 
@@ -70,10 +70,10 @@ define( [
 		
 		
 		
-<span id='jqc-template-LoDash-method-constructor'>		/**
+<span id='jqGui-template-LoDash-method-constructor'>		/**
 </span>		 * @constructor
-		 * @param {String/String[]/Function/jqc.template.Template} tpl A string or an array of strings which will be concatenated 
-		 *   together to generate the Lo-Dash template, a compiled Lo-Dash template function, or a {@link jqc.template.Template} 
+		 * @param {String/String[]/Function/jqGui.template.Template} tpl A string or an array of strings which will be concatenated 
+		 *   together to generate the Lo-Dash template, a compiled Lo-Dash template function, or a {@link jqGui.template.Template} 
 		 *   instance which will simply be returned from this constructor.
 		 * @param {Object} options Any options to provide to the Lo-Dash template generator function. This argument
 		 *   is only valid when the first argument to this constructor is a string or array of strings. See 
@@ -107,7 +107,7 @@ define( [
 		},
 		
 		
-<span id='jqc-template-LoDash-method-compile'>		/**
+<span id='jqGui-template-LoDash-method-compile'>		/**
 </span>		 * Compiles the template, if it is not yet a compiled Lo-Dash template function. You normally do not
 		 * need to call this method, as it will be called automatically when the template is first used, but
 		 * this may be called to pre-compile the template. Alternatively, the {@link #compiled} configuration 
@@ -120,7 +120,7 @@ define( [
 		},
 		
 		
-<span id='jqc-template-LoDash-method-apply'>		/**
+<span id='jqGui-template-LoDash-method-apply'>		/**
 </span>		 * Applies the given `data` object to the Lo-Dash template, and returns the result.
 		 * Compiles the template if it is not yet compiled.
 		 * 

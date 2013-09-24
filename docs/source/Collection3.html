@@ -21,24 +21,30 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
+	
 	'data/Data',
 	'data/DataComponent',
 	'data/NativeObjectConverter',
-	'data/persistence/operation/Read',
-	'data/persistence/operation/Write',
-	'data/persistence/operation/Batch',
+	
+	'data/persistence/operation/Load',
+	'data/persistence/request/Read',
+	'data/persistence/request/Batch',
+	'data/persistence/proxy/Proxy',
 	'data/Model'   // may be circular dependency, depending on load order. require( 'data/Model' ) is used internally
 ], function(
 	require,
 	jQuery,
 	_,
 	Class,
+	
 	Data,
 	DataComponent,
 	NativeObjectConverter,
-	ReadOperation,
-	WriteOperation,
-	OperationBatch
+	
+	LoadOperation,
+	ReadRequest,
+	RequestBatch,
+	Proxy
 ) {
 
 <span id='data-Collection'>	/**
@@ -131,9 +137,9 @@ define( [
 <span id='data-Collection-cfg-autoLoad'>		/**
 </span>		 * @cfg {Boolean} autoLoad
 		 * 
-		 * If no initial {@link #cfg-models} are specified (specifying inline data), and this config is 
-		 * `true`, the Collection's {@link #method-load} method will be called immediately upon 
-		 * instantiation to load the Collection.
+		 * If no initial {@link #data} config is specified (specifying an initial set of data/models), and this config is 
+		 * `true`, the Collection's {@link #method-load} method will be called immediately upon instantiation to load the 
+		 * Collection.
 		 * 
 		 * If the {@link #pageSize} config is set, setting this to `true` will just cause the first page of
 		 * data to be loaded. 
@@ -187,11 +193,13 @@ define( [
 		 *     var myCollection = new myApp.MyCollection();
 		 */
 		
-<span id='data-Collection-cfg-models'>		/**
-</span>		 * @cfg {Object/data.Model/Object[]/data.Model[]} models
-		 * If providing a configuration object to the data.Collection constructor instead of an array of initial models, the initial 
-		 * model(s) may be specified using this configuration option. Can be a single model or an array of models (or object / array of
-		 * objects that will be converted to models).
+<span id='data-Collection-cfg-data'>		/**
+</span>		 * @cfg {Object/Object[]/data.Model/data.Model[]} data
+		 * 
+		 * Any initial data/models to load the Collection with. This is used when providing a configuration object to the 
+		 * Collection constructor, instead of an array of initial data/models. Can be a single model, an array of models,
+		 * or an object / array of objects that will be converted to models based on the {@link #model} config (or 
+		 * overridden implementation of {@link #createModel}).
 		 * 
 		 * Ex:
 		 * 
@@ -201,7 +209,20 @@ define( [
 		 *         model2 = new myApp.MyModel();
 		 *     
 		 *     var collection = new myApp.MyCollection( {
-		 *         models: [ model1, model2 ]
+		 *         data: [ model1, model2 ]
+		 *     } );
+		 * 
+		 * Ex 2:    
+		 *     var MyModel = Model.extend( {
+		 *         attributes : [ 'id', 'name' ]
+		 *     } );
+		 *     
+		 *     var collection = new myApp.MyCollection( {
+		 *         model : MyModel,
+		 *         data: [
+		 *             { id: 1, name: &quot;John&quot; },
+		 *             { id: 2, name: &quot;Jane&quot; }
+		 *         ]
 		 *     } );
 		 */
 		
@@ -244,13 +265,13 @@ define( [
 		 */
 		modified : false,
 		
-<span id='data-Collection-property-loading'>		/**
+<span id='data-Collection-property-loadedPages'>		/**
 </span>		 * @protected
-		 * @property {Boolean} loading
+		 * @property {Number[]} loadedPages
 		 * 
-		 * Flag that is set to true when the Collection is loading data through its {@link #proxy}.
+		 * An array that stores the currently-loaded pages in the Collection. This is only used when a {@link #pageSize}
+		 * is set, and the user loads pages using the {@link #loadPage} or {@link #loadPageRange} methods.
 		 */
-		loading : false,
 		
 <span id='data-Collection-property-totalCount'>		/**
 </span>		 * @protected
@@ -262,6 +283,27 @@ define( [
 		 * this will be set to 0.
 		 */
 		
+<span id='data-Collection-property-activeLoadOperations'>		/**
+</span>		 * @protected
+		 * @property {data.persistence.operation.Load[]} activeLoadOperations
+		 * 
+		 * This array stores any {@link data.persistence.operation.Load LoadOperation} objects that are 
+		 * currently in the process of loading data. When an Operation completes, it is removed from this 
+		 * array.
+		 * 
+		 * This array is used to manage concurrency in asynchronous load operations. If concurrency is not
+		 * managed, it is possible that an older, longer running request may &quot;overtake&quot; a newer, shorter
+		 * running request, and load the Collection with old data. Ex:
+		 * 
+		 *           Time:  &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+		 *           
+		 *     Request #1:  |-------------------|   // This request ends up loading the Collection!
+		 *     Request #2:      |----------|
+		 * 
+		 * This array is used to make sure that a newer load request (&quot;Request #2&quot;) ends up loading the 
+		 * Collection instead of an older one (&quot;Request #1&quot;).
+		 */
+		
 		
 		
 <span id='data-Collection-method-constructor'>		/**
@@ -270,8 +312,8 @@ define( [
 		 * @constructor
 		 * @param {Object/Object[]/data.Model[]} config This can either be a configuration object (in which the options listed
 		 *   under &quot;configuration options&quot; can be provided), or an initial set of Models to provide to the Collection. If providing
-		 *   an initial set of models, they must be wrapped in an array. Note that an initial set of models can be provided when using
-		 *   a configuration object with the {@link #cfg-models} config.
+		 *   an initial set of data/models, they must be wrapped in an array. Note that an initial set of data/models can be provided 
+		 *   when using a configuration object with the {@link #data} config.
 		 */
 		constructor : function( config ) {
 			this.addEvents(
@@ -338,21 +380,41 @@ define( [
 				 */
 				'removeset',
 				
+<span id='data-Collection-event-loadbegin'>				/**
+</span>				 * Fires when the Collection begins a load request, through its {@link #proxy}. The {@link #event-load} event
+				 * will fire when the load is complete.
+				 * 
+				 * @event loadbegin
+				 * @param {data.Collection} This Collection instance.
+				 */
+				'loadbegin',
+				
 <span id='data-Collection-event-load'>				/**
 </span>				 * Fires when the Collection is loaded from an external data source, through its {@link #proxy}.
 				 * 
-				 * This event fires for both successful and failed &quot;load&quot; requests. Success of the load request may 
-				 * be determined using the `batch`'s {@link data.persistence.operation.Batch#wasSuccessful wasSuccessful} 
-				 * method. Note that all Operations may not be {@link data.persistence.operation.Operation#isComplete complete}
-				 * when this event fires if one or more Operations in the `batch` have errored.
+				 * This event fires for both successful and failed &quot;load&quot; operations. Success of the load operation may 
+				 * be determined using the `operation`'s {@link data.persistence.operation.Operation#wasSuccessful wasSuccessful} 
+				 * method. 
+				 * 
+				 * Note that some Requests of the Operation may not be {@link data.persistence.request.Request#isComplete complete}
+				 * when this event fires, if one or more Requests in the Operation have errored.
 				 * 
 				 * @event load
 				 * @param {data.Collection} collection This Collection instance.
-				 * @param {data.persistence.operation.Batch} batch The Batch object which holds the 
-				 *   {@link data.persistence.operation.Operation Operations} that were required to execute the load request. 
-				 *   In most cases, this object will hold just one Operation.
+				 * @param {data.persistence.operation.Load} operation The LoadOperation object which holds metadata, and 
+				 *   the {@link data.persistence.request.Request Request(s)} that were required to execute the load operation.
 				 */
-				'load'
+				'load',
+				
+<span id='data-Collection-event-loadcancel'>				/**
+</span>				 * Fires when one of the Collection's {@link data.persistence.operation.Load LoadOperation's} has been canceled 
+				 * by client code.
+				 * 
+				 * @event loadcancel
+				 * @param {data.Collection} collection This Collection instance.
+				 * @param {data.persistence.operation.Load} operation The LoadOperation object which was canceled (aborted).
+				 */
+				'loadcancel'
 			);
 			
 			
@@ -365,7 +427,7 @@ define( [
 			} else if( typeof config === 'object' ) {
 				_.assign( this, config );
 				
-				initialModels = this.models;  // grab any initial models in the config
+				initialModels = this.data;  // grab any initial data/models in the config
 			}
 
 			// Call Observable constructor
@@ -383,7 +445,8 @@ define( [
 			this.modelsByClientId = {};
 			this.modelsById = {};
 			this.removedModels = [];
-			
+			this.loadedPages = [];
+			this.activeLoadOperations = [];
 			
 			if( initialModels ) {
 				this.add( initialModels );
@@ -735,11 +798,11 @@ define( [
 		
 		
 <span id='data-Collection-method-hasRange'>		/**
-</span>		 * Determines if the collection holds the range of {@link data.Model Models} specified by the `startIndex` and
+</span>		 * Determines if the Collection holds the range of {@link data.Model Models} specified by the `startIndex` and
 		 * `endIndex`. If one or more {@link data.Model Models} are missing from the given range, this method returns
 		 * `false`.
 		 * 
-		 * @param {Number} [startIndex] The starting index.
+		 * @param {Number} startIndex The starting index.
 		 * @param {Number} [endIndex] The ending index. Defaults to the last Model in the Collection.
 		 * @return {Boolean} `true` if the Collection has {@link data.Model Models} in all indexes specified by
 		 *   the range of `startIndex` to `endIndex`, or `false` if one or more {@link data.Model Models} are missing.
@@ -748,6 +811,18 @@ define( [
 			// A bit of a naive implementation for now. In the future, this method will cover when say, pages
 			// are loaded out of order, and will ensure that the entire range is present.
 			return endIndex &lt; this.models.length;
+		},
+		
+		
+<span id='data-Collection-method-hasPage'>		/**
+</span>		 * Determines if the Collection has the given page number loaded. This is only valid when a {@link #pageSize} is set,
+		 * and using the paging methods {@link #loadPage} or {@link #loadPageRange}.
+		 * 
+		 * @param {Number} pageNum The page number to check.
+		 * @return {Boolean} `true` if the Collection has the given `pageNum` currently loaded, `false` otherwise.
+		 */
+		hasPage : function( pageNum ) {
+			return _.contains( this.loadedPages, pageNum );
 		},
 		
 		
@@ -770,7 +845,7 @@ define( [
 		 * @param {Object} [options] An object (hash) of options to change the behavior of this method. This object is sent to
 		 *   the {@link data.NativeObjectConverter#convert NativeObjectConverter's convert method}, and accepts all of the options
 		 *   that the {@link data.NativeObjectConverter#convert} method does. See that method for details.
-		 * @return {Object} A hash of the data, where the property names are the keys, and the values are the {@link data.attribute.Attribute Attribute} values.
+		 * @return {Object[]} An array of the Object representation of each of the Models in the Collection.
 		 */
 		getData : function( options ) {
 			return NativeObjectConverter.convert( this, options );
@@ -1052,7 +1127,12 @@ define( [
 		 * @return {data.persistence.proxy.Proxy} The Proxy configured for the collection, or null.
 		 */
 		getProxy : function() {
-			return this.proxy || null;
+			// Lazy instantiate an anonymous config object to a Proxy instance
+			var proxy = this.proxy;
+			if( _.isPlainObject( proxy ) ) {
+				this.proxy = proxy = Proxy.create( proxy );
+			}
+			return proxy || null;
 		},
 		
 		
@@ -1063,7 +1143,7 @@ define( [
 		 * @return {Boolean} `true` if the Collection is currently loading a set of data, `false` otherwise.
 		 */
 		isLoading : function() {
-			return this.loading;
+			return this.activeLoadOperations.length &gt; 0;
 		},
 		
 		
@@ -1076,28 +1156,31 @@ define( [
 		 * However, if the Collection is configured with a {@link #pageSize}, then only page 1 of the data will be requested
 		 * instead. You may load other pages of the data using {@link #loadPage} in this case.
 		 * 
-		 * Loading a Collection is asynchronous, and either callbacks must be provided to the method, or handlers must 
-		 * attached to the returned `jQuery.Promise` object to determine when the loading is complete.
+		 * Loading a Collection is asynchronous, and either callbacks must be provided to the method, or handlers must be
+		 * attached to the returned {@link data.persistence.operation.Promise OperationPromise} object to determine when 
+		 * the loading is complete.
 		 * 
-		 * All of the callbacks, and the promise handlers are called with the following arguments:
+		 * All of the callbacks, and OperationPromise handlers are called with the following arguments:
 		 * 
 		 * - `collection` : {@link data.Collection} This Collection instance.
-		 * - `batch` : {@link data.persistence.operation.Batch} The Batch of {@link data.persistence.operation.Read Read Operation(s)}
-		 *   that were executed.
+		 * - `operation` : {@link data.persistence.operation.Load} The LoadOperation that was executed, which provides
+		 *   information about the operation and the request(s) that took place.
 		 * 
 		 * @param {Object} [options] An object which may contain the following properties:
 		 * @param {Object} [options.params] Any additional parameters to pass along to the configured {@link #proxy}
-		 *   for the operation. See {@link data.persistence.operation.Operation#params} for details.
+		 *   for the request. See {@link data.persistence.request.Request#params} for details.
 		 * @param {Boolean} [options.addModels=false] `true` to add the loaded models to the Collection instead of 
 		 *   replacing the existing ones. 
 		 * @param {Function} [options.success] Function to call if the loading is successful.
 		 * @param {Function} [options.error] Function to call if the loading fails.
+		 * @param {Function} [options.cancel] Function to call if the loading has been canceled, by the returned
+		 *   OperationPromise being {@link data.persistence.operation.Promise#abort aborted}.
 		 * @param {Function} [options.complete] Function to call when the operation is complete, regardless
 		 *   of success or failure.
-		 * @param {Object} [options.scope] The object to call the `success`, `error`, and `complete` callbacks in.
+		 * @param {Object} [options.scope] The object to call the `success`, `error`, `cancel`, and `complete` callbacks in.
 		 *   This may also be provided as the property `context`, if you prefer. Defaults to this Collection.
-		 * @return {jQuery.Promise} A Promise object which may have handlers attached for when the load completes. The 
-		 *   Promise is both resolved or rejected with the arguments listed above in the method description.
+		 * @return {data.persistence.operation.Promise} An OperationPromise object which may have handlers attached for when 
+		 *   the load completes. The Promise is both resolved or rejected with the arguments listed above in the method description.
 		 */
 		load : function( options ) {
 			// If loading paged data (there is a `pageSize` config on the Collection), then automatically just load page 1
@@ -1106,21 +1189,31 @@ define( [
 				
 			} else {
 				options = this.normalizeLoadOptions( options );
-				var me = this,  // for closures
-				    deferred = new jQuery.Deferred(),
-				    operation = new ReadOperation( { params: options.params } ),
-				    batch = new OperationBatch( { operations: operation } );
+				var proxy = this.getProxy() || ( this.model ? this.model.getProxy() : null ),
+				    request = new ReadRequest( { proxy: proxy, params: options.params } ),
+				    operation = new LoadOperation( { dataComponent: this, requests: request, addModels: !!options.addModels } );
+				
+				// &lt;debug&gt;
+				// No persistence proxy, cannot load. Throw an error
+				if( !proxy ) {
+					throw new Error( &quot;data.Collection::doLoad() error: Cannot load. No `proxy` configured on the Collection or the Collection's `model`.&quot; );
+				}
+				// &lt;/debug&gt;
 				
 				// Attach user-provided callbacks to the deferred. The `scope` was attached to each of these in normalizeLoadOptions()
-				deferred.done( options.success ).fail( options.error ).always( options.complete );
+				operation.done( options.success ).fail( options.error ).cancel( options.cancel ).always( options.complete );
 				
-				this.doLoad( operation ).then(
-					function( operation ) { me.onLoadSuccess( deferred, batch, { addModels: !!options.addModels } ); },
-					function( operation ) { me.onLoadError( deferred, batch ); }
-				);
-				return deferred.promise();
+				// Add the Operation to the list of active load operations (which fires the 
+				// 'loadbegin' event if it begins overall Collection loading)
+				this.addActiveLoadOperation( operation );
+				
+				operation.executeRequests().always( _.bind( this.handleLoadRequestsComplete, this ) );
+				operation.cancel( _.bind( this.onLoadCancel, this, operation ) );  // handle if the Operation is canceled (aborted) by the user
+				
+				return operation.promise();  // returns the OperationPromise object
 			}
 		},
+		
 		
 		
 <span id='data-Collection-method-loadRange'>		/**
@@ -1132,31 +1225,34 @@ define( [
 		 * and `endIdx` arguments. If paging is not used, then the Collection will simply make a single start/limit request of the 
 		 * {@link #proxy} for the desired range.
 		 * 
-		 * Loading a Collection is asynchronous, and either callbacks must be provided to the method, or handlers must 
-		 * attached to the returned `jQuery.Promise` object to determine when the loading is complete.
+		 * Loading a Collection is asynchronous, and either callbacks must be provided to the method, or handlers must be
+		 * attached to the returned {@link data.persistence.operation.Promise OperationPromise} object to determine when 
+		 * the loading is complete.
 		 * 
 		 * All of the callbacks, and the promise handlers are called with the following arguments:
 		 * 
 		 * - `collection` : {@link data.Collection} This Collection instance.
-		 * - `batch` : {@link data.persistence.operation.Batch} The Batch of {@link data.persistence.operation.Read Read Operation(s)}
-		 *   that were executed.
+		 * - `operation` : {@link data.persistence.operation.Load} The LoadOperation that was executed, which provides
+		 *   information about the operation and the request(s) that took place.
 		 * 
 		 * @param {Number} startIdx The starting index of the range of models to load.
 		 * @param {Number} endIdx The ending index of the range of models to load.
 		 * @param {Object} [options] An object which may contain the following properties:
 		 * @param {Object} [options.params] Any additional parameters to pass along to the configured {@link #proxy}
-		 *   for the operation. See {@link data.persistence.operation.Operation#params} for details.
+		 *   for the request(s). See {@link data.persistence.request.Request#params} for details.
 		 * @param {Boolean} [options.addModels] `true` to add the loaded models to the Collection instead of replacing
 		 *   the existing ones. If not provided, the method follows the behavior of the {@link #clearOnPageLoad} config
 		 *   if page-based loading is being used (i.e. there is a {@link #pageSize} config), or defaults to false otherwise.
 		 * @param {Function} [options.success] Function to call if the loading is successful.
 		 * @param {Function} [options.error] Function to call if the loading fails.
+		 * @param {Function} [options.cancel] Function to call if the loading has been canceled, by the returned
+		 *   OperationPromise being {@link data.persistence.operation.Promise#abort aborted}.
 		 * @param {Function} [options.complete] Function to call when the operation is complete, regardless
 		 *   of success or failure.
-		 * @param {Object} [options.scope] The object to call the `success`, `error`, and `complete` callbacks in.
+		 * @param {Object} [options.scope] The object to call the `success`, `error`, `cancel`, and `complete` callbacks in.
 		 *   This may also be provided as the property `context`, if you prefer. Defaults to this Collection.
-		 * @return {jQuery.Promise} A Promise object which may have handlers attached for when the load completes. The 
-		 *   Promise is both resolved or rejected with the arguments listed above in the method description.
+		 * @return {data.persistence.operation.Promise} An OperationPromise object which may have handlers attached for when 
+		 *   the load completes. The Promise is both resolved or rejected with the arguments listed above in the method description.
 		 */
 		loadRange : function( startIdx, endIdx, options ) {
 			var pageSize = this.pageSize;
@@ -1170,25 +1266,28 @@ define( [
 				
 			} else {
 				options = this.normalizeLoadOptions( options );
-				var operation = new ReadOperation( {
-					params : options.params,
-					
-					start : startIdx,
-					limit : endIdx - startIdx
-				} );
+				var proxy = this.getProxy() || ( this.model ? this.model.getProxy() : null ),
+				    request = new ReadRequest( { proxy: proxy, params: options.params, start: startIdx, limit : endIdx - startIdx } ),
+				    operation = new LoadOperation( { dataComponent: this, requests: request, addModels: !!options.addModels } );
 				
-				var me = this,  // for closures
-				    deferred = new jQuery.Deferred(),
-				    batch = new OperationBatch( { operations: operation } );
+				// &lt;debug&gt;
+				// No persistence proxy, cannot load. Throw an error
+				if( !proxy ) {
+					throw new Error( &quot;data.Collection::doLoad() error: Cannot load. No `proxy` configured on the Collection or the Collection's `model`.&quot; );
+				}
+				// &lt;/debug&gt;
 				
 				// Attach user-provided callbacks to the deferred. The `scope` was attached to each of these in normalizeLoadOptions()
-				deferred.done( options.success ).fail( options.error ).always( options.complete );
+				operation.done( options.success ).fail( options.error ).cancel( options.cancel ).always( options.complete );
 				
-				this.doLoad( operation ).then(
-					function( operation ) { me.onLoadSuccess( deferred, batch, { addModels: !!options.addModels } ); },
-					function( operation ) { me.onLoadError( deferred, batch ); }
-				);
-				return deferred.promise();
+				// Add the Operation to the list of active load operations (which fires the 
+				// 'loadbegin' event if it begins overall Collection loading)
+				this.addActiveLoadOperation( operation );
+				
+				operation.executeRequests().always( _.bind( this.handleLoadRequestsComplete, this ) );
+				operation.cancel( _.bind( this.onLoadCancel, this, operation ) );  // handle if the Operation is canceled (aborted) by the user
+				
+				return operation.promise();  // returns the OperationPromise object
 			}
 		},
 		
@@ -1198,29 +1297,32 @@ define( [
 		 * {@link #model model's} proxy will be used instead. The {@link #pageSize} must be configured on the Collection
 		 * for this method to work.
 		 * 
-		 * Loading a Collection is asynchronous, and either callbacks must be provided to the method, or handlers must 
-		 * attached to the returned `jQuery.Promise` object to determine when the loading is complete.
+		 * Loading a Collection is asynchronous, and either callbacks must be provided to the method, or handlers must be
+		 * attached to the returned {@link data.persistence.operation.Promise OperationPromise} object to determine when 
+		 * the loading is complete.
 		 * 
 		 * All of the callbacks, and the promise handlers are called with the following arguments:
 		 * 
 		 * - `collection` : {@link data.Collection} This Collection instance.
-		 * - `batch` : {@link data.persistence.operation.Batch} The Batch of {@link data.persistence.operation.Read Read Operation(s)}
-		 *   that were executed.
+		 * - `operation` : {@link data.persistence.operation.Load} The LoadOperation that was executed, which provides
+		 *   information about the operation and the request(s) that took place.
 		 * 
 		 * @param {Number} page The 1-based page number of data to load. Page `1` is the first page.
 		 * @param {Object} [options] An object which may contain the following properties:
 		 * @param {Object} [options.params] Any additional parameters to pass along to the configured {@link #proxy}
-		 *   for the operation. See {@link data.persistence.operation.Operation#params} for details.
+		 *   for the request. See {@link data.persistence.request.Request#params} for details.
 		 * @param {Boolean} [options.addModels] `true` to add the loaded models to the Collection instead of replacing
 		 *   the existing ones. If not provided, the method follows the behavior of the {@link #clearOnPageLoad} config.
 		 * @param {Function} [options.success] Function to call if the loading is successful.
 		 * @param {Function} [options.error] Function to call if the loading fails.
+		 * @param {Function} [options.cancel] Function to call if the loading has been canceled, by the returned
+		 *   OperationPromise being {@link data.persistence.operation.Promise#abort aborted}.
 		 * @param {Function} [options.complete] Function to call when the operation is complete, regardless
 		 *   of success or failure.
-		 * @param {Object} [options.scope] The object to call the `success`, `error`, and `complete` callbacks in.
+		 * @param {Object} [options.scope] The object to call the `success`, `error`, `cancel`, and `complete` callbacks in.
 		 *   This may also be provided as the property `context`, if you prefer. Defaults to this Collection.
-		 * @return {jQuery.Promise} A Promise object which may have handlers attached for when the load completes. The 
-		 *   Promise is both resolved or rejected with the arguments listed above in the method description.
+		 * @return {data.persistence.operation.Promise} An OperationPromise object which may have handlers attached for when 
+		 *   the load completes. The Promise is both resolved or rejected with the arguments listed above in the method description.
 		 */
 		loadPage : function( page, options ) {
 			// &lt;debug&gt;
@@ -1238,30 +1340,33 @@ define( [
 		 * {@link #model model's} proxy will be used instead. The {@link #pageSize} must be configured on the Collection
 		 * for this method to work.
 		 * 
-		 * Loading a Collection is asynchronous, and either callbacks must be provided to the method, or handlers must 
-		 * attached to the returned `jQuery.Promise` object to determine when the loading is complete.
+		 * Loading a Collection is asynchronous, and either callbacks must be provided to the method, or handlers must be
+		 * attached to the returned {@link data.persistence.operation.Promise OperationPromise} object to determine when 
+		 * the loading is complete.
 		 * 
 		 * All of the callbacks, and the promise handlers are called with the following arguments:
 		 * 
 		 * - `collection` : {@link data.Collection} This Collection instance.
-		 * - `batch` : {@link data.persistence.operation.Batch} The Batch of {@link data.persistence.operation.Read Read Operation(s)}
-		 *   that were executed.
+		 * - `operation` : {@link data.persistence.operation.Load} The LoadOperation that was executed, which provides
+		 *   information about the operation and the request(s) that took place.
 		 * 
 		 * @param {Number} startPage The 1-based page number of the first page of data to load. Page `1` is the first page.
 		 * @param {Number} endPage The 1-based page number of the last page of data to load. Page `1` is the first page.
 		 * @param {Object} [options] An object which may contain the following properties:
 		 * @param {Object} [options.params] Any additional parameters to pass along to the configured {@link #proxy}
-		 *   for the operation. See {@link data.persistence.operation.Operation#params} for details.
+		 *   for the request(s). See {@link data.persistence.request.Request#params} for details.
 		 * @param {Boolean} [options.addModels] `true` to add the loaded models to the Collection instead of replacing
 		 *   the existing ones. If not provided, the method follows the behavior of the {@link #clearOnPageLoad} config.
 		 * @param {Function} [options.success] Function to call if the loading is successful.
 		 * @param {Function} [options.error] Function to call if the loading fails.
+		 * @param {Function} [options.cancel] Function to call if the loading has been canceled, by the returned
+		 *   OperationPromise being {@link data.persistence.operation.Promise#abort aborted}.
 		 * @param {Function} [options.complete] Function to call when the operation is complete, regardless
 		 *   of success or failure.
-		 * @param {Object} [options.scope] The object to call the `success`, `error`, and `complete` callbacks in.
+		 * @param {Object} [options.scope] The object to call the `success`, `error`, `cancel`, and `complete` callbacks in.
 		 *   This may also be provided as the property `context`, if you prefer. Defaults to this Collection.
-		 * @return {jQuery.Promise} A Promise object which may have handlers attached for when the load completes. The 
-		 *   Promise is both resolved or rejected with the arguments listed above in the method description.
+		 * @return {data.persistence.operation.Promise} An OperationPromise object which may have handlers attached for when 
+		 *   the load completes. The Promise is both resolved or rejected with the arguments listed above in the method description.
 		 */
 		loadPageRange : function( startPage, endPage, options ) {
 			var pageSize = this.pageSize;
@@ -1277,51 +1382,9 @@ define( [
 			
 			options = this.normalizeLoadOptions( options );
 			var me = this,  // for closures
-			    deferred = new jQuery.Deferred(),
-			    operations = [],
-			    loadPromises = [],
-			    addModels = options.hasOwnProperty( 'addModels' ) ? options.addModels : !this.clearOnPageLoad;
-			
-			for( var page = startPage; page &lt;= endPage; page++ ) {
-				var operation = new ReadOperation( {
-					params    : options.params,
-					
-					page     : page,
-					pageSize : pageSize,
-					start    : ( page - 1 ) * pageSize,
-					limit    : pageSize   // in this case, the `limit` is the pageSize
-				} );
-				
-				operations.push( operation );  // for populating the Batch that represents all Operations
-				loadPromises.push( this.doLoad( operation ) );  // load the page of data, and store its returned Promise
-			}
-			
-			var batch = new OperationBatch( { operations: operations } ),
-			    masterPromise = jQuery.when.apply( null, loadPromises );
-			
-			// Attach user-provided callbacks to the deferred. The `scope` was attached to each of these in normalizeLoadOptions()
-			deferred.done( options.success ).fail( options.error ).always( options.complete );
-			
-			masterPromise.then(
-				function( operation ) { me.onLoadSuccess( deferred, batch, { addModels: addModels } ); },
-				function( operation ) { me.onLoadError( deferred, batch ); }
-			);
-			return deferred.promise();
-		},
-		
-		
-<span id='data-Collection-method-doLoad'>		/**
-</span>		 * Performs the actual load operation for a request to {@link #method-load} or {@link #method-loadPage}, given the
-		 * `operation` object.
-		 * 
-		 * @protected
-		 * @param {data.persistence.operation.Read} operation The Read operation for the load.
-		 * @return {jQuery.Promise} A Promise object which is resolved if the load completes successfully, or rejected
-		 *   otherwise. The Promise is resolved or rejected with the argument: `operation`.
-		 */
-		doLoad : function( operation ) {
-			var me = this,  // for closures
-			    proxy = this.proxy || ( this.model ? this.model.getProxy() : null );
+			    proxy = this.getProxy() || ( this.model ? this.model.getProxy() : null ),
+			    addModels = options.hasOwnProperty( 'addModels' ) ? options.addModels : !this.clearOnPageLoad,
+			    operation = new LoadOperation( { dataComponent: this, addModels: addModels } );
 			
 			// &lt;debug&gt;
 			// No persistence proxy, cannot load. Throw an error
@@ -1330,12 +1393,62 @@ define( [
 			}
 			// &lt;/debug&gt;
 			
-			// Set the loading flag while the Collection is loading. Will be set to false in onLoadSuccess() or onLoadError().
-			this.loading = true;
+			for( var page = startPage; page &lt;= endPage; page++ ) {
+				var request = new ReadRequest( {
+					proxy    : proxy,
+					params   : options.params,
+					
+					page     : page,
+					pageSize : pageSize,
+					start    : ( page - 1 ) * pageSize,
+					limit    : pageSize   // in this case, the `limit` is the pageSize
+				} );
+				
+				operation.addRequest( request );
+			}
 			
-			// Make a request to read the data from the persistent storage, and return a Promise object
-			// which is resolved or rejected with the `operation` object
-			return proxy.read( operation );
+			// Attach user-provided callbacks to the deferred. The `scope` was attached to each of these in normalizeLoadOptions()
+			operation.done( options.success ).fail( options.error ).cancel( options.cancel ).always( options.complete );
+			
+			// Add the Operation to the list of active load operations (which fires the 
+			// 'loadbegin' event if it begins overall Collection loading)
+			this.addActiveLoadOperation( operation );
+			
+			operation.executeRequests()
+				.done( function( operation ) {
+					var loadedPages = _.range( startPage, endPage + 1 );  // second arg needs +1 because it is &quot;up to but not included&quot;
+					me.loadedPages = ( addModels ) ? me.loadedPages.concat( loadedPages ) : loadedPages;
+				} )
+				.always( _.bind( this.handleLoadRequestsComplete, this ) );
+			
+			operation.cancel( _.bind( this.onLoadCancel, this, operation ) );  // handle if the Operation is canceled (aborted) by the user
+			
+			return operation.promise();  // returns the OperationPromise object
+		},
+		
+		
+<span id='data-Collection-method-handleLoadRequestsComplete'>		/**
+</span>		 * Handles the request(s) of an {@link data.persistence.operation.Load LoadOperation} completing.
+		 * 
+		 * As a temporary implementation before implementing concurrency management, this method simply calls 
+		 * {@link #onLoadSuccess} or {@link #onLoadError}, as appropriate.
+		 * 
+		 * @protected
+		 * @param {data.persistence.operation.Load} loadOperation The LoadOperation object which hold metadata, and all of the 
+		 *   {@link data.persistence.request.Request Request(s)} which were required to complete the load operation.
+		 */
+		handleLoadRequestsComplete : function( loadOperation ) {
+			// If this LoadOperation has been removed from the queue previously, such as from the Operation being
+			// manually canceled (aborted), then simply return out. The LoadOperation got here from its requests completing,
+			// but we shouldn't take any further action.
+			if( !_.contains( this.activeLoadOperations, loadOperation ) )
+				return;
+			
+			if( loadOperation.requestsWereSuccessful() ) {
+				this.onLoadSuccess( loadOperation );
+			} else {
+				this.onLoadError( loadOperation );
+			}
 		},
 		
 		
@@ -1343,41 +1456,39 @@ define( [
 </span>		 * Handles the {@link #proxy} successfully loading a set of data as a result of any of the &quot;load&quot;
 		 * methods being called ({@link #method-load}, {@link #loadRange}, {@link #loadPage}, or {@link #loadPageRange}).
 		 * 
+		 * Resolves the `operation` object created by {@link #method-load}.
+		 * 
 		 * @protected
-		 * @param {jQuery.Deferred} deferred The Deferred object created in the &quot;load&quot; method. This Deferred will be
-		 *   resolved after post-processing of the successful load is complete.
-		 * @param {data.persistence.operation.Batch} batch The Batch object which holds all of the 
-		 *   {@link data.persistence.operation.Operation Operations} which were required to complete the load request.
-		 * @param {Object} options An Object (map) with options for this method. Note that this is not the same as the `options`
-		 *   object provided to each of the &quot;load&quot; methods. This object may contain the following properties:
-		 * @param {Boolean} [options.addModels=false] `true` to add the loaded models to the Collection instead of 
-		 *   replacing the existing ones. 
+		 * @param {data.persistence.operation.Load} operation The LoadOperation object which hold metadata, and all of the 
+		 *   {@link data.persistence.request.Request Request(s)} which were required to complete the load operation.
 		 */
-		onLoadSuccess : function( deferred, batch, options ) {
-			var operations = batch.getOperations();
+		onLoadSuccess : function( operation ) {
+			var requests = operation.getRequests();
 			
-			// Sample the first load Operation for a totalCount
-			var totalCount = operations[ 0 ].getResultSet().getTotalCount();
+			// Sample the first load Request for a totalCount
+			var totalCount = requests[ 0 ].getResultSet().getTotalCount();
 			if( totalCount !== undefined ) {
 				this.totalCount = totalCount;
 			}
 			
-			// If we're not adding the models, clear the Collection first
-			if( !options.addModels ) {
+			// If we're not adding (appending) the models, clear the Collection first
+			if( !operation.isAddModels() ) {
 				this.removeAll();
 			}
 			
-			// Create a single array of all of the loaded records, put together in order of the operations, and then
+			// Create a single array of all of the loaded records, put together in order of the requests, and then
 			// add them to the Collection.
 			var records = _.flatten(
-				_.map( operations, function( op ) { return op.getResultSet().getRecords(); } )  // create an array of the arrays of result sets (to be flattened after)
+				_.map( requests, function( req ) { return req.getResultSet().getRecords(); } )  // create an array of the arrays of result sets (to be flattened after)
 			);
 			this.add( records );
 			
-			this.loading = false;
+			// Remove the Operation from the `activeLoadOperations`. Note: If removing the last one,
+			// the Collection will no longer be considered 'loading'.
+			this.removeActiveLoadOperation( operation );
 			
-			deferred.resolve( this, batch );
-			this.fireEvent( 'load', this, batch );
+			operation.resolve();
+			this.fireEvent( 'load', this, operation );
 		},
 		
 		
@@ -1385,20 +1496,73 @@ define( [
 </span>		 * Handles the {@link #proxy} failing to load a set of data as a result of any of the &quot;load&quot;
 		 * methods being called ({@link #method-load}, {@link #loadRange}, {@link #loadPage}, or {@link #loadPageRange}.
 		 * 
-		 * Rejects the `jQuery.Deferred` object created by {@link #method-load}.
+		 * Rejects the `operation` object created by {@link #method-load}.
 		 * 
 		 * @protected
-		 * @param {jQuery.Deferred} deferred The Deferred object created in the &quot;load&quot; method. This Deferred will 
-		 *   be rejected after any post-processing.
-		 * @param {data.persistence.operation.Batch} batch The Batch object which holds all of the 
-		 *   {@link data.persistence.operation.Operation Operations} which were required to complete the load request.
-		 *   One or more of these Operations has errored. Note that all Operations may not be complete.
+		 * @param {data.persistence.operation.Load} operation The LoadOperation object which hold metadata, and all of the 
+		 *   {@link data.persistence.request.Request Request(s)} which were required to complete the load operation.
 		 */
-		onLoadError : function( deferred, batch ) {
-			this.loading = false;
+		onLoadError : function( operation ) {
+			// Remove the Operation from the `activeLoadOperations`. Note: If removing the last one,
+			// the Collection will no longer be considered 'loading'.
+			this.removeActiveLoadOperation( operation );
 			
-			deferred.reject( this, batch );
-			this.fireEvent( 'load', this, batch );
+			operation.reject();
+			this.fireEvent( 'load', this, operation );
+		},
+		
+		
+<span id='data-Collection-method-onLoadCancel'>		/**
+</span>		 * Handles a {@link data.persistence.operation.Load LoadOperation} being canceled (aborted) by a client of 
+		 * the Collection.
+		 * 
+		 * Removes the LoadOperation from the {@link #activeLoadOperations} queue, which causes any future requests'
+		 * completion to be ignored.
+		 * 
+		 * @protected
+		 * @param {data.persistence.operation.Load} operation The LoadOperation object which hold metadata, and all of the 
+		 *   {@link data.persistence.request.Request Request(s)} which were required to complete the load operation.
+		 */
+		onLoadCancel : function( operation ) {
+			// Request was canceled (aborted), simply remove it from the activeLoadOperations and ignore its results
+			this.removeActiveLoadOperation( operation );
+			
+			// Note: operation was already aborted. No need to call operation.abort() here.
+			this.fireEvent( 'loadcancel', this, operation );
+		},
+		
+		
+<span id='data-Collection-method-addActiveLoadOperation'>		/**
+</span>		 * Utility method used to add a LoadOperation to the {@link #activeLoadOperations} array.
+		 * 
+		 * If the `operation` provided to this method is the first to be placed into the array, this method
+		 * fires the {@link #loadbegin} event, as the Collection is now in a &quot;loading&quot; state.
+		 * 
+		 * @protected
+		 * @param {data.persistence.operation.Load} operation A LoadOperation which is currently active.
+		 *   If the Operation is not currently active, the call to this method will have no effect.
+		 */
+		addActiveLoadOperation : function( operation ) {
+			this.activeLoadOperations.push( operation );
+			
+			// if this Operation began the Collection's &quot;loading&quot; state, fire 'loadbegin'
+			if( this.activeLoadOperations.length === 1 )
+				this.fireEvent( 'loadbegin', this );
+		},
+		
+		
+<span id='data-Collection-method-removeActiveLoadOperation'>		/**
+</span>		 * Utility method used to remove a LoadOperation from the {@link #activeLoadOperations} array.
+		 * 
+		 * @protected
+		 * @param {data.persistence.operation.Load} operation A LoadOperation which is currently active.
+		 *   If the Operation is not currently active, the call to this method will have no effect.
+		 */
+		removeActiveLoadOperation : function( operation ) {
+			var idx = _.indexOf( this.activeLoadOperations, operation );
+			if( idx !== -1 ) {
+				this.activeLoadOperations.splice( idx, 1 );
+			}
 		},
 		
 		
@@ -1410,15 +1574,18 @@ define( [
 		 * `success`, `error`, and `complete` functions, and binds them to the `scope` (or `context`). All other properties
 		 * that exist on the `options` object will remain unchanged. 
 		 * 
+		 * @protected
 		 * @param {Object} options The options object provided to any of the &quot;load&quot; methods. If `undefined` or `null` is
 		 *   provided, a normalized options object will still be returned, simply with defaults filled out.
 		 * @param {Function} [options.success] Function to call if the loading is successful. Will be defaulted to an
 		 *   empty function as part of this method's normalization process.
 		 * @param {Function} [options.error] Function to call if the loading fails. Will be defaulted to an
 		 *   empty function as part of this method's normalization process.
+		 * @param {Function} [options.cancel] Function to call if the loading has been canceled, by the returned
+		 *   OperationPromise being {@link data.persistence.operation.Promise#abort aborted}.
 		 * @param {Function} [options.complete] Function to call when the operation is complete, regardless
 		 *   of success or failure. Will be defaulted to an empty function as part of this method's normalization process.
-		 * @param {Object} [options.scope] The object to call the `success`, `error`, and `complete` callbacks in.
+		 * @param {Object} [options.scope] The object to call the `success`, `error`, `cancel`, and `complete` callbacks in.
 		 *   This may also be provided as the property `context`. Defaults to this Collection. This method binds each of
 		 *   the callbacks to this object.
 		 * @return {Object} The normalize `options` object.
@@ -1431,6 +1598,7 @@ define( [
 			
 			options.success  = _.bind( options.success  || emptyFn, scope );
 			options.error    = _.bind( options.error    || emptyFn, scope );
+			options.cancel   = _.bind( options.cancel   || emptyFn, scope );
 			options.complete = _.bind( options.complete || emptyFn, scope );
 			
 			return options;
@@ -1442,7 +1610,7 @@ define( [
 		 * existing Models are modified, and removed Models are deleted.
 		 * 
 		 * - `collection` : {@link data.Collection} This Collection instance.
-		 * - `operation` : {@link data.persistence.operation.Write} The WriteOperation that was executed.
+		 * - `request` : {@link data.persistence.request.Write} The WriteRequest that was executed.
 		 * 
 		 * @param {Object} [options] An object which may contain the following properties:
 		 * @param {Function} [options.success] Function to call if the synchronization is successful.

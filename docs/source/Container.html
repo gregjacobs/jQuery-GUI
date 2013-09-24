@@ -20,16 +20,17 @@ define( [
 	'require',
 	'lodash',
 	'Class',
-	'jqc/Jqc',
-	'jqc/ComponentManager',
-	'jqc/Component',
-	'jqc/layout/Layout',   // circular dependency, used with require() call
-	'jqc/layout/Auto'      // circular dependency, used with require() call
-], function( require, _, Class, Jqc, ComponentManager, Component ) {
+	'jqGui/JqGui',
+	'jqGui/ComponentManager',
+	'jqGui/Component',
+	'jqGui/layout/Layout',   // circular dependency, used with require() call
+	'jqGui/layout/Auto'      // circular dependency, used with require() call
+], function( require, _, Class, JqGui, ComponentManager, Component ) {
 
-<span id='jqc-Container'>	/**
-</span>	 * @class jqc.Container
-	 * @extends jqc.Component
+<span id='jqGui-Container'>	/**
+</span>	 * @class jqGui.Container
+	 * @extends jqGui.Component
+	 * @alias type.container
 	 *
 	 * Base class for a component that holds other child components. Provides a default
 	 * container layout that just adds child components directly into it with no layout.
@@ -38,88 +39,120 @@ define( [
 	
 		statics : {
 			
-<span id='jqc-Container-static-property-LAYOUTS'>			/**
+<span id='jqGui-Container-static-property-layouts'>			/**
 </span>			 * @private
 			 * @static
-			 * @property {Object} LAYOUTS
-			 * Hash object that stores &quot;registered&quot; layout types. The layouts are in the `jqc.layout` package, and each
+			 * @property {Object} layouts
+			 * 
+			 * Map that stores &quot;registered&quot; layout types. The layouts are in the `jqGui.layout` package, and each
 			 * specifies a type name that is used to instantiate them.
 			 */
-			LAYOUTS : {},
+			layouts : {},
 			
-<span id='jqc-Container-static-method-registerLayout'>			/**
-</span>			 * Registers a {@link jqc.layout.Layout Layout} with the Container class, allowing {@link #layout layouts}
+<span id='jqGui-Container-static-method-registerLayout'>			/**
+</span>			 * Registers a {@link jqGui.layout.Layout Layout} with the Container class, allowing {@link #layout layouts}
 			 * to be specified by their string `typeName`.
 			 *
 			 * @static
-			 * @method registerLayout
 			 * @param {String} typeName The type name for the Layout.
-			 * @param {Function} layoutClass A jqc.layout.Layout subclass.
+			 * @param {Function} layoutClass A {@link jqGui.layout.Layout} subclass.
 			 */
 			registerLayout : function( typeName, layoutClass ) {
-				this.LAYOUTS[ typeName.toLowerCase() ] = layoutClass;
+				Container.layouts[ typeName.toLowerCase() ] = layoutClass;
+			},
+			
+<span id='jqGui-Container-static-method-getLayoutType'>			/**
+</span>			 * Retrieves a registered {@link jqGui.layout.Layout Layout} class by &quot;type&quot; name.
+			 * 
+			 * @static
+			 * @protected
+			 * @param {String} typeName The type name that the layout was registered with. This is case-insensitive.
+			 * @return {Function} The {@link jqGui.layout.Layout Layout} that was registered with the
+			 *   given `typeName`.
+			 * @throws {Error} If the `typeName` did not resolve to a registered {@link jqGui.layout.Layout Layout}.
+			 */
+			getLayoutType : function( typeName ) {
+				typeName = typeName.toLowerCase();
+				
+				// &lt;debug&gt;
+				// Check that the layout type given is a registered layout type (or 'auto', as the AutoLayout
+				// is assumed to be loaded as a workaround for the circular dependency of this class requiring it)
+				if( typeName !== 'auto' &amp;&amp; !Container.layouts[ typeName ] ) {
+					throw new Error( &quot;Layout type '&quot; + typeName + &quot;' is not a registered layout type.&quot; );
+				}
+				// &lt;/debug&gt;
+				
+				// Return the AutoLayout explicitly if asked for, since that class is not registered due to issues 
+				// with RequireJS and the circular dependency of this class requiring it. Other Layout classes are 
+				// registered normally. 
+				return ( typeName === 'auto' ) ? require( 'jqGui/layout/Auto' ) : Container.layouts[ typeName ];
 			}
 			
 		},
 	
-<span id='jqc-Container-cfg-defaultType'>		/**
+<span id='jqGui-Container-cfg-defaultType'>		/**
 </span>		 * @cfg {String} defaultType
+		 * 
 		 * The default Component 'type' to instantiate when child {@link #items} are specified as anonymous config objects
 		 * without a `type` property of their own. 
 		 */
 		defaultType : 'container',
 		
-<span id='jqc-Container-cfg-acceptType'>		/**
-</span>		 * @cfg {Function} acceptType
-		 * The {@link jqc.Component} class (or subclass) to accept in the Container for child {@link #items}. If an added component 
-		 * is not an instance of this type, an error will be thrown. This should be set to a {@link jqc.Component} subclass (as only 
-		 * {@link jqc.Component Components} may be added to a Container in the first place).
+<span id='jqGui-Container-cfg-acceptType'>		/**
+</span>		 * @cfg {String/Function} acceptType
 		 * 
-		 * This config is useful for subclasses to set/override if they require a specific {@link jqc.Component} subclass to be added to
-		 * them, so as to not allow just any {@link jqc.Component} to be added, and direct the user as such.
+		 * The {@link jqGui.Component} class (or subclass) to accept in the Container for child {@link #items}. If an added component 
+		 * is not an instance of this type, an error will be thrown. This should be set to a {@link jqGui.Component} subclass (as only 
+		 * {@link jqGui.Component Components} may be added to a Container in the first place).
+		 * 
+		 * This config is useful for subclasses to set/override if they require a specific {@link jqGui.Component} subclass to be added to
+		 * them, so as to not allow just any {@link jqGui.Component} to be added, and direct the user as such.
+		 * 
+		 * The value for this configuration option can either be the constructor function for a {@link jqGui.Component} class, or a
+		 * 'type' string which will be resolved to a {@link jqGui.Component} class via {@link jqGui.ComponentManager#getType}.
 		 * 
 		 * Note that the check for this is performed after any anonymous config objects have been converted into their corresponding
-		 * {@link jqc.Component} instance.
+		 * {@link jqGui.Component} instance.
 		 */
 		acceptType : Component,
 	
-<span id='jqc-Container-cfg-destroyRemoved'>		/**
+<span id='jqGui-Container-cfg-destroyRemoved'>		/**
 </span>		 * @cfg {Boolean} destroyRemoved
 		 * True if the Container should automatically destroy child Components that have been removed from it.
 		 */
 		destroyRemoved : true,
 	
-<span id='jqc-Container-cfg-layout'>		/**
-</span>		 * @cfg {String/Object/jqc.layout.Layout} layout
+<span id='jqGui-Container-cfg-layout'>		/**
+</span>		 * @cfg {String/Object/jqGui.layout.Layout} layout
 		 * The layout strategy object to use for laying out (displaying) the Container's child items.  This can either be a string with the
 		 * type name of the layout, an object which should have the property `type` (for the layout's type name) and any other layout
-		 * configuration options, or an instantiated {@link jqc.layout.Layout} subclass.
+		 * configuration options, or an instantiated {@link jqGui.layout.Layout} subclass.
 		 */
 	
-<span id='jqc-Container-cfg-items'>		/**
-</span>		 * @cfg {Object/Object[]/jqc.Component/jqc.Component[]} items
+<span id='jqGui-Container-cfg-items'>		/**
+</span>		 * @cfg {Object/Object[]/jqGui.Component/jqGui.Component[]} items
 		 * Any Components/Containers that will become children of this Container, and will be instantiated at
 		 * construction time.  These can be retrieved from the Container using {@link #getItems}.
 		 *
-		 * Note that specifying child items is mutually exclusive with setting the {@link jqc.Component#html} and
-		 * {@link jqc.Component#contentEl} configs, and will take precedence over them.
+		 * Note that specifying child items is mutually exclusive with setting the {@link jqGui.Component#html} and
+		 * {@link jqGui.Component#contentEl} configs, and will take precedence over them.
 		 */
 	
-<span id='jqc-Container-cfg-baseCls'>		/**
+<span id='jqGui-Container-cfg-baseCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Container',
+		baseCls : 'jqGui-container',
 	
 	
-<span id='jqc-Container-property-childComponents'>		/**
+<span id='jqGui-Container-property-childComponents'>		/**
 </span>		 * @private
-		 * @property {jqc.Component[]} childComponents
+		 * @property {jqGui.Component[]} childComponents
 		 * 
 		 * An array of child components. Created from the &quot;items&quot; config, or call(s) to the {@link #method-add} method.
 		 */
 		
-<span id='jqc-Container-property-deferLayout'>		/**
+<span id='jqGui-Container-property-deferLayout'>		/**
 </span>		 * @private
 		 * @property {Boolean} deferLayout
 		 * 
@@ -130,7 +163,9 @@ define( [
 		deferLayout : false,
 	
 	
-		// protected
+<span id='jqGui-Container-method-initComponent'>		/**
+</span>		 * @inheritdoc
+		 */
 		initComponent : function() {
 			// If the items config has a value, remove any html and contentEl configs, as the items config takes precedence.
 			if( this.items ) {
@@ -138,72 +173,72 @@ define( [
 				this.contentEl = undefined;
 			}
 	
-			// Check that the 'acceptType' config actually refers to a class
-			if( typeof this.acceptType !== 'function' ) { throw new Error( &quot;'acceptType' config did not resolve to a constructor function&quot; ); }
-	
+			// Check that the `acceptType` config actually refer to a class, or resolve a type name to the class.
+			this.acceptType = this.resolveType( this.acceptType );
+			
 			this.addEvents(
-<span id='jqc-Container-event-beforeadd'>				/**
+<span id='jqGui-Container-event-beforeadd'>				/**
 </span>				 * Fires before a Component has been added to this Container. A handler of
 				 * this event may return false to cancel the addition of the Component.
 				 *
 				 * @event beforeadd
-				 * @param {jqc.Container} container This Container.
-				 * @param {jqc.Component} component The Component that is to be added.
+				 * @param {jqGui.Container} container This Container.
+				 * @param {jqGui.Component} component The Component that is to be added.
 				 */
 				'beforeadd',
 	
-<span id='jqc-Container-event-add'>				/**
+<span id='jqGui-Container-event-add'>				/**
 </span>				 * Fires after a Component has been added to this Container. This event bubbles.
 				 *
 				 * @event add
-				 * @param {jqc.Container} container This Container.
-				 * @param {jqc.Component} component The Component that was added.
+				 * @param {jqGui.Container} container This Container.
+				 * @param {jqGui.Component} component The Component that was added.
 				 * @param {Number} index The index in this Container's child items array that the Component was added to.
 				 */
 				'add',
 	
-<span id='jqc-Container-event-reorder'>				/**
+<span id='jqGui-Container-event-reorder'>				/**
 </span>				 * Fires when a Component has been reordered within the Container (i.e. its index has changed).
 				 * This is fired by the {@link #insert} method if it notices that the Component being &quot;inserted&quot; is
 				 * already in this Container, but at a different index. If the Component was previously in a different
 				 * Container, then the {@link #event-add} event is fired.
 				 *
 				 * @event reorder
-				 * @param {jqc.Container} container This Container.
-				 * @param {jqc.Component} component The Component that was reordered within the Container.
+				 * @param {jqGui.Container} container This Container.
+				 * @param {jqGui.Component} component The Component that was reordered within the Container.
 				 * @param {Number} index The new index of the Component in this Container's child items array.
 				 * @param {Number} previousIndex The previous index of the Component in this Container's child items array.
 				 */
 				'reorder',
 	
-<span id='jqc-Container-event-beforeremove'>				/**
+<span id='jqGui-Container-event-beforeremove'>				/**
 </span>				 * Fires before a Component has been removed from this Container. A handler of
 				 * this event may return false to cancel the removal of the Component.
 				 *
 				 * @event beforeremove
-				 * @param {jqc.Container} container This Container.
-				 * @param {jqc.Component} component The Component that is to be removed.
+				 * @param {jqGui.Container} container This Container.
+				 * @param {jqGui.Component} component The Component that is to be removed.
 				 */
 				'beforeremove',
 	
-<span id='jqc-Container-event-remove'>				/**
+<span id='jqGui-Container-event-remove'>				/**
 </span>				 * Fires after a Component has been removed from this Container. This event bubbles.
 				 *
 				 * @event remove
-				 * @param {jqc.Container} container This Container.
-				 * @param {jqc.Component} component The Component that was removed.
+				 * @param {jqGui.Container} container This Container.
+				 * @param {jqGui.Component} component The Component that was removed.
 				 * @param {Number} index The index in this Container's child items array that the Component was removed from.
 				 */
 				'remove',
 				
-<span id='jqc-Container-event-afterlayout'>				/**
+<span id='jqGui-Container-event-afterlayout'>				/**
 </span>				 * Fires after the Container's {@link #doLayout} method has successfully executed.  
 				 * Note that this event will fire after the {@link #event-render} event fires for
 				 * the initial rendering of the Container (as {@link #doLayout} is executed at that
 				 * point).
 				 *
 				 * @event afterlayout
-				 * @param {jqc.Container} container This Container.
+				 * @param {jqGui.Container} container This Container.
 				 */
 				'afterlayout'
 			);
@@ -230,15 +265,41 @@ define( [
 				this.setData( this.data );
 			}
 		},
-	
-	
+		
+		
+<span id='jqGui-Container-method-resolveType'>		/**
+</span>		 * Resolves the constructor function for the value provided to the `type` argument. If a string is provided,
+		 * it is assumed to be a 'type' name and a lookup for the constructor function is performed via 
+		 * {@link jqGui.ComponentManager#getType}. If a function is provided, the function is returned as-is.
+		 * 
+		 * This method is used to support the {@link #defaultType} and {@link #acceptType} configs.
+		 * 
+		 * @protected
+		 * @param {String/Function} type The input type name, or constructor function.
+		 * @return {Function} The constructor function for the `type`.
+		 * @throws {Error} If the `type` does not resolve to a constructor function.
+		 */
+		resolveType : function( type ) {
+			if( typeof type === 'string' &amp;&amp; ComponentManager.hasType( type ) ) {
+				type = ComponentManager.getType( type );
+			}
+			
+			// &lt;debug&gt;
+			if( !_.isFunction( type ) ) {
+				throw new Error( &quot;The provided `type` did not resolve to a constructor function&quot; );
+			}
+			// &lt;/debug&gt;
+			
+			return type;
+		},
+		
 	
 		// ----------------------------------------
 	
 		// Child Component Manipulation Methods
 	
 	
-<span id='jqc-Container-method-createComponent'>		/**
+<span id='jqGui-Container-method-createComponent'>		/**
 </span>		 * Creates a Component from a configuration object. Automatically adds the parentContainer property to the supplied
 		 * `config` object that refers to this Container, and adds the {@link #defaultType} to the `config` object
 		 * if no `type` property was specified.
@@ -246,7 +307,7 @@ define( [
 		 * @protected
 		 * @method createComponent
 		 * @param {Object} config The configuration object for the Component.
-		 * @return {jqc.Component} The instantiated Component.
+		 * @return {jqGui.Component} The instantiated Component.
 		 */
 		createComponent : function( config ) {
 			// Set the Component's parentContainer property to this Container, and use the default component 'type' if one wasn't specified
@@ -261,9 +322,9 @@ define( [
 		},
 	
 	
-<span id='jqc-Container-method-add'>		/**
-</span>		 * Adds child {@link jqc.Component Component(s)} to this Container, instantiating them into their appropriate
-		 * jqc.Component subclass.  When all Components are added, this method automatically calls {@link #doLayout} to
+<span id='jqGui-Container-method-add'>		/**
+</span>		 * Adds child {@link jqGui.Component Component(s)} to this Container, instantiating them into their appropriate
+		 * jqGui.Component subclass.  When all Components are added, this method automatically calls {@link #doLayout} to
 		 * refresh the layout.
 		 *
 		 * Note that if multiple Components are being added, it is recommended that they all be provided to this method
@@ -274,9 +335,9 @@ define( [
 		 *
 		 *
 		 * @method add
-		 * @param {jqc.Component/Object/jqc.Component[]/Array} cmp A single child {@link jqc.Component} or config object, or an array of
-		 *   child {@link jqc.Component Components} or config objects.
-		 * @return {jqc.Component/jqc.Component[]} Returns the Component that was added, or an array of the Components that were added, depending on
+		 * @param {jqGui.Component/Object/jqGui.Component[]/Array} cmp A single child {@link jqGui.Component} or config object, or an array of
+		 *   child {@link jqGui.Component Components} or config objects.
+		 * @return {jqGui.Component/jqGui.Component[]} Returns the Component that was added, or an array of the Components that were added, depending on
 		 *   the type provided to the `cmp` argument.  Single Component addition returns a single Component; array addition returns an array. See
 		 *   the return value of {@link #insert}.
 		 */
@@ -300,13 +361,13 @@ define( [
 		},
 	
 	
-<span id='jqc-Container-method-insert'>		/**
-</span>		 * Inserts (or moves) a {@link jqc.Component Component} into this Container.
+<span id='jqGui-Container-method-insert'>		/**
+</span>		 * Inserts (or moves) a {@link jqGui.Component Component} into this Container.
 		 *
 		 * @method insert
-		 * @param {jqc.Component/Object} cmp The Component or config object of a Component to insert.
+		 * @param {jqGui.Component/Object} cmp The Component or config object of a Component to insert.
 		 * @param {Number} position (optional) The position (index) to insert the Component at. If omitted, the component will be appended to the Container.
-		 * @return {jqc.Component} The Component that was inserted, or null if the Component was not added because a beforeadd event handler returned false.
+		 * @return {jqGui.Component} The Component that was inserted, or null if the Component was not added because a beforeadd event handler returned false.
 		 */
 		insert : function( cmp, position ) {
 			cmp = this.doInsert( cmp, position );
@@ -318,15 +379,15 @@ define( [
 		},
 	
 	
-<span id='jqc-Container-method-doInsert'>		/**
+<span id='jqGui-Container-method-doInsert'>		/**
 </span>		 * Private method that does the actual add or insert of the Component.  This is called by both {@link #method-add} and {@link #insert} methods, and exists
 		 * so that those methods can call {@link #doLayout} after their processing is complete.
 		 *
 		 * @private
 		 * @method doInsert
-		 * @param {jqc.Component/Object} component The Component or config object of a Component to insert.
+		 * @param {jqGui.Component/Object} component The Component or config object of a Component to insert.
 		 * @param {Number} position (optional) The position (index) to insert the Component at. If omitted, the component will be appended to the Container.
-		 * @return {jqc.Component} The Component that was inserted, or null if the component was not added because a beforeadd event handler returned false.
+		 * @return {jqGui.Component} The Component that was inserted, or null if the component was not added because a beforeadd event handler returned false.
 		 */
 		doInsert : function( component, position ) {
 			// First, fix position if it is out of the bounds of the childComponents array
@@ -339,7 +400,7 @@ define( [
 			}
 	
 	
-			var isInstantiatedComponent = ( component instanceof Component ),   // if the component argument is an actual instantiated jqc.Component, and not just a configuration object
+			var isInstantiatedComponent = ( component instanceof Component ),   // if the component argument is an actual instantiated jqGui.Component, and not just a configuration object
 			    isReorder = isInstantiatedComponent &amp;&amp; this.has( component );  // Determines if this is an actual addition of the Component to the Container, or a reorder of the Component within the Container
 	
 			if( isReorder ) {
@@ -363,14 +424,14 @@ define( [
 				return component;
 	
 			} else {
-				// If the component is not yet a jqc.Component instance at this point (i.e. it is a configuration object), instantiate it now so
+				// If the component is not yet a jqGui.Component instance at this point (i.e. it is a configuration object), instantiate it now so
 				// we can provide it to the beforeadd event
 				if( !isInstantiatedComponent ) {
 					component = this.createComponent( component );
 				}
 				
 				// Perform the check that the component is of the correct class type (governed by the 'acceptType' config).
-				if( !( component instanceof this.acceptType ) ) {  // Note: this.acceptType defaults to jqc.Component
+				if( !( component instanceof this.acceptType ) ) {  // Note: this.acceptType defaults to jqGui.Component
 					throw new Error( &quot;A Component added to the Container was not of the correct class type ('acceptType' config)&quot; );
 				}
 	
@@ -401,49 +462,51 @@ define( [
 		},
 	
 	
-<span id='jqc-Container-method-onAdd'>		/**
+<span id='jqGui-Container-method-onAdd'>		/**
 </span>		 * Hook method that is run when a Component is added or inserted into the Container.
 		 *
 		 * @protected
 		 * @template
 		 * @method onAdd
-		 * @param {jqc.Component} component The component that was added or inserted into this Container.
+		 * @param {jqGui.Component} component The component that was added or inserted into this Container.
 		 * @param {Number} index The index in this Container's child items array where the new Component was added.
 		 */
-		onAdd : Jqc.emptyFn,
+		onAdd : JqGui.emptyFn,
 	
 	
-<span id='jqc-Container-method-onReorder'>		/**
+<span id='jqGui-Container-method-onReorder'>		/**
 </span>		 * Hook method that is run when a Component is reordered within the Container.
 		 *
 		 * @protected
 		 * @template
 		 * @method onReorder
-		 * @param {jqc.Component} component The Component that was reordered within the Container.
+		 * @param {jqGui.Component} component The Component that was reordered within the Container.
 		 * @param {Number} index The new index of the Component in this Container's child items array.
 		 * @param {Number} previousIndex The previous index of the Component in this Container's child items array.
 		 */
-		onReorder : Jqc.emptyFn,
+		onReorder : JqGui.emptyFn,
 	
 	
 	
-<span id='jqc-Container-method-remove'>		/**
-</span>		 * Removes child {@link jqc.Component Component(s)} from this Container.  Removed {@link jqc.Component Components} will automatically have
-		 * their destroy() method called if the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is explicitly set to true.
-		 * If the Component is not destroyed, its main {@link jqc.Component#$el element} is detached from this Container.  When all Components are removed,
-		 * this method automatically calls {@link #doLayout} to refresh the layout.
+<span id='jqGui-Container-method-remove'>		/**
+</span>		 * Removes one or more child {@link jqGui.Component Component(s)} from this Container.  
+		 * 
+		 * Removed {@link jqGui.Component Components} will automatically have their {@link jqGui.Component#method-destroy} method called if 
+		 * the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is explicitly set to true. 
+		 * If the Component is not destroyed, its main {@link jqGui.Component#$el element} is detached from this Container.  When all 
+		 * Components are removed, this method automatically calls {@link #doLayout} to refresh the layout.
 		 *
 		 * Note that if multiple Components are being removed, it is recommended that they all be provided to this method
 		 * in one call, using the array form of the `cmp` argument.  A call to {@link #doLayout} will only be done
-		 * after all Components have been removed (and not once for each Component that is removed).
+		 * after all Components have been removed (as opposed to once for each Component that is removed).
 		 *
-		 * The 'remove' event will be fired for each Component that is successfully removed (i.e. the Component was found in the Container, and a
-		 * {@link #beforeremove} event handler did not return false for it).
+		 * The 'remove' event will be fired for each Component that is successfully removed (i.e. the Component was found in the 
+		 * Container, and a {@link #beforeremove} event handler did not return false for it).
 		 *
 		 * @method remove
-		 * @param {jqc.Component/jqc.Component[]} cmp A single child {@link jqc.Component Component}, or an array of child Components.
+		 * @param {jqGui.Component/jqGui.Component[]} cmp A single child {@link jqGui.Component Component}, or an array of child Components.
 		 * @param {Boolean} destroyRemoved (optional) True to automatically destroy the removed component. Defaults to the value of this Container's {@link #destroyRemoved} config.
-		 * @return {jqc.Component/jqc.Component[]} Returns the Component that was removed, or an array of the Components that were removed, depending on
+		 * @return {jqGui.Component/jqGui.Component[]} Returns the Component that was removed, or an array of the Components that were removed, depending on
 		 *   the type provided to the `cmp` argument.  Single Component removal returns a single Component (or null if the Component was not removed);
 		 *   array removal returns an array of the Components that were successfully removed.
 		 */
@@ -468,12 +531,33 @@ define( [
 	
 			return returnVal;
 		},
+		
+		
+<span id='jqGui-Container-method-removeAt'>		/**
+</span>		 * Removes the child Component at the given `idx`, and returns the removed component. If there is no component 
+		 * at the given `idx`, then this method has no effect and returns `null`.
+		 * 
+		 * Note that the removed {@link jqGui.Component Component} will automatically have its {@link jqGui.Component#method-destroy destroy} 
+		 * method called if the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is 
+		 * explicitly set to true. If the Component is not destroyed, its main {@link jqGui.Component#$el element} is detached from 
+		 * this Container.  
+		 * 
+		 * When the Component is removed, this method automatically calls {@link #doLayout} to refresh the layout.
+		 * 
+		 * The 'remove' event will be fired for each Component that is successfully removed (i.e. the Component was found in the 
+		 * Container, and a {@link #beforeremove} event handler did not return false for it).
+		 * 
+		 * @param {Number} idx The index of the child component to remove.
+		 * @return {jqGui.Component} Returns the Component that was removed, or `null` if there was no Component at the given `idx`.
+		 */
+		removeAt : function( idx ) {
+			return this.remove( this.getItemAt( idx ) );
+		},
 	
 	
-<span id='jqc-Container-method-removeAll'>		/**
+<span id='jqGui-Container-method-removeAll'>		/**
 </span>		 * Removes all child Component(s) from this Container.
 		 *
-		 * @method removeAll
 		 * @param {Boolean} destroyRemoved (optional) True to automatically destroy the removed components. Defaults to the value of this Container's {@link #destroyRemoved} config.
 		 */
 		removeAll : function( destroyRemoved ) {
@@ -487,17 +571,17 @@ define( [
 		},
 	
 	
-<span id='jqc-Container-method-doRemove'>		/**
-</span>		 * Removes a child {@link jqc.Component Component(s)} from this Container.  If a Component is successfully removed, the 'remove' event will be fired.
-		 * Removed {@link jqc.Component Components} will automatically have their destroy() method called if the {@link #destroyRemoved} config is true, or
-		 * if the `destroyRemoved` argument is explicitly set to true.  If the Component is not destroyed, its main {@link jqc.Component#getEl element} is
+<span id='jqGui-Container-method-doRemove'>		/**
+</span>		 * Removes a child {@link jqGui.Component Component(s)} from this Container.  If a Component is successfully removed, the 'remove' event will be fired.
+		 * Removed {@link jqGui.Component Components} will automatically have their destroy() method called if the {@link #destroyRemoved} config is true, or
+		 * if the `destroyRemoved` argument is explicitly set to true.  If the Component is not destroyed, its main {@link jqGui.Component#getEl element} is
 		 * detached from this Container.
 		 *
 		 * @private
 		 * @method doRemove
-		 * @param {jqc.Component/jqc.Component[]} cmp A single child {@link jqc.Component Component}, or an array of child Components.
+		 * @param {jqGui.Component/jqGui.Component[]} cmp A single child {@link jqGui.Component Component}, or an array of child Components.
 		 * @param {Boolean} destroyRemoved (optional) True to automatically destroy the removed component. Defaults to the value of this Container's {@link #destroyRemoved} config.
-		 * @return {jqc.Component} The Component that was removed, or null if no Component was removed (i.e. a {@link #beforeremove}
+		 * @return {jqGui.Component} The Component that was removed, or null if no Component was removed (i.e. a {@link #beforeremove}
 		 *   event handler returned false, or the Component to be removed was not found).
 		 */
 		doRemove : function( cmp, destroyRemoved ) {
@@ -548,16 +632,16 @@ define( [
 		},
 	
 	
-<span id='jqc-Container-method-onRemove'>		/**
+<span id='jqGui-Container-method-onRemove'>		/**
 </span>		 * Hook method that is run when a Component is removed from the Container.
 		 *
 		 * @protected
 		 * @template
 		 * @method onRemove
-		 * @param {jqc.Component} component The component that was removed.
+		 * @param {jqGui.Component} component The component that was removed.
 		 * @param {Number} index The index in this Container's child items array where the Component was removed from.
 		 */
-		onRemove : Jqc.emptyFn,
+		onRemove : JqGui.emptyFn,
 	
 	
 	
@@ -565,8 +649,8 @@ define( [
 	
 		// Child Component Accessor Methods
 	
-<span id='jqc-Container-method-getCount'>		/**
-</span>		 * Retrives the number of child items ({@link jqc.Component components}) that are currently held by this Container.
+<span id='jqGui-Container-method-getCount'>		/**
+</span>		 * Retrives the number of child items ({@link jqGui.Component components}) that are currently held by this Container.
 		 * 
 		 * @method getCount
 		 * @return {Number}
@@ -576,36 +660,36 @@ define( [
 		},
 	
 	
-<span id='jqc-Container-method-getItems'>		/**
-</span>		 * Retrieves the child items ({@link jqc.Component components}) that are currently held by this Container.
+<span id='jqGui-Container-method-getItems'>		/**
+</span>		 * Retrieves the child items ({@link jqGui.Component components}) that are currently held by this Container.
 		 *
 		 * @method getItems
-		 * @return {jqc.Component[]}
+		 * @return {jqGui.Component[]}
 		 */
 		getItems : function() {
 			return this.childComponents;
 		},
 	
 	
-<span id='jqc-Container-method-getItemAt'>		/**
-</span>		 * Retrieves the child item ({@link jqc.Component Component} at the specified `index`. If the
+<span id='jqGui-Container-method-getItemAt'>		/**
+</span>		 * Retrieves the child item ({@link jqGui.Component Component} at the specified `index`. If the
 		 * index is out of range of the child items, this method returns null.
 		 *
 		 * @method getItemAt
 		 * @param {Number} index
-		 * @return {jqc.Component} The child item ({@link jqc.Component Component}) at the specified index, or null if the index is out of range.
+		 * @return {jqGui.Component} The child item ({@link jqGui.Component Component}) at the specified index, or null if the index is out of range.
 		 */
 		getItemAt : function( index ) {
 			return this.childComponents[ index ] || null;
 		},
 	
 	
-<span id='jqc-Container-method-getItemIndex'>		/**
-</span>		 * Retrieves the index of the given child item ({@link jqc.Component Component}). Returns -1 if the if the item
+<span id='jqGui-Container-method-getItemIndex'>		/**
+</span>		 * Retrieves the index of the given child item ({@link jqGui.Component Component}). Returns -1 if the if the item
 		 * is not found.
 		 *
 		 * @method getItemIndex
-		 * @param {jqc.Component} item The item to get the index of.
+		 * @param {jqGui.Component} item The item to get the index of.
 		 * @return {Number} The index of the item (component), or -1 if it was not found.
 		 */
 		getItemIndex : function( item ) {
@@ -619,11 +703,11 @@ define( [
 		},
 	
 	
-<span id='jqc-Container-method-has'>		/**
+<span id='jqGui-Container-method-has'>		/**
 </span>		 * Determine if this Container has a given `component` as a direct child component of this Container.
 		 *
 		 * @method has
-		 * @param {jqc.Component} component The {@link jqc.Component Component} to look for as a child of this Container.
+		 * @param {jqGui.Component} component The {@link jqGui.Component Component} to look for as a child of this Container.
 		 * @return {Boolean} True if the Component is found as a direct child of this Container, false otherwise.
 		 */
 		has : function( component ) {
@@ -635,7 +719,7 @@ define( [
 		// ----------------------------------------
 	
 	
-<span id='jqc-Container-method-onShow'>		/**
+<span id='jqGui-Container-method-onShow'>		/**
 </span>		 * Extension of onShow method used to test if a layout request has been deferred on the Container due
 		 * to the Container being hidden at the time.  If a layout request was deferred, {@link #doLayout}
 		 * will be run.
@@ -670,9 +754,9 @@ define( [
 		// Layout Methods
 	
 	
-<span id='jqc-Container-method-doLayout'>		/**
+<span id='jqGui-Container-method-doLayout'>		/**
 </span>		 * Lays out the Container's child components ({@link #items}) using the configured {@link #layout} strategy object.
-		 * If no {@link #layout} has been configured, the default {@link jqc.layout.Auto} is used.
+		 * If no {@link #layout} has been configured, the default {@link jqGui.layout.Auto} is used.
 		 *
 		 * Note that a layout can only be done if the Container is rendered and visible. This method will automatically
 		 * be run when the Container's {@link #method-render} method runs. If the Container isn' visible when this method is called,
@@ -681,7 +765,7 @@ define( [
 		 * @method doLayout
 		 */
 		doLayout : function() {
-			// Run the superclass's (jqc.Component's) layout functionality first
+			// Run the superclass's (jqGui.Component's) layout functionality first
 			this._super( arguments );
 			
 			if( !this.canLayout() ) {
@@ -707,18 +791,18 @@ define( [
 		},
 		
 		
-<span id='jqc-Container-method-onBeforeLayout'>		/**
-</span>		 * Hook method that is executed just before the {@link #layout layout's} {@link jqc.layout.Layout#doLayout doLayout}
+<span id='jqGui-Container-method-onBeforeLayout'>		/**
+</span>		 * Hook method that is executed just before the {@link #layout layout's} {@link jqGui.layout.Layout#doLayout doLayout}
 		 * method is executed to run the layout.
 		 * 
 		 * @protected
 		 * @template
 		 * @method onBeforeLayout
 		 */
-		onBeforeLayout : Jqc.emptyFn,
+		onBeforeLayout : JqGui.emptyFn,
 		
 		
-<span id='jqc-Container-method-onLayout'>		/**
+<span id='jqGui-Container-method-onLayout'>		/**
 </span>		 * Hook method that is executed after {@link #doLayout} has successfully executed. Extend this method
 		 * (calling the superclass method first) to implement any post-layout logic that the Container subclass
 		 * should perform after its {@link #items child components} have been laid out.
@@ -727,13 +811,13 @@ define( [
 		 * @template
 		 * @method onLayout
 		 */
-		onLayout : Jqc.emptyFn,
+		onLayout : JqGui.emptyFn,
 		
 	
-<span id='jqc-Container-method-canLayout'>		/**
+<span id='jqGui-Container-method-canLayout'>		/**
 </span>		 * Determines if the Container can be laid out at this time. The Container must be rendered, and visible.
 		 * It must be visible because for some layouts, especially those that use jQuery UI components or that
-		 * need to calculate the size of elements, we can not lay out their child {@link jqc.Component Components}
+		 * need to calculate the size of elements, we can not lay out their child {@link jqGui.Component Components}
 		 * when the Container's element is hidden (i.e. no css visibility/display).
 		 *
 		 * This method is basically used to determine if we can lay the child Components out, and if not, a layout
@@ -750,31 +834,31 @@ define( [
 	
 	
 	
-<span id='jqc-Container-method-getLayout'>		/**
-</span>		 * Retrieves the {@link jqc.layout.Layout Layout} object that the Container is currently
+<span id='jqGui-Container-method-getLayout'>		/**
+</span>		 * Retrieves the {@link jqGui.layout.Layout Layout} object that the Container is currently
 		 * configured to use.  If no {@link #layout} is currently configured for the Container, this method
-		 * creates a {@link jqc.layout.Auto} to use for this Container, and returns that.
+		 * creates a {@link jqGui.layout.Auto} to use for this Container, and returns that.
 		 *
 		 * @method getLayout
 		 */
 		getLayout : function() {
 			if( !this.layout ) {
-				var AutoLayout = require( 'jqc/layout/Auto' );
+				var AutoLayout = require( 'jqGui/layout/Auto' );
 				this.setLayout( new AutoLayout() );
 			}
 			return this.layout;
 		},
 	
 	
-<span id='jqc-Container-method-setLayout'>		/**
+<span id='jqGui-Container-method-setLayout'>		/**
 </span>		 * Sets a new layout strategy object for the Container. Any previous layout will be detached from
 		 * the Container (its container reference set to null).
 		 *
 		 * @method setLayout
-		 * @param {String/Object/jqc.layout.Layout} layout See the {@link #layout} config.
+		 * @param {String/Object/jqGui.layout.Layout} layout See the {@link #layout} config.
 		 */
 		setLayout : function( layout ) {
-			var Layout = require( 'jqc/layout/Layout' );  // for dealing with circular dependency
+			var Layout = require( 'jqGui/layout/Layout' );  // for dealing with circular dependency
 			
 			// Destroy the current layout if we have a new one, and detach all Components in the Container, as 
 			// a new layout is going to have to render them anyway.
@@ -791,38 +875,31 @@ define( [
 
 	
 			if( layout instanceof Layout ) {
-				// The new layout is already an AbstractLayout instance
+				// The new layout is already a Layout instance
 				this.layout = layout;
 				layout.setContainer( this );
 	
 			} else {
 				// The new layout is a string or config object
-				var layoutType,
+				var layoutTypeName,
 				    layoutConfig = { container: this };
 	
 				if( typeof layout === 'string' ) {
-					layoutType = layout;
+					layoutTypeName = layout;
 	
 				} else if( typeof layout === 'object' ) { // config object
-					layoutType = layout.type || 'auto';   // default to 'auto' layout
+					layoutTypeName = layout.type || 'auto';   // default to 'auto' layout
 					layoutConfig = _.defaults( _.clone( layoutConfig ), layout );
 					delete layoutConfig.type;  // remove the 'type' property from the config object now, as to not shadow the Layout object's prototype 'type' property when applied
 	
 				} else {
-					// Not a jqc.layout.Layout, String, or Object...
+					// Not a jqGui.layout.Layout, String, or Object...
 					throw new Error( &quot;Invalid layout argument provided to setLayout. See method description in docs.&quot; );
 				}
-	
-				// Layout types should be case-insensitive
-				layoutType = layoutType.toLowerCase();
-	
-				// Check that the layout type given is a registered layout type
-				if( !Container.LAYOUTS[ layoutType ] ) {
-					throw new Error( &quot;layout type '&quot; + layoutType + &quot;' is not a registered layout type.&quot; );
-				}
-	
-				// Create the layout strategy object if all is well
-				this.layout = new Container.LAYOUTS[ layoutType ]( layoutConfig );
+
+				// Create the layout strategy object from its type name if all is well
+				var LayoutClass = Container.getLayoutType( layoutTypeName );
+				this.layout = new LayoutClass( layoutConfig );
 			}
 		},
 	
@@ -831,19 +908,17 @@ define( [
 		// ----------------------------------------
 	
 	
-<span id='jqc-Container-method-cascade'>		/**
-</span>		 * Cascades down the Component/Container heirarchy from this Container (called first), calling the specified
-		 * function with each Component. The scope (`this` reference) of the function call will be the scope provided,
-		 * or the current Component that is being processed.  The arguments to the function will be the `args` provided,
-		 * or the current Component.
+<span id='jqGui-Container-method-cascade'>		/**
+</span>		 * Cascades down the {@link jqGui.Component Component}/Container heirarchy from this Container (called first), calling the specified
+		 * function for each Component. The scope (`this` reference) of the function call will be the scope provided,
+		 * or the current Component that is being processed.
 		 *
 		 * If the function returns false at any point, the cascade does not continue down that branch. However, siblings of the Container
 		 * that was being processed when the function returned false are still processed.
 		 *
-		 * @method cascade
 		 * @param {Function} fn The function to call
-		 * @param {Object} scope (optional) The scope of the function (defaults to current {@link jqc.Component Component})
-		 * @param {Array} args (optional) The args to call the function with (defaults to passing in the current {@link jqc.Component Component} as the only argument)
+		 * @param {Object} [scope] The scope of the function. Defaults to the {@link jqGui.Component Component} that is currently being
+		 *   processed.
 		 */
 		cascade : function( fn, scope, args ) {
 			if( fn.apply( scope || this, args || [this] ) !== false ) {
@@ -860,12 +935,11 @@ define( [
 		},
 	
 	
-<span id='jqc-Container-method-findById'>		/**
-</span>		 * Finds a Component under this container at any level by {@link jqc.Component#id id}.
+<span id='jqGui-Container-method-findById'>		/**
+</span>		 * Finds a Component under this container at any level by {@link jqGui.Component#id id}.
 		 *
-		 * @method findById
 		 * @param {String} id The ID of the Component to search for.
-		 * @return {jqc.Component} The component with the given `id`, or null if none was found.
+		 * @return {jqGui.Component} The component with the given `id`, or `null` if none was found.
 		 */
 		findById : function( id ) {
 			var returnVal = null,
@@ -881,14 +955,15 @@ define( [
 		},
 	
 	
-<span id='jqc-Container-method-findBy'>		/**
-</span>		 * Finds a Component under this container at any level by a custom function. If the passed function returns
-		 * true, the component will be included in the results.
+<span id='jqGui-Container-method-findBy'>		/**
+</span>		 * Finds the {@link jqGui.Component Components} under this Container at any level by a custom function. If the passed function 
+		 * returns true for a given Component, then that Component will be included in the results.
 		 *
-		 * @method findBy
-		 * @param {Function} fn The function to call. The function will be called with the arguments: (component, this container)
-		 * @param {Object} scope (optional) The scope to call the function in.
-		 * @return {jqc.Component[]} Array of {@link jqc.Component Components}
+		 * @param {Function} fn The function to call. The function will be called with the following arguments:
+		 * @param {jqGui.Component} fn.component The Component that is being inspected.
+		 * @param {jqGui.Container} fn.thisContainer This Container instance.
+		 * @param {Object} [scope] The scope to call the function in. Defaults to the Component being inspected.
+		 * @return {jqGui.Component[]} Array of {@link jqGui.Component Components}
 		 */
 		findBy : function( fn, scope ) {
 			var returnVal = [],
@@ -903,14 +978,13 @@ define( [
 		},
 	
 	
-<span id='jqc-Container-method-findByType'>		/**
-</span>		 * Finds a {@link jqc.Component} under this container at any level by Component `type`. The Container type can be either the 
-		 * type name that is registered to the {@link jqc.ComponentManager} (see the description of the {@link jqc.Component} class), 
-		 * or the JavaScript class (constructor function) of the {@link jqc.Component}.
+<span id='jqGui-Container-method-findByType'>		/**
+</span>		 * Finds the {@link jqGui.Component Components} under this Container at any level by Component `type`. The Component `type` can be either 
+		 * the type name that is registered to the {@link jqGui.ComponentManager} (see the description of the {@link jqGui.Component} class), 
+		 * or the JavaScript class (constructor function) of the {@link jqGui.Component Component}.
 		 *
-		 * @method findByType
-		 * @param {Function} type The type name registered with the {@link jqc.ComponentManager}, or the constructor function (class) of the Component.
-		 * @return {jqc.Component[]} Array of {@link jqc.Component Components} which match the `type`.
+		 * @param {Function} type The type name registered with the {@link jqGui.ComponentManager}, or the constructor function (class) of the Component.
+		 * @return {jqGui.Component[]} Array of {@link jqGui.Component Components} which match the `type`.
 		 */
 		findByType : function( type ) {
 			if( typeof type === 'string' ) {
@@ -933,7 +1007,7 @@ define( [
 		// ----------------------------------------
 	
 	
-<span id='jqc-Container-method-onDestroy'>		/**
+<span id='jqGui-Container-method-onDestroy'>		/**
 </span>		 * Destroys each child Component in the Container. Called when the Component's destroy() method is called.
 		 *
 		 * @protected
@@ -945,7 +1019,7 @@ define( [
 			this.removeAll();
 	
 			// Destroy the Container's layout, if it has one
-			var Layout = require( 'jqc/layout/Layout' );
+			var Layout = require( 'jqGui/layout/Layout' );
 			if( this.layout instanceof Layout ) {  // just in case it's still the string config
 				this.layout.destroy();
 			}
@@ -956,7 +1030,6 @@ define( [
 	} );
 	
 	
-	// Register the type so it can be created by the string 'container'
 	ComponentManager.registerType( 'container', Container );
 	
 	

@@ -19,43 +19,40 @@
 define( [
 	'lodash',
 	'Class',
-	'data/persistence/operation/Operation'
-], function( _, Class, Operation ) {
+	'data/persistence/request/Request'
+], function( _, Class, Request ) {
 	
-<span id='data-persistence-operation-Read'>	/**
-</span>	 * @class data.persistence.operation.Read
-	 * @extends data.persistence.operation.Operation
+<span id='data-persistence-request-Read'>	/**
+</span>	 * @class data.persistence.request.Read
+	 * @extends data.persistence.request.Request
 	 * 
-	 * Represents a read operation from a persistent storage mechanism. 
+	 * Represents a &quot;read&quot; CRUD request to a persistent storage mechanism. 
 	 * 
-	 * This class is used internally by the framework when making requests to {@link data.persistence.proxy.Proxy Proxies},
-	 * but is provided to client callbacks for when {@link data.Model Model}/{@link data.Collection Collection} operations 
-	 * complete.
+	 * This class is used internally by the framework when making requests to {@link data.persistence.proxy.Proxy Proxies}.
 	 */
-	var ReadOperation = Class.extend( Operation, {
+	var ReadRequest = Class.extend( Request, {
 		
-<span id='data-persistence-operation-Read-cfg-modelId'>		/**
+<span id='data-persistence-request-Read-cfg-modelId'>		/**
 </span>		 * @cfg {Number/String} modelId
 		 * 
-		 * A single ID to load. This is used for loading a single {@link data.Model Model}.
-		 * This value will be converted to a String when retrieved by {@link #getModelId}.
+		 * A single model ID to load. This is only used for loading a single {@link data.Model Model}.
 		 * If this value is not provided, it will be assumed to load a collection of models.
 		 */
 		
-<span id='data-persistence-operation-Read-cfg-page'>		/**
+<span id='data-persistence-request-Read-cfg-page'>		/**
 </span>		 * @cfg {Number} page
 		 * 
 		 * When loading a page of a paged data set, this is the 1-based page number to load.
 		 */
 		
-<span id='data-persistence-operation-Read-cfg-pageSize'>		/**
+<span id='data-persistence-request-Read-cfg-pageSize'>		/**
 </span>		 * @cfg {Number} pageSize
 		 * 
 		 * When loading a page of a paged data set, this is size of the page. Used in conjunction
 		 * with the {@link #page} config.
 		 */
 		
-<span id='data-persistence-operation-Read-cfg-start'>		/**
+<span id='data-persistence-request-Read-cfg-start'>		/**
 </span>		 * @cfg {Number} start
 		 * 
 		 * The start index of where to load models from. Used for when loading paged sets of data
@@ -63,7 +60,7 @@ define( [
 		 */
 		start : 0,
 		
-<span id='data-persistence-operation-Read-cfg-limit'>		/**
+<span id='data-persistence-request-Read-cfg-limit'>		/**
 </span>		 * @cfg {Number} limit
 		 * 
 		 * The number of models to load. Used in conjunction with the {@link #start} config.
@@ -73,19 +70,31 @@ define( [
 		limit : 0,
 		
 		
-<span id='data-persistence-operation-Read-method-getModelId'>		/**
-</span>		 * Retrieves the value of the {@link #modelId} config, if it was provided.
-		 * If it was not provided, returns null.
+<span id='data-persistence-request-Read-method-getAction'>		/**
+</span>		 * Implementation of abstract method to return the {@link data.persistence.proxy.Proxy Proxy}
+		 * CRUD action name for the Request.
 		 * 
-		 * @return {String} The {@link #modelId} provided as a config (converted to a string, if the config was provided
-		 *   as a number), or null if the config was not provided.
+		 * @protected
+		 * @return {String} Always returns 'read' for the ReadRequest.
 		 */
-		getModelId : function() {
-			return ( this.modelId !== undefined ) ? this.modelId + &quot;&quot; : null;
+		getAction : function() {
+			return 'read';
 		},
 		
 		
-<span id='data-persistence-operation-Read-method-getPage'>		/**
+<span id='data-persistence-request-Read-method-getModelId'>		/**
+</span>		 * Retrieves the value of the {@link #modelId} config, if it was provided.
+		 * If it was not provided, returns `undefined`.
+		 * 
+		 * @return {Number/String} The {@link #modelId} provided as a config, or `undefined` if the config 
+		 *   was not provided.
+		 */
+		getModelId : function() {
+			return this.modelId;
+		},
+		
+		
+<span id='data-persistence-request-Read-method-getPage'>		/**
 </span>		 * Retrieves the value of the {@link #page} config. Will return `undefined` if no {@link #page}
 		 * config has been provided.
 		 * 
@@ -96,7 +105,7 @@ define( [
 		},
 		
 		
-<span id='data-persistence-operation-Read-method-getPageSize'>		/**
+<span id='data-persistence-request-Read-method-getPageSize'>		/**
 </span>		 * Retrieves the value of the {@link #pageSize} config. Will return `undefined` if no {@link #pageSize}
 		 * config has been provided.
 		 * 
@@ -107,7 +116,7 @@ define( [
 		},
 		
 		
-<span id='data-persistence-operation-Read-method-getStart'>		/**
+<span id='data-persistence-request-Read-method-getStart'>		/**
 </span>		 * Retrieves the value of the {@link #start} config.
 		 * 
 		 * @return {Number}
@@ -117,7 +126,7 @@ define( [
 		},
 		
 		
-<span id='data-persistence-operation-Read-method-getLimit'>		/**
+<span id='data-persistence-request-Read-method-getLimit'>		/**
 </span>		 * Retrieves the value of the {@link #limit} config.
 		 * 
 		 * @return {Number}
@@ -128,7 +137,7 @@ define( [
 		
 	} );
 	
-	return ReadOperation;
+	return ReadRequest;
 	
 } );</pre>
 </body>

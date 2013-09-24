@@ -19,35 +19,37 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqc/ComponentManager',
-	'jqc/form/field/Field'
+	'jqGui/ComponentManager',
+	'jqGui/form/field/Field'
 ], function( jQuery, _, ComponentManager, Field ) {
 	
-<span id='jqc-form-field-Hidden'>	/**
-</span>	 * @class jqc.form.field.Hidden
-	 * @extends jqc.form.field.Field
+<span id='jqGui-form-field-Hidden'>	/**
+</span>	 * @class jqGui.form.field.Hidden
+	 * @extends jqGui.form.field.Field
+	 * @alias type.hidden
+	 * @alias type.hiddenfield
 	 * 
 	 * A hidden input. This class does not have any visible display.
 	 */
 	var HiddenField = Field.extend( {
 		
-<span id='jqc-form-field-Hidden-cfg-label'>		/**
+<span id='jqGui-form-field-Hidden-cfg-label'>		/**
 </span>		 * @hide
 		 * @cfg {String} label
 		 */
 		
-<span id='jqc-form-field-Hidden-cfg-extraMsg'>		/**
+<span id='jqGui-form-field-Hidden-cfg-extraMsg'>		/**
 </span>		 * @hide
 		 * @cfg {String} extraMsg
 		 */
 		
-<span id='jqc-form-field-Hidden-cfg-hidden'>		/**
+<span id='jqGui-form-field-Hidden-cfg-hidden'>		/**
 </span>		 * @hide
 		 * @cfg {Boolean} hidden
 		 */
 		
 		
-<span id='jqc-form-field-Hidden-method-initComponent'>		/**
+<span id='jqGui-form-field-Hidden-method-initComponent'>		/**
 </span>		 * @inheritdoc
 		 */
 		initComponent : function() {
@@ -55,14 +57,14 @@ define( [
 			this.label = &quot;&quot;;
 			this.extraMsg = &quot;&quot;;
 			
-			// Make sure the outer element (created by jqc.Component) is hidden, as there should be no visible indication of the field
+			// Make sure the outer element (created by jqGui.Component) is hidden, as there should be no visible indication of the field
 			this.hidden = true;
 			
 			this._super( arguments );
 		},
 		
 		
-<span id='jqc-form-field-Hidden-method-onRender'>		/**
+<span id='jqGui-form-field-Hidden-method-onRender'>		/**
 </span>		 * @inheritdoc
 		 */
 		onRender : function( container ) { 
@@ -75,8 +77,8 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Hidden-method-setValue'>		/**
-</span>		 * Implementation of {@link jqc.form.field.Field Field}'s setValue() method, which sets the value to the field.
+<span id='jqGui-form-field-Hidden-method-setValue'>		/**
+</span>		 * Implementation of {@link jqGui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {String} value The value of the field.
 		 */
@@ -89,8 +91,8 @@ define( [
 		},
 		
 		
-<span id='jqc-form-field-Hidden-method-getValue'>		/**
-</span>		 * Implementation of {@link jqc.form.field.Field Field}'s getValue() method, which returns the value of the field.
+<span id='jqGui-form-field-Hidden-method-getValue'>		/**
+</span>		 * Implementation of {@link jqGui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the field.
 		 */
@@ -105,7 +107,7 @@ define( [
 	} );
 	
 	
-	// Register the class so it can be created by the type string 'hiddenfield'
+	ComponentManager.registerType( 'hidden', HiddenField );
 	ComponentManager.registerType( 'hiddenfield', HiddenField );
 	
 	return HiddenField;

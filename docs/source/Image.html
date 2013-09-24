@@ -19,39 +19,40 @@
 define( [
 	'lodash',
 	'Class',
-	'jqc/ComponentManager',
-	'jqc/Component'
+	'jqGui/ComponentManager',
+	'jqGui/Component'
 ], function( _, Class, ComponentManager, Component ) {
 	
-<span id='jqc-Image'>	/**
-</span>	 * @class jqc.Image
-	 * @extends jqc.Component
+<span id='jqGui-Image'>	/**
+</span>	 * @class jqGui.Image
+	 * @extends jqGui.Component
+	 * @alias type.image
 	 *
-	 * A simple component which is an image.
+	 * A simple image component.
 	 */
 	var Image = Class.extend( Component, {
 		
-<span id='jqc-Image-cfg-src'>		/**
+<span id='jqGui-Image-cfg-src'>		/**
 </span>		 * @cfg {String} src
 		 * The initial src (url) for the image.
 		 */
 		src : &quot;&quot;,
 		
-<span id='jqc-Image-cfg-elType'>		/**
+<span id='jqGui-Image-cfg-elType'>		/**
 </span>		 * @hide
 		 * @cfg {String} elType
 		 * @inheritdoc
 		 */
 		elType : 'img',
 		
-<span id='jqc-Image-cfg-baseCls'>		/**
+<span id='jqGui-Image-cfg-baseCls'>		/**
 </span>		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqc-Image',
+		baseCls : 'jqGui-image',
 		
 		
-<span id='jqc-Image-property-loaded'>		/**
+<span id='jqGui-Image-property-loaded'>		/**
 </span>		 * @protected
 		 * @property {Boolean} loaded
 		 * 
@@ -60,7 +61,7 @@ define( [
 		 */
 		loaded : false,
 		
-<span id='jqc-Image-property-errored'>		/**
+<span id='jqGui-Image-property-errored'>		/**
 </span>		 * @protected
 		 * @property {Boolean} errored
 		 * 
@@ -70,7 +71,7 @@ define( [
 		errored : false,
 		
 		
-<span id='jqc-Image-property-blankImg'>		/**
+<span id='jqGui-Image-property-blankImg'>		/**
 </span>		 * @protected
 		 * @property {String} blankImg
 		 * 
@@ -87,19 +88,19 @@ define( [
 		// protected
 		initComponent : function() {
 			this.addEvents(
-<span id='jqc-Image-event-load'>				/**
+<span id='jqGui-Image-event-load'>				/**
 </span>				 * Fires when the underlying image has loaded successfully.
 				 * 
 				 * @event load
-				 * @param {jqc.Image} image This Image instance.
+				 * @param {jqGui.Image} image This Image instance.
 				 */
 				'load',
 				
-<span id='jqc-Image-event-error'>				/**
+<span id='jqGui-Image-event-error'>				/**
 </span>				 * Fires when the underlying image has failed to load.
 				 * 
 				 * @event error
-				 * @param {jqc.Image} image This Image instance.
+				 * @param {jqGui.Image} image This Image instance.
 				 */
 				'error'
 			);
@@ -121,7 +122,7 @@ define( [
 		// -------------------------------------
 		
 		
-<span id='jqc-Image-method-setSrc'>		/**
+<span id='jqGui-Image-method-setSrc'>		/**
 </span>		 * Sets the {@link #src} (url) of the Image.
 		 * 
 		 * @method setSrc
@@ -148,7 +149,7 @@ define( [
 		},
 		
 		
-<span id='jqc-Image-method-getSrc'>		/**
+<span id='jqGui-Image-method-getSrc'>		/**
 </span>		 * Retrieves the {@link #src} (url) of the Image. If no {@link #src} has been provided (either by the configuration
 		 * option, or by {@link #setSrc}), will return an empty string.
 		 * 
@@ -160,7 +161,7 @@ define( [
 		},
 		
 		
-<span id='jqc-Image-method-isLoaded'>		/**
+<span id='jqGui-Image-method-isLoaded'>		/**
 </span>		 * Determines if the image has loaded successfully.
 		 * 
 		 * @method isLoaded
@@ -171,7 +172,7 @@ define( [
 		},
 		
 		
-<span id='jqc-Image-method-isErrored'>		/**
+<span id='jqGui-Image-method-isErrored'>		/**
 </span>		 * Determines if the image has failed to load.
 		 * 
 		 * @method isErrored
@@ -182,7 +183,7 @@ define( [
 		},
 		
 		
-<span id='jqc-Image-method-onImageLoad'>		/**
+<span id='jqGui-Image-method-onImageLoad'>		/**
 </span>		 * Called when the underlying image has loaded successfully.
 		 * 
 		 * @protected
@@ -194,7 +195,7 @@ define( [
 		},
 		
 		
-<span id='jqc-Image-method-onImageError'>		/**
+<span id='jqGui-Image-method-onImageError'>		/**
 </span>		 * Called when the underlying image has failed to load.
 		 * 
 		 * @protected
@@ -208,7 +209,6 @@ define( [
 	} );
 	
 	
-	// Register the type so it can be created by the type string 'Image'
 	ComponentManager.registerType( 'image', Image );
 	
 	return Image;

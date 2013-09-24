@@ -17,37 +17,36 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">/*global define */
 define( [
-	'jquery',
 	'lodash',
 	'Class'
-], function( jQuery, _, Class ) {
+], function( _, Class ) {
 	
-<span id='jqc-util-OptionsStore'>	/**
-</span>	 * @class jqc.util.OptionsStore
+<span id='jqGui-util-OptionsStore'>	/**
+</span>	 * @class jqGui.util.OptionsStore
 	 * @extends Object
 	 * 
-	 * Helper utility class used for making the management of 'options' data easy, for any classes that use this format of data.
-	 * &quot;Options data&quot; in this context simply means &quot;text/value&quot; pairs, such as used by dropdowns. The purpose of this class 
-	 * was to not duplicate functionality for classes that use this format of data.
+	 * Helper utility class used for making the management of text/value &quot;options&quot; data easy, for any classes that rely on this format 
+	 * of data. This is used as used, for example, by {@link jqGui.form.field.Dropdown Dropdowns}. The purpose of this class 
+	 * was to not duplicate functionality for the classes that use this format of data.
 	 * 
-	 * This class is currently used by {@link jqc.form.field.Dropdown} and {@link jqc.form.field.Radio}, which use it for 
+	 * This class is currently used by {@link jqGui.form.field.Dropdown} and {@link jqGui.form.field.Radio}, which use it for 
 	 * managing the options that they provide.
 	 */
 	var OptionsStore = Class.extend( Object, {
 		
-<span id='jqc-util-OptionsStore-property-options'>		/**
-</span>		 * @private
+<span id='jqGui-util-OptionsStore-property-options'>		/**
+</span>		 * @protected
 		 * @property {Object[]} options
 		 * 
 		 * The internal array of options held by the OptionsStore.
 		 */
 		
 		
-<span id='jqc-util-OptionsStore-method-constructor'>		/**
+<span id='jqGui-util-OptionsStore-method-constructor'>		/**
 </span>		 * Instantiates an OptionsStore.
 		 * 
 		 * @constructor
-		 * @param {Array/Function} options The initial set of options to provide to the OptionsStore. 
+		 * @param {String[]/Object[]} [options] The initial set of options to provide to the OptionsStore, if any. 
 		 *   See the `options` parameter in {@link #setOptions} for accepted formats of this parameter.
 		 */
 		constructor : function( options ) {
@@ -55,95 +54,82 @@ define( [
 		},
 		
 		
-<span id='jqc-util-OptionsStore-method-normalizeOptions'>		/**
+<span id='jqGui-util-OptionsStore-method-normalizeOptions'>		/**
 </span>		 * Normalizes the given array of options into text/value options.
 		 * 
-		 * @private
-		 * @method normalizeOptions
-		 * @param {Object[]} options See the `options` argument of {@link #setOptions}.
-		 * @return {Object[]} The options normalized to objects with 'text' and 'value' properties.
+		 * @protected
+		 * @param {String[]/Object[]} options See the `options` argument of {@link #setOptions}.
+		 * @return {Object[]} The options normalized to objects with `text` and `value` properties.
 		 */
 		normalizeOptions : function( options ) {
-			var normalizedOptions = [];
-			
-			for( var i = 0, len = options.length; i &lt; len; i++ ) {
-				normalizedOptions.push( this.normalizeOption( options[ i ] ) );
-			}
-			
-			return normalizedOptions;
+			return _.map( options, function( opt ) { return this.normalizeOption( opt ); }, this );
 		},
 		
 		
-<span id='jqc-util-OptionsStore-method-normalizeOption'>		/**
-</span>		 * Normalizes a single option into an object with `text` and `value` properties. If a string is provided as the argument,
-		 * that string will be used as both the `text` and `value` properties. If an object is provided, it must at least have a 
-		 * `text` property, which will also be used for the `value` property should no `value` of its own exist.
+<span id='jqGui-util-OptionsStore-method-normalizeOption'>		/**
+</span>		 * Normalizes a single option into an object with `text` and `value` properties. 
 		 * 
-		 * @private
-		 * @method normalizeOption
+		 * - If a String is provided as the argument, that string will be used as both the `text` and `value` properties. 
+		 * - If an Object is provided, it must at least have a `text` property, which will also be used for the `value` 
+		 *   property should no `value` of its own exist.
+		 * 
+		 * @protected
 		 * @param {String/Object} option
 		 * @return {Object} A normalized object with `text` and `value` properties.
 		 */
 		normalizeOption : function( option ) {
-			var normalizedOption = {};
-			
 			if( typeof option === 'object' ) {
-				normalizedOption.text = option.text;
-				normalizedOption.value = ( typeof option.value !== 'undefined' ) ? option.value : option.text;  // If no value is specified, use the text as the value.
+				option = _.clone( option );  // make a shallow copy, as to not affect the original
 				
-				// Add any extra properties that may have been provided to the normalizedOption object.
-				for( var prop in option ) {
-					// Filter out the 'text' and 'value' properties (they have been handled above), and filter out any prototype properties as well
-					if( prop !== 'text' &amp;&amp; prop !== 'value' &amp;&amp; option.hasOwnProperty( prop ) ) {
-						normalizedOption[ prop ] = option[ prop ];
-					}
+				// If no value is specified, use the `text` property as the value.
+				if( option.value === undefined ) {
+					option.value = option.text;
 				}
 				
+				return option;
+				
 			} else {
-				// String option: use it for both text and value 
-				normalizedOption.text = option;
-				normalizedOption.value = option;
+				// String `option` arg: use it for both `text` and `value` properties on the returned object
+				return { text: option, value: option };
 			}
-			
-			return normalizedOption;
 		},
 		
 		
-<span id='jqc-util-OptionsStore-method-setOptions'>		/**
-</span>		 * Sets the options for the store. Normalizes the options into an array of objects, where each object
-		 * has the properties 'text' and 'value'.  Extra properties may be added however, when following the recommended format (an
-		 * array of objects).
+<span id='jqGui-util-OptionsStore-method-setOptions'>		/**
+</span>		 * Sets the options for the store. 
 		 * 
-		 * @method setOptions
-		 * @param {Array/Function} options The options for the OptionsStore. If this is a flat array, the values will be used as both the 'value' and 'text'
-		 *   of the options.  Ex: `[ &quot;Option 1&quot;, &quot;Option 2&quot;, &quot;Option 3&quot; ]`
+		 * Normalizes the options into an Array of Objects, where each Object has the properties `text` and `value`. Any extra 
+		 * properties on the objects are left unchanged.
 		 * 
-		 *   If you want to customize the value and text separately for each option (recommended), provide an array of objects, where the object has two
-		 *   properties: `text` and `value`. 
-		 *   Ex: `[ { &quot;text&quot;: &quot;Option 1&quot;, &quot;value&quot;: 1 }, { &quot;text&quot;: &quot;Option 2&quot;, &quot;value&quot;: 2 } ]`
+		 * @param {String[]/Object[]} options The options for the OptionsStore. If this is a flat array of strings, the values will be 
+		 *   used as both the `text` and `value` properties of the options.  Ex: 
+		 *   
+		 *       [ &quot;Option 1&quot;, &quot;Option 2&quot;, &quot;Option 3&quot; ]
+		 * 
+		 *   If you want to customize the value and text separately for each option, provide an Array of Objects, where the Object 
+		 *   has two properties: `text` and `value`. Ex: 
+		 *   
+		 *       [ 
+		 *           { &quot;text&quot;: &quot;Option 1&quot;, &quot;value&quot;: 1 },
+		 *           { &quot;text&quot;: &quot;Option 2&quot;, &quot;value&quot;: 2 }
+		 *       ]
 		 *   
 		 *   Extra properties may also be added if needed in this form, and will not be affected by the OptionsStore.  These properties
-		 *   may be used by whichever implementation is using the OptionsStore.
-		 *   Ex: `[ { &quot;text&quot;: &quot;Option 1&quot;, &quot;value&quot;: 1, &quot;cls&quot; : &quot;myCssClass&quot; }, { &quot;text&quot;: &quot;Option 2&quot;, &quot;value&quot;: 2, &quot;cls&quot; : &quot;myCssClass2&quot; } ]`
-		 * 
-		 *   If this config is specified as a function, the function will be executed, and its return will be used as the options. Its return should match one of
-		 *   the forms defined above.
+		 *   may be used by whichever implementation is using the OptionsStore. Ex: 
+		 *   
+		 *       [
+		 *           { &quot;text&quot;: &quot;Option 1&quot;, &quot;value&quot;: 1, &quot;cls&quot; : &quot;myCssClass&quot; },
+		 *           { &quot;text&quot;: &quot;Option 2&quot;, &quot;value&quot;: 2, &quot;cls&quot; : &quot;myCssClass2&quot; }
+		 *       ]
 		 */
 		setOptions : function( options ) {
-			// If the options were provided as a function, execute the function and use its return as the options array
-			if( typeof options === 'function' ) {
-				options = options();
-			}
-			
-			// Store the normalized options
 			this.options = this.normalizeOptions( options );
 		},
 		
 		
-<span id='jqc-util-OptionsStore-method-addOption'>		/**
+<span id='jqGui-util-OptionsStore-method-addOption'>		/**
 </span>		 * Adds an option to the OptionsStore.
 		 * 
-		 * @method addOption
 		 * @param {String/Object} A string, which will be used for both the text/value, or an object with `text` and `value` properties.
 		 * @param {Number} [index] The index to add the option at. Defaults to appending the option.
 		 */
@@ -158,36 +144,32 @@ define( [
 		},
 		
 		
-<span id='jqc-util-OptionsStore-method-removeOptionByValue'>		/**
-</span>		 * Removes an option from the OptionsStore by its value.
+<span id='jqGui-util-OptionsStore-method-removeOptionByText'>		/**
+</span>		 * Removes an option from the OptionsStore by its text.
 		 * 
-		 * @method removeOptionByValue
-		 * @param {Mixed} value The value of the option to remove.
+		 * @param {Mixed} text The text of the option to remove.
 		 */
-		removeOptionByValue : function( value ) {
-			var options = this.options;
-			for( var i = 0, len = options.length; i &lt; len; i++ ) {
-				if( options[ i ].value === value ) {
-					options.splice( i, 1 );  // Remove the option
-					return;
-				}
+		removeOptionByText : function( text ) {
+			var options = this.options,
+			    idx = _.findIndex( options, { text: text } );
+			
+			if( idx !== -1 ) {
+				options.splice( idx, 1 );  // remove the option
 			}
 		},
 		
 		
-<span id='jqc-util-OptionsStore-method-removeOptionByText'>		/**
-</span>		 * Removes an option from the OptionsStore by its text.
+<span id='jqGui-util-OptionsStore-method-removeOptionByValue'>		/**
+</span>		 * Removes an option from the OptionsStore by its value.
 		 * 
-		 * @method removeOptionByText
-		 * @param {Mixed} text The text of the option to remove.
+		 * @param {Mixed} value The value of the option to remove.
 		 */
-		removeOptionByText : function( text ) {
-			var options = this.options;
-			for( var i = 0, len = options.length; i &lt; len; i++ ) {
-				if( options[ i ].text === text ) {
-					options.splice( i, 1 );  // Remove the option
-					return;
-				}
+		removeOptionByValue : function( value ) {
+			var options = this.options,
+			    idx = _.findIndex( this.options, { value: value } );
+			
+			if( idx !== -1 ) {
+				options.splice( idx, 1 );  // remove the option
 			}
 		},
 		
@@ -196,21 +178,19 @@ define( [
 		
 		// Retrieval methods
 		
-<span id='jqc-util-OptionsStore-method-getOptions'>		/**
-</span>		 * Retrives all of the options objects held by the OptionsStore. Each options object has properties: 'text' and 'value'.
+<span id='jqGui-util-OptionsStore-method-getOptions'>		/**
+</span>		 * Retrives all of the options objects held by the OptionsStore. Each options object has properties: `text` and `value`.
 		 * 
-		 * @method getOptions
-		 * @return {Object[]} An array of the options objects, each of which has properties 'text' and 'value'.
+		 * @return {Object[]} An array of the options objects, each of which has properties `text` and `value`.
 		 */
 		getOptions : function() {
 			return this.options;
 		},
 		
 		
-<span id='jqc-util-OptionsStore-method-getCount'>		/**
+<span id='jqGui-util-OptionsStore-method-getCount'>		/**
 </span>		 * Retrieves the number of options held by the OptionsStore.
 		 * 
-		 * @method getCount
 		 * @return {Number} The number of options currently held by the OptionsStore.
 		 */
 		getCount : function() {
@@ -218,53 +198,36 @@ define( [
 		},
 		
 		
-<span id='jqc-util-OptionsStore-method-getAtIndex'>		/**
+<span id='jqGui-util-OptionsStore-method-getAtIndex'>		/**
 </span>		 * Retrieves an option based on its index position (0-based).
 		 * 
-		 * @method getAtIndex
 		 * @param {Number} index
-		 * @return {Object} The option object with properties 'text' and 'value', or null if the index was out of range.
+		 * @return {Object} The option object with properties `text` and `value`, or `null` if the index was out of range.
 		 */
 		getAtIndex : function( index ) {
 			return this.options[ index ] || null;
 		},
 		
 		
-<span id='jqc-util-OptionsStore-method-getByValue'>		/**
-</span>		 * Retrieves an option based on its `value`. An option object has properties 'text' and 'value'.
+<span id='jqGui-util-OptionsStore-method-getByText'>		/**
+</span>		 * Retrieves an option based on its `text`. An option object has properties `text` and `value`.
 		 * 
-		 * @method getByValue
-		 * @param {Mixed} value
-		 * @return {Object} The option object with properties 'text' and 'value', or null if no option was found.
+		 * @param {String} text
+		 * @return {Object} The option object with properties `text` and `value`, or `null` if no option was found.
 		 */
-		getByValue : function( value ) {
-			var options = this.options;
-				
-			for( var i = 0, len = options.length; i &lt; len; i++ ) {
-				if( options[ i ].value === value ) {
-					return options[ i ];
-				}
-			}
-			return null;  // return null if no option was found
+		getByText : function( text ) {
+			return _.find( this.options, { text: text } ) || null;
 		},
 		
 		
-<span id='jqc-util-OptionsStore-method-getByText'>		/**
-</span>		 * Retrieves an option based on its `text`. An option object has properties 'text' and 'value'.
+<span id='jqGui-util-OptionsStore-method-getByValue'>		/**
+</span>		 * Retrieves an option based on its `value`. An option object has properties `text` and `value`.
 		 * 
-		 * @method getByText
-		 * @param {String} text
-		 * @return {Object} The option object with properties 'text' and 'value', or null if no option was found.
+		 * @param {Mixed} value
+		 * @return {Object} The option object with properties `text` and `value`, or `null` if no option was found.
 		 */
-		getByText : function( text ) {
-			var options = this.options;
-				
-			for( var i = 0, len = options.length; i &lt; len; i++ ) {
-				if( options[ i ].text === text ) {
-					return options[ i ];
-				}
-			}
-			return null;  // return null if no option was found
+		getByValue : function( value ) {
+			return _.find( this.options, { value: value } ) || null;
 		}
 	
 	} );

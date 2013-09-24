@@ -19,12 +19,15 @@
 define( [
 	'jquery',
 	'lodash',
-	'Class'
+	'Class',
+	'jqGui/template/Template',
+	'jqGui/template/LoDash',
+	'jquery-ui.position'  // jQuery UI's `position` plugin
 ], 
-function( jQuery, _, Class ) {
+function( jQuery, _, Class, Template, LoDashTpl ) {
 	
-<span id='jqc-Mask'>	/**
-</span>	 * @class jqc.Mask
+<span id='jqGui-Mask'>	/**
+</span>	 * @class jqGui.Mask
 	 * @extends Object
 	 * 
 	 * Generalized class that can create a mask over any given element, and provides a simple interface
@@ -32,14 +35,14 @@ function( jQuery, _, Class ) {
 	 */
 	var Mask = Class.extend( Object, {
 		
-<span id='jqc-Mask-cfg-spinner'>		/**
+<span id='jqGui-Mask-cfg-spinner'>		/**
 </span>		 * @cfg {Boolean} spinner
 		 * 
-		 * True to display a spinner image in the {@link #$contentEl} element when the mask is shown. Set to false to hide the spinner.
+		 * `true` to display a spinner image in the {@link #$contentEl} element when the mask is shown.
 		 */
-		spinner : true,
+		spinner : false,
 		
-<span id='jqc-Mask-cfg-msg'>		/**
+<span id='jqGui-Mask-cfg-msg'>		/**
 </span>		 * @cfg {String/HTMLElement/jQuery} msg
 		 * 
 		 * A message (or any content) to display in the center of the mask. If this is specified, the {@link #$contentEl} will be
@@ -47,64 +50,86 @@ function( jQuery, _, Class ) {
 		 */
 		msg : &quot;&quot;,
 		
+
 		
-<span id='jqc-Mask-property-spinnerURL'>		/**
-</span>		 * @private
-		 * @property {String} spinnerURL
+<span id='jqGui-Mask-property-maskTpl'>		/**
+</span>		 * @protected
+		 * @property {String/jqGui.template.Template} maskTpl
 		 * 
-		 * The URL of the spinner image to use when the {@link #spinner} config is true.
+		 * The template to use to create the Mask's elements.
 		 */
-		//spinnerURL : &quot;assets/spinner2e2d2d.gif&quot;,
+		maskTpl : new LoDashTpl( [
+			'&lt;div data-elem=&quot;jqGui-mask-overlay&quot; class=&quot;jqGui-mask-overlay&quot; /&gt;',
+			'&lt;div data-elem=&quot;jqGui-mask-content&quot; class=&quot;jqGui-mask-content&quot;&gt;',
+				'&lt;span class=&quot;jqGui-mask-spinner&quot; /&gt;',
+				'&lt;div data-elem=&quot;jqGui-mask-msg&quot; class=&quot;jqGui-mask-msg&quot; /&gt;',
+			'&lt;/div&gt;'
+		] ),
 		
-		
-<span id='jqc-Mask-property-S-targetEl'>		/**
-</span>		 * @private
+<span id='jqGui-Mask-property-S-targetEl'>		/**
+</span>		 * @protected
 		 * @property {jQuery} $targetEl
 		 * 
 		 * The element to mask, wrapped in a jQuery wrapped set.
 		 */
 		
-<span id='jqc-Mask-property-rendered'>		/**
-</span>		 * @private
+<span id='jqGui-Mask-property-rendered'>		/**
+</span>		 * @protected
 		 * @property {Boolean} rendered
 		 * 
 		 * Will be true once the Mask's elements have been rendered ({@link #initMaskElements} has been run). Initially false.
 		 */
 		rendered : false,
 		
-<span id='jqc-Mask-property-S-maskEl'>		/**
-</span>		 * @private
-		 * @property {jQuery} $maskEl
+<span id='jqGui-Mask-property-S-overlayEl'>		/**
+</span>		 * @protected
+		 * @property {jQuery} $overlayEl
 		 * 
 		 * The masking element itself. This is lazily created in the {@link #initMaskElements} method when the mask is to
 		 * be shown.
 		 */
 		
-<span id='jqc-Mask-property-S-contentEl'>		/**
-</span>		 * @private
+<span id='jqGui-Mask-property-S-contentEl'>		/**
+</span>		 * @protected
 		 * @property {jQuery} $contentEl
 		 * 
 		 * The content element that sits on top of the Mask to display the {@link #msg} and/or {@link #spinner}. This is lazily 
 		 * created in the {@link #initMaskElements} method when the mask is to be shown.
 		 */
 		
-<span id='jqc-Mask-property-jQuery'>		/**
-</span>		 * @private
+<span id='jqGui-Mask-property-jQuery'>		/**
+</span>		 * @protected
 		 * @property [jQuery} $msgEl
 		 * 
-		 * The element that is used to display the {@link #msg}.
+		 * The element that is used to display the {@link #msg}, which sits inside the {@link #$contentEl}.
 		 */
 		
-<span id='jqc-Mask-property-shown'>		/**
-</span>		 * @private
-		 * @property {Boolean} shown
+<span id='jqGui-Mask-property-spinnerVisibleCls'>		/**
+</span>		 * @protected
+		 * @property {String} spinnerVisibleCls
 		 * 
-		 * Stores if the mask is currently being shown or not. Retrieve with {@link #isShown}.
+		 * The CSS class to add to the Mask's {@link #$contentEl} when the spinner is visible.
 		 */
-		shown : false,
+		spinnerVisibleCls : 'jqGui-mask-spinner-visible',
+		
+<span id='jqGui-Mask-property-msgVisibleCls'>		/**
+</span>		 * @protected
+		 * @property {String} msgVisibleCls
+		 * 
+		 * The CSS class to add to the Mask's {@link #$contentEl} when a {@link #msg} exists.
+		 */
+		msgVisibleCls : 'jqGui-mask-msg-visible',
+		
+<span id='jqGui-Mask-property-visible'>		/**
+</span>		 * @protected
+		 * @property {Boolean} visible
+		 * 
+		 * Stores if the mask is currently being shown or not (visible). Retrieve with {@link #isVisible}.
+		 */
+		visible : false,
 		
 		
-<span id='jqc-Mask-method-constructor'>		/**
+<span id='jqGui-Mask-method-constructor'>		/**
 </span>		 * @constructor
 		 * @param {HTMLElement/jQuery} targetEl The element or jQuery wrapped set that the mask is to mask over. This
 		 *   may only be one element in the case of a jQuery wrapped set. 
@@ -115,14 +140,21 @@ function( jQuery, _, Class ) {
 				this.$targetEl = jQuery( targetEl );
 				
 			} else if( targetEl instanceof jQuery ) {
+				// &lt;debug&gt;
 				if( targetEl.length !== 1 ) {
-					throw new Error( &quot;If the 'targetEl' argument to the jqc.Mask constructor is a jQuery wrapped set, it must contain exactly one element.&quot; );
+					throw new Error( &quot;If the 'targetEl' argument to the jqGui.Mask constructor is a jQuery wrapped set, it must contain exactly one element.&quot; );
 				}
+				// &lt;/debug&gt;
 				this.$targetEl = targetEl;
-				
+			
+			// &lt;debug&gt;
 			} else {
-				throw new Error( &quot;jqc.Mask requires the first argument to its constructor to be an HTMLElement, or a jQuery wrapped set&quot; );
+				throw new Error( &quot;jqGui.Mask requires the first argument to its constructor to be an HTMLElement, or a jQuery wrapped set&quot; );
+			// &lt;/debug&gt;
 			}
+			
+			if( !( this.maskTpl instanceof Template ) )
+				this.maskTpl = new LoDashTpl( this.maskTpl );
 			
 			// Apply any additional configuration properties onto this object
 			this.updateConfig( config );
@@ -130,16 +162,15 @@ function( jQuery, _, Class ) {
 		
 		
 		
-<span id='jqc-Mask-method-updateConfig'>		/**
+<span id='jqGui-Mask-method-updateConfig'>		/**
 </span>		 * Updates the configuration of the mask. Accepts an object with the configuration options for this class,
 		 * and updates the Mask accordingly.  Note that all configuration options that are not provided in the
 		 * `config` argument will be reset to their defaults. 
 		 * 
-		 * @method updateConfig
 		 * @param {Object} config The new configuration options for the Mask. See the &quot;config options&quot; section of the docs for details. 
 		 */
 		updateConfig : function( config ) {
-			// Remove any previously set configuration options
+			// Remove any previously set configuration options (unshadows defaults on prototype)
 			delete this.spinner;
 			delete this.msg;
 			
@@ -153,28 +184,24 @@ function( jQuery, _, Class ) {
 		},
 		
 		
-<span id='jqc-Mask-method-initMaskElements'>		/**
-</span>		 * Creates the masking elements (the {@link #$maskEl} and {@link #$contentEl}) if they have not yet been created. When creating
+<span id='jqGui-Mask-method-initMaskElements'>		/**
+</span>		 * Creates the masking elements (the {@link #$overlayEl} and {@link #$contentEl}) if they have not yet been created. When creating
 		 * the elements, they are appended to the target element (note that they are absolutely positioned so they do not affect document flow).
 		 * 
-		 * @private
-		 * @method initMaskElements
+		 * @protected
 		 */
 		initMaskElements : function() {
 			// Create the mask elements if they do not yet exist, and append it to the target element
 			if( !this.rendered ) {
 				var $targetEl = this.$targetEl;
+				$targetEl.append( this.maskTpl.apply( {} ) );  // no data for the template (at this point in time)
 				
-				this.$maskEl = jQuery( '&lt;div class=&quot;jqc-mask&quot; /&gt;' )
-					.click( function( evt ) { evt.stopPropagation(); } )   // the mask should swallow any click events to it, to prevent any behavior from the bubbling of the event
-					.appendTo( $targetEl );
-				
-				this.$contentEl = jQuery( '&lt;div class=&quot;jqc-mask-content&quot; /&gt;' )
-					.append( '&lt;img class=&quot;jqc-mask-content-spinner&quot; src=&quot;' + this.spinnerURL + '&quot; /&gt;' )  // This image will only be shown if the spinner config is true (i.e. the $contentEl has the 'jqc-mask-spinnerEnabled' css class)
-					.click( function( evt ) { evt.stopPropagation(); } )   // the mask should swallow any click events to it, to prevent any behavior from the bubbling of the event
-					.appendTo( $targetEl );
-				
-				this.$msgEl = jQuery( '&lt;div class=&quot;jqc-mask-msg&quot; /&gt;' ).appendTo( this.$contentEl );
+				var onMaskClick = _.bind( this.onMaskClick, this );
+				this.$overlayEl = $targetEl.find( '[data-elem=&quot;jqGui-mask-overlay&quot;]' )
+					.on( 'click', onMaskClick );
+				this.$contentEl = $targetEl.find( '[data-elem=&quot;jqGui-mask-content&quot;]' )
+					.on( 'click', onMaskClick );
+				this.$msgEl = $targetEl.find( '[data-elem=&quot;jqGui-mask-msg&quot;]' );
 				
 				this.rendered = true;
 				this.updateMaskElements();
@@ -182,161 +209,177 @@ function( jQuery, _, Class ) {
 		},
 		
 		
-<span id='jqc-Mask-method-updateMaskElements'>		/**
+<span id='jqGui-Mask-method-updateMaskElements'>		/**
 </span>		 * Updates the mask elements with the current values of the configuration options (which may be set after instantiation time
 		 * with the {@link #updateConfig} method.
 		 * 
-		 * @private
-		 * @method updateMaskElements
+		 * @protected
 		 */
 		updateMaskElements : function() {
 			if( this.rendered ) {
-				// Update the spinner
-				if( this.spinner ) {
-					this.$contentEl.addClass( 'jqc-mask-spinnerEnabled' );
-				} else {
-					this.$contentEl.removeClass( 'jqc-mask-spinnerEnabled' );
-				}
+				// Update the spinner's visibility based on the `spinner` config
+				this.$contentEl.toggleClass( this.spinnerVisibleCls, this.spinner );
 				
 				// Update the message
-				this.$msgEl.empty();
-				if( this.msg ) {
-					// Add the jqc-mask-contentBox css class if there is actually a message. This css class
-					// creates an opaque &quot;box&quot; that is shown in the middle of the mask where text can be placed
-					// and easily read. Then append the message itself to the $msgEl.
-					this.$contentEl.addClass( 'jqc-mask-contentBox' );
-					this.$msgEl.append( this.msg );
-				} else {
-					this.$contentEl.removeClass( 'jqc-mask-contentBox' );
-				}
+				this.setMsg( this.msg );
 			}
 		},
 		
 		
+<span id='jqGui-Mask-method-setMsg'>		/**
+</span>		 * Sets the {@link #msg message} for the Mask.
+		 * 
+		 * @param {String} msg The message. Accepts HTML. To remove the message, provide an empty string.
+		 */
+		setMsg : function( msg ) {
+			this.msg = msg;
+			
+			if( this.rendered ) {
+				this.$contentEl.toggleClass( this.msgVisibleCls, !!msg );
+				this.$msgEl.html( msg );
+			}
+		},
+		
+		
+<span id='jqGui-Mask-method-onMaskClick'>		/**
+</span>		 * Handles a click to the Mask's elements by simply stopping event propagation. The mask should swallow any click events 
+		 * to it, to prevent any behavior from the bubbling of the event.
+		 * 
+		 * @protected
+		 * @param {jQuery.Event} evt
+		 */
+		onMaskClick : function( evt ) { 
+			evt.stopPropagation();  // the mask should swallow any click events to it, to prevent any behavior from the bubbling of the event.
+		},
 		
 		
 		// -------------------------------------
 		
 		
-<span id='jqc-Mask-method-show'>		/**
+<span id='jqGui-Mask-method-show'>		/**
 </span>		 * Shows the mask over the target element.
 		 * 
-		 * Note that if the mask is already shown, and its height needs to be recalculated because the underlying element's 
+		 * Note that if the mask is already visible, and its height needs to be recalculated because the underlying element's 
 		 * size has changed, this method may be called again to redraw the mask.
-		 * 
-		 * @method show
 		 */
 		show : function() {
-			// First, make sure the masking elements have been created (lazily created upon showing the mask, not in the constructor)
-			this.initMaskElements();
-			
-			
-			var $targetEl = this.$targetEl,
-			    $maskEl = this.$maskEl,
-			    $contentEl = this.$contentEl;
-			
-			// First, add the jqc-masked css class to the target element, which removes the target element's scroll bars
-			$targetEl.addClass( 'jqc-masked' );
-			
-			// Next, give the target element a relative positioning context if it currently does not have one (i.e. it 
-			// has &quot;position: static&quot;), and the target element not the document body (the document body already has a positioning context)
-			if( $targetEl.css( 'position' ) === 'static' &amp;&amp; !$targetEl.is( 'body' ) ) {
-				$targetEl.addClass( 'jqc-masked-relative' );
-			}
-			
-			
-			// Now show the masking element.
-			$maskEl.show();
-			
-			// IE will not expand full height automatically if it has auto height. Just doing this calc for all browsers for now,
-			// instead of worrying about browser detection (determining which versions of IE are affected) or attempting 
-			// a feature detection for this.
-			$maskEl.height( $targetEl.outerHeight() );
-			
-			
-			// Center the $contentEl within the mask
-			$contentEl.show();  // show if previously hidden
-			
-			// Set flag
-			this.shown = true;
-			
-			// Position the content element ($contentEl) in the center of the $targetEl, and set it to continually reposition it on an interval.
-			// The interval is for when elements on the page may resize themselves, we need to adjust the content element's position. The interval
-			// will be cleared once the mask is hidden.
-			this.repositionContentEl();
-			var me = this;  // for closure
-			var repositionIntervalId = setInterval( function() {
-				if( me.isShown() ) {
-					me.repositionContentEl();
-				} else {
-					clearInterval( repositionIntervalId );  // When no longer shown, clear the interval
+			if( !this.isVisible() ) {
+				// First, make sure the masking elements have been created (lazily created upon showing the mask, not in the constructor)
+				this.initMaskElements();
+				
+				
+				var $targetEl = this.$targetEl,
+				    $overlayEl = this.$overlayEl,
+				    $contentEl = this.$contentEl;
+				
+				// First, add the jqGui-masked css class to the target element, which removes the target element's scroll bars
+				$targetEl.addClass( 'jqGui-masked' );
+				
+				// Next, give the target element a relative positioning context if it currently does not have one (i.e. it 
+				// has &quot;position: static&quot;), and the target element not the document body (the document body already has a positioning context)
+				if( $targetEl.css( 'position' ) === 'static' &amp;&amp; !$targetEl.is( 'body' ) ) {
+					$targetEl.addClass( 'jqGui-masked-relative' );
 				}
-			}, 100 );
+				
+				
+				// Now show the masking element. Make sure it is appended if it has been detached.
+				$overlayEl.appendTo( $targetEl );
+				
+				// IE will not expand full height automatically if it has auto height. Just doing this calc for all browsers for now,
+				// instead of worrying about browser detection (determining which versions of IE are affected) or attempting 
+				// a feature detection for this.
+				$overlayEl.height( $targetEl.outerHeight() );
+				
+				
+				// Position the content element ($contentEl) in the center of the $targetEl, and set it to continually reposition it on an interval.
+				// The interval is for when elements on the page may resize themselves, we need to adjust the content element's position. The interval
+				// will be cleared once the mask is hidden.
+				this.$contentEl.appendTo( $targetEl );  // Make sure it is appended if it has been detached.
+				this.repositionContentEl();
+				
+				var me = this;  // for closure
+				var repositionIntervalId = setInterval( function() {
+					if( me.isVisible() ) {
+						$overlayEl.height( $targetEl.outerHeight() );  // continually make sure that the mask's overlay height is correct, in case the content changes
+						me.repositionContentEl();
+					} else {
+						clearInterval( repositionIntervalId );  // When no longer shown, clear the interval
+					}
+				}, 100 );
+				
+				this.visible = true;
+			}
 		},
 		
 		
-<span id='jqc-Mask-method-repositionContentEl'>		/**
+<span id='jqGui-Mask-method-repositionContentEl'>		/**
 </span>		 * Repositions the {@link #$contentEl} to be in the center of the {@link #$targetEl}.
 		 * 
-		 * @private
-		 * @method repositionContentEl
+		 * @protected
 		 */
 		repositionContentEl : function() {
 			// using jQuery UI positioning utility to center the content element
-			this.$contentEl.position( {
-				my: 'center center',
-				at: 'center center',
-				of: this.$targetEl
-			} );
-		},
-		
-		
-<span id='jqc-Mask-method-hide'>		/**
-</span>		 * Hides the mask.
-		 * 
-		 * @method hide
-		 */
-		hide : function() {
-			// Should only hide if the mask is currently shown.
-			if( this.isShown() ) {
-				// Hide the mask and the content element (if it exists), and restore the target element 
-				// to its original state (i.e. scrollbars allowed, and no positioning context if it didn't have one)
-				this.$maskEl.hide();
-				this.$contentEl.hide();
-				this.$targetEl.removeClass( 'jqc-masked' ).removeClass( 'jqc-masked-relative' );
-				
-				this.shown = false;
+			if( this.isContentElVisible() ) {
+				this.$contentEl.position( {
+					my: 'center center',
+					at: 'center center',
+					of: this.$targetEl
+				} );
 			}
 		},
 		
 		
-<span id='jqc-Mask-method-isShown'>		/**
+<span id='jqGui-Mask-method-hide'>		/**
+</span>		 * Hides the mask.
+		 */
+		hide : function() {
+			// Should only hide if the mask is currently visible.
+			if( this.isVisible() ) {
+				// Hide the mask and the content element (if it exists), and restore the target element 
+				// to its original state (i.e. scrollbars allowed, and no positioning context if it didn't have one)
+				this.$overlayEl.detach();
+				this.$contentEl.detach();
+				this.$targetEl.removeClass( 'jqGui-masked' ).removeClass( 'jqGui-masked-relative' );
+				
+				this.visible = false;
+			}
+		},
+		
+		
+<span id='jqGui-Mask-method-isVisible'>		/**
 </span>		 * Determines if the Mask is currently shown (visible).
 		 * 
-		 * @method isShown
-		 * @return {Boolean} True if the mask is currently shown (visible).
+		 * @return {Boolean} `true` if the mask is currently shown (visible), `false` otherwise.
 		 */
-		isShown : function() {
-			return this.shown;
+		isVisible : function() {
+			return this.visible;
+		},
+		
+		
+<span id='jqGui-Mask-method-isContentElVisible'>		/**
+</span>		 * Determines if the {@link #$contentEl} is visible. This is used internally.
+		 * 
+		 * @protected
+		 * @return {Boolean} `true` if the {@link #$contentEl} is visible, `false` otherwise.
+		 */
+		isContentElVisible : function() {
+			return ( this.spinner || !!this.msg );
 		},
 		
 		
 		// -------------------------------------
 		
 		
-<span id='jqc-Mask-method-destroy'>		/**
+<span id='jqGui-Mask-method-destroy'>		/**
 </span>		 * Destroys the mask by cleaning up its elements.
-		 * 
-		 * @method destroy
 		 */
 		destroy : function() {
 			// Make sure the mask has been hidden, to restore the target element to its original state
 			this.hide();
 			
 			if( this.rendered ) {
-				this.$msgEl.remove();
+				this.$overlayEl.remove();
 				this.$contentEl.remove();
-				this.$maskEl.remove();
 			}
 		}
 		

@@ -19,41 +19,42 @@
 define( [
 	'lodash',
 	'Class',
-	'data/persistence/operation/Operation'
-], function( _, Class, Operation ) {
+	'data/persistence/request/Request'
+], function( _, Class, Request ) {
 	
-<span id='data-persistence-operation-Write'>	/**
-</span>	 * @class data.persistence.operation.Write
-	 * @extends data.persistence.operation.Operation
+<span id='data-persistence-request-Write'>	/**
+</span>	 * @abstract
+	 * @class data.persistence.request.Write
+	 * @extends data.persistence.request.Request
 	 * 
-	 * Represents a write operation to a persistent storage mechanism. This includes creating, updating, or destroying
-	 * (deleting) models on the persistent storage.
+	 * Abstract base class which represents a write request to a persistent storage mechanism. This includes creating, updating, 
+	 * or destroying (deleting) models on the persistent storage.
 	 * 
-	 * This class is used internally by the framework when making requests to {@link data.persistence.proxy.Proxy Proxies},
-	 * but is provided to client callbacks for when {@link data.Model Model}/{@link data.Collection Collection} operations 
-	 * complete.
+	 * This class is used internally by the framework when making requests to {@link data.persistence.proxy.Proxy Proxies}.
 	 */
-	var WriteOperation = Class.extend( Operation, {
+	var WriteRequest = Class.extend( Request, {
+		abstractClass : true,
 		
-<span id='data-persistence-operation-Write-cfg-models'>		/**
+		
+<span id='data-persistence-request-Write-cfg-models'>		/**
 </span>		 * @cfg {data.Model[]} models
 		 * 
-		 * The models to write during the WriteOperation.
+		 * The models to write during the WriteRequest.
 		 */
 		
 		
-<span id='data-persistence-operation-Write-method-getModels'>		/**
-</span>		 * Retrieves the {@link #models} provided for this WriteOperation.
+<span id='data-persistence-request-Write-method-getModels'>		/**
+</span>		 * Retrieves the {@link #models} provided for this WriteRequest.
 		 * 
 		 * @return {data.Model[]}
 		 */
 		getModels : function() {
-			return ( this.models || (this.models = []) );
+			return this.models || [];
 		}
 		
 	} );
 	
-	return WriteOperation;
+	return WriteRequest;
 	
 } );</pre>
 </body>

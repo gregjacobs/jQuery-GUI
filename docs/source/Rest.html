@@ -20,20 +20,22 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'data/persistence/proxy/Proxy'
-], function( jQuery, _, Class, Proxy ) {
+	'data/persistence/proxy/Proxy',
+	'data/persistence/proxy/Ajax'
+], function( jQuery, _, Class, Proxy, AjaxProxy ) {
 	
 <span id='data-persistence-proxy-Rest'>	/**
 </span>	 * @class data.persistence.proxy.Rest
-	 * @extends data.persistence.proxy.Proxy
+	 * @extends data.persistence.proxy.Ajax
 	 * 
-	 * RestProxy is responsible for performing CRUD operations in a RESTful manner for a given Model on the server.
+	 * RestProxy is responsible for performing CRUD requests in a RESTful manner for a given Model on the server.
 	 */
-	var RestProxy = Class.extend( Proxy, {
+	var RestProxy = Class.extend( AjaxProxy, {
 		
 <span id='data-persistence-proxy-Rest-cfg-urlRoot'>		/**
 </span>		 * @cfg {String} urlRoot
-		 * The url to use in a RESTful manner to perform CRUD operations. Ex: `/tasks`.
+		 * 
+		 * The url to use in a RESTful manner to perform CRUD requests. Ex: `/tasks`.
 		 * 
 		 * The {@link data.Model#idAttribute id} of the {@link data.Model} being read/updated/deleted
 		 * will automatically be appended to this url. Ex: `/tasks/12`
@@ -42,6 +44,7 @@ define( [
 		
 <span id='data-persistence-proxy-Rest-cfg-incremental'>		/**
 </span>		 * @cfg {Boolean} incremental
+		 * 
 		 * True to have the RestProxy only provide data that has changed to the server when
 		 * updating a model. By using this, it isn't exactly following REST per se, but can
 		 * optimize requests by only providing a subset of the full model data. Only enable
@@ -51,6 +54,7 @@ define( [
 		
 <span id='data-persistence-proxy-Rest-cfg-rootProperty'>		/**
 </span>		 * @cfg {String} rootProperty
+		 * 
 		 * If the server requires the data to be wrapped in a property of its own, use this config
 		 * to specify it. For example, if PUT'ing a Task's data needs to look like this, use this config:
 		 * 
@@ -65,32 +69,34 @@ define( [
 		 */
 		rootProperty : &quot;&quot;,
 		
-<span id='data-persistence-proxy-Rest-cfg-actionMethods'>		/**
-</span>		 * @cfg {Object} actionMethods
-		 * A mapping of the HTTP method to use for each action. This may be overridden for custom
-		 * server implementations.
+<span id='data-persistence-proxy-Rest-cfg-createMethod'>		/**
+</span>		 * @cfg
+		 * @inheritdoc
 		 */
-		actionMethods : {
-			create  : 'POST',
-			read    : 'GET',
-			update  : 'PUT',
-			destroy : 'DELETE'
-		},
-		
-<span id='data-persistence-proxy-Rest-property-ajax'>		/**
-</span>		 * @private
-		 * @property {Function} ajax
-		 * A reference to the AJAX function to use for persistence. This is normally left as jQuery.ajax,
-		 * but is changed for the unit tests.
+		createMethod : 'POST',
+
+<span id='data-persistence-proxy-Rest-cfg-readMethod'>		/**
+</span>		 * @cfg
+		 * @inheritdoc
 		 */
-		ajax : jQuery.ajax,
-		
+		readMethod : 'GET',
+
+<span id='data-persistence-proxy-Rest-cfg-updateMethod'>		/**
+</span>		 * @cfg
+		 * @inheritdoc
+		 */
+		updateMethod : 'PUT',
+
+<span id='data-persistence-proxy-Rest-cfg-destroyMethod'>		/**
+</span>		 * @cfg
+		 * @inheritdoc
+		 */
+		destroyMethod : 'DELETE',
 		
 		
 <span id='data-persistence-proxy-Rest-method-setRootProperty'>		/**
 </span>		 * Accessor to set the {@link #rootProperty} after instantiation.
 		 * 
-		 * @method setRootProperty
 		 * @param {String} rootProperty The new {@link #rootProperty} value. This can be set to an empty string 
 		 *   to remove the {@link #rootProperty}.
 		 */
@@ -102,17 +108,16 @@ define( [
 <span id='data-persistence-proxy-Rest-method-create'>		/**
 </span>		 * Creates the Model on the server.
 		 * 
-		 * @method create
-		 * @param {data.persistence.operation.Write} operation The WriteOperation instance that holds the model(s) 
+		 * @param {data.persistence.request.Create} request The CreateRequest instance that holds the model(s) 
 		 *   to be created on the REST server.
-		 * @return {jQuery.Promise} A Promise object which is resolved when the operation is complete.
-		 *   `done`, `fail`, and `always` callbacks are called with the `operation` object provided to 
+		 * @return {jQuery.Promise} A Promise object which is resolved when the request is complete.
+		 *   `done`, `fail`, and `always` callbacks are called with the `request` object provided to 
 		 *   this method as the first argument.
 		 */
-		create : function( operation ) {
+		create : function( request ) {
 			var me = this,  // for closures
 			    deferred = new jQuery.Deferred(),
-			    model = operation.getModels()[ 0 ],
+			    model = request.getModels()[ 0 ],
 			    dataToPersist = model.getData( { persistedOnly: true, raw: true } );
 			
 			// Handle needing a different &quot;root&quot; wrapper object for the data
@@ -124,21 +129,21 @@ define( [
 			
 			this.ajax( {
 				url         : this.buildUrl( 'create', model.getId() ),
-				type        : this.getMethod( 'create' ),
+				type        : this.getHttpMethod( 'create' ),
 				dataType    : 'text',
 				data        : JSON.stringify( dataToPersist ),
 				contentType : 'application/json'
 			} ).then(
 				function( data, textStatus, jqXHR ) {
 					if( data ) {  // data may or may not be returned by a server on a 'create' request
-						operation.setResultSet( me.reader.read( data ) );
+						request.setResultSet( me.reader.read( data ) );
 					}
-					operation.setSuccess();
-					deferred.resolve( operation );
+					request.setSuccess();
+					deferred.resolve( request );
 				},
 				function( jqXHR, textStatus, errorThrown ) {
-					operation.setException( { textStatus: textStatus, errorThrown: errorThrown } );
-					deferred.reject( operation );
+					request.setException( { textStatus: textStatus, errorThrown: errorThrown } );
+					deferred.reject( request );
 				}
 			);
 			
@@ -149,30 +154,29 @@ define( [
 <span id='data-persistence-proxy-Rest-method-read'>		/**
 </span>		 * Reads the Model from the server.
 		 * 
-		 * @method read
-		 * @param {data.persistence.operation.Read} operation The ReadOperation instance that holds the model(s) 
+		 * @param {data.persistence.request.Read} request The ReadRequest instance that holds the model(s) 
 		 *   to be read from the REST server.
-		 * @return {jQuery.Promise} A Promise object which is resolved when the operation is complete.
-		 *   `done`, `fail`, and `always` callbacks are called with the `operation` object provided to 
+		 * @return {jQuery.Promise} A Promise object which is resolved when the request is complete.
+		 *   `done`, `fail`, and `always` callbacks are called with the `request` object provided to 
 		 *   this method as the first argument.
 		 */
-		read : function( operation ) {
+		read : function( request ) {
 			var me = this,  // for closures
 			    deferred = new jQuery.Deferred();
 			
 			this.ajax( {
-				url      : this.buildUrl( 'read', operation.getModelId() ),
-				type     : this.getMethod( 'read' ),
+				url      : this.buildUrl( 'read', request.getModelId() ),
+				type     : this.getHttpMethod( 'read' ),
 				dataType : 'json'
 			} ).then(
 				function( data, textStatus, jqXHR ) {
-					operation.setResultSet( me.reader.read( data ) );
-					operation.setSuccess();
-					deferred.resolve( operation );
+					request.setResultSet( me.reader.read( data ) );
+					request.setSuccess();
+					deferred.resolve( request );
 				},
 				function( jqXHR, textStatus, errorThrown ) {
-					operation.setException( { textStatus: textStatus, errorThrown: errorThrown } );
-					deferred.reject( operation );
+					request.setException( { textStatus: textStatus, errorThrown: errorThrown } );
+					deferred.reject( request );
 				}
 			);
 			
@@ -184,25 +188,22 @@ define( [
 </span>		 * Updates the given Model on the server.  This method uses &quot;incremental&quot; updates, in which only the changed attributes of the `model`
 		 * are persisted.
 		 * 
-		 * @method update
-		 * @param {data.persistence.operation.Write} operation The WriteOperation instance that holds the model(s) 
+		 * @param {data.persistence.request.Update} request The UpdateRequest instance that holds the model(s) 
 		 *   to be updated on the REST server.
-		 * @return {jQuery.Promise} A Promise object which is resolved when the operation is complete.
-		 *   `done`, `fail`, and `always` callbacks are called with the `operation` object provided to 
+		 * @return {jQuery.Promise} A Promise object which is resolved when the request is complete.
+		 *   `done`, `fail`, and `always` callbacks are called with the `request` object provided to 
 		 *   this method as the first argument.
 		 */
-		update : function( operation, options ) {
-			options = options || {};
+		update : function( request ) {
 			var me = this,  // for closures
-			    scope = options.scope || options.context || this,
-			    model = operation.getModels()[ 0 ],
+			    model = request.getModels()[ 0 ],
 			    changedData = model.getChanges( { persistedOnly: true, raw: true } ),
 			    deferred = new jQuery.Deferred();
 			
 			// Short Circuit: If there is no changed data in any of the attributes that are to be persisted, there is no need to make a 
 			// request. Resolves the deferred and return out.
 			if( _.isEmpty( changedData ) ) {
-				deferred.resolve( operation );
+				deferred.resolve( request );
 				return deferred.promise();
 			}
 			
@@ -227,21 +228,21 @@ define( [
 			// Finally, persist to the server
 			this.ajax( {
 				url         : this.buildUrl( 'update', model.getId() ),
-				type        : this.getMethod( 'update' ),
+				type        : this.getHttpMethod( 'update' ),
 				dataType    : 'text',
 				data        : JSON.stringify( dataToPersist ),
 				contentType : 'application/json'
 			} ).then(
 				function( data, textStatus, jqXHR ) {
 					if( data ) {  // data may or may not be returned by a server on an 'update' request
-						operation.setResultSet( me.reader.read( data ) );
+						request.setResultSet( me.reader.read( data ) );
 					}
-					operation.setSuccess();
-					deferred.resolve( operation );
+					request.setSuccess();
+					deferred.resolve( request );
 				},
 				function( jqXHR, textStatus, errorThrown ) {
-					operation.setException( { textStatus: textStatus, errorThrown: errorThrown } );
-					deferred.reject( operation );
+					request.setException( { textStatus: textStatus, errorThrown: errorThrown } );
+					deferred.reject( request );
 				}
 			);
 			
@@ -254,29 +255,28 @@ define( [
 		 * 
 		 * Note that this method is not named &quot;delete&quot; as &quot;delete&quot; is a JavaScript reserved word.
 		 * 
-		 * @method destroy
-		 * @param {data.persistence.operation.Write} operation The WriteOperation instance that holds the model(s) 
+		 * @param {data.persistence.request.Destroy} request The DestroyRequest instance that holds the model(s) 
 		 *   to be destroyed on the REST server.
-		 * @return {jQuery.Promise} A Promise object which is resolved when the operation is complete.
-		 *   `done`, `fail`, and `always` callbacks are called with the `operation` object provided to 
+		 * @return {jQuery.Promise} A Promise object which is resolved when the request is complete.
+		 *   `done`, `fail`, and `always` callbacks are called with the `request` object provided to 
 		 *   this method as the first argument.
 		 */
-		destroy : function( operation ) {
+		destroy : function( request ) {
 			var deferred = new jQuery.Deferred(),
-			    model = operation.getModels()[ 0 ];
+			    model = request.getModels()[ 0 ];
 			
 			this.ajax( {
 				url      : this.buildUrl( 'destroy', model.getId() ),
-				type     : this.getMethod( 'destroy' ),
+				type     : this.getHttpMethod( 'destroy' ),
 				dataType : 'text'  // in case the server returns nothing. Otherwise, jQuery might make a guess as to the wrong data type (such as JSON), and try to parse it, causing the `error` callback to be executed instead of `success`
 			} ).then(
 				function( data, textStatus, jqXHR ) {
-					operation.setSuccess();
-					deferred.resolve( operation );
+					request.setSuccess();
+					deferred.resolve( request );
 				},
 				function( jqXHR, textStatus, errorThrown ) {
-					operation.setException( { textStatus: textStatus, errorThrown: errorThrown } );
-					deferred.reject( operation );
+					request.setException( { textStatus: textStatus, errorThrown: errorThrown } );
+					deferred.reject( request );
 				}
 			);
 			
@@ -288,10 +288,9 @@ define( [
 		
 		
 <span id='data-persistence-proxy-Rest-method-buildUrl'>		/**
-</span>		 * Builds the URL to use to do CRUD operations.
+</span>		 * Builds the URL to use to do CRUD requests.
 		 * 
 		 * @protected
-		 * @method buildUrl
 		 * @param {String} action The action being taken. Must be one of: 'create', 'read', 'update', or 'destroy'.
 		 * @param {String} modelId The ID for the model that a url is being built for.
 		 * @return {String} The url to use.
@@ -303,7 +302,7 @@ define( [
 			// In the read case where there is no particular model to load (i.e. loading a collection),
 			// then we skip this as well, as we want to load *all* (or at least a range of) models of the 
 			// particular resource.
-			if( action !== 'create' &amp;&amp; modelId ) {
+			if( action !== 'create' &amp;&amp; modelId !== undefined ) {
 				if( !url.match( /\/$/ ) ) {
 					url += '/';  // append trailing slash if it's not there
 				}
@@ -312,20 +311,6 @@ define( [
 			}
 			
 			return url;
-		},
-		
-		
-<span id='data-persistence-proxy-Rest-method-getMethod'>		/**
-</span>		 * Retrieves the HTTP method that should be used for a given action. This is, by default, done via 
-		 * a lookup to the {@link #actionMethods} config object.
-		 * 
-		 * @protected
-		 * @method getMethod
-		 * @param {String} action The action that is being taken. Should be 'create', 'read', 'update', or 'destroy'.
-		 * @return {String} The HTTP method that should be used.
-		 */
-		getMethod : function( action ) {
-			return this.actionMethods[ action ];
 		}
 		
 	} );
