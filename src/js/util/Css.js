@@ -2,7 +2,7 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqGui/JqGui'
+	'jqg/JqGui'
 ],
 function( jQuery, _, JqGui ) {
 	
@@ -10,7 +10,7 @@ function( jQuery, _, JqGui ) {
 	
 	
 	/**
-	 * @class jqGui.util.Css
+	 * @class jqg.util.Css
 	 * @singleton
 	 * 
 	 * General CSS manipulation/reading functionality.  Allows the dynamic modification of 

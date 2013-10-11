@@ -2,13 +2,13 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqGui/ComponentManager',
-	'jqGui/form/field/Field'
+	'jqg/ComponentManager',
+	'jqg/form/field/Field'
 ], function( jQuery, _, ComponentManager, Field ) {
 	
 	/**
-	 * @class jqGui.form.field.Hidden
-	 * @extends jqGui.form.field.Field
+	 * @class jqg.form.field.Hidden
+	 * @extends jqg.form.field.Field
 	 * @alias type.hidden
 	 * @alias type.hiddenfield
 	 * 
@@ -40,7 +40,7 @@ define( [
 			this.label = "";
 			this.extraMsg = "";
 			
-			// Make sure the outer element (created by jqGui.Component) is hidden, as there should be no visible indication of the field
+			// Make sure the outer element (created by jqg.Component) is hidden, as there should be no visible indication of the field
 			this.hidden = true;
 			
 			this._super( arguments );
@@ -61,7 +61,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqGui.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link jqg.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {String} value The value of the field.
 		 */
@@ -75,7 +75,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqGui.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link jqg.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the field.
 		 */

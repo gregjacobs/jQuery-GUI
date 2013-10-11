@@ -1,12 +1,12 @@
 /*global define */
 define( [
-	'jqGui/Container',
-	'jqGui/layout/Layout'
+	'jqg/Container',
+	'jqg/layout/Layout'
 ], function( Container, Layout ) {
 
 	/**
-	 * @class jqGui.layout.VBox
-	 * @extends jqGui.layout.Layout
+	 * @class jqg.layout.VBox
+	 * @extends jqg.layout.Layout
 	 * @alias layout.vbox
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
@@ -63,7 +63,7 @@ define( [
 		 * @protected
 		 * @template
 		 * @method onLayout
-		 * @param {jqGui.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
@@ -127,7 +127,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the jqGui.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the jqg.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'vbox', VBoxLayout );
 	
 	return VBoxLayout;

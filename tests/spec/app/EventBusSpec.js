@@ -2,11 +2,11 @@
 /*jshint sub:true */
 define( [
 	'lodash',
-	'jqGui/app/EventBus',
-	'jqGui/Component'
+	'jqg/app/EventBus',
+	'jqg/Component'
 ], function( _, EventBus, Component ) {
 	
-	describe( 'jqGui.app.EventBus', function() {
+	describe( 'jqg.app.EventBus', function() {
 		
 		afterEach( function() {
 			// Reset the EventBus's callbacks array. Do a check for its existence though, in case the property

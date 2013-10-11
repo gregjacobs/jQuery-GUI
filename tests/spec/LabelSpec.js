@@ -1,10 +1,10 @@
 /*global define, describe, it, expect */
 define( [
-	'jqGui/Label'
+	'jqg/Label'
 ],
 function( Label ) {
 	
-	describe( 'jqGui.Label', function() {
+	describe( 'jqg.Label', function() {
 		
 		describe( "sanity", function() {
 			

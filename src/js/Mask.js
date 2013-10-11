@@ -3,14 +3,14 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'jqGui/template/Template',
-	'jqGui/template/LoDash',
+	'jqg/template/Template',
+	'jqg/template/LoDash',
 	'jquery-ui/position'  // jQuery UI's `position` plugin
 ], 
 function( jQuery, _, Class, Template, LoDashTpl ) {
 	
 	/**
-	 * @class jqGui.Mask
+	 * @class jqg.Mask
 	 * @extends Object
 	 * 
 	 * Generalized class that can create a mask over any given element, and provides a simple interface
@@ -37,15 +37,15 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		
 		/**
 		 * @protected
-		 * @property {String/jqGui.template.Template} maskTpl
+		 * @property {String/jqg.template.Template} maskTpl
 		 * 
 		 * The template to use to create the Mask's elements.
 		 */
 		maskTpl : new LoDashTpl( [
-			'<div data-elem="jqGui-mask-overlay" class="jqGui-mask-overlay" />',
-			'<div data-elem="jqGui-mask-content" class="jqGui-mask-content">',
-				'<span class="jqGui-mask-spinner" />',
-				'<div data-elem="jqGui-mask-msg" class="jqGui-mask-msg" />',
+			'<div data-elem="jqg-mask-overlay" class="jqg-mask-overlay" />',
+			'<div data-elem="jqg-mask-content" class="jqg-mask-content">',
+				'<span class="jqg-mask-spinner" />',
+				'<div data-elem="jqg-mask-msg" class="jqg-mask-msg" />',
 			'</div>'
 		] ),
 		
@@ -93,7 +93,7 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 * 
 		 * The CSS class to add to the Mask's {@link #$contentEl} when the spinner is visible.
 		 */
-		spinnerVisibleCls : 'jqGui-mask-spinner-visible',
+		spinnerVisibleCls : 'jqg-mask-spinner-visible',
 		
 		/**
 		 * @protected
@@ -101,7 +101,7 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 * 
 		 * The CSS class to add to the Mask's {@link #$contentEl} when a {@link #msg} exists.
 		 */
-		msgVisibleCls : 'jqGui-mask-msg-visible',
+		msgVisibleCls : 'jqg-mask-msg-visible',
 		
 		/**
 		 * @protected
@@ -125,14 +125,14 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 			} else if( targetEl instanceof jQuery ) {
 				// <debug>
 				if( targetEl.length !== 1 ) {
-					throw new Error( "If the 'targetEl' argument to the jqGui.Mask constructor is a jQuery wrapped set, it must contain exactly one element." );
+					throw new Error( "If the 'targetEl' argument to the jqg.Mask constructor is a jQuery wrapped set, it must contain exactly one element." );
 				}
 				// </debug>
 				this.$targetEl = targetEl;
 			
 			// <debug>
 			} else {
-				throw new Error( "jqGui.Mask requires the first argument to its constructor to be an HTMLElement, or a jQuery wrapped set" );
+				throw new Error( "jqg.Mask requires the first argument to its constructor to be an HTMLElement, or a jQuery wrapped set" );
 			// </debug>
 			}
 			
@@ -180,11 +180,11 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 				$targetEl.append( this.maskTpl.apply( {} ) );  // no data for the template (at this point in time)
 				
 				var onMaskClick = _.bind( this.onMaskClick, this );
-				this.$overlayEl = $targetEl.find( '[data-elem="jqGui-mask-overlay"]' )
+				this.$overlayEl = $targetEl.find( '[data-elem="jqg-mask-overlay"]' )
 					.on( 'click', onMaskClick );
-				this.$contentEl = $targetEl.find( '[data-elem="jqGui-mask-content"]' )
+				this.$contentEl = $targetEl.find( '[data-elem="jqg-mask-content"]' )
 					.on( 'click', onMaskClick );
-				this.$msgEl = $targetEl.find( '[data-elem="jqGui-mask-msg"]' );
+				this.$msgEl = $targetEl.find( '[data-elem="jqg-mask-msg"]' );
 				
 				this.rendered = true;
 				this.updateMaskElements();
@@ -255,13 +255,13 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 				    $overlayEl = this.$overlayEl,
 				    $contentEl = this.$contentEl;
 				
-				// First, add the jqGui-masked css class to the target element, which removes the target element's scroll bars
-				$targetEl.addClass( 'jqGui-masked' );
+				// First, add the jqg-masked css class to the target element, which removes the target element's scroll bars
+				$targetEl.addClass( 'jqg-masked' );
 				
 				// Next, give the target element a relative positioning context if it currently does not have one (i.e. it 
 				// has "position: static"), and the target element not the document body (the document body already has a positioning context)
 				if( $targetEl.css( 'position' ) === 'static' && !$targetEl.is( 'body' ) ) {
-					$targetEl.addClass( 'jqGui-masked-relative' );
+					$targetEl.addClass( 'jqg-masked-relative' );
 				}
 				
 				
@@ -322,7 +322,7 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 				// to its original state (i.e. scrollbars allowed, and no positioning context if it didn't have one)
 				this.$overlayEl.detach();
 				this.$contentEl.detach();
-				this.$targetEl.removeClass( 'jqGui-masked' ).removeClass( 'jqGui-masked-relative' );
+				this.$targetEl.removeClass( 'jqg-masked' ).removeClass( 'jqg-masked-relative' );
 				
 				this.visible = false;
 			}

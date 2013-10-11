@@ -1,11 +1,11 @@
 /*global define, describe, beforeEach, afterEach, it, expect, spyOn */
 define( [
 	'data/Model',
-	'jqGui/util/ModelBindable'
+	'jqg/util/ModelBindable'
 ], 
 function( Model, ModelBindable ) {
 	
-	describe( 'jqGui.util.ModelBindable', function() {
+	describe( 'jqg.util.ModelBindable', function() {
 		var TestModelBindable = ModelBindable.extend( {
 			modelProp : 'myModel',  // to test this config with all methods
 			

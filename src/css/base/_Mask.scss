@@ -1,4 +1,4 @@
-.jqGui-mask-overlay { 
+.jqg-mask-overlay { 
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -8,7 +8,7 @@
 	zoom: 1;
 }
 
-.jqGui-mask-content {
+.jqg-mask-content {
 	position: absolute; 
 	top: 0; 
 	left: 0; 
@@ -16,29 +16,29 @@
 	zoom: 1;
 	display: none;  // Initially hidden. Will be displayed if the spinner is enabled, or if there is a msg.
 	
-	&.jqGui-mask-spinner-visible { display: block; }  // if either the spinner is enabled, or a
-	&.jqGui-mask-msg-visible { display: block; }      // message is shown, show the content element
+	&.jqg-mask-spinner-visible { display: block; }  // if either the spinner is enabled, or a
+	&.jqg-mask-msg-visible { display: block; }      // message is shown, show the content element
 }
 
-.jqGui-mask-spinner { 
+.jqg-mask-spinner { 
 	display: none;
 	vertical-align: middle;
 
-	.jqGui-mask-spinner-visible & { display: inline-block; }
+	.jqg-mask-spinner-visible & { display: inline-block; }
 }
 
-.jqGui-mask-msg { 
+.jqg-mask-msg { 
 	display: none;
 	vertical-align: middle;
 	
-	.jqGui-mask-msg-visible & { display: inline-block; }
+	.jqg-mask-msg-visible & { display: inline-block; }
 }
 
 /* For elements that are masked, they should have their overflow hidden to remove scroll bars */
 /* Note: the uses of !important are necessary to override more specific css classes! */
-.jqGui-masked { 
+.jqg-masked { 
 	overflow: hidden !important;  
 }
 
 /* For elements that are masked, they need a positioning context. This will only be added if they don't have a positioning context. */
-.jqGui-masked-relative { position: relative !important; }
+.jqg-masked-relative { position: relative !important; }

@@ -2,10 +2,10 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqGui/form/field/Hidden'
+	'jqg/form/field/Hidden'
 ], function( jQuery, _, HiddenField ) {
 	
-	describe( 'jqGui.form.field.Hidden', function() {
+	describe( 'jqg.form.field.Hidden', function() {
 		
 		describe( "sanity", function() {
 			

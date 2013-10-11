@@ -2,13 +2,13 @@
 define( [
 	'lodash',
 	'Class',
-	'jqGui/ComponentManager',
-	'jqGui/Component'
+	'jqg/ComponentManager',
+	'jqg/Component'
 ], function( _, Class, ComponentManager, Component ) {
 	
 	/**
-	 * @class jqGui.Image
-	 * @extends jqGui.Component
+	 * @class jqg.Image
+	 * @extends jqg.Component
 	 * @alias type.image
 	 *
 	 * A simple image component.
@@ -32,7 +32,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqGui-image',
+		baseCls : 'jqg-image',
 		
 		
 		/**
@@ -75,7 +75,7 @@ define( [
 				 * Fires when the underlying image has loaded successfully.
 				 * 
 				 * @event load
-				 * @param {jqGui.Image} image This Image instance.
+				 * @param {jqg.Image} image This Image instance.
 				 */
 				'load',
 				
@@ -83,7 +83,7 @@ define( [
 				 * Fires when the underlying image has failed to load.
 				 * 
 				 * @event error
-				 * @param {jqGui.Image} image This Image instance.
+				 * @param {jqg.Image} image This Image instance.
 				 */
 				'error'
 			);

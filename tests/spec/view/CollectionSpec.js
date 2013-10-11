@@ -3,11 +3,11 @@ define( [
 	'jquery',
 	'data/Model',
 	'data/Collection',
-	'jqGui/view/Collection',
-	'jqGui/template/LoDash'
+	'jqg/view/Collection',
+	'jqg/template/LoDash'
 ], function( jQuery, Model, Collection, CollectionView, LoDashTpl ) {
 	
-	describe( 'jqGui.view.Collection', function() {
+	describe( 'jqg.view.Collection', function() {
 		
 		// A simple Model subclass to use for the tests
 		var UserModel = Model.extend( {

@@ -1,17 +1,17 @@
 /*global define */
 define( [
 	'lodash',
-	'jqGui/ComponentManager',
-	'jqGui/Container',
-	'jqGui/Label',
-	'jqGui/layout/HBox'
+	'jqg/ComponentManager',
+	'jqg/Container',
+	'jqg/Label',
+	'jqg/layout/HBox'
 ], function( _, ComponentManager, Container, Label ) {
 	
 	/**
-	 * @class jqGui.panel.Header
-	 * @extends jqGui.Container
+	 * @class jqg.panel.Header
+	 * @extends jqg.Container
 	 * 
-	 * Specialized Container subclass which is used as a {@link jqGui.panel.Panel Panel's} header.
+	 * Specialized Container subclass which is used as a {@link jqg.panel.Panel Panel's} header.
 	 */
 	var PanelHeader = Container.extend( {
 		
@@ -43,9 +43,9 @@ define( [
 		 */
 		
 		/**
-		 * @cfg {Object/Object[]/jqGui.panel.ToolButton/jqGui.panel.ToolButton[]} toolButtons
+		 * @cfg {Object/Object[]/jqg.panel.ToolButton/jqg.panel.ToolButton[]} toolButtons
 		 * 
-		 * One or more {@link jqGui.panel.ToolButton ToolButtons} or ToolButton config objects. These will
+		 * One or more {@link jqg.panel.ToolButton ToolButtons} or ToolButton config objects. These will
 		 * be placed on the right side of the header.
 		 */
 		
@@ -59,19 +59,19 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqGui-panel-header',
+		componentCls : 'jqg-panel-header',
 		
 		
 		/**
 		 * @protected
-		 * @property {jqGui.Label} titleLabel
+		 * @property {jqg.Label} titleLabel
 		 * 
 		 * The label component for the title.
 		 */
 		
 		/**
 		 * @protected
-		 * @property {jqGui.Container} toolButtonsCt
+		 * @property {jqg.Container} toolButtonsCt
 		 * 
 		 * The Container that holds the {@link #toolButtons}.
 		 */
@@ -120,7 +120,7 @@ define( [
 		 * config will be applied to, by default.
 		 * 
 		 * @protected
-		 * @return {jqGui.Label}
+		 * @return {jqg.Label}
 		 */
 		createTitleLabel : function() {
 			return new Label( {
@@ -134,12 +134,12 @@ define( [
 		 * Creates the tool buttons container.
 		 * 
 		 * @protected
-		 * @return {jqGui.Container}
+		 * @return {jqg.Container}
 		 */
 		createToolButtonsCt : function() {
 			return new Container( {
 				cls         : this.componentCls + '-toolButtons',
-				defaultType : 'toolbutton',   // jqGui.panel.ToolButton
+				defaultType : 'toolbutton',   // jqg.panel.ToolButton
 				items       : this.toolButtons
 			} );
 		},

@@ -1,13 +1,13 @@
 /*global define, describe, beforeEach, afterEach, it, expect, spyOn */
 /*jshint loopfunc:true */
 define( [
-	'jqGui/panel/Panel',
-	'jqGui/tab/Panel',
-	'jqGui/tab/Bar',
-	'jqGui/tab/Tab'
+	'jqg/panel/Panel',
+	'jqg/tab/Panel',
+	'jqg/tab/Bar',
+	'jqg/tab/Tab'
 ], function( Panel, TabPanel, TabBar, Tab ) {
 	
-	describe( 'jqGui.tab.Bar', function() {
+	describe( 'jqg.tab.Bar', function() {
 		
 		describe( 'setActiveTab', function() {
 			var panels,

@@ -2,14 +2,14 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqGui/Component',
-	'jqGui/ComponentManager',
-	'jqGui/template/LoDash'
+	'jqg/Component',
+	'jqg/ComponentManager',
+	'jqg/template/LoDash'
 ], function( jQuery, _, Component, ComponentManager, LoDashTpl ) {
 
 	/**
-	 * @class jqGui.button.Button
-	 * @extends jqGui.Component
+	 * @class jqg.button.Button
+	 * @extends jqg.Component
 	 * @alias type.button
 	 * 
 	 * A generic button that calls its {@link #handler} when clicked.
@@ -67,7 +67,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqGui-button',
+		baseCls : 'jqg-button',
 		
 		/**
 		 * @cfg
@@ -91,7 +91,7 @@ define( [
 				 * Fires when the button has been clicked.
 				 * 
 				 * @event click
-				 * @param {jqGui.button.Button} button This jqGui.Button instance.
+				 * @param {jqg.button.Button} button This jqg.Button instance.
 				 */
 				'click',
 				
@@ -99,7 +99,7 @@ define( [
 				 * Fires when the mouse has entered (hovered over) the button. Equivalent to the jQuery mouseenter event.
 				 * 
 				 * @event mouseenter
-				 * @param {jqGui.button.Button} button This jqGui.Button instance.
+				 * @param {jqg.button.Button} button This jqg.Button instance.
 				 */
 				'mouseenter',
 				
@@ -107,7 +107,7 @@ define( [
 				 * Fires when the mouse has left (no longer hovered over) the button. Equivalent to the jQuery mouseleave event.
 				 * 
 				 * @event mouseleave
-				 * @param {jqGui.button.Button} button This jqGui.Button instance.
+				 * @param {jqg.button.Button} button This jqg.Button instance.
 				 */
 				'mouseleave'
 			);

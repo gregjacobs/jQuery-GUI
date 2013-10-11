@@ -1,11 +1,11 @@
 /*global define, describe, it, expect */
 /*jshint scripturl:true */
 define( [
-	'jqGui/Anchor'
+	'jqg/Anchor'
 ],
 function( Anchor ) {
 	
-	describe( 'jqGui.Anchor', function() {
+	describe( 'jqg.Anchor', function() {
 		
 		describe( "sanity", function() {
 			

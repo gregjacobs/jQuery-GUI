@@ -3,19 +3,19 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'jqGui/JqGui',
-	'jqGui/anim/Animation',
-	'jqGui/Component',
-	'jqGui/panel/Panel',
+	'jqg/JqGui',
+	'jqg/anim/Animation',
+	'jqg/Component',
+	'jqg/panel/Panel',
 	'jquery-ui/position'  // jQuery UI's `position` plugin
 ], function( jQuery, _, Class, JqGui, Animation, Component, Panel ) {
 	
 	/**
 	 * @abstract
-	 * @class jqGui.Overlay
-	 * @extends jqGui.panel.Panel
+	 * @class jqg.Overlay
+	 * @extends jqg.panel.Panel
 	 *
-	 * Base class for UI elements that "float" on top of the document (most notably: {@link jqGui.window.Window}).
+	 * Base class for UI elements that "float" on top of the document (most notably: {@link jqg.window.Window}).
 	 * This can be positioned by {@link #x} and {@link #y} values, or positioned relative to other elements using the 
 	 * {@link #anchor} config.
 	 */
@@ -34,8 +34,8 @@ define( [
 		/**
 		 * @cfg {Object} showAnim
 		 * 
-		 * A {@link jqGui.anim.Animation} configuration object to animate the "show" transition. You do not need to specify
-		 * the {@link jqGui.anim.Animation#target} parameter however, as it will be set to this Overlay.
+		 * A {@link jqg.anim.Animation} configuration object to animate the "show" transition. You do not need to specify
+		 * the {@link jqg.anim.Animation#target} parameter however, as it will be set to this Overlay.
 		 * 
 		 * This config is to provide a default animation that the Overlay always shows with. If the animation is to be
 		 * different for different calls to {@link #method-show}, one may supply the animation config in the `anim` option
@@ -46,16 +46,16 @@ define( [
 		/**
 		 * @cfg {Object} hideAnim
 		 * 
-		 * A {@link jqGui.anim.Animation} configuration object to animate the "hide" transition. You do not need to specify
-		 * the {@link jqGui.anim.Animation#target} parameter however, as it will be set to this Overlay.
+		 * A {@link jqg.anim.Animation} configuration object to animate the "hide" transition. You do not need to specify
+		 * the {@link jqg.anim.Animation#target} parameter however, as it will be set to this Overlay.
 		 * 
 		 * This config is to provide a default animation that the Overlay always hides with. If the animation is to be
 		 * different for different calls to {@link #method-hide}, one may supply the animation config in the `anim` option
 		 * to the {@link #method-hide} method. Note that an `anim` option provided to the {@link #method-hide} method 
 		 * always overrides this config for that call
 		 * 
-		 * This config is especially useful with the {@link jqGui.window.Window#closeOnEscape} config of the
-		 * {@link jqGui.window.Window Window} subclass, as the call to the {@link #method-hide} method is made behind the scenes 
+		 * This config is especially useful with the {@link jqg.window.Window#closeOnEscape} config of the
+		 * {@link jqg.window.Window Window} subclass, as the call to the {@link #method-hide} method is made behind the scenes 
 		 * in this case.
 		 */
 	
@@ -82,11 +82,11 @@ define( [
 		 *   "left", "right". Example: "left top" or "center center".  So, if "left bottom", the overlay will be
 		 *   positioned against the bottom left of the target `element`. Defaults to "left bottom".
 		 *
-		 * @cfg {HTMLElement/jQuery/jqGui.Component} anchor.of
-		 *   The HTMLElement or {@link jqGui.Component} to anchor the overlay to. Can either be defined as either "of" (following
+		 * @cfg {HTMLElement/jQuery/jqg.Component} anchor.of
+		 *   The HTMLElement or {@link jqg.Component} to anchor the overlay to. Can either be defined as either "of" (following
 		 *   jQuery UI) or "element". Required unless the `element` property is provided.
 		 *
-		 * @cfg {HTMLElement/jQuery/jqGui.Component} [anchor.element]
+		 * @cfg {HTMLElement/jQuery/jqg.Component} [anchor.element]
 		 *   Synonym of `of` property, which may replace it where it makes more sense in calling code.
 		 *
 		 * @cfg {String} [anchor.offset]
@@ -137,7 +137,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqGui-overlay',
+		baseCls : 'jqg-overlay',
 		
 		/**
 		 * @hide
@@ -152,7 +152,7 @@ define( [
 		 * @protected
 		 * @property {jQuery} $contentContainer
 		 * 
-		 * The inner overlay container, where either content HTML or child {@link jqGui.Component Components} are added.
+		 * The inner overlay container, where either content HTML or child {@link jqg.Component Components} are added.
 		 */
 	
 		/**
@@ -216,8 +216,8 @@ define( [
 		 * @param {Number/String} [options.y] A {@link #y} config to set on the call to open. Note that subsequent calls to open()
 		 *   will use this config unless changed by a call to {@link #setPosition}.  See {@link #y} for more details. Note that
 		 *   providing an `anchor` will override this value.
-		 * @param {Object/Boolean} [options.anim] An {@link jqGui.anim.Animation Animation} config object (minus the 
-		 *   {@link jqGui.anim.Animation#target target} property) for animating the showing of the Overlay. If this is not provided,
+		 * @param {Object/Boolean} [options.anim] An {@link jqg.anim.Animation Animation} config object (minus the 
+		 *   {@link jqg.anim.Animation#target target} property) for animating the showing of the Overlay. If this is not provided,
 		 *   it defaults to using the {@link #showAnim} config.
 		 *   
 		 *   This property may also be set to the boolean `false` to prevent the {@link #showAnim} from running on this call to 
@@ -378,7 +378,7 @@ define( [
 					of = anchor.element || anchor.of;  // accept either 'element' or 'of' from the anchor config
 					collision = anchor.collision || 'flipfit';
 	
-					// Handle the anchor element being a jqGui.Component, by grabbing the Component's DOM element
+					// Handle the anchor element being a jqg.Component, by grabbing the Component's DOM element
 					if( of instanceof Component ) {
 						of = of.getEl();
 					}

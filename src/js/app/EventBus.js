@@ -2,16 +2,16 @@
 define( [
 	'lodash',
 	'Class',
-	'jqGui/Component'
+	'jqg/Component'
 ], function( _, Class, Component ) {
 	
 	/**
-	 * @class jqGui.app.EventBus
+	 * @class jqg.app.EventBus
 	 * @extends Object
 	 * @singleton
 	 * 
-	 * Singleton class which allows any subscriber to listen to all events from all {@link jqGui.Component Component}
-	 * instances (including {@link jqGui.Component Component} subclass instances).
+	 * Singleton class which allows any subscriber to listen to all events from all {@link jqg.Component Component}
+	 * instances (including {@link jqg.Component Component} subclass instances).
 	 */
 	var EventBus = Class.create( {
 		
@@ -28,11 +28,11 @@ define( [
 		 * @property {Boolean} fireEventPatched
 		 * 
 		 * Flag which is set to `true` once Observable's {@link Observable#fireEvent fireEvent} method has been wrapped in an
-		 * interceptor function on {@link jqGui.Component Component's} prototype, which provides the hook to be able to listen
+		 * interceptor function on {@link jqg.Component Component's} prototype, which provides the hook to be able to listen
 		 * for all Component events.
 		 * 
 		 * Without this, we would need to subscribe an 'all' event listener to every instantiated component, and then remove that 
-		 * listener when the components are {@link jqGui.Component#method-destroy destroyed}. This would really just be extra processing 
+		 * listener when the components are {@link jqg.Component#method-destroy destroyed}. This would really just be extra processing 
 		 * and memory usage.
 		 */
 		fireEventPatched : false,
@@ -49,7 +49,7 @@ define( [
 		/**
 		 * Subscribes a callback to all events from all components. The callback is provided the following arguments:
 		 * 
-		 * - component ({@link jqGui.Component}) : The Component that fired the event.
+		 * - component ({@link jqg.Component}) : The Component that fired the event.
 		 * - eventName (String) : The name of the event that was fired.
 		 * - fireEventArgs (Mixed[]) : The array of arguments that were passed to the original {@link Observable#fireEvent fireEvent}
 		 *   call. This does not include the event name.
@@ -105,11 +105,11 @@ define( [
 		
 		
 		/**
-		 * Handles an event being fired on a {@link jqGui.Component}, by dispatching the event to all subscribed callbacks.
+		 * Handles an event being fired on a {@link jqg.Component}, by dispatching the event to all subscribed callbacks.
 		 * The arguments that are passed to the callback are documented in {@link #subscribe}.
 		 * 
 		 * @protected
-		 * @param {jqGui.Component} component The Component that fired the event.
+		 * @param {jqg.Component} component The Component that fired the event.
 		 * @param {String} eventName The event name that was fired.
 		 * @param {Mixed[]} fireEventArgs The arguments provided to the original {@link Observable#fireEvent fireEvent} call.
 		 *   This does not include the event name.
@@ -129,11 +129,11 @@ define( [
 		
 		
 		/**
-		 * Patches Observable's {@link Observable#fireEvent fireEvent} method on {@link jqGui.Component Component's} prototype, using
+		 * Patches Observable's {@link Observable#fireEvent fireEvent} method on {@link jqg.Component Component's} prototype, using
 		 * an interceptor function which provides the hook to be able to listen for all Component events.
 		 * 
 		 * Without this, we would need to subscribe an 'all' event listener to every instantiated component, and then remove that 
-		 * listener when the components are {@link jqGui.Component#method-destroy destroyed}. This would just be extra processing 
+		 * listener when the components are {@link jqg.Component#method-destroy destroyed}. This would just be extra processing 
 		 * and memory usage, when this method is much simpler.
 		 * 
 		 * This method will only be executed once. Once the interceptor method has been placed, it does not need to be added again.

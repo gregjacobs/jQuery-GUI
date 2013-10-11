@@ -2,32 +2,32 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqGui/ComponentManager',
-	'jqGui/button/Button',
-	'jqGui/template/LoDash'
+	'jqg/ComponentManager',
+	'jqg/button/Button',
+	'jqg/template/LoDash'
 ], function( jQuery, _, ComponentManager, Button, LoDashTpl ) {
 
 	/**
-	 * @class jqGui.tab.Tab
-	 * @extends jqGui.button.Button
+	 * @class jqg.tab.Tab
+	 * @extends jqg.button.Button
 	 * @alias type.tab
 	 *
-	 * A specialized button used as the tabs of a {@link jqGui.tab.Panel TabPanel}.
+	 * A specialized button used as the tabs of a {@link jqg.tab.Panel TabPanel}.
 	 */
 	var Tab = Button.extend( {
 		
 		/**
-		 * @cfg {jqGui.panel.Panel} correspondingPanel (required)
+		 * @cfg {jqg.panel.Panel} correspondingPanel (required)
 		 * 
 		 * The Panel that this tab has been created for, and corresponds to. The Panel is a child item of the parent
-		 * {@link jqGui.tab.Panel TabPanel}, and is needed to map the Tab to the Panel it shows.
+		 * {@link jqg.tab.Panel TabPanel}, and is needed to map the Tab to the Panel it shows.
 		 */
 		
 		/**
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqGui-tabPanel-tab',
+		componentCls : 'jqg-tabPanel-tab',
 		
 		
 		/**
@@ -35,7 +35,7 @@ define( [
 		 * @property {Boolean} active
 		 * 
 		 * Flag which is set to `true` when this is the active Tab. The active Tab is the one whose {@link #correspondingPanel}
-		 * is the one shown in the parent {@link jqGui.tab.Panel TabPanel}.
+		 * is the one shown in the parent {@link jqg.tab.Panel TabPanel}.
 		 */
 		active : false,
 		
@@ -53,9 +53,9 @@ define( [
 		
 		
 		/**
-		 * Retrieves the {@link jqGui.panel.Panel Panel} that this Tab corresponds to in the parent {@link jqGui.tab.Panel TabPanel}.
+		 * Retrieves the {@link jqg.panel.Panel Panel} that this Tab corresponds to in the parent {@link jqg.tab.Panel TabPanel}.
 		 * 
-		 * @return {jqGui.panel.Panel}
+		 * @return {jqg.panel.Panel}
 		 */
 		getCorrespondingPanel : function() {
 			return this.correspondingPanel;
@@ -64,7 +64,7 @@ define( [
 		
 		/**
 		 * Sets the tab as the "active" tab. The active Tab is the one whose {@link #correspondingPanel}
-		 * is the one shown in the parent {@link jqGui.tab.Panel TabPanel}.
+		 * is the one shown in the parent {@link jqg.tab.Panel TabPanel}.
 		 * 
 		 * @chainable
 		 */
@@ -80,7 +80,7 @@ define( [
 		
 		/**
 		 * Sets the tab as an "inactive" tab. This is for when the {@link #correspondingPanel} is made invisible
-		 * in the parent {@link jqGui.tab.Panel TabPanel}.
+		 * in the parent {@link jqg.tab.Panel TabPanel}.
 		 * 
 		 * @chainable
 		 */
@@ -96,7 +96,7 @@ define( [
 		
 		/**
 		 * Determines if the tab is the "active" tab. The active Tab is the one whose {@link #correspondingPanel}
-		 * is the one shown in the parent {@link jqGui.tab.Panel TabPanel}.
+		 * is the one shown in the parent {@link jqg.tab.Panel TabPanel}.
 		 * 
 		 * @return {Boolean}
 		 */

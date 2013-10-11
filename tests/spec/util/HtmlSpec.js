@@ -1,9 +1,9 @@
 /*global define, describe, beforeEach, afterEach, it, expect */
 define( [
-	'jqGui/util/Html'
+	'jqg/util/Html'
 ], function( Html ) {
 
-	describe( 'jqGui.util.Html', function() {
+	describe( 'jqg.util.Html', function() {
 		
 		describe( 'decode()', function() {
 			

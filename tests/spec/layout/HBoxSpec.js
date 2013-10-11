@@ -3,7 +3,7 @@ define( [
 	'spec/layout/HBoxFixture'
 ], function( HBoxLayoutFixture ) {
 	
-	describe( 'jqGui.layout.HBox', function() {
+	describe( 'jqg.layout.HBox', function() {
 		
 		describe( "Test doLayout()", function() {
 			var fixture;

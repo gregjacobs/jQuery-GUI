@@ -2,11 +2,11 @@
 define( [
 	'lodash',
 	'Class',
-	'jqGui/JqGui'
+	'jqg/JqGui'
 ], function( _, Class, JqGui ) {
 	
 	/**
-	 * @class jqGui.util.ModelBindable
+	 * @class jqg.util.ModelBindable
 	 * @extends Object
 	 * 
 	 * This class is intended to be used as a mixin. It allows any class that it is mixed into (the "target" class in these docs) to have 
@@ -21,11 +21,11 @@ define( [
 	 * The target class may also implement the {@link #onModelBind} method, to detect and handle when a new {@link data.Model} has
 	 * been bound, and/or when the currently-bound model has been unbound.
 	 * 
-	 * Here is an example of mixing this class into a {@link jqGui.Component Component}, to make the Component data-bound to a Model:
+	 * Here is an example of mixing this class into a {@link jqg.Component Component}, to make the Component data-bound to a Model:
 	 * 
 	 *     define( [
-	 *         'jqGui/Component',
-	 *         'jqGui/util/ModelBindable'
+	 *         'jqg/Component',
+	 *         'jqg/util/ModelBindable'
 	 *     ], function( Component, ModelBindable ) {
 	 *         
 	 *         var MyBindableComponent = Component.extend( {
@@ -221,7 +221,7 @@ define( [
 		 * 
 		 *     require( [
 		 *         'Class',
-		 *         'jqGui/util/ModelBindable'
+		 *         'jqg/util/ModelBindable'
 		 *     ], function( Class, ModelBindable ) {
 		 *         
 		 *         var MyBindableClass = Class.create( {

@@ -1,9 +1,9 @@
 /*global define, describe, beforeEach, afterEach, it, expect */
 define( [
-	'jqGui/window/Window'
+	'jqg/window/Window'
 ], function( Window ) {
 	
-	describe( 'jqGui.window.Window', function() {
+	describe( 'jqg.window.Window', function() {
 		
 		describe( "sanity", function() {
 			

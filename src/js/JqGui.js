@@ -14,14 +14,14 @@ define( [
 ], function( Class, jQuery, _ ) {
 
 	/**
-	 * @class jqGui.JqGui
+	 * @class jqg.JqGui
 	 * @singleton
 	 * 
 	 * Main singleton class of the jQuery-GUI library, with a few base utility functions. 
 	 * 
-	 * This class can be included in implementations by using the RequireJS path of 'jqGui/JqGui'. Ex:
+	 * This class can be included in implementations by using the RequireJS path of 'jqg/JqGui'. Ex:
 	 * 
-	 *     require( [ 'jqGui/JqGui' ], function( JqGui ) {
+	 *     require( [ 'jqg/JqGui' ], function( JqGui ) {
 	 *         console.log( "This browser's scrollbar width: ", JqGui.getScrollbarWidth(), "px" );
 	 *     } );
 	 */

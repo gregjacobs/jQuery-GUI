@@ -5,21 +5,21 @@ define( [
 	'lodash',
 	'Class',
 	'Observable',
-	'jqGui/Component'
+	'jqg/Component'
 ], function( require, jQuery, _, Class, Observable, Component ) {
 	
 	/**
-	 * @class jqGui.anim.Animation
+	 * @class jqg.anim.Animation
 	 * @extends Observable
 	 * 
-	 * A class that encapsulates a single animation of a given HTMLElement, jQuery wrapped set, or {@link jqGui.Component}.
+	 * A class that encapsulates a single animation of a given HTMLElement, jQuery wrapped set, or {@link jqg.Component}.
 	 */
 	var Animation = Class.extend( Observable, {
 		
 		/**
-		 * @cfg {HTMLElement/jQuery/jqGui.Component} target (required)
+		 * @cfg {HTMLElement/jQuery/jqg.Component} target (required)
 		 * 
-		 * The target element(s) to animate. In the case of a {@link jqGui.Component}, the Component's {@link jqGui.Component#getEl getEl}
+		 * The target element(s) to animate. In the case of a {@link jqg.Component}, the Component's {@link jqg.Component#getEl getEl}
 		 * method is run to retrieve the element to animate.
 		 * 
 		 * Note that this config is not required upon instantiation of the Animation, but must be present at the time that
@@ -128,7 +128,7 @@ define( [
 				 * prevent the animation from starting.
 				 * 
 				 * @event beforeanimate
-				 * @param {jqGui.anim.Animation} animation This Animation instance.
+				 * @param {jqg.anim.Animation} animation This Animation instance.
 				 * @preventable
 				 */
 				'beforeanimate',
@@ -137,7 +137,7 @@ define( [
 				 * Fires when the animation completes.
 				 * 
 				 * @event afteranimate
-				 * @param {jqGui.anim.Animation} animation This Animation instance.
+				 * @param {jqg.anim.Animation} animation This Animation instance.
 				 */
 				'afteranimate',
 				
@@ -145,7 +145,7 @@ define( [
 				 * An alias of {@link #afteranimate}, fires when the animation completes.
 				 * 
 				 * @event complete
-				 * @param {jqGui.anim.Animation} animation This Animation instance.
+				 * @param {jqg.anim.Animation} animation This Animation instance.
 				 */
 				'complete'
 			);
@@ -156,8 +156,8 @@ define( [
 		 * Sets the {@link #target} for the Animation. This method allows it to be set after instantiation,
 		 * if the {@link #target} config was not provided.
 		 * 
-		 * @param {HTMLElement/jQuery/jqGui.Component} target The target element(s) to animate. In the case of a {@link jqGui.Component}, 
-		 *   the Component's {@link jqGui.Component#getEl getEl} method is run to retrieve the element to animate.
+		 * @param {HTMLElement/jQuery/jqg.Component} target The target element(s) to animate. In the case of a {@link jqg.Component}, 
+		 *   the Component's {@link jqg.Component#getEl getEl} method is run to retrieve the element to animate.
 		 * @chainable
 		 */
 		setTarget : function( target ) {
@@ -183,7 +183,7 @@ define( [
 			// Make sure there is a 'target' config, and normalize it if need be
 			var target = this.target;
 			if( target ) {
-				if( target instanceof require( 'jqGui/Component' ) ) {   // need to require() jqGui.Component here, because it is a circular dependency
+				if( target instanceof require( 'jqg/Component' ) ) {   // need to require() jqg.Component here, because it is a circular dependency
 					$target = jQuery( target.getEl() );
 				} else {
 					$target = jQuery( target );
@@ -210,10 +210,10 @@ define( [
 			// <debug>
 			// Make sure there is a target element, and either a 'to' config or an 'effect' config
 			if( !$target ) {
-				throw new Error( "jqGui.anim.Animation.start(): Error. No `target` config provided" );
+				throw new Error( "jqg.anim.Animation.start(): Error. No `target` config provided" );
 			}
 			if( !to && !effect ) {
-				throw new Error( "jqGui.anim.Animation.start(): Error. No `to` or `effect` config provided" );
+				throw new Error( "jqg.anim.Animation.start(): Error. No `to` or `effect` config provided" );
 			}
 			// </debug>
 			

@@ -2,11 +2,11 @@
 define( [
 	'lodash',
 	'Class',
-	'jqGui/JqGui'
+	'jqg/JqGui'
 ], function( _, Class, JqGui ) {
 	
 	/**
-	 * @class jqGui.util.CollectionBindable
+	 * @class jqg.util.CollectionBindable
 	 * @extends Object
 	 * 
 	 * This class is intended to be used as a mixin. It allows any class that it is mixed into (the "target" class in these docs) to have 
@@ -21,11 +21,11 @@ define( [
 	 * The target class may also implement the {@link #onCollectionBind} method, to detect and handle when a new {@link data.Collection} has
 	 * been bound, and/or when the currently-bound collection has been unbound.
 	 * 
-	 * Here is an example of mixing this class into a {@link jqGui.Component Component}, to make the Component data-bound to a Collection:
+	 * Here is an example of mixing this class into a {@link jqg.Component Component}, to make the Component data-bound to a Collection:
 	 * 
 	 *     define( [
-	 *         'jqGui/Component',
-	 *         'jqGui/util/CollectionBindable'
+	 *         'jqg/Component',
+	 *         'jqg/util/CollectionBindable'
 	 *     ], function( Component, CollectionBindable ) {
 	 *         
 	 *         var MyBindableComponent = Component.extend( {
@@ -217,7 +217,7 @@ define( [
 		 * 
 		 *     require( [
 		 *         'Class',
-		 *         'jqGui/util/CollectionBindable'
+		 *         'jqg/util/CollectionBindable'
 		 *     ], function( Class, CollectionBindable ) {
 		 *         
 		 *         var MyBindableClass = Class.create( {
