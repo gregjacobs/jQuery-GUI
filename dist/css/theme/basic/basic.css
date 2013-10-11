@@ -949,23 +949,18 @@
   text-decoration: none;
 }
 
-/* line 3, ../../../../src/css/theme/basic/form/field/_Text.scss */
-.jqGui-form-field-text .jqGui-form-field-inputContainer {
-  border: 1px solid #CCC;
+/* line 1, ../../../../src/css/theme/basic/form/field/_Field.scss */
+.jqGui-form-field-inputContainer {
+  border: 1px solid #3baae3;
 }
 
-/* line 9, ../../../../src/css/theme/basic/form/field/_Text.scss */
+/* line 5, ../../../../src/css/theme/basic/form/field/_Text.scss */
 .jqGui-form-field-text-emptyText, .jqGui-form-field-textarea-emptyText {
   font-size: 14px;
   color: #AAA;
 }
 
-/* line 3, ../../../../src/css/theme/basic/form/field/_TextArea.scss */
-.jqGui-form-field-textarea .jqGui-form-field-inputContainer {
-  border: 1px solid #C6C6C6;
-}
-
-/* line 9, ../../../../src/css/theme/basic/form/field/_TextArea.scss */
+/* line 6, ../../../../src/css/theme/basic/form/field/_TextArea.scss */
 .jqGui-form-field-textarea-input {
   resize: none;
 }
