@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Dropdown Field Test</title>
+
+	<link rel="stylesheet" href="../../../../dist/css/base/base.css" />
+	<link rel="stylesheet" href="../../../../dist/css/theme/basic/basic.css" />
+
+	<script type="text/javascript" src="../../../../bower_components/requirejs/require.js"></script>
+	<script type="text/javascript">
+		require.config( {
+			baseUrl : '../../../../',
+			
+			paths : {
+				// General dependencies
+				'jquery'     : 'bower_components/jquery/jquery',
+				'jquery-ui'  : 'bower_components/jquery-ui-amd/jquery-ui-1.10.0/jqueryui',
+				'lodash'     : 'bower_components/lodash/dist/lodash.compat',
+				'Class'      : 'bower_components/Class-js/dist/Class',
+				'Observable' : 'bower_components/Observable-js/dist/Observable',
+				'data'       : 'bower_components/Data-js/src',
+				
+				// jQuery-GUI Library
+				'jqGui' : 'src/js'
+			}
+		} );
+		
+		
+		require( [
+			'jquery',
+			'jqGui/form/field/Dropdown'
+		], function( $, Dropdown ) {
+			$( document ).ready( function() {
+				
+				var dropdown = new Dropdown( {
+					renderTo : 'body',
+					options  : [ { text: "Opt1", value: "opt1" }, { text: "Opt2", value: "opt2" }, { text: "Opt3", value: "opt3" } ]
+				} );
+				jQuery( '<br><br>' ).appendTo( 'body' );
+				
+			} );
+		} );
+	</script>
+
+</head>
+
+<body>
+</body>
+</html>

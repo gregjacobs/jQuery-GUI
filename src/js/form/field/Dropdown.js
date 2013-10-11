@@ -508,13 +508,13 @@ define( [
 			this.$optionsMenu.show();
 			
 			// Size the width of the menu based on the width of the dropdown's elements
-			this.$optionsMenu.width( this.$selectText.width() );
+			this.$optionsMenu.width( this.$inputContainerEl.innerWidth() );
 			
 			// Position the menu against the dropdown's elements
 			this.$optionsMenu.position( {
-				my : 'left center',
-				at : 'left center',
-				of : this.$selectText,
+				my : 'left top',
+				at : 'left bottom',
+				of : this.$inputContainerEl,
 				collision : this.menuCollisionStrategy
 			} );
 		},
