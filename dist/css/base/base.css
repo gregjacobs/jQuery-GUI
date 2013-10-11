@@ -170,7 +170,7 @@ iframe.jqGui-form-field-dropdown-shim {
 }
 
 /* line 22, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqGui-form-field-dropdown-openButton {
+.jqGui-form-field-dropdown-expandButton {
   position: absolute;
   top: 0;
   right: 0;

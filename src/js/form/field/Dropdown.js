@@ -91,7 +91,7 @@ define( [
 					'<div id="<%= elId %>-selectText" class="<%= componentCls %>-selectText">',
 						'<div class="<%= optionClass %>" style="<%= optionStyles %>"><%= optionText %></div>',
 					'</div>',
-					'<div id="<%= elId %>-openButton" class="<%= componentCls %>-openButton" />',
+					'<div id="<%= elId %>-expandButton" class="<%= componentCls %>-expandButton" />',
 				'</div>'
 			] ),
 			
@@ -210,12 +210,12 @@ define( [
 			this.$inputEl = jQuery( '#' + inputId );
 			this.$dropdownContainer = jQuery( '#' + elId + '-dropdownContainer' );
 			this.$selectText = jQuery( '#' + elId + '-selectText' );
-			this.$openButton = jQuery( '#' + elId + '-openButton' );
+			this.$expandButton = jQuery( '#' + elId + '-expandButton' );
 			
 			// Apply a click handler to the dropdown's "select text" and open button, for showing the dropdownMenu
 			var onDropdownClickDelegate = _.bind( this.onDropdownClick, this );
 			this.$selectText.click( onDropdownClickDelegate );
-			this.$openButton.click( onDropdownClickDelegate );
+			this.$expandButton.click( onDropdownClickDelegate );
 			
 			
 			// Create the dropdown menu, which is a <ul> element that holds the dropdown list. This is appended to the document body.

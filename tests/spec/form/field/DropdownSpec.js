@@ -186,7 +186,7 @@ define( [
 				expect( field.$inputEl.length ).toBe( 1 );
 				expect( field.$dropdownContainer.length ).toBe( 1 );
 				expect( field.$selectText.length ).toBe( 1 );
-				expect( field.$openButton.length ).toBe( 1 );
+				expect( field.$expandButton.length ).toBe( 1 );
 				
 				field.destroy();  // clean up
 			} );
