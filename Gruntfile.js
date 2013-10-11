@@ -7,7 +7,7 @@ module.exports = function( grunt ) {
 	// Register main tasks
 	grunt.registerTask( 'default', "Default task runs JSHint and then builds the project.", [ 'build' ] );
 	grunt.registerTask( 'build', "Builds the distribution JavaScript files, which will be located in dist/.",
-		[ 'jshint', 'requirejs:compile', 'copy:afterRequirejs', 'concat:afterRequirejs', 'uglify:dist' ] );
+		[ 'jshint', 'requirejs:compile', 'concat:afterRequirejs', 'uglify:dist' ] );
 	grunt.registerTask( 'doc', "Builds the JavaScript documentation.", [ 'build', 'compileDocs' ] );
 	
 	
@@ -70,14 +70,14 @@ module.exports = function( grunt ) {
 					// Note: Paths relative to the baseUrl, `src/js`. This is so that when the files
 					// are optimized, they are defined in the output file as 'jqGui/Xyz', instead of 'src/jqGui/Xyz'.
 					paths : {
-						'jquery'             : 'empty:',
-						'lodash'             : 'empty:',
-						'jquery-ui.position' : 'empty:',
-						'Class'              : 'empty:',
-						'Observable'         : 'empty:',
-						'data'               : 'empty:',
+						'jquery'     : 'empty:',
+						'jquery-ui'  : 'empty:',
+						'lodash'     : 'empty:',
+						'Class'      : 'empty:',
+						'Observable' : 'empty:',
+						'data'       : 'empty:',
 						
-						'jqGui'              : '.'
+						'jqGui'      : '.'
 					},
 					
 					logLevel: 2,       // 0=trace, 1=info, 2=warn, 3=error, 4=silent
@@ -87,15 +87,6 @@ module.exports = function( grunt ) {
 					insertRequire : allSrcFiles   // add a require() statement at the end of the build file for the library's
 					                              // files, so that its classes can be instantiated lazily based on their `type` property
 				}
-			}
-		},
-		
-		
-		copy : {
-			'afterRequirejs' : {
-				files : [
-					{ src : [ 'vendor/jquery-ui.position/**' ], dest: 'dist/' }
-				]
 			}
 		},
 		

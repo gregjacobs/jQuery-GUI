@@ -7,7 +7,7 @@ define( [
 	'ui/anim/Animation',
 	'ui/Component',
 	'ui/Container',
-	'jquery-ui.position'  // jQuery UI's `position` plugin
+	'jquery-ui/position'  // jQuery UI's `position` plugin
 ], function( jQuery, _, Class, UI, Animation, Component, Container ) {
 	
 	/**

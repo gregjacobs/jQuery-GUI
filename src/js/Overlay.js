@@ -7,7 +7,7 @@ define( [
 	'jqGui/anim/Animation',
 	'jqGui/Component',
 	'jqGui/panel/Panel',
-	'jquery-ui.position'  // jQuery UI's `position` plugin
+	'jquery-ui/position'  // jQuery UI's `position` plugin
 ], function( jQuery, _, Class, JqGui, Animation, Component, Panel ) {
 	
 	/**

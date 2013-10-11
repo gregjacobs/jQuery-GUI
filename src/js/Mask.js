@@ -5,7 +5,7 @@ define( [
 	'Class',
 	'jqGui/template/Template',
 	'jqGui/template/LoDash',
-	'jquery-ui.position'  // jQuery UI's `position` plugin
+	'jquery-ui/position'  // jQuery UI's `position` plugin
 ], 
 function( jQuery, _, Class, Template, LoDashTpl ) {
 	
