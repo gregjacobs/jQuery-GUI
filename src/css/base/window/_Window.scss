@@ -1,13 +1,13 @@
-.jqg-window {
-  @extend .jqg-overlay;
+.gui-window {
+  @extend .gui-overlay;
 }
 
-.jqg-window-header {}
-.jqg-window-header-innerCt {}
-.jqg-window-header-title { float: left; }
-.jqg-window-header-toolButtons { float: right; }
+.gui-window-header {}
+.gui-window-header-innerCt {}
+.gui-window-header-title { float: left; }
+.gui-window-header-toolButtons { float: right; }
 
-.jqg-window-body {}
+.gui-window-body {}
 
 
-.jqg-window-modalMask { position: absolute; top: 0; left: 0; }
+.gui-window-modalMask { position: absolute; top: 0; left: 0; }

@@ -1,9 +1,9 @@
 /*global define, describe, beforeEach, afterEach, it, expect */
 define( [
-	'jqg/util/OptionsStore'
+	'gui/util/OptionsStore'
 ], function( OptionsStore ) {
 	
-	describe( 'jqg.util.OptionsStore', function() {
+	describe( 'gui.util.OptionsStore', function() {
 		
 		describe( "constructor", function() {
 			

@@ -25,17 +25,17 @@
 				'data'       : 'bower_components/Data-js/src',
 				
 				// jQuery-GUI Library
-				'jqg' : 'src/js'
+				'gui' : 'src/js'
 			}
 		} );
 		
 		
 		require( [
 			'jquery',
-			'jqg/panel/Panel',
+			'gui/panel/Panel',
 			
-			'jqg/Anchor',
-			'jqg/button/Button'
+			'gui/Anchor',
+			'gui/button/Button'
 		], function( $, Panel ) {
 			$( document ).ready( function() {
 				

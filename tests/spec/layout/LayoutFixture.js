@@ -3,16 +3,16 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'jqg/Component',
-	'jqg/Container',
-	'jqg/layout/Layout'
+	'gui/Component',
+	'gui/Container',
+	'gui/layout/Layout'
 ], function( jQuery, _, Class, Component, Container, Layout ) {
 	
 	/**
 	 * @class spec.layout.LayoutFixture
 	 * @extends Object
 	 * 
-	 * Fixture class for the base class {@link jqg.layout.Layout} tests.
+	 * Fixture class for the base class {@link gui.layout.Layout} tests.
 	 * 
 	 * This class creates the fixture for the tests upon construction. It is usually created as part
 	 * of a `beforeEach()` method. All parts of the fixture which are needed for tests are available via 
@@ -48,14 +48,14 @@ define( [
 		
 		/**
 		 * @protected
-		 * @property {jqg.Container} container
+		 * @property {gui.Container} container
 		 * 
-		 * A mock {@link jqg.Container} instance.
+		 * A mock {@link gui.Container} instance.
 		 */
 		
 		/**
 		 * @protected
-		 * @property {jqg.layout.Layout} layout
+		 * @property {gui.layout.Layout} layout
 		 * 
 		 * The layout created via {@link #createLayout} for the TestCase subclass, and configured with the
 		 * mock {@link #container}.
@@ -97,7 +97,7 @@ define( [
 		 * This method must be overridden in each TestCase subclass.
 		 * 
 		 * @method createLayout
-		 * @return {jqg.layout.Layout} A concrete Layout subclass for use with the tests.
+		 * @return {gui.layout.Layout} A concrete Layout subclass for use with the tests.
 		 */
 		createLayout : function() {
 			var LayoutSubclass = Class.extend( Layout, {} );  // concrete subclass
@@ -107,11 +107,11 @@ define( [
 		
 		/**
 		 * Utility method for tests to be able to create mock child components with some default implementations
-		 * for common methods (such as {@link jqg.Component#getPadding}, {@link jqg.Component#getMargin}, and {@link jqg.Component#getBorderWidth}.
+		 * for common methods (such as {@link gui.Component#getPadding}, {@link gui.Component#getMargin}, and {@link gui.Component#getBorderWidth}.
 		 * 
 		 * @method createChildComponents
 		 * @param {Number} howMany How many components to create.
-		 * @return {jqg.Component[]} An array of mock {@link jqg.Component components}.
+		 * @return {gui.Component[]} An array of mock {@link gui.Component components}.
 		 */
 		createChildComponents : function( howMany ) {
 			var childComponents = [],
@@ -140,7 +140,7 @@ define( [
 		 * Retrieves the Fixture's {@link #container}, which is the Container that the {@link #layout}
 		 * is attached to.
 		 * 
-		 * @return {jqg.Container}
+		 * @return {gui.Container}
 		 */
 		getContainer : function() {
 			return this.container;
@@ -151,7 +151,7 @@ define( [
 		 * Retrieves the Fixture's {@link #layout} (which is created by {@link #createLayout}).
 		 * This layout is attached to the fixture's {@link #container}.
 		 * 
-		 * @return {jqg.layout.Layout}
+		 * @return {gui.layout.Layout}
 		 */
 		getLayout : function() {
 			return this.layout;

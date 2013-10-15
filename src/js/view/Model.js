@@ -2,22 +2,22 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/Component',
-	'jqg/util/ModelBindable'
+	'gui/ComponentManager',
+	'gui/Component',
+	'gui/util/ModelBindable'
 ], function( jQuery, _, ComponentManager, Component, ModelBindable ) {
 	
 	/**
-	 * @class jqg.view.Model
-	 * @extends jqg.Component
-	 * @mixins jqg.util.ModelBindable
+	 * @class gui.view.Model
+	 * @extends gui.Component
+	 * @mixins gui.util.ModelBindable
 	 * @alias type.modelview
 	 * 
 	 * A view of the data in a single {@link data.Model}. The view uses the {@link #tpl} config, which 
 	 * is automatically passed the {@link #model} to populate the template. When any of the {@link #model model's} 
 	 * attributes change, the Model View is automatically refreshed to reflect the change.  
 	 * 
-	 * This view is similar to the {@link jqg.view.Collection Collection View}, which shows a {@link data.Collection Collection}
+	 * This view is similar to the {@link gui.view.Collection Collection View}, which shows a {@link data.Collection Collection}
 	 * of {@link data.Model Models} instead of a single one.  
 	 */
 	var ModelView = Component.extend( {
@@ -34,14 +34,14 @@ define( [
 		 */
 		
 		/**
-		 * @cfg {String/String[]/Function/jqg.template.Template} tpl (required)
+		 * @cfg {String/String[]/Function/gui.template.Template} tpl (required)
 		 * 
 		 * The template which will be used to populate the Model View. By default, this template will be provided
 		 * the variable `model`, which is the {@link #model} instance bound to this Model View. The name of the 
 		 * variable provided to the {@link #tpl} that holds the models may be configured using the {@link #modelVar} config.
 		 * 
 		 * For example, if we had a "User" model, which had fields `id`, `firstName`, and `lastName`, then we
-		 * might want to display this information in a template as such: (using a {@link jqg.template.LoDash Lo-Dash template}
+		 * might want to display this information in a template as such: (using a {@link gui.template.LoDash Lo-Dash template}
 		 * in this case)
 		 * 
 		 *     tpl : new LoDashTpl( [
@@ -65,8 +65,8 @@ define( [
 		 * a subset of the attributes in the {@link data.Model Model} are needed for the template, it would be more efficient 
 		 * to only retrieve those particular attributes using {@link data.Model#get}.
 		 * 
-		 * For more information on templates themselves, see the {@link jqg.Component#tpl tpl} config in the superclass, 
-		 * {@link jqg.Component Component}.
+		 * For more information on templates themselves, see the {@link gui.Component#tpl tpl} config in the superclass, 
+		 * {@link gui.Component Component}.
 		 */
 		
 		/**
@@ -77,7 +77,7 @@ define( [
 		 * 
 		 * This may be used to provide a variable name that makes more sense inside the template for the type of model 
 		 * being used. For example, if the Model View is working with a "User" model, one might want to
-		 * set this config to `user`. Example: (using a {@link jqg.template.LoDash Lo-Dash template} in this case)
+		 * set this config to `user`. Example: (using a {@link gui.template.LoDash Lo-Dash template} in this case)
 		 * 
 		 *     modelVar : 'user',
 		 *     tpl : new LoDashTpl( [
@@ -143,7 +143,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqg.util.ModelBindable} mixin method, which retrieves an Object (map) of the listeners that 
+		 * Implementation of {@link gui.util.ModelBindable} mixin method, which retrieves an Object (map) of the listeners that 
 		 * should be set up on the {@link #model}, when a {@link data.Model} is bound to the view. This method may be overridden 
 		 * in a subclass to add extra events that should be listened for.
 		 * 
@@ -163,7 +163,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqg.util.ModelBindable} mixin method. Handles when a new {@link #model} has been 
+		 * Implementation of {@link gui.util.ModelBindable} mixin method. Handles when a new {@link #model} has been 
 		 * bound to the view.
 		 * 
 		 * @protected
@@ -225,7 +225,7 @@ define( [
 		
 		
 		/**
-		 * Retrieves the data that will be {@link jqg.template.Template#apply applied} to the {@link #tpl} upon 
+		 * Retrieves the data that will be {@link gui.template.Template#apply applied} to the {@link #tpl} upon 
 		 * {@link #refresh}. 
 		 * 
 		 * This method may be overridden by subclasses to add additional properties which will be provided
@@ -233,7 +233,7 @@ define( [
 		 * 
 		 * @protected
 		 * @param {data.Model} model The model that is to be rendered by the {@link #tpl}.
-		 * @return {Object} An Object (map) of the properties which will be {@link jqg.template.Template#apply applied}
+		 * @return {Object} An Object (map) of the properties which will be {@link gui.template.Template#apply applied}
 		 *   to the {@link #tpl}, to produce the output.
 		 */
 		prepareTplData : function( model ) {

@@ -1,6 +1,6 @@
 /*global define */
 define( [
-	'jqg/layout/HBox',
+	'gui/layout/HBox',
 	'spec/layout/LayoutFixture'
 ], function( HBoxLayout, LayoutFixture ) {
 	
@@ -8,7 +8,7 @@ define( [
 	 * @class spec.layout.HBoxFixture
 	 * @extends spec.layout.LayoutFixture
 	 * 
-	 * Fixture class for the {@link jqg.layout.HBox HBox} layout's tests.
+	 * Fixture class for the {@link gui.layout.HBox HBox} layout's tests.
 	 */
 	var HBoxLayoutFixture = LayoutFixture.extend( {		
 		
@@ -23,9 +23,9 @@ define( [
 		
 		
 		/**
-		 * Overridden method to create the {@link jqg.layout.HBox HBox} layout.
+		 * Overridden method to create the {@link gui.layout.HBox HBox} layout.
 		 * 
-		 * @return {jqg.layout.HBox}
+		 * @return {gui.layout.HBox}
 		 */
 		createLayout : function() {
 			return new HBoxLayout();

@@ -6,11 +6,11 @@ define( [
 	
 	/**
 	 * @abstract
-	 * @class jqg.template.Template
+	 * @class gui.template.Template
 	 * @extends Object
 	 * 
 	 * Base class and interface for template implementations. For the default concrete Template implementation used
-	 * by the framework, see {@link jqg.template.LoDash}.
+	 * by the framework, see {@link gui.template.LoDash}.
 	 */
 	var Template = Class.extend( Object, {
 		abstractClass : true,

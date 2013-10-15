@@ -25,24 +25,24 @@
 				'data'       : 'bower_components/Data-js/src',
 				
 				// jQuery-GUI Library
-				'jqg' : 'src/js'
+				'gui' : 'src/js'
 			}
 		} );
 		
 		var win;
 		require( [
 			'jquery',
-			'jqg/panel/Panel',
-			'jqg/Overlay',
-			'jqg/button/Button',
-			'jqg/window/Window',
+			'gui/panel/Panel',
+			'gui/Overlay',
+			'gui/button/Button',
+			'gui/window/Window',
 			'data/Collection',
 			
 			// Dependencies used by type name
-			'jqg/form/field/Text',
-			'jqg/form/field/TextArea',
-			'jqg/layout/HBox',
-			'jqg/layout/VBox'
+			'gui/form/field/Text',
+			'gui/form/field/TextArea',
+			'gui/layout/HBox',
+			'gui/layout/VBox'
 		], function( $, Panel, Overlay, Button, Window, Collection ) {
 			$( document ).ready( function() {
 				$( 'body' ).html( "Hello, Playground!" );

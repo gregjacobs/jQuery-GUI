@@ -1,4 +1,4 @@
-.jqg-button {
+.gui-button {
 	display: inline-block;
 	position: relative;
 	margin: 0;
@@ -12,15 +12,15 @@
 }
 
 /* General Button Styles */
-.jqg-button-hiddenEl { display: none !important; }
+.gui-button-hiddenEl { display: none !important; }
 
 /* Icons */
-.jqg-button-icon { display: inline-block; }
-.jqg-button-icon-left {}
-.jqg-button-icon-right {}
+.gui-button-icon { display: inline-block; }
+.gui-button-icon-left {}
+.gui-button-icon-right {}
 
 /* button text element */
-.jqg-button-text {
+.gui-button-text {
 	display: inline-block;
 	line-height: normal;
 }

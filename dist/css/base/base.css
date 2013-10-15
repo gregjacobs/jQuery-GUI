@@ -1,5 +1,5 @@
 /* line 1, ../../../src/css/base/_Overlay.scss */
-.jqg-overlay, .jqg-window {
+.gui-overlay, .gui-window {
   position: absolute;
   top: 0;
   left: 0;
@@ -7,7 +7,7 @@
 }
 
 /* line 1, ../../../src/css/base/_Mask.scss */
-.jqg-mask-overlay {
+.gui-mask-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -18,7 +18,7 @@
 }
 
 /* line 11, ../../../src/css/base/_Mask.scss */
-.jqg-mask-content {
+.gui-mask-content {
   position: absolute;
   top: 0;
   left: 0;
@@ -27,49 +27,49 @@
   display: none;
 }
 /* line 19, ../../../src/css/base/_Mask.scss */
-.jqg-mask-content.jqg-mask-spinner-visible {
+.gui-mask-content.gui-mask-spinner-visible {
   display: block;
 }
 /* line 20, ../../../src/css/base/_Mask.scss */
-.jqg-mask-content.jqg-mask-msg-visible {
+.gui-mask-content.gui-mask-msg-visible {
   display: block;
 }
 
 /* line 23, ../../../src/css/base/_Mask.scss */
-.jqg-mask-spinner {
+.gui-mask-spinner {
   display: none;
   vertical-align: middle;
 }
 /* line 27, ../../../src/css/base/_Mask.scss */
-.jqg-mask-spinner-visible .jqg-mask-spinner {
+.gui-mask-spinner-visible .gui-mask-spinner {
   display: inline-block;
 }
 
 /* line 30, ../../../src/css/base/_Mask.scss */
-.jqg-mask-msg {
+.gui-mask-msg {
   display: none;
   vertical-align: middle;
 }
 /* line 34, ../../../src/css/base/_Mask.scss */
-.jqg-mask-msg-visible .jqg-mask-msg {
+.gui-mask-msg-visible .gui-mask-msg {
   display: inline-block;
 }
 
 /* For elements that are masked, they should have their overflow hidden to remove scroll bars */
 /* Note: the uses of !important are necessary to override more specific css classes! */
 /* line 39, ../../../src/css/base/_Mask.scss */
-.jqg-masked {
+.gui-masked {
   overflow: hidden !important;
 }
 
 /* For elements that are masked, they need a positioning context. This will only be added if they don't have a positioning context. */
 /* line 44, ../../../src/css/base/_Mask.scss */
-.jqg-masked-relative {
+.gui-masked-relative {
   position: relative !important;
 }
 
 /* line 1, ../../../src/css/base/button/_Button.scss */
-.jqg-button {
+.gui-button {
   display: inline-block;
   position: relative;
   margin: 0;
@@ -85,66 +85,66 @@
 
 /* General Button Styles */
 /* line 15, ../../../src/css/base/button/_Button.scss */
-.jqg-button-hiddenEl {
+.gui-button-hiddenEl {
   display: none !important;
 }
 
 /* Icons */
 /* line 18, ../../../src/css/base/button/_Button.scss */
-.jqg-button-icon {
+.gui-button-icon {
   display: inline-block;
 }
 
 /* button text element */
 /* line 23, ../../../src/css/base/button/_Button.scss */
-.jqg-button-text {
+.gui-button-text {
   display: inline-block;
   line-height: normal;
 }
 
 /* line 1, ../../../src/css/base/form/field/_Field.scss */
-.jqg-form-field {
+.gui-form-field {
   margin: 0;
   padding: 0;
   width: 100%;
   border-collapse: collapse;
 }
 /* line 7, ../../../src/css/base/form/field/_Field.scss */
-.jqg-form-field tbody, .jqg-form-field tr, .jqg-form-field th {
+.gui-form-field tbody, .gui-form-field tr, .gui-form-field th {
   margin: 0;
   padding: 0;
 }
 /* line 9, ../../../src/css/base/form/field/_Field.scss */
-.jqg-form-field.jqg-form-field-leftLabel {
+.gui-form-field.gui-form-field-leftLabel {
   table-layout: fixed;
 }
 /* line 10, ../../../src/css/base/form/field/_Field.scss */
-.jqg-form-field.jqg-form-field-topLabel {
+.gui-form-field.gui-form-field-topLabel {
   table-layout: auto;
 }
 
 /* line 14, ../../../src/css/base/form/field/_Field.scss */
-.jqg-form-field-leftLabelCell {
+.gui-form-field-leftLabelCell {
   margin: 0;
   padding: 0;
   vertical-align: top;
 }
 
 /* line 18, ../../../src/css/base/form/field/_Field.scss */
-.jqg-form-field-inputCell {
+.gui-form-field-inputCell {
   vertical-align: top;
   width: 100%;
 }
 
 /* line 19, ../../../src/css/base/form/field/_Field.scss */
-.jqg-form-field-inputContainer {
+.gui-form-field-inputContainer {
   position: relative;
 }
 
 /* This is for the custom implementation of dropdowns, which don't use the html <select> element 
 ============================================================================================== */
 /* line 3, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqg-form-field-dropdown {
+.gui-form-field-dropdown {
   position: relative;
   left: 0px;
   top: 0px;
@@ -152,7 +152,7 @@
 
 /* For IE, need an iframe to cover certain elements */
 /* line 10, ../../../src/css/base/form/field/_Dropdown.scss */
-iframe.jqg-form-field-dropdown-shim {
+iframe.gui-form-field-dropdown-shim {
   position: absolute;
   z-index: 1;
   width: 100%;
@@ -162,7 +162,7 @@ iframe.jqg-form-field-dropdown-shim {
 
 /* The box that shows the selected option's text */
 /* line 15, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqg-form-field-dropdown-selectText {
+.gui-form-field-dropdown-selectText {
   overflow-x: hidden;
   white-space: nowrap;
   background: none transparent;
@@ -170,7 +170,7 @@ iframe.jqg-form-field-dropdown-shim {
 }
 
 /* line 22, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqg-form-field-dropdown-expandButton {
+.gui-form-field-dropdown-expandButton {
   position: absolute;
   top: 0;
   right: 0;
@@ -179,7 +179,7 @@ iframe.jqg-form-field-dropdown-shim {
 }
 
 /* line 32, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqg-form-field-dropdown-menu {
+.gui-form-field-dropdown-menu {
   position: absolute;
   list-style: none;
   display: none;
@@ -190,12 +190,12 @@ iframe.jqg-form-field-dropdown-shim {
 }
 
 /* line 42, ../../../src/css/base/form/field/_Dropdown.scss */
-.jqg-form-field-dropdown-menu-item {
+.gui-form-field-dropdown-menu-item {
   cursor: pointer;
 }
 
 /* line 3, ../../../src/css/base/form/field/_Text.scss */
-.jqg-form-field-text-input, .jqg-form-field-textarea-input {
+.gui-form-field-text-input, .gui-form-field-textarea-input {
   background: none transparent;
   border: none;
   width: 100%;
@@ -205,13 +205,13 @@ iframe.jqg-form-field-dropdown-shim {
 }
 
 /* line 11, ../../../src/css/base/form/field/_Text.scss */
-.jqg-form-field-text-input:focus, .jqg-form-field-textarea-input:focus {
+.gui-form-field-text-input:focus, .gui-form-field-textarea-input:focus {
   outline: 0;
   /* Override some user agent style sheets, like Chrome which has a 5px outline */
 }
 
 /* line 15, ../../../src/css/base/form/field/_Text.scss */
-.jqg-form-field-text-emptyText, .jqg-form-field-textarea-emptyText {
+.gui-form-field-text-emptyText, .gui-form-field-textarea-emptyText {
   position: absolute;
   top: 0;
   left: 0;
@@ -219,34 +219,34 @@ iframe.jqg-form-field-dropdown-shim {
 }
 
 /* line 2, ../../../src/css/base/layout/_Hbox.scss */
-.jqg-layout-hbox-component {
+.gui-layout-hbox-component {
   float: left;
   min-height: 1px;
 }
 
 /* line 8, ../../../src/css/base/layout/_Hbox.scss */
-.jqg-layout-hbox-clear {
+.gui-layout-hbox-clear {
   clear: both;
 }
 
 /* line 3, ../../../src/css/base/panel/_ToolButton.scss */
-.jqg-panel-toolbutton .jqg-button-text {
+.gui-panel-toolbutton .gui-button-text {
   padding: 0;
   line-height: 0;
 }
 
 /* line 7, ../../../src/css/base/window/_Window.scss */
-.jqg-window-header-title {
+.gui-window-header-title {
   float: left;
 }
 
 /* line 8, ../../../src/css/base/window/_Window.scss */
-.jqg-window-header-toolButtons {
+.gui-window-header-toolButtons {
   float: right;
 }
 
 /* line 13, ../../../src/css/base/window/_Window.scss */
-.jqg-window-modalMask {
+.gui-window-modalMask {
   position: absolute;
   top: 0;
   left: 0;
@@ -254,6 +254,6 @@ iframe.jqg-form-field-dropdown-shim {
 
 /* General Styles */
 /* line 23, ../../../src/css/base/base.scss */
-.jqg-clear {
+.gui-clear {
   clear: both;
 }

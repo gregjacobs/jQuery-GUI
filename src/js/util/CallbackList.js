@@ -5,7 +5,7 @@ define( [
 ], function( _, Class ) {
 	
 	/**
-	 * @class jqg.util.CallbackList
+	 * @class gui.util.CallbackList
 	 * @extends Object
 	 * 
 	 * Simple utility used to maintain a list of callback functions, and their associated scope objects.

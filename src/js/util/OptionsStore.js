@@ -5,14 +5,14 @@ define( [
 ], function( _, Class ) {
 	
 	/**
-	 * @class jqg.util.OptionsStore
+	 * @class gui.util.OptionsStore
 	 * @extends Object
 	 * 
 	 * Helper utility class used for making the management of text/value "options" data easy, for any classes that rely on this format 
-	 * of data. This is used as used, for example, by {@link jqg.form.field.Dropdown Dropdowns}. The purpose of this class 
+	 * of data. This is used as used, for example, by {@link gui.form.field.Dropdown Dropdowns}. The purpose of this class 
 	 * was to not duplicate functionality for the classes that use this format of data.
 	 * 
-	 * This class is currently used by {@link jqg.form.field.Dropdown} and {@link jqg.form.field.Radio}, which use it for 
+	 * This class is currently used by {@link gui.form.field.Dropdown} and {@link gui.form.field.Radio}, which use it for 
 	 * managing the options that they provide.
 	 */
 	var OptionsStore = Class.extend( Object, {

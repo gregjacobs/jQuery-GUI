@@ -2,12 +2,12 @@
 /*jshint sub: true */
 define( [
 	'Class',
-	'jqg/ComponentManager',
-	'jqg/Component',
-	'jqg/Container'
+	'gui/ComponentManager',
+	'gui/Component',
+	'gui/Container'
 ], function( Class, ComponentManager, Component, Container ) {
 	
-	describe( 'jqg.ComponentManager', function() {
+	describe( 'gui.ComponentManager', function() {
 		var componentClasses;   // for restoring the previous list of component classes that have been registered, after the tests
 		
 		
@@ -49,7 +49,7 @@ define( [
 				expect( function() {
 					ComponentManager.registerType( 'someClass', class2 );  // try to register the second class under the same "type" name. This should throw an error
 					
-				} ).toThrow( "Error: jqg.ComponentManager already has a type 'someclass'" );
+				} ).toThrow( "Error: gui.ComponentManager already has a type 'someclass'" );
 			} );
 		
 		} );
@@ -121,7 +121,7 @@ define( [
 				expect( cmp ).toBe( myComponent );  // create() did not return already-instantiated Component directly.
 			} );
 			
-			it( "should simply return an already-instantiated component, if the component is a subclass of jqg.Component", function() {
+			it( "should simply return an already-instantiated component, if the component is a subclass of gui.Component", function() {
 				// Test that subclasses of Component are returned directly
 				var MyComponentSubclass = Class.extend( Component, {
 					init : function() {}
@@ -146,7 +146,7 @@ define( [
 				expect( cmp instanceof Component ).toBe( true );  // create() did not instantiate 'someClass' via config object.
 			} );
 			
-			it( "should create the type `jqg.Container` when no 'type' config is specified in the anonymous config object", function() { 
+			it( "should create the type `gui.Container` when no 'type' config is specified in the anonymous config object", function() { 
 				ComponentManager.registerType( 'container', Container );  // need to re-register the Container class for this test.
 				
 				var cmp = ComponentManager.create( {} );

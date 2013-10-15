@@ -2,15 +2,15 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/form/field/Field',
-	'jqg/template/LoDash',
-	'jqg/util/OptionsStore'
+	'gui/ComponentManager',
+	'gui/form/field/Field',
+	'gui/template/LoDash',
+	'gui/util/OptionsStore'
 ], function( jQuery, _, ComponentManager, Field, LoDashTpl, OptionsStore ) {
 	
 	/**
-	 * @class jqg.form.field.Radio
-	 * @extends jqg.form.field.Field
+	 * @class gui.form.field.Radio
+	 * @extends gui.form.field.Field
 	 * @alias type.radio
 	 * @alias type.radiofield
 	 * 
@@ -57,7 +57,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-form-field-radio',
+		componentCls : 'gui-form-field-radio',
 		
 		
 		/**
@@ -162,7 +162,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {String} value The value of the field.
 		 */
@@ -182,7 +182,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the field.
 		 */

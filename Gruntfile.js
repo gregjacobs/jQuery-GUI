@@ -35,13 +35,13 @@ module.exports = function( grunt ) {
 	/*
 	 * Put together the list of jQuery-GUI source files, for the RequireJS optimizer "includes" list. 
 	 * 
-	 * After retrieving the list of files, prepend "jqg/", and remove their .js extensions.
+	 * After retrieving the list of files, prepend "gui/", and remove their .js extensions.
 	 * This will create us the RequireJS includes list. 
 	 * 
-	 * Ex: 'Component.js' becomes 'jqg/Component'
-	 *     'button/Button.js' becomes "jqg/button/Button'
+	 * Ex: 'Component.js' becomes 'gui/Component'
+	 *     'button/Button.js' becomes "gui/button/Button'
 	 */
-	var allSrcFiles = createRequiresList( 'src/js', 'jqg' );
+	var allSrcFiles = createRequiresList( 'src/js', 'gui' );
 	
 	
 	// Project configuration
@@ -65,10 +65,10 @@ module.exports = function( grunt ) {
 				// Example of all available options at: https://github.com/jrburke/r.js/blob/master/build/example.build.js
 				options : {
 					baseUrl: 'src/js',
-					out : "dist/js/jqg-all.js",
+					out : "dist/js/gui-all.js",
 					
 					// Note: Paths relative to the baseUrl, `src/js`. This is so that when the files
-					// are optimized, they are defined in the output file as 'jqg/Xyz', instead of 'src/jqg/Xyz'.
+					// are optimized, they are defined in the output file as 'gui/Xyz', instead of 'src/gui/Xyz'.
 					paths : {
 						'jquery'     : 'empty:',
 						'jquery-ui'  : 'empty:',
@@ -77,7 +77,7 @@ module.exports = function( grunt ) {
 						'Observable' : 'empty:',
 						'data'       : 'empty:',
 						
-						'jqg'      : '.'
+						'gui'      : '.'
 					},
 					
 					logLevel: 2,       // 0=trace, 1=info, 2=warn, 3=error, 4=silent
@@ -95,8 +95,8 @@ module.exports = function( grunt ) {
 				options : {
 					banner: banner
 				},
-				src  : [ 'dist/js/jqg-all.js' ],  // simply adding the banner
-				dest : 'dist/js/jqg-all.js'       // to the output file
+				src  : [ 'dist/js/gui-all.js' ],  // simply adding the banner
+				dest : 'dist/js/gui-all.js'       // to the output file
 			}
 		},
 		
@@ -107,7 +107,7 @@ module.exports = function( grunt ) {
 					preserveComments : 'some'  // preserve license header comments
 				},
 				files : {
-					'dist/js/jqg-all-min.js' : [ 'dist/js/jqg-all.js' ]
+					'dist/js/gui-all-min.js' : [ 'dist/js/gui-all.js' ]
 				}
 			}
 		}
@@ -188,19 +188,19 @@ module.exports = function( grunt ) {
 	 * inside it. It will then remove the '.js' suffix, and prepend the provided `prefix` library name.
 	 * 
 	 * For example, when putting together the list of Data.js source files, the arguments to this method
-	 * would be: `'src/', 'jqg'`. This will create a returned list something along the lines of this,
+	 * would be: `'src/', 'gui'`. This will create a returned list something along the lines of this,
 	 * which will be the RequireJS includes list:
 	 * 
 	 *     [
-	 *         'jqg/Component',
-	 *         'jqg/Container',
+	 *         'gui/Component',
+	 *         'gui/Container',
 	 *         ...
 	 *         
-	 *         'jqg/layout/Fit',
+	 *         'gui/layout/Fit',
 	 *         ...
 	 *     ]
 	 * 
-	 * As another point of example: "Component.js" becomes "jqg/Component" in the above output.
+	 * As another point of example: "Component.js" becomes "gui/Component" in the above output.
 	 * 
 	 * @param {String} directory
 	 * @param {String} prefix

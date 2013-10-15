@@ -2,15 +2,15 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqg/JqGui'
+	'gui/Gui'
 ],
-function( jQuery, _, JqGui ) {
+function( jQuery, _, Gui ) {
 	
 	var spacesRe = /\s+/g;
 	
 	
 	/**
-	 * @class jqg.util.Css
+	 * @class gui.util.Css
 	 * @singleton
 	 * 
 	 * General CSS manipulation/reading functionality.  Allows the dynamic modification of 
@@ -146,7 +146,7 @@ function( jQuery, _, JqGui ) {
 		updateStyleEl : function( styleEl, cssText ) {
 			var $styleEl = jQuery( styleEl );
 			
-			if( JqGui.isIE ) {
+			if( Gui.isIE ) {
 				for( var i = 0, len = $styleEl.length; i < len; i++ ) {   // in case there is more than one element
 					$styleEl[ i ].styleSheet.cssText = cssText;  // special case for IE
 				}

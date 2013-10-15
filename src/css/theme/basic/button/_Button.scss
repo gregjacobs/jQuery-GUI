@@ -1,16 +1,16 @@
-.jqg-button {
+.gui-button {
 	border: 1px solid #D3D3D3;
 }
 
-.jqg-button-hover {
+.gui-button-hover {
 	border: 1px outset #999;
 }
-.jqg-button-active {
+.gui-button-active {
 	border: 1px inset #AAA;
 }
 
 
-.jqg-button-icon {
+.gui-button-icon {
 	position: relative;
 	top: 2px;
 	
@@ -18,7 +18,7 @@
 	height: 16px;
 }
 
-.jqg-button-text {
+.gui-button-text {
 	padding: 2px 6px;
 	text-decoration: none;
 }

@@ -2,20 +2,20 @@
 define( [
 	'lodash',
 	'Observable',
-	'jqg/JqGui',
-	'jqg/ComponentQuery',
-	'jqg/app/EventBus'
-], function( _, Observable, JqGui, ComponentQuery, EventBus ) {
+	'gui/Gui',
+	'gui/ComponentQuery',
+	'gui/app/EventBus'
+], function( _, Observable, Gui, ComponentQuery, EventBus ) {
 	
 	/**
-	 * @class jqg.app.Controller
+	 * @class gui.app.Controller
 	 * @extends Observable
 	 * 
 	 * Base class Controller which should be extended by implementations to implement controller logic.
 	 * 
-	 * The Controller must be provided the {@link #view view(s)} ({@link jqg.Component Components}) that it is to work with. 
+	 * The Controller must be provided the {@link #view view(s)} ({@link gui.Component Components}) that it is to work with. 
 	 * It uses this to query for components, and listen to events from. This may be one Component (most likely an outer
-	 * {@link jqg.Viewport} or {@link jqg.Container}), or multiple components to reference and listen to events from. The
+	 * {@link gui.Viewport} or {@link gui.Container}), or multiple components to reference and listen to events from. The
 	 * Component(s) provided to the {@link #view} config give the scope of the Controllers reach, where both those components
 	 * and their descendant components may be manipulated / listened to.
 	 * 
@@ -23,7 +23,7 @@ define( [
 	 * ## References to View Components
 	 * 
 	 * A Controller may set up {@link #cfg-refs} to easily retrieve references to components, based on a 
-	 * {@link jqg.ComponentQuery ComponentQuery} selector. Alternatively, the {@link #addRef} method may also be used to 
+	 * {@link gui.ComponentQuery ComponentQuery} selector. Alternatively, the {@link #addRef} method may also be used to 
 	 * dynamically add references. 
 	 * 
 	 * References to component(s) are retrieved using the {@link #getRef} method. The {@link #getRef} accepts the reference
@@ -31,7 +31,7 @@ define( [
 	 * For example, defining a Controller implementation subclass:
 	 * 
 	 *     define( [
-	 *         'jqg/Controller'
+	 *         'gui/Controller'
 	 *     ], function( Controller ) {
 	 *     
 	 *         var UserController = Controller.extend( {
@@ -46,7 +46,7 @@ define( [
 	 *                 
 	 *                 // (If we wanted to retrieve the components right here in the init() method...)
 	 *                 this.getRef( 'userPanel' );      // --> Retrieves the Panel instance with an id of 'mainUserPanel'
-	 *                 this.getRef( 'userTextFields' ); // --> Retrieves the array of {@link jqg.form.field.Text} components
+	 *                 this.getRef( 'userTextFields' ); // --> Retrieves the array of {@link gui.form.field.Text} components
 	 *             }
 	 *         
 	 *         } );
@@ -67,12 +67,12 @@ define( [
 	 * 
 	 * ## Listening to Events
 	 * 
-	 * A Controller may set up listeners based on {@link jqg.ComponentQuery ComponentQuery} selectors, to be able to respond to
+	 * A Controller may set up listeners based on {@link gui.ComponentQuery ComponentQuery} selectors, to be able to respond to
 	 * events from components living under its configured {@link #view}. The {@link #listen} method handles this functionality,
 	 * and listeners are usually set up from the {@link #init} hook method. For example:
 	 * 
 	 *     define( [
-	 *         'jqg/Controller'
+	 *         'gui/Controller'
 	 *     ], function( Controller ) {
 	 *     
 	 *         var UserController = Controller.extend( {
@@ -138,23 +138,23 @@ define( [
 		
 		
 		/**
-		 * @cfg {jqg.Component} view (required)
+		 * @cfg {gui.Component} view (required)
 		 * 
 		 * The view Component that the Controller should manage. {@link #cfg-refs References} retrieved for components, and events 
 		 * listened to must either be on the Component provided to this config, or a descendant of the component (which
-		 * in this case is a {@link jqg.Container Container}) provided to this config.
+		 * in this case is a {@link gui.Container Container}) provided to this config.
 		 * 
-		 * Most often, this config will be the the page's outermost {@link jqg.Viewport Viewport} (which itself is a 
-		 * {@link jqg.Container Container} subclass). However, this may also be any 
-		 * {@link jqg.Component Component}/{@link jqg.Container Container}, which will limit the scope of what component(s) the 
+		 * Most often, this config will be the the page's outermost {@link gui.Viewport Viewport} (which itself is a 
+		 * {@link gui.Container Container} subclass). However, this may also be any 
+		 * {@link gui.Component Component}/{@link gui.Container Container}, which will limit the scope of what component(s) the 
 		 * Controller controls.
 		 * 
 		 * As an example setup for a page:
 		 * 
 		 *     require( [
 		 *         'jquery',
-		 *         'jqg/Viewport',
-		 *         'my/app/Controller'  // your own jqg.app.Controller subclass, which implements your page's logic
+		 *         'gui/Viewport',
+		 *         'my/app/Controller'  // your own gui.app.Controller subclass, which implements your page's logic
 		 *     ], function( $, Viewport, Controller ) {
 		 *         
 		 *         var viewport = new Viewport( {
@@ -184,7 +184,7 @@ define( [
 		 * **prototype** of the Controller, in a Controller subclass. See the documentation of this class for an example of
 		 * how to create a Controller subclass.
 		 * 
-		 * References are based on a {@link jqg.ComponentQuery ComponentQuery} selector, and make it easy to retrieve matching 
+		 * References are based on a {@link gui.ComponentQuery ComponentQuery} selector, and make it easy to retrieve matching 
 		 * component(s) throughout the Controller's code using {@link #getRef}.
 		 * 
 		 * This Object should be keyed by the ref names, and whose values are Objects with the following properties:
@@ -222,7 +222,7 @@ define( [
 		 *   when retrieving the ref), or `false` if the selector returns a single component.
 		 * - **noCache** (Boolean) : `true` if this ref should not cache its result, and instead re-query the {@link #view}
 		 *   when the ref is requested again.
-		 * - **cachedComponents** (jqg.Component[]) : An array of the cached component references. This is populated after the
+		 * - **cachedComponents** (gui.Component[]) : An array of the cached component references. This is populated after the
 		 *   first use of the ref.
 		 */
 		
@@ -252,8 +252,8 @@ define( [
 		 * @protected
 		 * @property {Boolean} eventBusSubscribed
 		 * 
-		 * Flag which is set to true once this controller has subscribed to the {@link jqg.app.EventBus}, to listen for all
-		 * {@link jqg.Component} events.
+		 * Flag which is set to true once this controller has subscribed to the {@link gui.app.EventBus}, to listen for all
+		 * {@link gui.Component} events.
 		 */
 		
 		
@@ -270,7 +270,7 @@ define( [
 				 * Fires when the Controller has been destroyed.
 				 * 
 				 * @event destroy
-				 * @param {jqg.app.Controller} controller This Controller instance.
+				 * @param {gui.app.Controller} controller This Controller instance.
 				 */
 				'destroy'
 			);
@@ -299,7 +299,7 @@ define( [
 		 * @template
 		 * @method init
 		 */
-		init : JqGui.emptyFn,
+		init : Gui.emptyFn,
 		
 		
 		// ------------------------------------
@@ -309,7 +309,7 @@ define( [
 		
 		/**
 		 * Adds a reference to one or more components that can be retrieved easily by name. A reference is related
-		 * to a {@link jqg.ComponentQuery ComponentQuery} selector, which is executed when the reference is retrieved
+		 * to a {@link gui.ComponentQuery ComponentQuery} selector, which is executed when the reference is retrieved
 		 * (via {@link #getRef}).
 		 * 
 		 * After the first retrieval of a reference with {@link #getRef}, the result is cached for subsequent {@link #getRef}
@@ -331,7 +331,7 @@ define( [
 		 * @param {String} selector The selector string to select components by.
 		 * @param {Object} [options] An object which may contain the following properties:
 		 * @param {Boolean} [options.multiple=false] `true` to create a reference which returns multiple
-		 *   components. The return from {@link #getRef} will be an array of {@link jqg.Component Components}
+		 *   components. The return from {@link #getRef} will be an array of {@link gui.Component Components}
 		 *   if this option is set to `true`. By default, a ref only retrieves a single component, and its
 		 *   instance is directly returned by {@link #getRef}. 
 		 * @param {Boolean} [options.noCache=true] `false` to prevent the caching of the retrieved components after they
@@ -369,7 +369,7 @@ define( [
 		
 		
 		/**
-		 * Retrieves a {@link jqg.Component Component} by ref name (or multiple {@link jqg.Component Components}, if the 
+		 * Retrieves a {@link gui.Component Component} by ref name (or multiple {@link gui.Component Components}, if the 
 		 * `multiple` flag was set to `true` when {@link #addRef adding the ref}).
 		 * 
 		 * @param {String} refName
@@ -378,8 +378,8 @@ define( [
 		 *   even if the component references have previously been cached. This may be useful for "multi-component"
 		 *   references, if the components on the page have changed, and a new query for them must be made. (Single
 		 *   component references are automatically handled if the component has been 
-		 *   {@link jqg.Component#method-destroy destroyed}.)
-		 * @return {jqg.Component/jqg.Component[]} A single component (in the case of singular references, which are
+		 *   {@link gui.Component#method-destroy destroyed}.)
+		 * @return {gui.Component/gui.Component[]} A single component (in the case of singular references, which are
 		 *   the default), or an array if the `multiple` flag was provided for the reference in {@link #addRef}.
 		 */
 		getRef : function( refName, options ) {
@@ -405,14 +405,14 @@ define( [
 		// Event Listening Functionality
 		
 		/**
-		 * Adds event listeners to components selected via {@link jqg.ComponentQuery} selectors. The `selectors` argument accepts an 
+		 * Adds event listeners to components selected via {@link gui.ComponentQuery} selectors. The `selectors` argument accepts an 
 		 * Object (map) of component selector strings as its keys, and a map of event names -&gt; handler functions as its values.
 		 * 
-		 * For example, in this controller, we may want to handle the click event of all {@link jqg.button.Button} components which 
-		 * exist under the {@link #view}, as well as a {@link jqg.Anchor} component with the id "myAnchor".
+		 * For example, in this controller, we may want to handle the click event of all {@link gui.button.Button} components which 
+		 * exist under the {@link #view}, as well as a {@link gui.Anchor} component with the id "myAnchor".
 		 * 
 		 *     define( [
-		 *         'jqg/app/Controller'
+		 *         'gui/app/Controller'
 		 *     ], function( Controller ) {
 		 *         
 		 *         var MyController = Controller.extend( {
@@ -446,7 +446,7 @@ define( [
 		 * 
 		 * Note that handlers are always called in the scope (`this` reference) of the Controller.
 		 * 
-		 * See {@link jqg.ComponentQuery} for more information on component selector strings.
+		 * See {@link gui.ComponentQuery} for more information on component selector strings.
 		 * 
 		 * @param {Object} selectors An Object (map) where the keys are component selector strings, and the values are Objects (maps)
 		 *   which map event names to handler functions. See the description of this method for details.
@@ -473,11 +473,11 @@ define( [
 		
 		
 		/**
-		 * Handles an event being fired by a component, from the {@link jqg.app.EventBus EventBus}. Calls the handlers
+		 * Handles an event being fired by a component, from the {@link gui.app.EventBus EventBus}. Calls the handlers
 		 * that are registered for the particular `eventName`, and that match the selector which was set up in {@link #listen}.
 		 * 
 		 * @protected
-		 * @param {jqg.Component} component The Component which fired the event.
+		 * @param {gui.Component} component The Component which fired the event.
 		 * @param {String} eventName The name of the event which was fired.
 		 * @param {Mixed[]} fireEventArgs The arguments provided to the original {@link Observable#fireEvent fireEvent} call.
 		 *   This does not include the event name.
@@ -536,7 +536,7 @@ define( [
 		 * @protected
 		 * @method onDestroy
 		 */
-		onDestroy : JqGui.emptyFn
+		onDestroy : Gui.emptyFn
 		
 	} );
 	

@@ -1,25 +1,25 @@
 /* This is for the custom implementation of dropdowns, which don't use the html <select> element 
 ============================================================================================== */
-.jqg-form-field-dropdown {
+.gui-form-field-dropdown {
 	position: relative;
 	left: 0px; 
 	top: 0px;
 }
 
 /* For IE, need an iframe to cover certain elements */
-iframe.jqg-form-field-dropdown-shim { position: absolute; z-index: 1; width: 100%; left: 0px; top: 0px; }
+iframe.gui-form-field-dropdown-shim { position: absolute; z-index: 1; width: 100%; left: 0px; top: 0px; }
 
-.jqg-form-field-dropdown-dropdownContainer {}
+.gui-form-field-dropdown-dropdownContainer {}
 
 /* The box that shows the selected option's text */
-.jqg-form-field-dropdown-selectText {
+.gui-form-field-dropdown-selectText {
 	overflow-x: hidden;
 	white-space: nowrap;
 	background: none transparent;
 	cursor: pointer;
 }
 
-.jqg-form-field-dropdown-expandButton {
+.gui-form-field-dropdown-expandButton {
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -29,7 +29,7 @@ iframe.jqg-form-field-dropdown-shim { position: absolute; z-index: 1; width: 100
 
 
 // The dropdown menu itself. This is appended to the document body
-.jqg-form-field-dropdown-menu {
+.gui-form-field-dropdown-menu {
 	position: absolute;
 	list-style: none;
 	display: none;
@@ -39,7 +39,7 @@ iframe.jqg-form-field-dropdown-shim { position: absolute; z-index: 1; width: 100
 	z-index: 5000;
 }
 
-.jqg-form-field-dropdown-menu-item {
+.gui-form-field-dropdown-menu-item {
 	cursor: pointer;
 }
-.jqg-form-field-dropdown-menu-item-selected {}
+.gui-form-field-dropdown-menu-item-selected {}

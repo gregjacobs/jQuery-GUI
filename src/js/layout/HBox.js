@@ -1,14 +1,14 @@
 /*global define */
 define( [
 	'jquery',
-	'jqg/Component',
-	'jqg/Container',
-	'jqg/layout/Layout'
+	'gui/Component',
+	'gui/Container',
+	'gui/layout/Layout'
 ], function( jQuery, Component, Container, Layout ) {
 
 	/**
-	 * @class jqg.layout.HBox
-	 * @extends jqg.layout.Layout
+	 * @class gui.layout.HBox
+	 * @extends gui.layout.Layout
 	 * @alias layout.hbox
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
@@ -71,7 +71,7 @@ define( [
 		 * 
 		 * @protected
 		 * @template
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
@@ -90,7 +90,7 @@ define( [
 				
 				// Add the CSS class to components to be able to place them in an HBox layout. This adds `float:left;`,
 				// and a few other fixing styles.
-				childComponent.addCls( 'jqg-layout-hbox-component' );
+				childComponent.addCls( 'gui-layout-hbox-component' );
 				
 				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
 				this.renderComponent( childComponent, $targetEl, { position: i } );
@@ -142,7 +142,7 @@ define( [
 			}
 			
 			if( !this.$clearEl ) {
-				this.$clearEl = jQuery( '<div class="jqg-layout-hbox-clear" />' );  // to clear the floats
+				this.$clearEl = jQuery( '<div class="gui-layout-hbox-clear" />' );  // to clear the floats
 			}
 			$targetEl.append( this.$clearEl );
 		},
@@ -162,7 +162,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the jqg.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'hbox', HBoxLayout );
 	
 	return HBoxLayout;

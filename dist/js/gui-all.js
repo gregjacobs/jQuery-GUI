@@ -1,6 +1,6 @@
 /*!
  * jQuery-GUI
- * Version 0.1.0
+ * Version 0.4.0
  *
  * Copyright(c) 2013 Gregory Jacobs.
  * MIT Licensed. http://www.opensource.org/licenses/mit-license.php
@@ -17,25 +17,25 @@
  */
 
 /*global define */
-define('jqg/JqGui', [
+define('gui/Gui', [
 	'Class',
 	'jquery',
 	'lodash'
 ], function( Class, jQuery, _ ) {
 
 	/**
-	 * @class jqg.JqGui
+	 * @class gui.Gui
 	 * @singleton
 	 * 
 	 * Main singleton class of the jQuery-GUI library, with a few base utility functions. 
 	 * 
-	 * This class can be included in implementations by using the RequireJS path of 'jqg/JqGui'. Ex:
+	 * This class can be included in implementations by using the RequireJS path of 'gui/Gui'. Ex:
 	 * 
-	 *     require( [ 'jqg/JqGui' ], function( JqGui ) {
-	 *         console.log( "This browser's scrollbar width: ", JqGui.getScrollbarWidth(), "px" );
+	 *     require( [ 'gui/Gui' ], function( Gui ) {
+	 *         console.log( "This browser's scrollbar width: ", Gui.getScrollbarWidth(), "px" );
 	 *     } );
 	 */
-	var JqGui = Class.extend( Object, {
+	var Gui = Class.extend( Object, {
 
 		/**
 		 * @readonly
@@ -81,7 +81,7 @@ define('jqg/JqGui', [
 		 * This may be placed into CSS styles as such:
 		 * 
 		 *     var $div = jQuery( '<div />' );
-		 *     $div.css( 'background-image', 'url(' + JqGui.getBlankImgUrl() + ')' );
+		 *     $div.css( 'background-image', 'url(' + Gui.getBlankImgUrl() + ')' );
 		 * 
 		 * @method getBlankImgUrl
 		 * @return {String}
@@ -205,22 +205,22 @@ define('jqg/JqGui', [
 	
 	
 	// Return singleton instance
-	return new JqGui();
+	return new Gui();
 	
 } );
 /*global define */
-define('jqg/util/Css', [
+define('gui/util/Css', [
 	'jquery',
 	'lodash',
-	'jqg/JqGui'
+	'gui/Gui'
 ],
-function( jQuery, _, JqGui ) {
+function( jQuery, _, Gui ) {
 	
 	var spacesRe = /\s+/g;
 	
 	
 	/**
-	 * @class jqg.util.Css
+	 * @class gui.util.Css
 	 * @singleton
 	 * 
 	 * General CSS manipulation/reading functionality.  Allows the dynamic modification of 
@@ -356,7 +356,7 @@ function( jQuery, _, JqGui ) {
 		updateStyleEl : function( styleEl, cssText ) {
 			var $styleEl = jQuery( styleEl );
 			
-			if( JqGui.isIE ) {
+			if( Gui.isIE ) {
 				for( var i = 0, len = $styleEl.length; i < len; i++ ) {   // in case there is more than one element
 					$styleEl[ i ].styleSheet.cssText = cssText;  // special case for IE
 				}
@@ -491,12 +491,12 @@ function( jQuery, _, JqGui ) {
 	
 } );
 /*global define */
-define('jqg/util/Html', [
+define('gui/util/Html', [
 	'lodash'
 ], function( _ ) {
 	
 	/**
-	 * @class jqg.util.Html
+	 * @class gui.util.Html
 	 * @singleton
 	 * 
 	 * Utility class for doing html/text transformations.
@@ -575,18 +575,18 @@ define('jqg/util/Html', [
 	
 } );
 /*global define */
-define('jqg/template/Template', [
+define('gui/template/Template', [
 	'lodash',
 	'Class'
 ], function( _, Class ) {
 	
 	/**
 	 * @abstract
-	 * @class jqg.template.Template
+	 * @class gui.template.Template
 	 * @extends Object
 	 * 
 	 * Base class and interface for template implementations. For the default concrete Template implementation used
-	 * by the framework, see {@link jqg.template.LoDash}.
+	 * by the framework, see {@link gui.template.LoDash}.
 	 */
 	var Template = Class.extend( Object, {
 		abstractClass : true,
@@ -608,14 +608,14 @@ define('jqg/template/Template', [
 	
 } );
 /*global define */
-define('jqg/template/LoDash', [
+define('gui/template/LoDash', [
 	'lodash',
-	'jqg/template/Template'
+	'gui/template/Template'
 ], function( _, Template ) {
 	
 	/**
-	 * @class jqg.template.LoDash
-	 * @extends jqg.template.Template
+	 * @class gui.template.LoDash
+	 * @extends gui.template.Template
 	 * 
 	 * A wrapper class for Lo-Dash templates which helps with a few normalization procedures, and
 	 * allows for lazy compilation of a template from its string source.
@@ -664,8 +664,8 @@ define('jqg/template/LoDash', [
 		
 		/**
 		 * @constructor
-		 * @param {String/String[]/Function/jqg.template.Template} tpl A string or an array of strings which will be concatenated 
-		 *   together to generate the Lo-Dash template, a compiled Lo-Dash template function, or a {@link jqg.template.Template} 
+		 * @param {String/String[]/Function/gui.template.Template} tpl A string or an array of strings which will be concatenated 
+		 *   together to generate the Lo-Dash template, a compiled Lo-Dash template function, or a {@link gui.template.Template} 
 		 *   instance which will simply be returned from this constructor.
 		 * @param {Object} options Any options to provide to the Lo-Dash template generator function. This argument
 		 *   is only valid when the first argument to this constructor is a string or array of strings. See 
@@ -734,18 +734,18 @@ define('jqg/template/LoDash', [
 	
 } );
 /*global define */
-define('jqg/Mask', [
+define('gui/Mask', [
 	'jquery',
 	'lodash',
 	'Class',
-	'jqg/template/Template',
-	'jqg/template/LoDash',
+	'gui/template/Template',
+	'gui/template/LoDash',
 	'jquery-ui/position'  // jQuery UI's `position` plugin
 ], 
 function( jQuery, _, Class, Template, LoDashTpl ) {
 	
 	/**
-	 * @class jqg.Mask
+	 * @class gui.Mask
 	 * @extends Object
 	 * 
 	 * Generalized class that can create a mask over any given element, and provides a simple interface
@@ -772,15 +772,15 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		
 		/**
 		 * @protected
-		 * @property {String/jqg.template.Template} maskTpl
+		 * @property {String/gui.template.Template} maskTpl
 		 * 
 		 * The template to use to create the Mask's elements.
 		 */
 		maskTpl : new LoDashTpl( [
-			'<div data-elem="jqg-mask-overlay" class="jqg-mask-overlay" />',
-			'<div data-elem="jqg-mask-content" class="jqg-mask-content">',
-				'<span class="jqg-mask-spinner" />',
-				'<div data-elem="jqg-mask-msg" class="jqg-mask-msg" />',
+			'<div data-elem="gui-mask-overlay" class="gui-mask-overlay" />',
+			'<div data-elem="gui-mask-content" class="gui-mask-content">',
+				'<span class="gui-mask-spinner" />',
+				'<div data-elem="gui-mask-msg" class="gui-mask-msg" />',
 			'</div>'
 		] ),
 		
@@ -828,7 +828,7 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 * 
 		 * The CSS class to add to the Mask's {@link #$contentEl} when the spinner is visible.
 		 */
-		spinnerVisibleCls : 'jqg-mask-spinner-visible',
+		spinnerVisibleCls : 'gui-mask-spinner-visible',
 		
 		/**
 		 * @protected
@@ -836,7 +836,7 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 * 
 		 * The CSS class to add to the Mask's {@link #$contentEl} when a {@link #msg} exists.
 		 */
-		msgVisibleCls : 'jqg-mask-msg-visible',
+		msgVisibleCls : 'gui-mask-msg-visible',
 		
 		/**
 		 * @protected
@@ -860,14 +860,14 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 			} else if( targetEl instanceof jQuery ) {
 				// <debug>
 				if( targetEl.length !== 1 ) {
-					throw new Error( "If the 'targetEl' argument to the jqg.Mask constructor is a jQuery wrapped set, it must contain exactly one element." );
+					throw new Error( "If the 'targetEl' argument to the gui.Mask constructor is a jQuery wrapped set, it must contain exactly one element." );
 				}
 				// </debug>
 				this.$targetEl = targetEl;
 			
 			// <debug>
 			} else {
-				throw new Error( "jqg.Mask requires the first argument to its constructor to be an HTMLElement, or a jQuery wrapped set" );
+				throw new Error( "gui.Mask requires the first argument to its constructor to be an HTMLElement, or a jQuery wrapped set" );
 			// </debug>
 			}
 			
@@ -915,11 +915,11 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 				$targetEl.append( this.maskTpl.apply( {} ) );  // no data for the template (at this point in time)
 				
 				var onMaskClick = _.bind( this.onMaskClick, this );
-				this.$overlayEl = $targetEl.find( '[data-elem="jqg-mask-overlay"]' )
+				this.$overlayEl = $targetEl.find( '[data-elem="gui-mask-overlay"]' )
 					.on( 'click', onMaskClick );
-				this.$contentEl = $targetEl.find( '[data-elem="jqg-mask-content"]' )
+				this.$contentEl = $targetEl.find( '[data-elem="gui-mask-content"]' )
 					.on( 'click', onMaskClick );
-				this.$msgEl = $targetEl.find( '[data-elem="jqg-mask-msg"]' );
+				this.$msgEl = $targetEl.find( '[data-elem="gui-mask-msg"]' );
 				
 				this.rendered = true;
 				this.updateMaskElements();
@@ -990,13 +990,13 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 				    $overlayEl = this.$overlayEl,
 				    $contentEl = this.$contentEl;
 				
-				// First, add the jqg-masked css class to the target element, which removes the target element's scroll bars
-				$targetEl.addClass( 'jqg-masked' );
+				// First, add the gui-masked css class to the target element, which removes the target element's scroll bars
+				$targetEl.addClass( 'gui-masked' );
 				
 				// Next, give the target element a relative positioning context if it currently does not have one (i.e. it 
 				// has "position: static"), and the target element not the document body (the document body already has a positioning context)
 				if( $targetEl.css( 'position' ) === 'static' && !$targetEl.is( 'body' ) ) {
-					$targetEl.addClass( 'jqg-masked-relative' );
+					$targetEl.addClass( 'gui-masked-relative' );
 				}
 				
 				
@@ -1057,7 +1057,7 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 				// to its original state (i.e. scrollbars allowed, and no positioning context if it didn't have one)
 				this.$overlayEl.detach();
 				this.$contentEl.detach();
-				this.$targetEl.removeClass( 'jqg-masked' ).removeClass( 'jqg-masked-relative' );
+				this.$targetEl.removeClass( 'gui-masked' ).removeClass( 'gui-masked-relative' );
 				
 				this.visible = false;
 			}
@@ -1107,27 +1107,27 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 } );
 
 /*global define */
-define('jqg/anim/Animation', [
+define('gui/anim/Animation', [
 	'require',
 	'jquery',
 	'lodash',
 	'Class',
 	'Observable',
-	'jqg/Component'
+	'gui/Component'
 ], function( require, jQuery, _, Class, Observable, Component ) {
 	
 	/**
-	 * @class jqg.anim.Animation
+	 * @class gui.anim.Animation
 	 * @extends Observable
 	 * 
-	 * A class that encapsulates a single animation of a given HTMLElement, jQuery wrapped set, or {@link jqg.Component}.
+	 * A class that encapsulates a single animation of a given HTMLElement, jQuery wrapped set, or {@link gui.Component}.
 	 */
 	var Animation = Class.extend( Observable, {
 		
 		/**
-		 * @cfg {HTMLElement/jQuery/jqg.Component} target (required)
+		 * @cfg {HTMLElement/jQuery/gui.Component} target (required)
 		 * 
-		 * The target element(s) to animate. In the case of a {@link jqg.Component}, the Component's {@link jqg.Component#getEl getEl}
+		 * The target element(s) to animate. In the case of a {@link gui.Component}, the Component's {@link gui.Component#getEl getEl}
 		 * method is run to retrieve the element to animate.
 		 * 
 		 * Note that this config is not required upon instantiation of the Animation, but must be present at the time that
@@ -1236,7 +1236,7 @@ define('jqg/anim/Animation', [
 				 * prevent the animation from starting.
 				 * 
 				 * @event beforeanimate
-				 * @param {jqg.anim.Animation} animation This Animation instance.
+				 * @param {gui.anim.Animation} animation This Animation instance.
 				 * @preventable
 				 */
 				'beforeanimate',
@@ -1245,7 +1245,7 @@ define('jqg/anim/Animation', [
 				 * Fires when the animation completes.
 				 * 
 				 * @event afteranimate
-				 * @param {jqg.anim.Animation} animation This Animation instance.
+				 * @param {gui.anim.Animation} animation This Animation instance.
 				 */
 				'afteranimate',
 				
@@ -1253,7 +1253,7 @@ define('jqg/anim/Animation', [
 				 * An alias of {@link #afteranimate}, fires when the animation completes.
 				 * 
 				 * @event complete
-				 * @param {jqg.anim.Animation} animation This Animation instance.
+				 * @param {gui.anim.Animation} animation This Animation instance.
 				 */
 				'complete'
 			);
@@ -1264,8 +1264,8 @@ define('jqg/anim/Animation', [
 		 * Sets the {@link #target} for the Animation. This method allows it to be set after instantiation,
 		 * if the {@link #target} config was not provided.
 		 * 
-		 * @param {HTMLElement/jQuery/jqg.Component} target The target element(s) to animate. In the case of a {@link jqg.Component}, 
-		 *   the Component's {@link jqg.Component#getEl getEl} method is run to retrieve the element to animate.
+		 * @param {HTMLElement/jQuery/gui.Component} target The target element(s) to animate. In the case of a {@link gui.Component}, 
+		 *   the Component's {@link gui.Component#getEl getEl} method is run to retrieve the element to animate.
 		 * @chainable
 		 */
 		setTarget : function( target ) {
@@ -1291,7 +1291,7 @@ define('jqg/anim/Animation', [
 			// Make sure there is a 'target' config, and normalize it if need be
 			var target = this.target;
 			if( target ) {
-				if( target instanceof require( 'jqg/Component' ) ) {   // need to require() jqg.Component here, because it is a circular dependency
+				if( target instanceof require( 'gui/Component' ) ) {   // need to require() gui.Component here, because it is a circular dependency
 					$target = jQuery( target.getEl() );
 				} else {
 					$target = jQuery( target );
@@ -1318,10 +1318,10 @@ define('jqg/anim/Animation', [
 			// <debug>
 			// Make sure there is a target element, and either a 'to' config or an 'effect' config
 			if( !$target ) {
-				throw new Error( "jqg.anim.Animation.start(): Error. No `target` config provided" );
+				throw new Error( "gui.anim.Animation.start(): Error. No `target` config provided" );
 			}
 			if( !to && !effect ) {
-				throw new Error( "jqg.anim.Animation.start(): Error. No `to` or `effect` config provided" );
+				throw new Error( "gui.anim.Animation.start(): Error. No `to` or `effect` config provided" );
 			}
 			// </debug>
 			
@@ -1423,7 +1423,7 @@ define('jqg/anim/Animation', [
 	
 } );
 /*global define */
-define('jqg/plugin/Plugin', [ 
+define('gui/plugin/Plugin', [ 
 	'lodash',
 	'Class',
 	'Observable'
@@ -1432,14 +1432,14 @@ function( _, Class, Observable ) {
 	
 	/**
 	 * @abstract
-	 * @class jqg.plugin.Plugin
+	 * @class gui.plugin.Plugin
 	 * @extends Observable
 	 * 
 	 * Abstract base class for plugins.  All plugins that are created should extend from this class.  Concrete plugin implementations
-	 * must implement the method {@link #init}, which is called by a {@link jqg.Component} when it initializes the plugin. See
+	 * must implement the method {@link #init}, which is called by a {@link gui.Component} when it initializes the plugin. See
 	 * {@link #init} for more details.
 	 * 
-	 * See the jqg.plugin package for examples on building plugins.
+	 * See the gui.plugin package for examples on building plugins.
 	 */
 	var Plugin = Class.extend( Observable, {
 		abstractClass : true,
@@ -1460,13 +1460,13 @@ function( _, Class, Observable ) {
 		
 		/**
 		 * Abstract method that must be implemented by subclasses to provide the functionality of the plugin. This method
-		 * is called by the {@link jqg.Component} that the plugin has been provided to when the Component initializes its plugins. 
-		 * This method is given a reference to the {@link jqg.Component Component} as the first argument so that the Component's
+		 * is called by the {@link gui.Component} that the plugin has been provided to when the Component initializes its plugins. 
+		 * This method is given a reference to the {@link gui.Component Component} as the first argument so that the Component's
 		 * events can be subscribed to and its methods can be overridden/extended to implement the plugin's functionality.
 		 * 
 		 * @abstract
 		 * @method init
-		 * @param {jqg.Component} component A reference to the {@link jqg.Component} that this plugin belongs to. 
+		 * @param {gui.Component} component A reference to the {@link gui.Component} that this plugin belongs to. 
 		 */
 		init : Class.abstractMethod
 		
@@ -1478,26 +1478,26 @@ function( _, Class, Observable ) {
 } );
 
 /*global define */
-define('jqg/Component', [
+define('gui/Component', [
 	'require',
 	'jquery',
 	'lodash',
 	'Class',
-	'jqg/JqGui',
+	'gui/Gui',
 	'Observable',
-	'jqg/util/Css',
-	'jqg/util/Html',
-	'jqg/Mask',
-	'jqg/anim/Animation',
-	'jqg/plugin/Plugin',
-	'jqg/template/Template',
-	'jqg/template/LoDash',
-	'jqg/ComponentManager'   // circular dependency. used via require() call in code below
+	'gui/util/Css',
+	'gui/util/Html',
+	'gui/Mask',
+	'gui/anim/Animation',
+	'gui/plugin/Plugin',
+	'gui/template/Template',
+	'gui/template/LoDash',
+	'gui/ComponentManager'   // circular dependency. used via require() call in code below
 ],
-function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
+function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
 
 	/**
-	 * @class jqg.Component
+	 * @class gui.Component
 	 * @extends Observable
 	 * @alias type.component
 	 * 
@@ -1506,7 +1506,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 	 * each step of the way.
 	 * 
 	 * Components can be constructed via anonymous config objects, based on their `type` property. This is useful for defining components in
-	 * an anonymous object, when added as items of a {@link jqg.Container}.
+	 * an anonymous object, when added as items of a {@link gui.Container}.
 	 * 
 	 * Some other things to note about Component and its subclasses are:
 	 * 
@@ -1556,12 +1556,12 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * is applied to the Component's {@link #$el element}. 
 		 * 
 		 * The value of this config, by convention, is also used to prefix descendent elements of a Component subclass. For 
-		 * example, {@link jqg.panel.Panel Panel} sets this config to 'jqg-panel', and its header and body elements are prefixed with 
-		 * this to become 'jqg-panel-header' and 'jqg-panel-body', respectively. However when a {@link jqg.window.Window Window} is 
-		 * created (which is a subclass of {@link jqg.panel.Panel Panel}, the value is 'jqg-window', and the header and body become 
-		 * 'jqg-window-header' and 'jqg-window-body' instead.
+		 * example, {@link gui.panel.Panel Panel} sets this config to 'gui-panel', and its header and body elements are prefixed with 
+		 * this to become 'gui-panel-header' and 'gui-panel-body', respectively. However when a {@link gui.window.Window Window} is 
+		 * created (which is a subclass of {@link gui.panel.Panel Panel}, the value is 'gui-window', and the header and body become 
+		 * 'gui-window-header' and 'gui-window-body' instead.
 		 */
-		baseCls : 'jqg-component',
+		baseCls : 'gui-component',
 		
 		/**
 		 * @protected
@@ -1571,11 +1571,11 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * This is used for subclasses whose parent defines a {@link #baseCls}, but then have to add additional styling
 		 * themselves. 
 		 * 
-		 * For example, the base form {@link jqg.form.field.Field Field} class adds the {@link #baseCls} 'jqg-form-field', and
-		 * the {@link jqg.form.field.Text TextField} subclass wants to keep that class, and also add 'jqg-form-field-text'
-		 * to allow for any different styling of that particular subclass. The result is two css classes: 'jqg-form-field' 
-		 * and 'jqg-form-field-text'. In the case of {@link jqg.form.field.TextArea TextAreaField} (a subclass of TextField}, 
-		 * its componentCls is 'jqg-form-field-textarea', which overrides TextField's componentCls.
+		 * For example, the base form {@link gui.form.field.Field Field} class adds the {@link #baseCls} 'gui-form-field', and
+		 * the {@link gui.form.field.Text TextField} subclass wants to keep that class, and also add 'gui-form-field-text'
+		 * to allow for any different styling of that particular subclass. The result is two css classes: 'gui-form-field' 
+		 * and 'gui-form-field-text'. In the case of {@link gui.form.field.TextArea TextAreaField} (a subclass of TextField}, 
+		 * its componentCls is 'gui-form-field-textarea', which overrides TextField's componentCls.
 		 */
 		
 		/**
@@ -1610,7 +1610,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		/**
 		 * @protected
-		 * @cfg {String/String[]/Function/jqg.template.LoDash} renderTpl
+		 * @cfg {String/String[]/Function/gui.template.LoDash} renderTpl
 		 * 
 		 * The template to use to render the Component's **internal** structure. This is used for Component subclasses to
 		 * generate the markup that will make up the Component's structure that does not change. This is opposed to the {@link #tpl}
@@ -1637,9 +1637,9 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * If, for example, the {@link #html} config is provided, then the value of the config will be placed into the "body" div.
 		 * 
 		 * 
-		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqg.template.Template} 
-		 * instance. For the string, array of strings, or function form, a {@link jqg.template.LoDash LoDash template} instance will be 
-		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqg.template.Template} 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link gui.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link gui.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link gui.template.Template} 
 		 * subclass to this config. 
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
@@ -1671,9 +1671,9 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * 
 		 * - **elId**: The value of the {@link #elId} property (an auto-generated, unique value).
 		 * - **baseCls**: The {@link #baseCls} config, which is the base CSS class to prefix descendent elements' CSS
-		 *   classes with. Ex: a {@link #baseCls} of 'jqg-panel' is used to prefix a {@link jqg.panel.Panel Panel's} body
-		 *   element to become 'jqg-panel-body', but when a {@link jqg.window.Window Window} is created, the value is
-		 *   'jqg-window', and the body becomes 'jqg-window-body' instead. 
+		 *   classes with. Ex: a {@link #baseCls} of 'gui-panel' is used to prefix a {@link gui.panel.Panel Panel's} body
+		 *   element to become 'gui-panel-body', but when a {@link gui.window.Window Window} is created, the value is
+		 *   'gui-window', and the body becomes 'gui-window-body' instead. 
 		 * - **componentCls**: The {@link #componentCls} config.
 		 */
 		
@@ -1697,7 +1697,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 */
 		
 		/**
-		 * @cfg {String/String[]/Function/jqg.template.Template} tpl
+		 * @cfg {String/String[]/Function/gui.template.Template} tpl
 		 * 
 		 * The template to use as the HTML template of the Component. 
 		 * 
@@ -1709,9 +1709,9 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * outputs can be updated with new data by using the {@link #update} method, and providing an Object as its first argument.
 		 * 
 		 * 
-		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqg.template.Template} 
-		 * instance. For the string, array of strings, or function form, a {@link jqg.template.LoDash LoDash template} instance will be 
-		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqg.template.Template} 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link gui.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link gui.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link gui.template.Template} 
 		 * subclass to this config. 
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
@@ -1767,7 +1767,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * when it is first rendered).  This default maskConfig can be overrided when calling {@link #mask} by passing a configuration object for its argument.
 		 * 
 		 * Masks are shown and hidden using the {@link #mask} and {@link #unMask} methods. If this configuration option is not provided, the configuration
-		 * options default to the default values of the configuration options for {@link jqg.Mask}.
+		 * options default to the default values of the configuration options for {@link gui.Mask}.
 		 */
 		
 		/**
@@ -1778,10 +1778,10 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * @cfg {jqg.plugin.Plugin/jqg.plugin.Plugin[]} plugins
+		 * @cfg {gui.plugin.Plugin/gui.plugin.Plugin[]} plugins
 		 * 
-		 * A single plugin or array of plugins to attach to the Component. Plugins must extend the class {@link jqg.plugin.Plugin}.
-		 * See {@link jqg.plugin.Plugin} for details on creating plugins.
+		 * A single plugin or array of plugins to attach to the Component. Plugins must extend the class {@link gui.plugin.Plugin}.
+		 * See {@link gui.plugin.Plugin} for details on creating plugins.
 		 * 
 		 * Note that Component will normalize this config into an array, converting a single plugin into a one-element array, or creating
 		 * an empty array if no plugins were provided.  This is done so that subclasses may add plugins by pushing them directly
@@ -1791,10 +1791,10 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		/**
 		 * @protected
-		 * @cfg {jqg.Container} parentContainer
+		 * @cfg {gui.Container} parentContainer
 		 * 
-		 * The parent {@link jqg.Container Container} of this Component (if any), which this Component is a child of. This is set 
-		 * by the {@link jqg.Container Container} that is adding this Component as a child, and should not be supplied directly.
+		 * The parent {@link gui.Container Container} of this Component (if any), which this Component is a child of. This is set 
+		 * by the {@link gui.Container Container} that is adding this Component as a child, and should not be supplied directly.
 		 */
 		parentContainer: null,
 		
@@ -1870,7 +1870,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 	
 		/**
 		 * @private
-		 * @property {jqg.anim.Animation} currentAnimation
+		 * @property {gui.anim.Animation} currentAnimation
 		 * 
 		 * The currently running {@link #method-show}/{@link #method-hide} animation, if any. Will be null if the Component
 		 * is not currently in the process of showing or hiding. This is only relevant when {@link #method-show} or
@@ -1891,7 +1891,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @property {Boolean} deferMaskShow
 		 * 
 		 * Flag that is set to true if the {@link #mask} method is run, but the Component is currently hidden.
-		 * The Component must be in a visible state to show the mask, as the jqg.Mask class makes a calculation of 
+		 * The Component must be in a visible state to show the mask, as the gui.Mask class makes a calculation of 
 		 * the height of the mask target element.  When the Component's {@link #method-show} method runs, this flag will be
 		 * tested to see if it is true, and if so, will run the {@link #mask} method at that time.
 		 */
@@ -1899,10 +1899,10 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		/**
 		 * @private
-		 * @property {jqg.Mask} _mask
+		 * @property {gui.Mask} _mask
 		 * 
-		 * The jqg.Mask instance that the Component is currently using to mask over the Component. This will be null
-		 * if no jqg.Mask has been created (i.e. the {@link #mask} method has never been called). 
+		 * The gui.Mask instance that the Component is currently using to mask over the Component. This will be null
+		 * if no gui.Mask has been created (i.e. the {@link #mask} method has never been called). 
 		 */
 		
 		/**
@@ -1968,7 +1968,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Fires when this Component has been {@link #method-render rendered}.
 				 * 
 				 * @event render
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'render',
 				
@@ -1979,7 +1979,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event beforeshow
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 * @preventable
 				 */
 				'beforeshow',
@@ -1997,7 +1997,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 * 
 				 * @event show
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'show',
 	
@@ -2008,7 +2008,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event showbegin
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'showbegin',
 	
@@ -2019,7 +2019,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event aftershow
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'aftershow',
 				
@@ -2030,7 +2030,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event beforehide
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 * @preventable
 				 */
 				'beforehide',
@@ -2048,7 +2048,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 * 
 				 * @event hide
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'hide',
 	
@@ -2062,7 +2062,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event hidebegin
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'hidebegin',
 	
@@ -2073,7 +2073,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event afterhide
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'afterhide',
 				
@@ -2082,7 +2082,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * the destruction process for the Component.
 				 * 
 				 * @event beforedestroy
-				 * @param {jqg.Component} component This Component instance. 
+				 * @param {gui.Component} component This Component instance. 
 				 * @preventable
 				 */
 				'beforedestroy',
@@ -2091,7 +2091,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Fires when this Component has been destroyed.
 				 * 
 				 * @event destroy
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'destroy'
 			);
@@ -2099,7 +2099,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 			
 			// Generate a globally unique identifier for the Component, which is unique for all Components on the page.
 			// This will also be used as the `elId`, and the default value for the `id` config if one was not provided.
-			this.uuid = this.elId = 'jqg-cmp-' + _.uniqueId();
+			this.uuid = this.elId = 'gui-cmp-' + _.uniqueId();
 			this.id = this.id || this.uuid;  // default the Component's id to the uuid if not provided
 			
 			
@@ -2135,14 +2135,14 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @protected
 		 * @method initComponent
 		 */
-		initComponent : JqGui.emptyFn,
+		initComponent : Gui.emptyFn,
 		
 		
 		/**
 		 * Initializes the plugins for the Component.
 		 * 
 		 * @private
-		 * @param {jqg.plugin.Plugin/jqg.plugin.Plugin[]} plugin A single plugin, or array of plugins to initialize.
+		 * @param {gui.plugin.Plugin/gui.plugin.Plugin[]} plugin A single plugin, or array of plugins to initialize.
 		 */
 		initPlugins : function( plugin ) {
 			if( _.isArray( plugin ) ) {
@@ -2153,7 +2153,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 			}
 			
 			if( !( plugin instanceof Plugin ) ) {
-				throw new Error( "error: a plugin provided to this Component was not of type jqg.plugin.Plugin" );
+				throw new Error( "error: a plugin provided to this Component was not of type gui.plugin.Plugin" );
 			}
 			
 			// Initialize the plugin, passing a reference to this Component into it.
@@ -2313,7 +2313,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				this.fireEvent( 'render', this );
 				
 				// Finally, if the deferLayout option was not provided as true, run the layout on the Component (or Container, 
-				// if it's a jqg.Container subclass!)
+				// if it's a gui.Container subclass!)
 				if( !options.deferLayout ) {
 					this.doLayout();
 				}
@@ -2404,7 +2404,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component is being rendered into.
 		 * @param {Object} options The options provided to {@link #method-render}.
 		 */
-		onRender : JqGui.emptyFn,
+		onRender : Gui.emptyFn,
 		
 		
 		/**
@@ -2419,7 +2419,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component has been rendered into.
 		 * @param {Object} options The options provided to {@link #method-render}.
 		 */
-		onAfterRender : JqGui.emptyFn,
+		onAfterRender : Gui.emptyFn,
 		
 		
 		/**
@@ -2463,25 +2463,25 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		// Layout Functionality
 		
 		/**
-		 * This method was initially intended to bring Component layouts into the mix (instead of only having {@link jqg.Container Container}
-		 * layouts, which lay out {@link jqg.Container#items child components}). A Component layout was going to size and position the HTML 
+		 * This method was initially intended to bring Component layouts into the mix (instead of only having {@link gui.Container Container}
+		 * layouts, which lay out {@link gui.Container#items child components}). A Component layout was going to size and position the HTML 
 		 * elements that a particular Component had created in its {@link #onRender} method.
 		 * 
-		 * However, at the time of this writing, we never got around to implementing this feature, and {@link jqg.Container} extends
-		 * this method for its {@link jqg.Container#layout layout} of {@link jqg.Container#items child components}. This method was added into 
+		 * However, at the time of this writing, we never got around to implementing this feature, and {@link gui.Container} extends
+		 * this method for its {@link gui.Container#layout layout} of {@link gui.Container#items child components}. This method was added into 
 		 * the Component class (this class) later though, in an effort to allow Components to respond to being laid out by their {@link #parentContainer}.
-		 * When the Component's {@link #parentContainer} runs its {@link jqg.Container#layout layout}, this method is executed from it. A 
+		 * When the Component's {@link #parentContainer} runs its {@link gui.Container#layout layout}, this method is executed from it. A 
 		 * Component author may implement an extension of the {@link #onComponentLayout} hook method to respond to the Component being laid 
 		 * out by its {@link #parentContainer}, such as to implement updating the size or positioning of its child elements upon being laid out.
 		 * Note that {@link #onComponentLayout} will eventually be called just from the Component's initial {@link #method-render rendering} 
 		 * process as well, if the Component is not being rendered by a {@link #parentContainer} layout (i.e. it is a standalone Component,
-		 * not part of a {@link jqg.Container Container}/Component hierarchy).
+		 * not part of a {@link gui.Container Container}/Component hierarchy).
 		 * 
 		 * So, bottom line, if you wish for your Component to do something when it is laid out by its {@link #parentContainer},
 		 * implement the {@link #onComponentLayout} method. See {@link #onComponentLayout} for details.
 		 */
 		doLayout : function() {
-			// Note: this method is extended in the jqg.Container subclass. Keep this in mind if ever implementing Component
+			// Note: this method is extended in the gui.Container subclass. Keep this in mind if ever implementing Component
 			// layouts properly, which should both run both the Component's layout, *and* the Container's layout (in that order).
 			
 			// Simply call the hook method to allow subclasses to participate in the Component being laid out, and fire the event.
@@ -2493,12 +2493,12 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * Hook method that is executed when {@link #doLayout} has executed. Extend this method (calling the superclass method first)
 		 * to implement any logic that the Component subclass should perform when it is either: 
 		 * 
-		 * a) Initially rendered (as a standalone component, not part of a {@link jqg.Container Container}/Component hierarchy), or
+		 * a) Initially rendered (as a standalone component, not part of a {@link gui.Container Container}/Component hierarchy), or
 		 * b) Has been laid out by its {@link #parentContainer}. If initially rendered by its {@link #parentContainer parent container's}
 		 * layout, then this will be the same event.
 		 * 
 		 * For example, a Component could resize its inner elements for new dimensions set on the Component by its 
-		 * {@link #parentContainer parentContainer's} {@link jqg.Container#layout layout} algorithm. The layout may size the Component
+		 * {@link #parentContainer parentContainer's} {@link gui.Container#layout layout} algorithm. The layout may size the Component
 		 * upon its initial rendering, an update to the child components of the {@link #parentContainer}, or from say, a browser resize
 		 * where the layout runs again.
 		 *
@@ -2506,11 +2506,11 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @template
 		 * @method onComponentLayout
 		 */
-		onComponentLayout : JqGui.emptyFn,
+		onComponentLayout : Gui.emptyFn,
 		
 		
 		/**
-		 * When called on the Component, this method bubbles up to the top of the {@link jqg.Container Container}/Component hierarchy,
+		 * When called on the Component, this method bubbles up to the top of the {@link gui.Container Container}/Component hierarchy,
 		 * and runs {@link #doLayout} on the top-most component. This has the effect of re-doing the layout for all Containers/Components
 		 * in that particular hierarchy. As such, this may be an expensive operation; use with care. This may be useful however for components
 		 * that are sized based on their content, and when their content size changes, they should force a layout to adjust for the new
@@ -2536,7 +2536,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @param {String/Object} name The attribute name. This first argument may also be provided as an Object of key/value
 		 *   pairs for attribute names/values to apply to the Component's {@link #$el element}.
 		 * @param {String} value The value for the attribute. Optional if the first argument is an Object.
-		 * @return {jqg.Component} This Component, to allow method chaining.
+		 * @return {gui.Component} This Component, to allow method chaining.
 		 */
 		setAttr : function( name, value ) {
 			if( !this.rendered ) {
@@ -2560,7 +2560,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * 
 		 * @param {String} cssClass One or more CSS classes to add to the Component's element. If specifying multiple CSS classes,
 		 *   they should be separated with a space. Ex: "class1 class2"
-		 * @return {jqg.Component} This Component, to allow method chaining.
+		 * @return {gui.Component} This Component, to allow method chaining.
 		 */
 		addCls : function( cssClass ) {
 			if( !this.rendered ) {
@@ -2577,7 +2577,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * 
 		 * @param {String} cssClass One or more CSS classes to remove from the Component's element. If specifying multiple CSS classes,
 		 *   they should be separated with a space. Ex: "class1 class2"
-		 * @return {jqg.Component} This Component, to allow method chaining.
+		 * @return {gui.Component} This Component, to allow method chaining.
 		 */
 		removeCls : function( cssClass ) {
 			if( !this.rendered ) {
@@ -2597,7 +2597,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 *   they should be separated with a space. Ex: "class1 class2"
 		 * @param {Boolean} [flag] True if the class(es) should be added, false if they should be removed. This argument is optional,
 		 *   and if provided, determines if the class should be added or removed.
-		 * @return {jqg.Component} This Component, to allow method chaining.
+		 * @return {gui.Component} This Component, to allow method chaining.
 		 */
 		toggleCls : function( cssClass, flag ) {
 			if( typeof flag === 'undefined' ) {
@@ -2630,7 +2630,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @param {String/Object} name The CSS property name. This first argument may also be provided as an Object of key/value
 		 *   pairs for CSS property names/values to apply to the Component's {@link #$el element}.
 		 * @param {String} value The value for the CSS property. Optional if the first argument is an Object.
-		 * @return {jqg.Component} This Component, to allow method chaining.
+		 * @return {gui.Component} This Component, to allow method chaining.
 		 */
 		setStyle : function( name, value ) {
 			if( !this.rendered ) {
@@ -2653,7 +2653,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * Retrieves the element that should be the target for the Component's content (html).  For jqg.Component, this is just the Component's
+		 * Retrieves the element that should be the target for the Component's content (html).  For gui.Component, this is just the Component's
 		 * base element (see {@link #$el}), but this method can be overridden in subclasses that define a more complex structure, where their
 		 * content should be placed elsewhere. 
 		 * 
@@ -2938,7 +2938,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * Convenience method to show or hide the Component using a boolean.
 		 * 
 		 * @param {Boolean} visible True to show the Component, false to hide it.
-		 * @return {jqg.Component} This Component, to allow method chaining.
+		 * @return {gui.Component} This Component, to allow method chaining.
 		 */
 		setVisible : function( visible ) {
 			return this[ visible ? 'show' : 'hide' ]();
@@ -2949,8 +2949,8 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * Shows the Component. 
 		 *
 		 * @param {Object} [options] An object which may contain the following options:
-		 * @param {Object} [options.anim] An {@link jqg.anim.Animation Animation} config object (minus the 
-		 *   {@link jqg.anim.Animation#target target} property) for animating the showing of the Component. 
+		 * @param {Object} [options.anim] An {@link gui.anim.Animation Animation} config object (minus the 
+		 *   {@link gui.anim.Animation#target target} property) for animating the showing of the Component. 
 		 *   Note that this will only be run if the Component is currently {@link #rendered}.
 		 * @chainable
 		 */
@@ -3035,7 +3035,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @method onBeforeShow
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onBeforeShow : JqGui.emptyFn,
+		onBeforeShow : Gui.emptyFn,
 		
 		
 		/**
@@ -3048,7 +3048,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @method onShow
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onShow : JqGui.emptyFn,
+		onShow : Gui.emptyFn,
 		
 		
 		/**
@@ -3060,7 +3060,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @method onAfterShow
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onAfterShow : JqGui.emptyFn,
+		onAfterShow : Gui.emptyFn,
 		
 		
 		
@@ -3068,8 +3068,8 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * Hides the Component.
 		 *
 		 * @param {Object} [options] An object which may contain the following options:
-		 * @param {Object} [options.anim] An {@link jqg.anim.Animation Animation} config object (minus the 
-		 *   {@link jqg.anim.Animation#target target) property) for animating the showing of the Component. 
+		 * @param {Object} [options.anim] An {@link gui.anim.Animation Animation} config object (minus the 
+		 *   {@link gui.anim.Animation#target target) property) for animating the showing of the Component. 
 		 *   Note that this will only be run if the Component is currently {@link #rendered}.
 		 * @chainable
 		 */
@@ -3143,7 +3143,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @method onBeforeHide
 		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
-		onBeforeHide : JqGui.emptyFn,
+		onBeforeHide : Gui.emptyFn,
 		
 		
 		/**
@@ -3156,7 +3156,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @method onHide
 		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
-		onHide : JqGui.emptyFn,
+		onHide : Gui.emptyFn,
 	
 	
 		/**
@@ -3169,7 +3169,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @method onAfterHide
 		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
-		onAfterHide : JqGui.emptyFn,
+		onAfterHide : Gui.emptyFn,
 		
 		
 		/**
@@ -3294,10 +3294,10 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * Masks the component with a {@link jqg.Mask}. Uses the default mask configuration provided by the {@link #maskConfig} configuration object,
+		 * Masks the component with a {@link gui.Mask}. Uses the default mask configuration provided by the {@link #maskConfig} configuration object,
 		 * or optionally, the provided `maskConfig` argument.
 		 * 
-		 * @param {Object} maskConfig (optional) The explicit configuration options to set the {@link jqg.Mask} that will mask over the Component.
+		 * @param {Object} maskConfig (optional) The explicit configuration options to set the {@link gui.Mask} that will mask over the Component.
 		 *   If not provided, will use the default options provided by the {@link #maskConfig} configuration option.
 		 */
 		mask : function( maskConfig ) {
@@ -3311,7 +3311,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				
 			} else {
 				// If the Component is currently hidden when the mask() request is made, we need to defer
-				// it to when the Component's show() method is run. This is because jqg.Mask has to make a calculation
+				// it to when the Component's show() method is run. This is because gui.Mask has to make a calculation
 				// of the mask target's height. 
 				if( this.isHidden() ) {
 					this.deferMaskShow = true;
@@ -3364,7 +3364,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * Method that defines which element the Component's mask should be shown over. For jqg.Component,
+		 * Method that defines which element the Component's mask should be shown over. For gui.Component,
 		 * this is the Component's base {@link #$el element}, but this may be redefined by subclasses.
 		 * 
 		 * @protected
@@ -3381,7 +3381,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		/**
 		 * Sets the Container that owns (i.e. is a parent of) this Component.
 		 * 
-		 * @param {jqg.Container} container
+		 * @param {gui.Container} container
 		 */
 		setParentContainer : function( container ) {
 			this.parentContainer = container;
@@ -3391,7 +3391,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		/**
 		 * Gets the Container that owns (i.e. is a parent of) this Component.
 		 * 
-		 * @return {jqg.Container} The Container that owns this Component, or null if there is none.
+		 * @return {gui.Container} The Container that owns this Component, or null if there is none.
 		 */
 		getParentContainer : function() {
 			return this.parentContainer;
@@ -3423,11 +3423,11 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * Finds a {@link jqg.Container Container} above this Component at any level by a custom function. If the passed function returns
-		 * true, the {@link jqg.Container Container} will be returned.
+		 * Finds a {@link gui.Container Container} above this Component at any level by a custom function. If the passed function returns
+		 * true, the {@link gui.Container Container} will be returned.
 		 * 
 		 * @param {Function} fn The custom function to call with the arguments (Container, this Component).
-		 * @return {jqg.Container} The first Container for which the custom function returns true.
+		 * @return {gui.Container} The first Container for which the custom function returns true.
 		 */
 		findParentBy : function( fn ) {
 			for( var p = this.parentContainer; (p !== null) && !fn( p, this ); p = p.parentContainer );  // intentional semicolon, loop does the work
@@ -3436,11 +3436,11 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * Finds a {@link jqg.Container Container} above this Component at any level by {@link #id}.  If there is no parent Container
+		 * Finds a {@link gui.Container Container} above this Component at any level by {@link #id}.  If there is no parent Container
 		 * with the supplied `id`, this method returns null.
 		 * 
 		 * @param {String} id The {@link #id} of the parent Container to look for.
-		 * @return {jqg.Container} The first Container which matches the supplied {@link #id}.
+		 * @return {gui.Container} The first Container which matches the supplied {@link #id}.
 		 *   If no Container for the supplied {@link #id} is found, this method returns null.
 		 */
 		findParentById : function( id ) {
@@ -3450,16 +3450,16 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * Finds the closest {@link jqg.Container Container} above this Component by Container `type`.  The Container `type` can be either
-		 * the type name that is registered to the {@link jqg.ComponentManager ComponentManager} (see the description of this class), or the JavaScript
+		 * Finds the closest {@link gui.Container Container} above this Component by Container `type`.  The Container `type` can be either
+		 * the type name that is registered to the {@link gui.ComponentManager ComponentManager} (see the description of this class), or the JavaScript
 		 * class (constructor function) of the Container.
 		 * 
-		 * @param {Function} type The type name registered with the {@link jqg.ComponentManager ComponentManager}, or the constructor function (class) of the Container.
-		 * @return {jqg.Container} The first Container which is an instance of the supplied type. 
+		 * @param {Function} type The type name registered with the {@link gui.ComponentManager ComponentManager}, or the constructor function (class) of the Container.
+		 * @return {gui.Container} The first Container which is an instance of the supplied type. 
 		 */
 		findParentByType : function( type ) {
 			if( typeof type === 'string' ) {
-				type = require( 'jqg/ComponentManager' ).getType( type );
+				type = require( 'gui/ComponentManager' ).getType( type );
 				
 				// No type found for the given type name, return null immediately
 				if( !type ) {
@@ -3476,7 +3476,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		/**
 		 * Determines if this Component is a descendent of the provided `container`.
 		 * 
-		 * @param {jqg.Container} container
+		 * @param {gui.Container} container
 		 * @return {Boolean} `true` if the Component is a descendant of the `container`, otherwise `false`.
 		 */
 		isDescendantOf : function( container ) {
@@ -3510,7 +3510,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 					this.currentAnimation.end();
 				}
 				
-				// Destroy the mask, if it is an instantiated jqg.Mask object (it may not be if the mask was never used)
+				// Destroy the mask, if it is an instantiated gui.Mask object (it may not be if the mask was never used)
 				if( this._mask instanceof Mask ) {
 					this._mask.destroy();
 				}
@@ -3548,7 +3548,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @protected
 		 * @method onDestroy
 		 */
-		onDestroy : JqGui.emptyFn
+		onDestroy : Gui.emptyFn
 	
 	} );
 	
@@ -3563,16 +3563,16 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 } );
 
 /*global define */
-define('jqg/ComponentManager', [
+define('gui/ComponentManager', [
 	'require',
-	'jqg/Component'  // loaded via require() call in the code below, as it is a circular dependency
+	'gui/Component'  // loaded via require() call in the code below, as it is a circular dependency
 ], function( require ) {
 	
 	/**
-	 * @class jqg.ComponentManager
+	 * @class gui.ComponentManager
 	 * @singleton
 	 *
-	 * Object used to manage {@link jqg.Component} "types", and handles instantiating them based on the string that is specified
+	 * Object used to manage {@link gui.Component} "types", and handles instantiating them based on the string that is specified
 	 * for them in the manifest.
 	 */
 	var ComponentManager = {
@@ -3581,7 +3581,7 @@ define('jqg/ComponentManager', [
 		 * @private
 		 * @property {Object} componentClasses
 		 * 
-		 * An Object (map) of the {@link jqg.Component} classes which have been {@link #registerType registered}, 
+		 * An Object (map) of the {@link gui.Component} classes which have been {@link #registerType registered}, 
 		 * keyed by their type name. 
 		 */
 		componentClasses : {},
@@ -3604,7 +3604,7 @@ define('jqg/ComponentManager', [
 				this.componentClasses[ type ] = jsClass;
 			// <debug>
 			} else {
-				throw new Error( "Error: jqg.ComponentManager already has a type '" + type + "'" );
+				throw new Error( "Error: gui.ComponentManager already has a type '" + type + "'" );
 			// </debug>
 			}
 		},
@@ -3620,8 +3620,8 @@ define('jqg/ComponentManager', [
 			type = type.toLowerCase();
 			
 			// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
-			// jqg.Component can't register itself with the ComponentManager
-			var jsClass = ( type === 'component' ) ? require( 'jqg/Component' ) : this.componentClasses[ type ];
+			// gui.Component can't register itself with the ComponentManager
+			var jsClass = ( type === 'component' ) ? require( 'gui/Component' ) : this.componentClasses[ type ];
 			
 			// <debug>
 			if( !jsClass ) 
@@ -3653,19 +3653,19 @@ define('jqg/ComponentManager', [
 		
 		
 		/**
-		 * Creates (instantiates) a {@link jqg.Component Component} based on its type name, given
+		 * Creates (instantiates) a {@link gui.Component Component} based on its type name, given
 		 * a configuration object that has a `type` property. If an already-instantiated 
-		 * {@link jqg.Component Component} is provided, it will simply be returned unchanged.
+		 * {@link gui.Component Component} is provided, it will simply be returned unchanged.
 		 * 
 		 * @param {Object} config The configuration object for the Component. Config objects should have the property `type`, 
-		 *   which determines which type of {@link jqg.Component Component} will be instantiated. If the object does not
+		 *   which determines which type of {@link gui.Component Component} will be instantiated. If the object does not
 		 *   have a `type` property, it will default to "container", which makes it simple to create things like tab containers. 
-		 *   Note that already-instantiated {@link jqg.Component Components} will simply be returned unchanged. 
-		 * @return {jqg.Component} The instantiated Component.
+		 *   Note that already-instantiated {@link gui.Component Components} will simply be returned unchanged. 
+		 * @return {gui.Component} The instantiated Component.
 		 */
 		create : function( config ) {
 			var type = config.type ? config.type.toLowerCase() : undefined,
-			    Component = require( 'jqg/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (jqg.Component depends on jqg.ComponentManager)
+			    Component = require( 'gui/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (gui.Component depends on gui.ComponentManager)
 			
 			if( config instanceof Component ) {
 				// Already a Component instance, return it
@@ -3690,16 +3690,16 @@ define('jqg/ComponentManager', [
 } );
 /*global define */
 /*jshint scripturl:true */
-define('jqg/Anchor', [
+define('gui/Anchor', [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/Component'
+	'gui/ComponentManager',
+	'gui/Component'
 ], function( jQuery, _, ComponentManager, Component ) {
 	
 	/**
-	 * @class jqg.Anchor
-	 * @extends jqg.Component
+	 * @class gui.Anchor
+	 * @extends gui.Component
 	 * @alias type.anchor
 	 *
 	 * A simple anchor component. This component can be used as a standard anchor (&lt;a&gt; tag) by setting
@@ -3708,7 +3708,7 @@ define('jqg/Anchor', [
 	 * 
 	 *     @example
 	 *     require( [
-	 *         'jqg/Anchor'
+	 *         'gui/Anchor'
 	 *     ], function( Anchor ) {
 	 *     
 	 *         var standardAnchor = new Anchor( {
@@ -3763,7 +3763,7 @@ define('jqg/Anchor', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-anchor',
+		baseCls : 'gui-anchor',
 	
 	
 		// protected
@@ -3773,7 +3773,7 @@ define('jqg/Anchor', [
 				 * Fires before the Anchor is clicked. Handlers may return false to cancel the action of the anchor.
 				 * 
 				 * @event beforeclick
-				 * @param {jqg.Anchor} anchor This Anchor instance.
+				 * @param {gui.Anchor} anchor This Anchor instance.
 				 * @preventable
 				 */
 				'beforeclick',
@@ -3782,7 +3782,7 @@ define('jqg/Anchor', [
 				 * Fires when the Anchor is clicked.
 				 * 
 				 * @event click
-				 * @param {jqg.Anchor} anchor This Anchor instance.
+				 * @param {gui.Anchor} anchor This Anchor instance.
 				 */
 				'click'
 			);
@@ -3875,24 +3875,24 @@ define('jqg/Anchor', [
 	
 } );
 /*global define */
-define('jqg/layout/Layout', [
+define('gui/layout/Layout', [
 	'lodash',
 	'Observable',
-	'jqg/JqGui'
-], function( _, Observable, JqGui ) {
+	'gui/Gui'
+], function( _, Observable, Gui ) {
 	
 	/**
 	 * @abstract 
-	 * @class jqg.layout.Layout
+	 * @class gui.layout.Layout
 	 * @extends Observable
 	 * 
 	 * Base class Layout that defines the public interface of all Layout subclasses. Layouts are stateful strategy objects 
-	 * that are used by {@link jqg.Container jqg.Containers} to implement how their child items are displayed. Because of their 
-	 * stateful nature, the same layout may not be used by multiple {@link jqg.Container jqg.Containers}.
+	 * that are used by {@link gui.Container gui.Containers} to implement how their child items are displayed. Because of their 
+	 * stateful nature, the same layout may not be used by multiple {@link gui.Container gui.Containers}.
 	 * 
-	 * The default layout that is used for a {@link jqg.Container Container} is the {@link jqg.layout.Auto}, 
-	 * which simply renders each child component directly into the {@link jqg.Container jqg.Container's} 
-	 * {@link jqg.Component#getContentTarget content target element}, and does no further sizing or formatting.
+	 * The default layout that is used for a {@link gui.Container Container} is the {@link gui.layout.Auto}, 
+	 * which simply renders each child component directly into the {@link gui.Container gui.Container's} 
+	 * {@link gui.Component#getContentTarget content target element}, and does no further sizing or formatting.
 	 * 
 	 * 
 	 * ## Building a Layout
@@ -3902,7 +3902,7 @@ define('jqg/layout/Layout', [
 	 * Note the following items:
 	 * 
 	 * - {@link #onLayout} and {@link #afterLayout} will be executed each time the {@link #container container's} 
-	 *   {@link jqg.Container#doLayout} method is executed. This means that {@link #onLayout} and {@link #afterLayout}
+	 *   {@link gui.Container#doLayout} method is executed. This means that {@link #onLayout} and {@link #afterLayout}
 	 *   may be called multiple times during the lifetime of the Layout, and this should be handled. Some layouts choose
 	 *   to have completely separate "first run" and "update layout" methods.
 	 * - Use the helper methods in this Layout class to {@link #renderComponent render} and {link #sizeComponent size}
@@ -3911,17 +3911,17 @@ define('jqg/layout/Layout', [
 	 *   {@link #renderComponent} and {@link #sizeComponent} methods for details.
 	 * - Layouts should handle the case of the {@link #container} they are laying out having 0 child components, and it should
 	 *   also handle the cases where child components are added, removed, or reordered. However, try not execute the
-	 *   {@link #renderComponent} method (and thus the {@link jqg.Component#method-render} method) when the component is already
+	 *   {@link #renderComponent} method (and thus the {@link gui.Component#method-render} method) when the component is already
 	 *   rendered and in the correct position. This adds DOM overhead, and can cause some weird behavior such as having
-	 *   {@link jqg.form.field.Text Text Fields} to lose focus if a layout runs that does this.
-	 * - Browser window resize events should not be handled within the Layout. The top level {@link jqg.Viewport} will
-	 *   call its {@link jqg.Container#doLayout doLayout} method to fix the layout automatically, on resize.
+	 *   {@link gui.form.field.Text Text Fields} to lose focus if a layout runs that does this.
+	 * - Browser window resize events should not be handled within the Layout. The top level {@link gui.Viewport} will
+	 *   call its {@link gui.Container#doLayout doLayout} method to fix the layout automatically, on resize.
 	 * 
 	 * Layouts are required to manage any HTML elements that they create, and should clean up after themselves
 	 * when they are done. This includes cleaning up old HTML elements when {@link #doLayout} (and therefore,
 	 * {@link #onLayout}) is run again, and when the Layout is {@link #method-destroy destroyed}. Subclasses should
 	 * implement the {@link #onDestroy} method to implement their clean up as part of the destruction process.
-	 * Note that a layout may be destroyed by a {@link jqg.Container} if another layout is set to it, and therefore
+	 * Note that a layout may be destroyed by a {@link gui.Container} if another layout is set to it, and therefore
 	 * it cannot be relied on that the Container will clean up any stray elements that a Layout has created.
 	 */
 	var Layout = Observable.extend( {
@@ -3929,9 +3929,9 @@ define('jqg/layout/Layout', [
 		
 		
 		/**
-		 * @cfg {jqg.Container} container
+		 * @cfg {gui.Container} container
 		 * 
-		 * The {@link jqg.Container} that this Layout object belongs to. Defaults to null, and can be set
+		 * The {@link gui.Container} that this Layout object belongs to. Defaults to null, and can be set
 		 * after instantiation with {@link #setContainer}. 
 		 */
 		container : null,
@@ -3966,7 +3966,7 @@ define('jqg/layout/Layout', [
 				 * Fires when this layout is destroyed.
 				 * 
 				 * @event destroy
-				 * @param {jqg.layout.Layout} layout This AbstractLayout instance.
+				 * @param {gui.layout.Layout} layout This AbstractLayout instance.
 				 */
 				'destroy'
 			);
@@ -3998,13 +3998,13 @@ define('jqg/layout/Layout', [
 		 * @template
 		 * @method initLayout
 		 */
-		initLayout : JqGui.emptyFn,
+		initLayout : Gui.emptyFn,
 		
 		
 		/**
-		 * Sets the {@link jqg.Container} instance that this Layout belongs to.
+		 * Sets the {@link gui.Container} instance that this Layout belongs to.
 		 * 
-		 * @param {jqg.Container} container
+		 * @param {gui.Container} container
 		 */
 		setContainer : function( container ) {
 			this.container = container;
@@ -4013,9 +4013,9 @@ define('jqg/layout/Layout', [
 		
 		
 		/**
-		 * Gets the {@link jqg.Container} instance that this Layout belongs to.
+		 * Gets the {@link gui.Container} instance that this Layout belongs to.
 		 * 
-		 * @return {jqg.Container} The container
+		 * @return {gui.Container} The container
 		 */
 		getContainer : function() {
 			return this.container;
@@ -4033,9 +4033,9 @@ define('jqg/layout/Layout', [
 		 * @protected
 		 * @template
 		 * @method onContainerSet
-		 * @param {jqg.Container} container The Container that was set.
+		 * @param {gui.Container} container The Container that was set.
 		 */
-		onContainerSet : JqGui.emptyFn,
+		onContainerSet : Gui.emptyFn,
 		
 		
 		/**
@@ -4068,7 +4068,7 @@ define('jqg/layout/Layout', [
 			this.onLayout( childComponents, $targetEl );
 			
 			
-			// Now that each child jqg.Component has been rendered, we need to run the layouts on each component 
+			// Now that each child gui.Component has been rendered, we need to run the layouts on each component 
 			// that has not yet had a layout executed on it
 			for( i = 0; i < numChildComponents; i++ ) {
 				childComponent = childComponents[ i ];
@@ -4094,10 +4094,10 @@ define('jqg/layout/Layout', [
 		 * @protected
 		 * @template
 		 * @method onLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
-		onLayout : JqGui.emptyFn,
+		onLayout : Gui.emptyFn,
 		
 		
 		/**
@@ -4108,10 +4108,10 @@ define('jqg/layout/Layout', [
 		 * @protected
 		 * @template
 		 * @method afterLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
-		afterLayout : JqGui.emptyFn,
+		afterLayout : Gui.emptyFn,
 		
 		
 		/**
@@ -4119,7 +4119,7 @@ define('jqg/layout/Layout', [
 		 * ({@link #doLayout}/{@link #onLayout}). This is so that we know that we don't have to lay out components
 		 * that have already been manually laid out.
 		 * 
-		 * @param {jqg.Component} component The Component that a layout was performed on.
+		 * @param {gui.Component} component The Component that a layout was performed on.
 		 */
 		markLayoutComplete : function( component ) {
 			this.needsLayoutMap[ component.getUuid() ] = false;
@@ -4130,36 +4130,36 @@ define('jqg/layout/Layout', [
 		
 		
 		/**
-		 * Utility method used to render a child {@link jqg.Component} into the layout's target element. This method renders
-		 * the child component, deferring any layout of child {@link jqg.Container containers} until after the layout process 
+		 * Utility method used to render a child {@link gui.Component} into the layout's target element. This method renders
+		 * the child component, deferring any layout of child {@link gui.Container containers} until after the layout process 
 		 * is complete.
 		 * 
-		 * This method lazily renders the provided `component`. A call to the component's {@link jqg.Component#method-render render}
+		 * This method lazily renders the provided `component`. A call to the component's {@link gui.Component#method-render render}
 		 * method will only be made if:
 		 * 
-		 * 1) The `component` is not yet {@link jqg.Component#method-render rendered}.
-		 * 2) The `component` is rendered, but not a child of the `$targetEl`. Calling {@link jqg.Component#method-render render} here
+		 * 1) The `component` is not yet {@link gui.Component#method-render rendered}.
+		 * 2) The `component` is rendered, but not a child of the `$targetEl`. Calling {@link gui.Component#method-render render} here
 		 *    will move it.
 		 * 3) The `component` is not at the provided `position` in the $targetEl. Basically if the `position` option is provided, 
 		 *    an extra check will be made to determine if the component already exists at that position, and if so, no call to 
-		 *    {@link jqg.Component#method-render render} will be made.
+		 *    {@link gui.Component#method-render render} will be made.
 		 * 
-		 * The main reason that this method checks to see if the {@link jqg.Component#method-render} method needs to be called before
+		 * The main reason that this method checks to see if the {@link gui.Component#method-render} method needs to be called before
 		 * doing so is so that we do not end up moving components around the DOM when they don't need to be. Doing so will
 		 * make the browser do more work, and can also cause unwanted side effects. One of these side effects could be if the user 
-		 * is editing a {@link jqg.form.field.TextArea TextArea Field}, and the field resizes, triggering a layout routine 
-		 * (see {@link jqg.form.field.TextArea#autoGrow}). If a parent layout of the TextArea moves a component in the DOM, 
+		 * is editing a {@link gui.form.field.TextArea TextArea Field}, and the field resizes, triggering a layout routine 
+		 * (see {@link gui.form.field.TextArea#autoGrow}). If a parent layout of the TextArea moves a component in the DOM, 
 		 * the TextArea will lose focus, and the user would have to click into it again to continue editing.
 		 * 
 		 * @protected
-		 * @param {jqg.Component} component The component to render.
+		 * @param {gui.Component} component The component to render.
 		 * @param {jQuery} $targetEl The target element to render the `component` into.
 		 * @param {Object} [options] Any additional options to provide to the `options` argument of the 
-		 *   `component`'s {@link jqg.Component#method-render} method. 
+		 *   `component`'s {@link gui.Component#method-render} method. 
 		 * @param {Number/String/HTMLElement/jQuery} [options.position] This property is handled in particular 
 		 *   by this method (if provided), to determine if the `component` needs to be moved (by way
-		 *   of the {@link jqg.Component#method-render render} method). If provided, an extra test will check if
-		 *   the component is already in the correct position, or else no call to {@link jqg.Component#method-render}
+		 *   of the {@link gui.Component#method-render render} method). If provided, an extra test will check if
+		 *   the component is already in the correct position, or else no call to {@link gui.Component#method-render}
 		 *   will be made (as an optimization). This may be a numeric position index, a jQuery selector, an HTML 
 		 *   element, or a jQuery wrapped set itself.
 		 */
@@ -4187,12 +4187,12 @@ define('jqg/layout/Layout', [
 		
 		
 		/**
-		 * Utility method used to size a child {@link jqg.Component} to the given `width` and `height`, based on the `component`'s 
+		 * Utility method used to size a child {@link gui.Component} to the given `width` and `height`, based on the `component`'s 
 		 * margin/padding/border widths. This method should only be called after the `component` has already been rendered, so that 
 		 * it can access the margin/padding/border widths on the `component`.
 		 * 
 		 * @protected
-		 * @param {jqg.Component} component The {@link jqg.Component component} to size.
+		 * @param {gui.Component} component The {@link gui.Component component} to size.
 		 * @param {Number} targetWidth The width the component should be sized to. If the width should not be changed, this argument
 		 *   may be passed as `undefined`.
 		 * @param {Number} targetHeight The height the component should be sized to. If the height should not be changed, this argument
@@ -4242,39 +4242,39 @@ define('jqg/layout/Layout', [
 		 * @template
 		 * @method onDestroy
 		 */
-		onDestroy : JqGui.emptyFn
+		onDestroy : Gui.emptyFn
 		
 	} );
 
 	return Layout;
 } );
 /*global define */
-define('jqg/layout/Auto', [
+define('gui/layout/Auto', [
 	'require',
-	'jqg/layout/Layout',
-	'jqg/Container'
+	'gui/layout/Layout',
+	'gui/Container'
 ], function( require, Layout ) {
 	
 	/**
-	 * @class jqg.layout.Auto
-	 * @extends jqg.layout.Layout
+	 * @class gui.layout.Auto
+	 * @extends gui.layout.Layout
 	 * @alias layout.auto
 	 * 
-	 * The default layout that is used for a {@link jqg.Container Container}, which simply
+	 * The default layout that is used for a {@link gui.Container Container}, which simply
 	 * renders each child component into their own div element, and does no further sizing or formatting.
 	 * 
 	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'auto' (or
-	 * by not giving a {@link jqg.Container Container} any {@link jqg.Container#layout layout} config).
+	 * by not giving a {@link gui.Container Container} any {@link gui.Container#layout layout} config).
 	 */
 	var AutoLayout = Layout.extend( {
 		
 		/**
 		 * Layout implementation for AutoLayout, which simply renders each child component directly into the 
-		 * Container's content target (see {@link jqg.Component#getContentTarget}). 
+		 * Container's content target (see {@link gui.Component#getContentTarget}). 
 		 * 
 		 * @protected
 		 * @method onLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
@@ -4288,8 +4288,8 @@ define('jqg/layout/Auto', [
 		
 	} );
 	
-	// Register the layout type with the jqg.Container class, which is used to be able to instantiate the layout via its type name.
-	// NOTE: Due to circular dependency issues with RequireJS, jqg.Container automatically considers this class as "registered" with
+	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
+	// NOTE: Due to circular dependency issues with RequireJS, gui.Container automatically considers this class as "registered" with
 	// the type string 'auto'. Leaving below line commented as a reminder. Even if we add an async require() call here,
 	// it is possible that the AutoLayout class is still not registered in time for use.
 	//Container.registerLayout( 'auto', AutoLayout );   -- leave as reminder
@@ -4297,20 +4297,20 @@ define('jqg/layout/Auto', [
 	return AutoLayout;
 } );
 /*global define */
-define('jqg/Container', [
+define('gui/Container', [
 	'require',
 	'lodash',
 	'Class',
-	'jqg/JqGui',
-	'jqg/ComponentManager',
-	'jqg/Component',
-	'jqg/layout/Layout',   // circular dependency, used with require() call
-	'jqg/layout/Auto'      // circular dependency, used with require() call
-], function( require, _, Class, JqGui, ComponentManager, Component ) {
+	'gui/Gui',
+	'gui/ComponentManager',
+	'gui/Component',
+	'gui/layout/Layout',   // circular dependency, used with require() call
+	'gui/layout/Auto'      // circular dependency, used with require() call
+], function( require, _, Class, Gui, ComponentManager, Component ) {
 
 	/**
-	 * @class jqg.Container
-	 * @extends jqg.Component
+	 * @class gui.Container
+	 * @extends gui.Component
 	 * @alias type.container
 	 *
 	 * Base class for a component that holds other child components. Provides a default
@@ -4325,32 +4325,32 @@ define('jqg/Container', [
 			 * @static
 			 * @property {Object} layouts
 			 * 
-			 * Map that stores "registered" layout types. The layouts are in the `jqg.layout` package, and each
+			 * Map that stores "registered" layout types. The layouts are in the `gui.layout` package, and each
 			 * specifies a type name that is used to instantiate them.
 			 */
 			layouts : {},
 			
 			/**
-			 * Registers a {@link jqg.layout.Layout Layout} with the Container class, allowing {@link #layout layouts}
+			 * Registers a {@link gui.layout.Layout Layout} with the Container class, allowing {@link #layout layouts}
 			 * to be specified by their string `typeName`.
 			 *
 			 * @static
 			 * @param {String} typeName The type name for the Layout.
-			 * @param {Function} layoutClass A {@link jqg.layout.Layout} subclass.
+			 * @param {Function} layoutClass A {@link gui.layout.Layout} subclass.
 			 */
 			registerLayout : function( typeName, layoutClass ) {
 				Container.layouts[ typeName.toLowerCase() ] = layoutClass;
 			},
 			
 			/**
-			 * Retrieves a registered {@link jqg.layout.Layout Layout} class by "type" name.
+			 * Retrieves a registered {@link gui.layout.Layout Layout} class by "type" name.
 			 * 
 			 * @static
 			 * @protected
 			 * @param {String} typeName The type name that the layout was registered with. This is case-insensitive.
-			 * @return {Function} The {@link jqg.layout.Layout Layout} that was registered with the
+			 * @return {Function} The {@link gui.layout.Layout Layout} that was registered with the
 			 *   given `typeName`.
-			 * @throws {Error} If the `typeName` did not resolve to a registered {@link jqg.layout.Layout Layout}.
+			 * @throws {Error} If the `typeName` did not resolve to a registered {@link gui.layout.Layout Layout}.
 			 */
 			getLayoutType : function( typeName ) {
 				typeName = typeName.toLowerCase();
@@ -4366,7 +4366,7 @@ define('jqg/Container', [
 				// Return the AutoLayout explicitly if asked for, since that class is not registered due to issues 
 				// with RequireJS and the circular dependency of this class requiring it. Other Layout classes are 
 				// registered normally. 
-				return ( typeName === 'auto' ) ? require( 'jqg/layout/Auto' ) : Container.layouts[ typeName ];
+				return ( typeName === 'auto' ) ? require( 'gui/layout/Auto' ) : Container.layouts[ typeName ];
 			}
 			
 		},
@@ -4382,18 +4382,18 @@ define('jqg/Container', [
 		/**
 		 * @cfg {String/Function} acceptType
 		 * 
-		 * The {@link jqg.Component} class (or subclass) to accept in the Container for child {@link #items}. If an added component 
-		 * is not an instance of this type, an error will be thrown. This should be set to a {@link jqg.Component} subclass (as only 
-		 * {@link jqg.Component Components} may be added to a Container in the first place).
+		 * The {@link gui.Component} class (or subclass) to accept in the Container for child {@link #items}. If an added component 
+		 * is not an instance of this type, an error will be thrown. This should be set to a {@link gui.Component} subclass (as only 
+		 * {@link gui.Component Components} may be added to a Container in the first place).
 		 * 
-		 * This config is useful for subclasses to set/override if they require a specific {@link jqg.Component} subclass to be added to
-		 * them, so as to not allow just any {@link jqg.Component} to be added, and direct the user as such.
+		 * This config is useful for subclasses to set/override if they require a specific {@link gui.Component} subclass to be added to
+		 * them, so as to not allow just any {@link gui.Component} to be added, and direct the user as such.
 		 * 
-		 * The value for this configuration option can either be the constructor function for a {@link jqg.Component} class, or a
-		 * 'type' string which will be resolved to a {@link jqg.Component} class via {@link jqg.ComponentManager#getType}.
+		 * The value for this configuration option can either be the constructor function for a {@link gui.Component} class, or a
+		 * 'type' string which will be resolved to a {@link gui.Component} class via {@link gui.ComponentManager#getType}.
 		 * 
 		 * Note that the check for this is performed after any anonymous config objects have been converted into their corresponding
-		 * {@link jqg.Component} instance.
+		 * {@link gui.Component} instance.
 		 */
 		acceptType : Component,
 	
@@ -4404,31 +4404,31 @@ define('jqg/Container', [
 		destroyRemoved : true,
 	
 		/**
-		 * @cfg {String/Object/jqg.layout.Layout} layout
+		 * @cfg {String/Object/gui.layout.Layout} layout
 		 * The layout strategy object to use for laying out (displaying) the Container's child items.  This can either be a string with the
 		 * type name of the layout, an object which should have the property `type` (for the layout's type name) and any other layout
-		 * configuration options, or an instantiated {@link jqg.layout.Layout} subclass.
+		 * configuration options, or an instantiated {@link gui.layout.Layout} subclass.
 		 */
 	
 		/**
-		 * @cfg {Object/Object[]/jqg.Component/jqg.Component[]} items
+		 * @cfg {Object/Object[]/gui.Component/gui.Component[]} items
 		 * Any Components/Containers that will become children of this Container, and will be instantiated at
 		 * construction time.  These can be retrieved from the Container using {@link #getItems}.
 		 *
-		 * Note that specifying child items is mutually exclusive with setting the {@link jqg.Component#html} and
-		 * {@link jqg.Component#contentEl} configs, and will take precedence over them.
+		 * Note that specifying child items is mutually exclusive with setting the {@link gui.Component#html} and
+		 * {@link gui.Component#contentEl} configs, and will take precedence over them.
 		 */
 	
 		/**
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-container',
+		baseCls : 'gui-container',
 	
 	
 		/**
 		 * @private
-		 * @property {jqg.Component[]} childComponents
+		 * @property {gui.Component[]} childComponents
 		 * 
 		 * An array of child components. Created from the "items" config, or call(s) to the {@link #method-add} method.
 		 */
@@ -4463,8 +4463,8 @@ define('jqg/Container', [
 				 * this event may return false to cancel the addition of the Component.
 				 *
 				 * @event beforeadd
-				 * @param {jqg.Container} container This Container.
-				 * @param {jqg.Component} component The Component that is to be added.
+				 * @param {gui.Container} container This Container.
+				 * @param {gui.Component} component The Component that is to be added.
 				 */
 				'beforeadd',
 	
@@ -4472,8 +4472,8 @@ define('jqg/Container', [
 				 * Fires after a Component has been added to this Container. This event bubbles.
 				 *
 				 * @event add
-				 * @param {jqg.Container} container This Container.
-				 * @param {jqg.Component} component The Component that was added.
+				 * @param {gui.Container} container This Container.
+				 * @param {gui.Component} component The Component that was added.
 				 * @param {Number} index The index in this Container's child items array that the Component was added to.
 				 */
 				'add',
@@ -4485,8 +4485,8 @@ define('jqg/Container', [
 				 * Container, then the {@link #event-add} event is fired.
 				 *
 				 * @event reorder
-				 * @param {jqg.Container} container This Container.
-				 * @param {jqg.Component} component The Component that was reordered within the Container.
+				 * @param {gui.Container} container This Container.
+				 * @param {gui.Component} component The Component that was reordered within the Container.
 				 * @param {Number} index The new index of the Component in this Container's child items array.
 				 * @param {Number} previousIndex The previous index of the Component in this Container's child items array.
 				 */
@@ -4497,8 +4497,8 @@ define('jqg/Container', [
 				 * this event may return false to cancel the removal of the Component.
 				 *
 				 * @event beforeremove
-				 * @param {jqg.Container} container This Container.
-				 * @param {jqg.Component} component The Component that is to be removed.
+				 * @param {gui.Container} container This Container.
+				 * @param {gui.Component} component The Component that is to be removed.
 				 */
 				'beforeremove',
 	
@@ -4506,8 +4506,8 @@ define('jqg/Container', [
 				 * Fires after a Component has been removed from this Container. This event bubbles.
 				 *
 				 * @event remove
-				 * @param {jqg.Container} container This Container.
-				 * @param {jqg.Component} component The Component that was removed.
+				 * @param {gui.Container} container This Container.
+				 * @param {gui.Component} component The Component that was removed.
 				 * @param {Number} index The index in this Container's child items array that the Component was removed from.
 				 */
 				'remove',
@@ -4519,7 +4519,7 @@ define('jqg/Container', [
 				 * point).
 				 *
 				 * @event afterlayout
-				 * @param {jqg.Container} container This Container.
+				 * @param {gui.Container} container This Container.
 				 */
 				'afterlayout'
 			);
@@ -4551,7 +4551,7 @@ define('jqg/Container', [
 		/**
 		 * Resolves the constructor function for the value provided to the `type` argument. If a string is provided,
 		 * it is assumed to be a 'type' name and a lookup for the constructor function is performed via 
-		 * {@link jqg.ComponentManager#getType}. If a function is provided, the function is returned as-is.
+		 * {@link gui.ComponentManager#getType}. If a function is provided, the function is returned as-is.
 		 * 
 		 * This method is used to support the {@link #defaultType} and {@link #acceptType} configs.
 		 * 
@@ -4588,7 +4588,7 @@ define('jqg/Container', [
 		 * @protected
 		 * @method createComponent
 		 * @param {Object} config The configuration object for the Component.
-		 * @return {jqg.Component} The instantiated Component.
+		 * @return {gui.Component} The instantiated Component.
 		 */
 		createComponent : function( config ) {
 			// Set the Component's parentContainer property to this Container, and use the default component 'type' if one wasn't specified
@@ -4604,8 +4604,8 @@ define('jqg/Container', [
 	
 	
 		/**
-		 * Adds child {@link jqg.Component Component(s)} to this Container, instantiating them into their appropriate
-		 * jqg.Component subclass.  When all Components are added, this method automatically calls {@link #doLayout} to
+		 * Adds child {@link gui.Component Component(s)} to this Container, instantiating them into their appropriate
+		 * gui.Component subclass.  When all Components are added, this method automatically calls {@link #doLayout} to
 		 * refresh the layout.
 		 *
 		 * Note that if multiple Components are being added, it is recommended that they all be provided to this method
@@ -4616,9 +4616,9 @@ define('jqg/Container', [
 		 *
 		 *
 		 * @method add
-		 * @param {jqg.Component/Object/jqg.Component[]/Array} cmp A single child {@link jqg.Component} or config object, or an array of
-		 *   child {@link jqg.Component Components} or config objects.
-		 * @return {jqg.Component/jqg.Component[]} Returns the Component that was added, or an array of the Components that were added, depending on
+		 * @param {gui.Component/Object/gui.Component[]/Array} cmp A single child {@link gui.Component} or config object, or an array of
+		 *   child {@link gui.Component Components} or config objects.
+		 * @return {gui.Component/gui.Component[]} Returns the Component that was added, or an array of the Components that were added, depending on
 		 *   the type provided to the `cmp` argument.  Single Component addition returns a single Component; array addition returns an array. See
 		 *   the return value of {@link #insert}.
 		 */
@@ -4643,12 +4643,12 @@ define('jqg/Container', [
 	
 	
 		/**
-		 * Inserts (or moves) a {@link jqg.Component Component} into this Container.
+		 * Inserts (or moves) a {@link gui.Component Component} into this Container.
 		 *
 		 * @method insert
-		 * @param {jqg.Component/Object} cmp The Component or config object of a Component to insert.
+		 * @param {gui.Component/Object} cmp The Component or config object of a Component to insert.
 		 * @param {Number} position (optional) The position (index) to insert the Component at. If omitted, the component will be appended to the Container.
-		 * @return {jqg.Component} The Component that was inserted, or null if the Component was not added because a beforeadd event handler returned false.
+		 * @return {gui.Component} The Component that was inserted, or null if the Component was not added because a beforeadd event handler returned false.
 		 */
 		insert : function( cmp, position ) {
 			cmp = this.doInsert( cmp, position );
@@ -4666,9 +4666,9 @@ define('jqg/Container', [
 		 *
 		 * @private
 		 * @method doInsert
-		 * @param {jqg.Component/Object} component The Component or config object of a Component to insert.
+		 * @param {gui.Component/Object} component The Component or config object of a Component to insert.
 		 * @param {Number} position (optional) The position (index) to insert the Component at. If omitted, the component will be appended to the Container.
-		 * @return {jqg.Component} The Component that was inserted, or null if the component was not added because a beforeadd event handler returned false.
+		 * @return {gui.Component} The Component that was inserted, or null if the component was not added because a beforeadd event handler returned false.
 		 */
 		doInsert : function( component, position ) {
 			// First, fix position if it is out of the bounds of the childComponents array
@@ -4681,7 +4681,7 @@ define('jqg/Container', [
 			}
 	
 	
-			var isInstantiatedComponent = ( component instanceof Component ),   // if the component argument is an actual instantiated jqg.Component, and not just a configuration object
+			var isInstantiatedComponent = ( component instanceof Component ),   // if the component argument is an actual instantiated gui.Component, and not just a configuration object
 			    isReorder = isInstantiatedComponent && this.has( component );  // Determines if this is an actual addition of the Component to the Container, or a reorder of the Component within the Container
 	
 			if( isReorder ) {
@@ -4705,14 +4705,14 @@ define('jqg/Container', [
 				return component;
 	
 			} else {
-				// If the component is not yet a jqg.Component instance at this point (i.e. it is a configuration object), instantiate it now so
+				// If the component is not yet a gui.Component instance at this point (i.e. it is a configuration object), instantiate it now so
 				// we can provide it to the beforeadd event
 				if( !isInstantiatedComponent ) {
 					component = this.createComponent( component );
 				}
 				
 				// Perform the check that the component is of the correct class type (governed by the 'acceptType' config).
-				if( !( component instanceof this.acceptType ) ) {  // Note: this.acceptType defaults to jqg.Component
+				if( !( component instanceof this.acceptType ) ) {  // Note: this.acceptType defaults to gui.Component
 					throw new Error( "A Component added to the Container was not of the correct class type ('acceptType' config)" );
 				}
 	
@@ -4749,10 +4749,10 @@ define('jqg/Container', [
 		 * @protected
 		 * @template
 		 * @method onAdd
-		 * @param {jqg.Component} component The component that was added or inserted into this Container.
+		 * @param {gui.Component} component The component that was added or inserted into this Container.
 		 * @param {Number} index The index in this Container's child items array where the new Component was added.
 		 */
-		onAdd : JqGui.emptyFn,
+		onAdd : Gui.emptyFn,
 	
 	
 		/**
@@ -4761,20 +4761,20 @@ define('jqg/Container', [
 		 * @protected
 		 * @template
 		 * @method onReorder
-		 * @param {jqg.Component} component The Component that was reordered within the Container.
+		 * @param {gui.Component} component The Component that was reordered within the Container.
 		 * @param {Number} index The new index of the Component in this Container's child items array.
 		 * @param {Number} previousIndex The previous index of the Component in this Container's child items array.
 		 */
-		onReorder : JqGui.emptyFn,
+		onReorder : Gui.emptyFn,
 	
 	
 	
 		/**
-		 * Removes one or more child {@link jqg.Component Component(s)} from this Container.  
+		 * Removes one or more child {@link gui.Component Component(s)} from this Container.  
 		 * 
-		 * Removed {@link jqg.Component Components} will automatically have their {@link jqg.Component#method-destroy} method called if 
+		 * Removed {@link gui.Component Components} will automatically have their {@link gui.Component#method-destroy} method called if 
 		 * the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is explicitly set to true. 
-		 * If the Component is not destroyed, its main {@link jqg.Component#$el element} is detached from this Container.  When all 
+		 * If the Component is not destroyed, its main {@link gui.Component#$el element} is detached from this Container.  When all 
 		 * Components are removed, this method automatically calls {@link #doLayout} to refresh the layout.
 		 *
 		 * Note that if multiple Components are being removed, it is recommended that they all be provided to this method
@@ -4785,9 +4785,9 @@ define('jqg/Container', [
 		 * Container, and a {@link #beforeremove} event handler did not return false for it).
 		 *
 		 * @method remove
-		 * @param {jqg.Component/jqg.Component[]} cmp A single child {@link jqg.Component Component}, or an array of child Components.
+		 * @param {gui.Component/gui.Component[]} cmp A single child {@link gui.Component Component}, or an array of child Components.
 		 * @param {Boolean} destroyRemoved (optional) True to automatically destroy the removed component. Defaults to the value of this Container's {@link #destroyRemoved} config.
-		 * @return {jqg.Component/jqg.Component[]} Returns the Component that was removed, or an array of the Components that were removed, depending on
+		 * @return {gui.Component/gui.Component[]} Returns the Component that was removed, or an array of the Components that were removed, depending on
 		 *   the type provided to the `cmp` argument.  Single Component removal returns a single Component (or null if the Component was not removed);
 		 *   array removal returns an array of the Components that were successfully removed.
 		 */
@@ -4818,9 +4818,9 @@ define('jqg/Container', [
 		 * Removes the child Component at the given `idx`, and returns the removed component. If there is no component 
 		 * at the given `idx`, then this method has no effect and returns `null`.
 		 * 
-		 * Note that the removed {@link jqg.Component Component} will automatically have its {@link jqg.Component#method-destroy destroy} 
+		 * Note that the removed {@link gui.Component Component} will automatically have its {@link gui.Component#method-destroy destroy} 
 		 * method called if the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is 
-		 * explicitly set to true. If the Component is not destroyed, its main {@link jqg.Component#$el element} is detached from 
+		 * explicitly set to true. If the Component is not destroyed, its main {@link gui.Component#$el element} is detached from 
 		 * this Container.  
 		 * 
 		 * When the Component is removed, this method automatically calls {@link #doLayout} to refresh the layout.
@@ -4829,7 +4829,7 @@ define('jqg/Container', [
 		 * Container, and a {@link #beforeremove} event handler did not return false for it).
 		 * 
 		 * @param {Number} idx The index of the child component to remove.
-		 * @return {jqg.Component} Returns the Component that was removed, or `null` if there was no Component at the given `idx`.
+		 * @return {gui.Component} Returns the Component that was removed, or `null` if there was no Component at the given `idx`.
 		 */
 		removeAt : function( idx ) {
 			return this.remove( this.getItemAt( idx ) );
@@ -4853,16 +4853,16 @@ define('jqg/Container', [
 	
 	
 		/**
-		 * Removes a child {@link jqg.Component Component(s)} from this Container.  If a Component is successfully removed, the 'remove' event will be fired.
-		 * Removed {@link jqg.Component Components} will automatically have their destroy() method called if the {@link #destroyRemoved} config is true, or
-		 * if the `destroyRemoved` argument is explicitly set to true.  If the Component is not destroyed, its main {@link jqg.Component#getEl element} is
+		 * Removes a child {@link gui.Component Component(s)} from this Container.  If a Component is successfully removed, the 'remove' event will be fired.
+		 * Removed {@link gui.Component Components} will automatically have their destroy() method called if the {@link #destroyRemoved} config is true, or
+		 * if the `destroyRemoved` argument is explicitly set to true.  If the Component is not destroyed, its main {@link gui.Component#getEl element} is
 		 * detached from this Container.
 		 *
 		 * @private
 		 * @method doRemove
-		 * @param {jqg.Component/jqg.Component[]} cmp A single child {@link jqg.Component Component}, or an array of child Components.
+		 * @param {gui.Component/gui.Component[]} cmp A single child {@link gui.Component Component}, or an array of child Components.
 		 * @param {Boolean} destroyRemoved (optional) True to automatically destroy the removed component. Defaults to the value of this Container's {@link #destroyRemoved} config.
-		 * @return {jqg.Component} The Component that was removed, or null if no Component was removed (i.e. a {@link #beforeremove}
+		 * @return {gui.Component} The Component that was removed, or null if no Component was removed (i.e. a {@link #beforeremove}
 		 *   event handler returned false, or the Component to be removed was not found).
 		 */
 		doRemove : function( cmp, destroyRemoved ) {
@@ -4919,10 +4919,10 @@ define('jqg/Container', [
 		 * @protected
 		 * @template
 		 * @method onRemove
-		 * @param {jqg.Component} component The component that was removed.
+		 * @param {gui.Component} component The component that was removed.
 		 * @param {Number} index The index in this Container's child items array where the Component was removed from.
 		 */
-		onRemove : JqGui.emptyFn,
+		onRemove : Gui.emptyFn,
 	
 	
 	
@@ -4931,7 +4931,7 @@ define('jqg/Container', [
 		// Child Component Accessor Methods
 	
 		/**
-		 * Retrives the number of child items ({@link jqg.Component components}) that are currently held by this Container.
+		 * Retrives the number of child items ({@link gui.Component components}) that are currently held by this Container.
 		 * 
 		 * @method getCount
 		 * @return {Number}
@@ -4942,10 +4942,10 @@ define('jqg/Container', [
 	
 	
 		/**
-		 * Retrieves the child items ({@link jqg.Component components}) that are currently held by this Container.
+		 * Retrieves the child items ({@link gui.Component components}) that are currently held by this Container.
 		 *
 		 * @method getItems
-		 * @return {jqg.Component[]}
+		 * @return {gui.Component[]}
 		 */
 		getItems : function() {
 			return this.childComponents;
@@ -4953,12 +4953,12 @@ define('jqg/Container', [
 	
 	
 		/**
-		 * Retrieves the child item ({@link jqg.Component Component} at the specified `index`. If the
+		 * Retrieves the child item ({@link gui.Component Component} at the specified `index`. If the
 		 * index is out of range of the child items, this method returns null.
 		 *
 		 * @method getItemAt
 		 * @param {Number} index
-		 * @return {jqg.Component} The child item ({@link jqg.Component Component}) at the specified index, or null if the index is out of range.
+		 * @return {gui.Component} The child item ({@link gui.Component Component}) at the specified index, or null if the index is out of range.
 		 */
 		getItemAt : function( index ) {
 			return this.childComponents[ index ] || null;
@@ -4966,11 +4966,11 @@ define('jqg/Container', [
 	
 	
 		/**
-		 * Retrieves the index of the given child item ({@link jqg.Component Component}). Returns -1 if the if the item
+		 * Retrieves the index of the given child item ({@link gui.Component Component}). Returns -1 if the if the item
 		 * is not found.
 		 *
 		 * @method getItemIndex
-		 * @param {jqg.Component} item The item to get the index of.
+		 * @param {gui.Component} item The item to get the index of.
 		 * @return {Number} The index of the item (component), or -1 if it was not found.
 		 */
 		getItemIndex : function( item ) {
@@ -4988,7 +4988,7 @@ define('jqg/Container', [
 		 * Determine if this Container has a given `component` as a direct child component of this Container.
 		 *
 		 * @method has
-		 * @param {jqg.Component} component The {@link jqg.Component Component} to look for as a child of this Container.
+		 * @param {gui.Component} component The {@link gui.Component Component} to look for as a child of this Container.
 		 * @return {Boolean} True if the Component is found as a direct child of this Container, false otherwise.
 		 */
 		has : function( component ) {
@@ -5037,7 +5037,7 @@ define('jqg/Container', [
 	
 		/**
 		 * Lays out the Container's child components ({@link #items}) using the configured {@link #layout} strategy object.
-		 * If no {@link #layout} has been configured, the default {@link jqg.layout.Auto} is used.
+		 * If no {@link #layout} has been configured, the default {@link gui.layout.Auto} is used.
 		 *
 		 * Note that a layout can only be done if the Container is rendered and visible. This method will automatically
 		 * be run when the Container's {@link #method-render} method runs. If the Container isn' visible when this method is called,
@@ -5046,7 +5046,7 @@ define('jqg/Container', [
 		 * @method doLayout
 		 */
 		doLayout : function() {
-			// Run the superclass's (jqg.Component's) layout functionality first
+			// Run the superclass's (gui.Component's) layout functionality first
 			this._super( arguments );
 			
 			if( !this.canLayout() ) {
@@ -5073,14 +5073,14 @@ define('jqg/Container', [
 		
 		
 		/**
-		 * Hook method that is executed just before the {@link #layout layout's} {@link jqg.layout.Layout#doLayout doLayout}
+		 * Hook method that is executed just before the {@link #layout layout's} {@link gui.layout.Layout#doLayout doLayout}
 		 * method is executed to run the layout.
 		 * 
 		 * @protected
 		 * @template
 		 * @method onBeforeLayout
 		 */
-		onBeforeLayout : JqGui.emptyFn,
+		onBeforeLayout : Gui.emptyFn,
 		
 		
 		/**
@@ -5092,13 +5092,13 @@ define('jqg/Container', [
 		 * @template
 		 * @method onLayout
 		 */
-		onLayout : JqGui.emptyFn,
+		onLayout : Gui.emptyFn,
 		
 	
 		/**
 		 * Determines if the Container can be laid out at this time. The Container must be rendered, and visible.
 		 * It must be visible because for some layouts, especially those that use jQuery UI components or that
-		 * need to calculate the size of elements, we can not lay out their child {@link jqg.Component Components}
+		 * need to calculate the size of elements, we can not lay out their child {@link gui.Component Components}
 		 * when the Container's element is hidden (i.e. no css visibility/display).
 		 *
 		 * This method is basically used to determine if we can lay the child Components out, and if not, a layout
@@ -5116,15 +5116,15 @@ define('jqg/Container', [
 	
 	
 		/**
-		 * Retrieves the {@link jqg.layout.Layout Layout} object that the Container is currently
+		 * Retrieves the {@link gui.layout.Layout Layout} object that the Container is currently
 		 * configured to use.  If no {@link #layout} is currently configured for the Container, this method
-		 * creates a {@link jqg.layout.Auto} to use for this Container, and returns that.
+		 * creates a {@link gui.layout.Auto} to use for this Container, and returns that.
 		 *
 		 * @method getLayout
 		 */
 		getLayout : function() {
 			if( !this.layout ) {
-				var AutoLayout = require( 'jqg/layout/Auto' );
+				var AutoLayout = require( 'gui/layout/Auto' );
 				this.setLayout( new AutoLayout() );
 			}
 			return this.layout;
@@ -5136,10 +5136,10 @@ define('jqg/Container', [
 		 * the Container (its container reference set to null).
 		 *
 		 * @method setLayout
-		 * @param {String/Object/jqg.layout.Layout} layout See the {@link #layout} config.
+		 * @param {String/Object/gui.layout.Layout} layout See the {@link #layout} config.
 		 */
 		setLayout : function( layout ) {
-			var Layout = require( 'jqg/layout/Layout' );  // for dealing with circular dependency
+			var Layout = require( 'gui/layout/Layout' );  // for dealing with circular dependency
 			
 			// Destroy the current layout if we have a new one, and detach all Components in the Container, as 
 			// a new layout is going to have to render them anyway.
@@ -5174,7 +5174,7 @@ define('jqg/Container', [
 					delete layoutConfig.type;  // remove the 'type' property from the config object now, as to not shadow the Layout object's prototype 'type' property when applied
 	
 				} else {
-					// Not a jqg.layout.Layout, String, or Object...
+					// Not a gui.layout.Layout, String, or Object...
 					throw new Error( "Invalid layout argument provided to setLayout. See method description in docs." );
 				}
 
@@ -5190,7 +5190,7 @@ define('jqg/Container', [
 	
 	
 		/**
-		 * Cascades down the {@link jqg.Component Component}/Container heirarchy from this Container (called first), calling the specified
+		 * Cascades down the {@link gui.Component Component}/Container heirarchy from this Container (called first), calling the specified
 		 * function for each Component. The scope (`this` reference) of the function call will be the scope provided,
 		 * or the current Component that is being processed.
 		 *
@@ -5198,7 +5198,7 @@ define('jqg/Container', [
 		 * that was being processed when the function returned false are still processed.
 		 *
 		 * @param {Function} fn The function to call
-		 * @param {Object} [scope] The scope of the function. Defaults to the {@link jqg.Component Component} that is currently being
+		 * @param {Object} [scope] The scope of the function. Defaults to the {@link gui.Component Component} that is currently being
 		 *   processed.
 		 */
 		cascade : function( fn, scope, args ) {
@@ -5217,10 +5217,10 @@ define('jqg/Container', [
 	
 	
 		/**
-		 * Finds a Component under this container at any level by {@link jqg.Component#id id}.
+		 * Finds a Component under this container at any level by {@link gui.Component#id id}.
 		 *
 		 * @param {String} id The ID of the Component to search for.
-		 * @return {jqg.Component} The component with the given `id`, or `null` if none was found.
+		 * @return {gui.Component} The component with the given `id`, or `null` if none was found.
 		 */
 		findById : function( id ) {
 			var returnVal = null,
@@ -5237,14 +5237,14 @@ define('jqg/Container', [
 	
 	
 		/**
-		 * Finds the {@link jqg.Component Components} under this Container at any level by a custom function. If the passed function 
+		 * Finds the {@link gui.Component Components} under this Container at any level by a custom function. If the passed function 
 		 * returns true for a given Component, then that Component will be included in the results.
 		 *
 		 * @param {Function} fn The function to call. The function will be called with the following arguments:
-		 * @param {jqg.Component} fn.component The Component that is being inspected.
-		 * @param {jqg.Container} fn.thisContainer This Container instance.
+		 * @param {gui.Component} fn.component The Component that is being inspected.
+		 * @param {gui.Container} fn.thisContainer This Container instance.
 		 * @param {Object} [scope] The scope to call the function in. Defaults to the Component being inspected.
-		 * @return {jqg.Component[]} Array of {@link jqg.Component Components}
+		 * @return {gui.Component[]} Array of {@link gui.Component Components}
 		 */
 		findBy : function( fn, scope ) {
 			var returnVal = [],
@@ -5260,12 +5260,12 @@ define('jqg/Container', [
 	
 	
 		/**
-		 * Finds the {@link jqg.Component Components} under this Container at any level by Component `type`. The Component `type` can be either 
-		 * the type name that is registered to the {@link jqg.ComponentManager} (see the description of the {@link jqg.Component} class), 
-		 * or the JavaScript class (constructor function) of the {@link jqg.Component Component}.
+		 * Finds the {@link gui.Component Components} under this Container at any level by Component `type`. The Component `type` can be either 
+		 * the type name that is registered to the {@link gui.ComponentManager} (see the description of the {@link gui.Component} class), 
+		 * or the JavaScript class (constructor function) of the {@link gui.Component Component}.
 		 *
-		 * @param {Function} type The type name registered with the {@link jqg.ComponentManager}, or the constructor function (class) of the Component.
-		 * @return {jqg.Component[]} Array of {@link jqg.Component Components} which match the `type`.
+		 * @param {Function} type The type name registered with the {@link gui.ComponentManager}, or the constructor function (class) of the Component.
+		 * @return {gui.Component[]} Array of {@link gui.Component Components} which match the `type`.
 		 */
 		findByType : function( type ) {
 			if( typeof type === 'string' ) {
@@ -5300,7 +5300,7 @@ define('jqg/Container', [
 			this.removeAll();
 	
 			// Destroy the Container's layout, if it has one
-			var Layout = require( 'jqg/layout/Layout' );
+			var Layout = require( 'gui/layout/Layout' );
 			if( this.layout instanceof Layout ) {  // just in case it's still the string config
 				this.layout.destroy();
 			}
@@ -5317,15 +5317,15 @@ define('jqg/Container', [
 	return Container;
 } );
 /*global define */
-define('jqg/ComponentQuery', [
+define('gui/ComponentQuery', [
 	'lodash',
 	'Class',
-	'jqg/Container',
-	'jqg/ComponentManager'
+	'gui/Container',
+	'gui/ComponentManager'
 ], function( _, Class, Container, ComponentManager ) {
 	
 	/**
-	 * @class jqg.ComponentQuery
+	 * @class gui.ComponentQuery
 	 * @extends Object
 	 * @singleton
 	 * 
@@ -5333,9 +5333,9 @@ define('jqg/ComponentQuery', [
 	 * 
 	 * At this time, the selectors that are available are limited to:
 	 * 
-	 * - **id** : For referencing a Component by {@link jqg.Component#id}. Example: "#myComponent".
+	 * - **id** : For referencing a Component by {@link gui.Component#id}. Example: "#myComponent".
 	 * - **type** : For referencing one or more Components by their string 'type' name. Example: "button" would
-	 *   find all {@link jqg.button.Button} instances, and any subclasses of Button instances. It will also find
+	 *   find all {@link gui.button.Button} instances, and any subclasses of Button instances. It will also find
 	 *   instances which implementing the type name as a mixin.
 	 * 
 	 * No child or descendant selectors are available yet at this time, but this class will be extended to do
@@ -5348,9 +5348,9 @@ define('jqg/ComponentQuery', [
 		 * components. See the description of this class for valid selectors.
 		 * 
 		 * @param {String} selector The selector to query components by.
-		 * @param {jqg.Component/jqg.Component[]} context The component(s) to query the `selector` for. If one
+		 * @param {gui.Component/gui.Component[]} context The component(s) to query the `selector` for. If one
 		 *   or more of the components match the selector, they will be included. Components that are 
-		 *   {@link jqg.Container Containers} will be recursively queried to determine if their descendant 
+		 *   {@link gui.Container Containers} will be recursively queried to determine if their descendant 
 		 *   components match the `selector` as well.
 		 */
 		query : function( selector, context ) {
@@ -5373,7 +5373,7 @@ define('jqg/ComponentQuery', [
 		/**
 		 * Determines if a given `component` is matched by the provided `selector`.
 		 * 
-		 * @param {jqg.Component} component The Component(s) to test.
+		 * @param {gui.Component} component The Component(s) to test.
 		 * @param {String} selector The selector string to test the `component` against.
 		 * @return {Boolean} `true` if the Component matches the selector, `false` otherwise.
 		 */
@@ -5388,9 +5388,9 @@ define('jqg/ComponentQuery', [
 		 * on the selector, and the resulting array returned.
 		 * 
 		 * @protected
-		 * @param {jqg.Component[]} The list of components which is to be filtered by the selector.
+		 * @param {gui.Component[]} The list of components which is to be filtered by the selector.
 		 * @param {String} selector The selector string to apply to the set of components.
-		 * @return {jqg.Component[]} The unique set of Components that matched the selector. Duplicates are removed.
+		 * @return {gui.Component[]} The unique set of Components that matched the selector. Duplicates are removed.
 		 */
 		filterBySelector : function( components, selector ) {
 			if( selector.charAt( 0 ) === '#' ) {  // ID selector
@@ -5403,13 +5403,13 @@ define('jqg/ComponentQuery', [
 		
 		
 		/**
-		 * Filters the given set of `components` by returning only the ones that have an {@link jqg.Component#id id}
+		 * Filters the given set of `components` by returning only the ones that have an {@link gui.Component#id id}
 		 * matching the provided `id`.
 		 * 
 		 * @protected
-		 * @param {jqg.Component[]} components
+		 * @param {gui.Component[]} components
 		 * @param {String} id The ID of the component to return.
-		 * @return {jqg.Component[]} The filtered array of components.
+		 * @return {gui.Component[]} The filtered array of components.
 		 */
 		filterById : function( components, id ) {
 			return _.filter( components, function( component ) { return ( component.getId() === id ); } );
@@ -5425,13 +5425,13 @@ define('jqg/ComponentQuery', [
 		 * If the `type` provided is not a registered type name, then an empty array is returned, as no component
 		 * could possibly match it. This is done instead of throwing an error for the case that a certain type has 
 		 * not yet been loaded in yet when using the {@link #query} or {@link #is} methods, or when a
-		 * {@link jqg.app.Controller} listens for events on a certain component type which hasn't been loaded yet.
+		 * {@link gui.app.Controller} listens for events on a certain component type which hasn't been loaded yet.
 		 * 
 		 * @protected
-		 * @param {jqg.Component[]} components
+		 * @param {gui.Component[]} components
 		 * @param {String} type The component `type`, which will be resolved to a component class to test each
 		 *   component against.
-		 * @return {jqg.Component[]} The filtered array of components.
+		 * @return {gui.Component[]} The filtered array of components.
 		 */
 		filterByType : function( components, type ) {
 			if( !ComponentManager.hasType( type ) ) {
@@ -5448,11 +5448,11 @@ define('jqg/ComponentQuery', [
 		
 		
 		/**
-		 * Retrieves the descendants of the provided {@link jqg.Container Container}.
+		 * Retrieves the descendants of the provided {@link gui.Container Container}.
 		 * 
 		 * @protected
-		 * @param {jqg.Container} container
-		 * @param {jqg.Component[]} All of the descendant components of the `container`. 
+		 * @param {gui.Container} container
+		 * @param {gui.Component[]} All of the descendant components of the `container`. 
 		 */
 		getDescendants : function( container ) {
 			var items = container.getItems(),
@@ -5477,16 +5477,16 @@ define('jqg/ComponentQuery', [
 	
 } );
 /*global define */
-define('jqg/Image', [
+define('gui/Image', [
 	'lodash',
 	'Class',
-	'jqg/ComponentManager',
-	'jqg/Component'
+	'gui/ComponentManager',
+	'gui/Component'
 ], function( _, Class, ComponentManager, Component ) {
 	
 	/**
-	 * @class jqg.Image
-	 * @extends jqg.Component
+	 * @class gui.Image
+	 * @extends gui.Component
 	 * @alias type.image
 	 *
 	 * A simple image component.
@@ -5510,7 +5510,7 @@ define('jqg/Image', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-image',
+		baseCls : 'gui-image',
 		
 		
 		/**
@@ -5553,7 +5553,7 @@ define('jqg/Image', [
 				 * Fires when the underlying image has loaded successfully.
 				 * 
 				 * @event load
-				 * @param {jqg.Image} image This Image instance.
+				 * @param {gui.Image} image This Image instance.
 				 */
 				'load',
 				
@@ -5561,7 +5561,7 @@ define('jqg/Image', [
 				 * Fires when the underlying image has failed to load.
 				 * 
 				 * @event error
-				 * @param {jqg.Image} image This Image instance.
+				 * @param {gui.Image} image This Image instance.
 				 */
 				'error'
 			);
@@ -5675,14 +5675,14 @@ define('jqg/Image', [
 	return Image;
 } );
 /*global define */
-define('jqg/Label', [
-	'jqg/ComponentManager',
-	'jqg/Component'
+define('gui/Label', [
+	'gui/ComponentManager',
+	'gui/Component'
 ], function( ComponentManager, Component ) {
 	
 	/**
-	 * @class jqg.Label
-	 * @extends jqg.Component
+	 * @class gui.Label
+	 * @extends gui.Component
 	 * @alias type.label
 	 * 
 	 * Creates a label (piece of text).
@@ -5700,7 +5700,7 @@ define('jqg/Label', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-label',
+		baseCls : 'gui-label',
 		
 	
 		/**
@@ -5753,16 +5753,16 @@ define('jqg/Label', [
 	
 } );
 /*global define */
-define('jqg/layout/HBox', [
+define('gui/layout/HBox', [
 	'jquery',
-	'jqg/Component',
-	'jqg/Container',
-	'jqg/layout/Layout'
+	'gui/Component',
+	'gui/Container',
+	'gui/layout/Layout'
 ], function( jQuery, Component, Container, Layout ) {
 
 	/**
-	 * @class jqg.layout.HBox
-	 * @extends jqg.layout.Layout
+	 * @class gui.layout.HBox
+	 * @extends gui.layout.Layout
 	 * @alias layout.hbox
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
@@ -5825,7 +5825,7 @@ define('jqg/layout/HBox', [
 		 * 
 		 * @protected
 		 * @template
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
@@ -5844,7 +5844,7 @@ define('jqg/layout/HBox', [
 				
 				// Add the CSS class to components to be able to place them in an HBox layout. This adds `float:left;`,
 				// and a few other fixing styles.
-				childComponent.addCls( 'jqg-layout-hbox-component' );
+				childComponent.addCls( 'gui-layout-hbox-component' );
 				
 				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
 				this.renderComponent( childComponent, $targetEl, { position: i } );
@@ -5896,7 +5896,7 @@ define('jqg/layout/HBox', [
 			}
 			
 			if( !this.$clearEl ) {
-				this.$clearEl = jQuery( '<div class="jqg-layout-hbox-clear" />' );  // to clear the floats
+				this.$clearEl = jQuery( '<div class="gui-layout-hbox-clear" />' );  // to clear the floats
 			}
 			$targetEl.append( this.$clearEl );
 		},
@@ -5916,7 +5916,7 @@ define('jqg/layout/HBox', [
 	} );
 	
 	
-	// Register the layout type with the jqg.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'hbox', HBoxLayout );
 	
 	return HBoxLayout;
@@ -5924,19 +5924,19 @@ define('jqg/layout/HBox', [
 } );
 
 /*global define */
-define('jqg/panel/Header', [
+define('gui/panel/Header', [
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/Container',
-	'jqg/Label',
-	'jqg/layout/HBox'
+	'gui/ComponentManager',
+	'gui/Container',
+	'gui/Label',
+	'gui/layout/HBox'
 ], function( _, ComponentManager, Container, Label ) {
 	
 	/**
-	 * @class jqg.panel.Header
-	 * @extends jqg.Container
+	 * @class gui.panel.Header
+	 * @extends gui.Container
 	 * 
-	 * Specialized Container subclass which is used as a {@link jqg.panel.Panel Panel's} header.
+	 * Specialized Container subclass which is used as a {@link gui.panel.Panel Panel's} header.
 	 */
 	var PanelHeader = Container.extend( {
 		
@@ -5968,9 +5968,9 @@ define('jqg/panel/Header', [
 		 */
 		
 		/**
-		 * @cfg {Object/Object[]/jqg.panel.ToolButton/jqg.panel.ToolButton[]} toolButtons
+		 * @cfg {Object/Object[]/gui.panel.ToolButton/gui.panel.ToolButton[]} toolButtons
 		 * 
-		 * One or more {@link jqg.panel.ToolButton ToolButtons} or ToolButton config objects. These will
+		 * One or more {@link gui.panel.ToolButton ToolButtons} or ToolButton config objects. These will
 		 * be placed on the right side of the header.
 		 */
 		
@@ -5984,19 +5984,19 @@ define('jqg/panel/Header', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-panel-header',
+		componentCls : 'gui-panel-header',
 		
 		
 		/**
 		 * @protected
-		 * @property {jqg.Label} titleLabel
+		 * @property {gui.Label} titleLabel
 		 * 
 		 * The label component for the title.
 		 */
 		
 		/**
 		 * @protected
-		 * @property {jqg.Container} toolButtonsCt
+		 * @property {gui.Container} toolButtonsCt
 		 * 
 		 * The Container that holds the {@link #toolButtons}.
 		 */
@@ -6045,7 +6045,7 @@ define('jqg/panel/Header', [
 		 * config will be applied to, by default.
 		 * 
 		 * @protected
-		 * @return {jqg.Label}
+		 * @return {gui.Label}
 		 */
 		createTitleLabel : function() {
 			return new Label( {
@@ -6059,12 +6059,12 @@ define('jqg/panel/Header', [
 		 * Creates the tool buttons container.
 		 * 
 		 * @protected
-		 * @return {jqg.Container}
+		 * @return {gui.Container}
 		 */
 		createToolButtonsCt : function() {
 			return new Container( {
 				cls         : this.componentCls + '-toolButtons',
-				defaultType : 'toolbutton',   // jqg.panel.ToolButton
+				defaultType : 'toolbutton',   // gui.panel.ToolButton
 				items       : this.toolButtons
 			} );
 		},
@@ -6091,17 +6091,17 @@ define('jqg/panel/Header', [
 	
 } );
 /*global define */
-define('jqg/button/Button', [
+define('gui/button/Button', [
 	'jquery',
 	'lodash',
-	'jqg/Component',
-	'jqg/ComponentManager',
-	'jqg/template/LoDash'
+	'gui/Component',
+	'gui/ComponentManager',
+	'gui/template/LoDash'
 ], function( jQuery, _, Component, ComponentManager, LoDashTpl ) {
 
 	/**
-	 * @class jqg.button.Button
-	 * @extends jqg.Component
+	 * @class gui.button.Button
+	 * @extends gui.Component
 	 * @alias type.button
 	 * 
 	 * A generic button that calls its {@link #handler} when clicked.
@@ -6159,7 +6159,7 @@ define('jqg/button/Button', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-button',
+		baseCls : 'gui-button',
 		
 		/**
 		 * @cfg
@@ -6183,7 +6183,7 @@ define('jqg/button/Button', [
 				 * Fires when the button has been clicked.
 				 * 
 				 * @event click
-				 * @param {jqg.button.Button} button This jqg.Button instance.
+				 * @param {gui.button.Button} button This gui.Button instance.
 				 */
 				'click',
 				
@@ -6191,7 +6191,7 @@ define('jqg/button/Button', [
 				 * Fires when the mouse has entered (hovered over) the button. Equivalent to the jQuery mouseenter event.
 				 * 
 				 * @event mouseenter
-				 * @param {jqg.button.Button} button This jqg.Button instance.
+				 * @param {gui.button.Button} button This gui.Button instance.
 				 */
 				'mouseenter',
 				
@@ -6199,7 +6199,7 @@ define('jqg/button/Button', [
 				 * Fires when the mouse has left (no longer hovered over) the button. Equivalent to the jQuery mouseleave event.
 				 * 
 				 * @event mouseleave
-				 * @param {jqg.button.Button} button This jqg.Button instance.
+				 * @param {gui.button.Button} button This gui.Button instance.
 				 */
 				'mouseleave'
 			);
@@ -6406,17 +6406,17 @@ define('jqg/button/Button', [
 } );
 
 /*global define */
-define('jqg/panel/ToolButton', [
-	'jqg/button/Button',
-	'jqg/ComponentManager'
+define('gui/panel/ToolButton', [
+	'gui/button/Button',
+	'gui/ComponentManager'
 ], function( Button, ComponentManager ) {
 	
 	/**
-	 * @class jqg.panel.ToolButton
-	 * @extends jqg.button.Button
+	 * @class gui.panel.ToolButton
+	 * @extends gui.button.Button
 	 * @alias type.toolbutton
 	 * 
-	 * Small utility class for a button that can be used in a {@link jqg.panel.Panel Panel's} header.
+	 * Small utility class for a button that can be used in a {@link gui.panel.Panel Panel's} header.
 	 */
 	var ToolButton = Button.extend( {
 		
@@ -6433,7 +6433,7 @@ define('jqg/panel/ToolButton', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-panel-toolbutton',
+		componentCls : 'gui-panel-toolbutton',
 		
 		
 		/**
@@ -6448,7 +6448,7 @@ define('jqg/panel/ToolButton', [
 			    toolType = this.toolType;
 			
 			this.iconCls = [
-				'jqg-icon-' + toolType,
+				'gui-icon-' + toolType,
 				componentCls + '-icon',
 				componentCls + '-icon-' + toolType
 			].join( " " );
@@ -6465,23 +6465,23 @@ define('jqg/panel/ToolButton', [
 	
 } );
 /*global define */
-define('jqg/panel/Panel', [
+define('gui/panel/Panel', [
 	'jquery',
 	'lodash',
-	'jqg/util/Css',
-	'jqg/ComponentManager',
-	'jqg/Container',
-	'jqg/panel/Header',
-	'jqg/template/LoDash',
-	'jqg/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
+	'gui/util/Css',
+	'gui/ComponentManager',
+	'gui/Container',
+	'gui/panel/Header',
+	'gui/template/LoDash',
+	'gui/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
 ], function( jQuery, _, Css, ComponentManager, Container, PanelHeader, LoDashTpl ) {
 
 	/**
-	 * @class jqg.panel.Panel
-	 * @extends jqg.Container
+	 * @class gui.panel.Panel
+	 * @extends gui.Container
 	 * @alias type.panel
 	 *
-	 * An application-oriented {@link jqg.Container} subclass which supports adding a {@link #title} bar and 
+	 * An application-oriented {@link gui.Container} subclass which supports adding a {@link #title} bar and 
 	 * {@link #toolButtons}.
 	 */
 	var Panel = Container.extend( {
@@ -6516,9 +6516,9 @@ define('jqg/panel/Panel', [
 		title : "",
 		
 		/**
-		 * @cfg {Object/Object[]/jqg.panel.ToolButton/jqg.panel.ToolButton[]} toolButtons
+		 * @cfg {Object/Object[]/gui.panel.ToolButton/gui.panel.ToolButton[]} toolButtons
 		 * 
-		 * One or more {@link jqg.panel.ToolButton ToolButtons} or ToolButton config objects. These will
+		 * One or more {@link gui.panel.ToolButton ToolButtons} or ToolButton config objects. These will
 		 * be placed on the right side of the Panel's header (i.e. top right of the Panel).
 		 */
 		
@@ -6526,13 +6526,13 @@ define('jqg/panel/Panel', [
 		 * @cfg {Object} header
 		 * 
 		 * Any configuration options to pass to the {@link #property-header} component. This may include
-		 * a `type` property to specify a different Header subclass than the default {@link jqg.panel.Header}.
+		 * a `type` property to specify a different Header subclass than the default {@link gui.panel.Header}.
 		 */
 		
 		/**
-		 * @cfg {Object/Object[]/jqg.button.Button/jqg.button.Button[]} buttons
+		 * @cfg {Object/Object[]/gui.button.Button/gui.button.Button[]} buttons
 		 * 
-		 * One or more {@link jqg.button.Button Buttons} or Button config objects for buttons to place
+		 * One or more {@link gui.button.Button Buttons} or Button config objects for buttons to place
 		 * in the footer of the Panel. These will be placed on the right side of the Panel's footer 
 		 * (i.e. bottom right of the Panel).
 		 */
@@ -6548,7 +6548,7 @@ define('jqg/panel/Panel', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-panel',
+		baseCls : 'gui-panel',
 		
 		/**
 		 * @cfg
@@ -6572,7 +6572,7 @@ define('jqg/panel/Panel', [
 		
 		/**
 		 * @protected
-		 * @property {jqg.Container} header
+		 * @property {gui.Container} header
 		 * 
 		 * The Container which acts as the Panel's header. The header holds the {@link #title}, and any {@link #toolButtons} 
 		 * specified. 
@@ -6582,7 +6582,7 @@ define('jqg/panel/Panel', [
 		
 		/**
 		 * @protected
-		 * @property {jqg.Container} footer
+		 * @property {gui.Container} footer
 		 * 
 		 * The Container which acts as the Panel's footer. The footer holds the any {@link #buttons} specified. 
 		 * 
@@ -6596,7 +6596,7 @@ define('jqg/panel/Panel', [
 		initComponent : function() {
 			this._super( arguments );
 			
-			// Move the `header` config to `headerCfg`, as to not be confusing when an actual jqg.panel.Header is created in the `header` property
+			// Move the `header` config to `headerCfg`, as to not be confusing when an actual gui.panel.Header is created in the `header` property
 			this.headerCfg = this.header;
 			delete this.header;
 			
@@ -6677,7 +6677,7 @@ define('jqg/panel/Panel', [
 		doCreateHeader : function() {
 			this.header = this.createHeader( _.defaults( {}, this.headerCfg, {
 				type         : 'panelheader',
-				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'jqg-panel-header'. For Window, 'jqg-window-header'
+				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'gui-panel-header'. For Window, 'gui-window-header'
 				title        : this.title,
 				toolButtons  : this.toolButtons
 			} ) );
@@ -6695,7 +6695,7 @@ define('jqg/panel/Panel', [
 		 * 
 		 * @protected
 		 * @param {Object} headerConfig The configuration for the header, with defaults applied from the Panel.
-		 * @return {jqg.panel.Header}
+		 * @return {gui.panel.Header}
 		 */
 		createHeader : function( headerConfig ) {
 			return ComponentManager.create( headerConfig );
@@ -6725,7 +6725,7 @@ define('jqg/panel/Panel', [
 		 * Creates the {@link #footer} Container, which contains any {@link #buttons} that were configured.
 		 * 
 		 * @protected
-		 * @return {jqg.Container}
+		 * @return {gui.Container}
 		 */
 		createFooter : function() {
 			return new Container( {
@@ -6738,7 +6738,7 @@ define('jqg/panel/Panel', [
 						type : 'container',
 						cls  : this.baseCls + '-footer-buttons',
 						
-						defaultType : 'button',   // jqg.button.Button
+						defaultType : 'button',   // gui.button.Button
 						items       : this.buttons
 					}
 				]
@@ -6761,7 +6761,7 @@ define('jqg/panel/Panel', [
 		 * the header. In this case, be aware that the header is created with components of its own, and you will need
 		 * to inject yours at the correct indexes.
 		 * 
-		 * @return {jqg.panel.Header}
+		 * @return {gui.panel.Header}
 		 */
 		getHeader : function() {
 			if( !this.header ) {
@@ -6840,7 +6840,7 @@ define('jqg/panel/Panel', [
 		 * 
 		 * @param {String} cssClass One or more CSS classes to add to the Panel's {@link #$bodyEl body} element. If specifying 
 		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
-		 * @return {jqg.panel.Panel} This Panel, to allow method chaining.
+		 * @return {gui.panel.Panel} This Panel, to allow method chaining.
 		 */
 		addBodyCls : function( cssClass ) {
 			if( !this.rendered ) {
@@ -6857,7 +6857,7 @@ define('jqg/panel/Panel', [
 		 * 
 		 * @param {String} cssClass One or more CSS classes to remove from the Panel's {@link #$bodyEl body} element. If specifying 
 		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
-		 * @return {jqg.panel.Panel} This Panel, to allow method chaining.
+		 * @return {gui.panel.Panel} This Panel, to allow method chaining.
 		 */
 		removeBodyCls : function( cssClass ) {
 			if( !this.rendered ) {
@@ -6887,7 +6887,7 @@ define('jqg/panel/Panel', [
 		 * @param {String/Object} name The CSS property name. This first argument may also be provided as an Object of key/value
 		 *   pairs for CSS property names/values to apply to the Panel's {@link #$bodyEl body} element.
 		 * @param {String} value The value for the CSS property. Optional if the first argument is an Object.
-		 * @return {jqg.panel.Panel} This Panel, to allow method chaining.
+		 * @return {gui.panel.Panel} This Panel, to allow method chaining.
 		 */
 		setBodyStyle : function( name, value ) {
 			if( !this.rendered ) {
@@ -6928,23 +6928,23 @@ define('jqg/panel/Panel', [
 	
 } );
 /*global define */
-define('jqg/Overlay', [
+define('gui/Overlay', [
 	'jquery',
 	'lodash',
 	'Class',
-	'jqg/JqGui',
-	'jqg/anim/Animation',
-	'jqg/Component',
-	'jqg/panel/Panel',
+	'gui/Gui',
+	'gui/anim/Animation',
+	'gui/Component',
+	'gui/panel/Panel',
 	'jquery-ui/position'  // jQuery UI's `position` plugin
-], function( jQuery, _, Class, JqGui, Animation, Component, Panel ) {
+], function( jQuery, _, Class, Gui, Animation, Component, Panel ) {
 	
 	/**
 	 * @abstract
-	 * @class jqg.Overlay
-	 * @extends jqg.panel.Panel
+	 * @class gui.Overlay
+	 * @extends gui.panel.Panel
 	 *
-	 * Base class for UI elements that "float" on top of the document (most notably: {@link jqg.window.Window}).
+	 * Base class for UI elements that "float" on top of the document (most notably: {@link gui.window.Window}).
 	 * This can be positioned by {@link #x} and {@link #y} values, or positioned relative to other elements using the 
 	 * {@link #anchor} config.
 	 */
@@ -6963,8 +6963,8 @@ define('jqg/Overlay', [
 		/**
 		 * @cfg {Object} showAnim
 		 * 
-		 * A {@link jqg.anim.Animation} configuration object to animate the "show" transition. You do not need to specify
-		 * the {@link jqg.anim.Animation#target} parameter however, as it will be set to this Overlay.
+		 * A {@link gui.anim.Animation} configuration object to animate the "show" transition. You do not need to specify
+		 * the {@link gui.anim.Animation#target} parameter however, as it will be set to this Overlay.
 		 * 
 		 * This config is to provide a default animation that the Overlay always shows with. If the animation is to be
 		 * different for different calls to {@link #method-show}, one may supply the animation config in the `anim` option
@@ -6975,16 +6975,16 @@ define('jqg/Overlay', [
 		/**
 		 * @cfg {Object} hideAnim
 		 * 
-		 * A {@link jqg.anim.Animation} configuration object to animate the "hide" transition. You do not need to specify
-		 * the {@link jqg.anim.Animation#target} parameter however, as it will be set to this Overlay.
+		 * A {@link gui.anim.Animation} configuration object to animate the "hide" transition. You do not need to specify
+		 * the {@link gui.anim.Animation#target} parameter however, as it will be set to this Overlay.
 		 * 
 		 * This config is to provide a default animation that the Overlay always hides with. If the animation is to be
 		 * different for different calls to {@link #method-hide}, one may supply the animation config in the `anim` option
 		 * to the {@link #method-hide} method. Note that an `anim` option provided to the {@link #method-hide} method 
 		 * always overrides this config for that call
 		 * 
-		 * This config is especially useful with the {@link jqg.window.Window#closeOnEscape} config of the
-		 * {@link jqg.window.Window Window} subclass, as the call to the {@link #method-hide} method is made behind the scenes 
+		 * This config is especially useful with the {@link gui.window.Window#closeOnEscape} config of the
+		 * {@link gui.window.Window Window} subclass, as the call to the {@link #method-hide} method is made behind the scenes 
 		 * in this case.
 		 */
 	
@@ -7011,11 +7011,11 @@ define('jqg/Overlay', [
 		 *   "left", "right". Example: "left top" or "center center".  So, if "left bottom", the overlay will be
 		 *   positioned against the bottom left of the target `element`. Defaults to "left bottom".
 		 *
-		 * @cfg {HTMLElement/jQuery/jqg.Component} anchor.of
-		 *   The HTMLElement or {@link jqg.Component} to anchor the overlay to. Can either be defined as either "of" (following
+		 * @cfg {HTMLElement/jQuery/gui.Component} anchor.of
+		 *   The HTMLElement or {@link gui.Component} to anchor the overlay to. Can either be defined as either "of" (following
 		 *   jQuery UI) or "element". Required unless the `element` property is provided.
 		 *
-		 * @cfg {HTMLElement/jQuery/jqg.Component} [anchor.element]
+		 * @cfg {HTMLElement/jQuery/gui.Component} [anchor.element]
 		 *   Synonym of `of` property, which may replace it where it makes more sense in calling code.
 		 *
 		 * @cfg {String} [anchor.offset]
@@ -7066,7 +7066,7 @@ define('jqg/Overlay', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-overlay',
+		baseCls : 'gui-overlay',
 		
 		/**
 		 * @hide
@@ -7081,7 +7081,7 @@ define('jqg/Overlay', [
 		 * @protected
 		 * @property {jQuery} $contentContainer
 		 * 
-		 * The inner overlay container, where either content HTML or child {@link jqg.Component Components} are added.
+		 * The inner overlay container, where either content HTML or child {@link gui.Component Components} are added.
 		 */
 	
 		/**
@@ -7145,8 +7145,8 @@ define('jqg/Overlay', [
 		 * @param {Number/String} [options.y] A {@link #y} config to set on the call to open. Note that subsequent calls to open()
 		 *   will use this config unless changed by a call to {@link #setPosition}.  See {@link #y} for more details. Note that
 		 *   providing an `anchor` will override this value.
-		 * @param {Object/Boolean} [options.anim] An {@link jqg.anim.Animation Animation} config object (minus the 
-		 *   {@link jqg.anim.Animation#target target} property) for animating the showing of the Overlay. If this is not provided,
+		 * @param {Object/Boolean} [options.anim] An {@link gui.anim.Animation Animation} config object (minus the 
+		 *   {@link gui.anim.Animation#target target} property) for animating the showing of the Overlay. If this is not provided,
 		 *   it defaults to using the {@link #showAnim} config.
 		 *   
 		 *   This property may also be set to the boolean `false` to prevent the {@link #showAnim} from running on this call to 
@@ -7307,7 +7307,7 @@ define('jqg/Overlay', [
 					of = anchor.element || anchor.of;  // accept either 'element' or 'of' from the anchor config
 					collision = anchor.collision || 'flipfit';
 	
-					// Handle the anchor element being a jqg.Component, by grabbing the Component's DOM element
+					// Handle the anchor element being a gui.Component, by grabbing the Component's DOM element
 					if( of instanceof Component ) {
 						of = of.getEl();
 					}
@@ -7382,20 +7382,20 @@ define('jqg/Overlay', [
 
 } );
 /*global define */
-define('jqg/layout/Fit', [
+define('gui/layout/Fit', [
 	'Class',
-	'jqg/Component',
-	'jqg/Container',
-	'jqg/layout/Layout'
+	'gui/Component',
+	'gui/Container',
+	'gui/layout/Layout'
 ], function( Class, Component, Container, Layout ) {
 
 	/**
-	 * @class jqg.layout.Fit
-	 * @extends jqg.layout.Layout
+	 * @class gui.layout.Fit
+	 * @extends gui.layout.Layout
 	 * @alias layout.fit
 	 * 
-	 * A layout that renders a {@link jqg.Container Container's} child component to full height and width of the container. 
-	 * A FitLayout only renders the first {@link jqg.Container#items child component} of a {@link jqg.Container Container}.
+	 * A layout that renders a {@link gui.Container Container's} child component to full height and width of the container. 
+	 * A FitLayout only renders the first {@link gui.Container#items child component} of a {@link gui.Container Container}.
 	 * 
 	 * This class is usually not meant to be instantiated directly, but created by its layout type name 'fit'.
 	 */
@@ -7418,7 +7418,7 @@ define('jqg/layout/Fit', [
 		
 		/**
 		 * @protected
-		 * @property {jqg.Component} lastRenderedComponent
+		 * @property {gui.Component} lastRenderedComponent
 		 * 
 		 * Keeps track of the last component that was rendered by the FitLayout. This has to do with caching
 		 * the size (stored by {@link #lastRenderedSize}). We don't want to cache the size of another component
@@ -7436,12 +7436,12 @@ define('jqg/layout/Fit', [
 		
 	
 		/**
-		 * Implementation of the FitLayout, which sizes the {@link #container container's} first {@link jqg.Container#items child component}
+		 * Implementation of the FitLayout, which sizes the {@link #container container's} first {@link gui.Container#items child component}
 		 * to be the full height and width of the {@link #container container's} element.
 		 * 
 		 * @protected
 		 * @method onLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
@@ -7483,35 +7483,35 @@ define('jqg/layout/Fit', [
 	} );
 	
 	
-	// Register the layout type with the jqg.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'fit', FitLayout );
 
 	return FitLayout;
 	
 } );
 /*global define */
-define('jqg/Viewport', [
+define('gui/Viewport', [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/Container',
-	'jqg/layout/Fit'  // default layout
+	'gui/ComponentManager',
+	'gui/Container',
+	'gui/layout/Fit'  // default layout
 ], function( jQuery, _, ComponentManager, Container ) {
 
 	/**
-	 * @class jqg.Viewport
-	 * @extends jqg.Container
+	 * @class gui.Viewport
+	 * @extends gui.Container
 	 * @alias type.viewport
 	 *  
-	 * A special {@link jqg.Container Container} which keeps itself at the size of its parent element, and responds to window resizes
-	 * to re-layout its child {@link jqg.Component Components}.
+	 * A special {@link gui.Container Container} which keeps itself at the size of its parent element, and responds to window resizes
+	 * to re-layout its child {@link gui.Component Components}.
 	 * 
 	 * Ideally, there should only be one Viewport on a page, and it should automatically be rendered into the document body.
 	 * However, until everything uses the UI framework, this is used on an individual basis in some areas. 
 	 * 
 	 * Note that a Viewport should not contain another Viewport though. A set of parent/child relationships should end at the
-	 * top with a Viewport, and all children should simply be {@link jqg.Container Containers}. If they need to be sized to 100% height/width,
-	 * their parent {@link jqg.Container Container} should be configured with a {@link jqg.layout.Fit FitLayout}.
+	 * top with a Viewport, and all children should simply be {@link gui.Container Containers}. If they need to be sized to 100% height/width,
+	 * their parent {@link gui.Container Container} should be configured with a {@link gui.layout.Fit FitLayout}.
 	 */
 	var Viewport = Container.extend( {
 		
@@ -7624,19 +7624,19 @@ define('jqg/Viewport', [
 	
 } );
 /*global define */
-define('jqg/app/EventBus', [
+define('gui/app/EventBus', [
 	'lodash',
 	'Class',
-	'jqg/Component'
+	'gui/Component'
 ], function( _, Class, Component ) {
 	
 	/**
-	 * @class jqg.app.EventBus
+	 * @class gui.app.EventBus
 	 * @extends Object
 	 * @singleton
 	 * 
-	 * Singleton class which allows any subscriber to listen to all events from all {@link jqg.Component Component}
-	 * instances (including {@link jqg.Component Component} subclass instances).
+	 * Singleton class which allows any subscriber to listen to all events from all {@link gui.Component Component}
+	 * instances (including {@link gui.Component Component} subclass instances).
 	 */
 	var EventBus = Class.create( {
 		
@@ -7653,11 +7653,11 @@ define('jqg/app/EventBus', [
 		 * @property {Boolean} fireEventPatched
 		 * 
 		 * Flag which is set to `true` once Observable's {@link Observable#fireEvent fireEvent} method has been wrapped in an
-		 * interceptor function on {@link jqg.Component Component's} prototype, which provides the hook to be able to listen
+		 * interceptor function on {@link gui.Component Component's} prototype, which provides the hook to be able to listen
 		 * for all Component events.
 		 * 
 		 * Without this, we would need to subscribe an 'all' event listener to every instantiated component, and then remove that 
-		 * listener when the components are {@link jqg.Component#method-destroy destroyed}. This would really just be extra processing 
+		 * listener when the components are {@link gui.Component#method-destroy destroyed}. This would really just be extra processing 
 		 * and memory usage.
 		 */
 		fireEventPatched : false,
@@ -7674,7 +7674,7 @@ define('jqg/app/EventBus', [
 		/**
 		 * Subscribes a callback to all events from all components. The callback is provided the following arguments:
 		 * 
-		 * - component ({@link jqg.Component}) : The Component that fired the event.
+		 * - component ({@link gui.Component}) : The Component that fired the event.
 		 * - eventName (String) : The name of the event that was fired.
 		 * - fireEventArgs (Mixed[]) : The array of arguments that were passed to the original {@link Observable#fireEvent fireEvent}
 		 *   call. This does not include the event name.
@@ -7730,11 +7730,11 @@ define('jqg/app/EventBus', [
 		
 		
 		/**
-		 * Handles an event being fired on a {@link jqg.Component}, by dispatching the event to all subscribed callbacks.
+		 * Handles an event being fired on a {@link gui.Component}, by dispatching the event to all subscribed callbacks.
 		 * The arguments that are passed to the callback are documented in {@link #subscribe}.
 		 * 
 		 * @protected
-		 * @param {jqg.Component} component The Component that fired the event.
+		 * @param {gui.Component} component The Component that fired the event.
 		 * @param {String} eventName The event name that was fired.
 		 * @param {Mixed[]} fireEventArgs The arguments provided to the original {@link Observable#fireEvent fireEvent} call.
 		 *   This does not include the event name.
@@ -7754,11 +7754,11 @@ define('jqg/app/EventBus', [
 		
 		
 		/**
-		 * Patches Observable's {@link Observable#fireEvent fireEvent} method on {@link jqg.Component Component's} prototype, using
+		 * Patches Observable's {@link Observable#fireEvent fireEvent} method on {@link gui.Component Component's} prototype, using
 		 * an interceptor function which provides the hook to be able to listen for all Component events.
 		 * 
 		 * Without this, we would need to subscribe an 'all' event listener to every instantiated component, and then remove that 
-		 * listener when the components are {@link jqg.Component#method-destroy destroyed}. This would just be extra processing 
+		 * listener when the components are {@link gui.Component#method-destroy destroyed}. This would just be extra processing 
 		 * and memory usage, when this method is much simpler.
 		 * 
 		 * This method will only be executed once. Once the interceptor method has been placed, it does not need to be added again.
@@ -7794,23 +7794,23 @@ define('jqg/app/EventBus', [
 	
 } );
 /*global define */
-define('jqg/app/Controller', [
+define('gui/app/Controller', [
 	'lodash',
 	'Observable',
-	'jqg/JqGui',
-	'jqg/ComponentQuery',
-	'jqg/app/EventBus'
-], function( _, Observable, JqGui, ComponentQuery, EventBus ) {
+	'gui/Gui',
+	'gui/ComponentQuery',
+	'gui/app/EventBus'
+], function( _, Observable, Gui, ComponentQuery, EventBus ) {
 	
 	/**
-	 * @class jqg.app.Controller
+	 * @class gui.app.Controller
 	 * @extends Observable
 	 * 
 	 * Base class Controller which should be extended by implementations to implement controller logic.
 	 * 
-	 * The Controller must be provided the {@link #view view(s)} ({@link jqg.Component Components}) that it is to work with. 
+	 * The Controller must be provided the {@link #view view(s)} ({@link gui.Component Components}) that it is to work with. 
 	 * It uses this to query for components, and listen to events from. This may be one Component (most likely an outer
-	 * {@link jqg.Viewport} or {@link jqg.Container}), or multiple components to reference and listen to events from. The
+	 * {@link gui.Viewport} or {@link gui.Container}), or multiple components to reference and listen to events from. The
 	 * Component(s) provided to the {@link #view} config give the scope of the Controllers reach, where both those components
 	 * and their descendant components may be manipulated / listened to.
 	 * 
@@ -7818,7 +7818,7 @@ define('jqg/app/Controller', [
 	 * ## References to View Components
 	 * 
 	 * A Controller may set up {@link #cfg-refs} to easily retrieve references to components, based on a 
-	 * {@link jqg.ComponentQuery ComponentQuery} selector. Alternatively, the {@link #addRef} method may also be used to 
+	 * {@link gui.ComponentQuery ComponentQuery} selector. Alternatively, the {@link #addRef} method may also be used to 
 	 * dynamically add references. 
 	 * 
 	 * References to component(s) are retrieved using the {@link #getRef} method. The {@link #getRef} accepts the reference
@@ -7826,7 +7826,7 @@ define('jqg/app/Controller', [
 	 * For example, defining a Controller implementation subclass:
 	 * 
 	 *     define( [
-	 *         'jqg/Controller'
+	 *         'gui/Controller'
 	 *     ], function( Controller ) {
 	 *     
 	 *         var UserController = Controller.extend( {
@@ -7841,7 +7841,7 @@ define('jqg/app/Controller', [
 	 *                 
 	 *                 // (If we wanted to retrieve the components right here in the init() method...)
 	 *                 this.getRef( 'userPanel' );      // --> Retrieves the Panel instance with an id of 'mainUserPanel'
-	 *                 this.getRef( 'userTextFields' ); // --> Retrieves the array of {@link jqg.form.field.Text} components
+	 *                 this.getRef( 'userTextFields' ); // --> Retrieves the array of {@link gui.form.field.Text} components
 	 *             }
 	 *         
 	 *         } );
@@ -7862,12 +7862,12 @@ define('jqg/app/Controller', [
 	 * 
 	 * ## Listening to Events
 	 * 
-	 * A Controller may set up listeners based on {@link jqg.ComponentQuery ComponentQuery} selectors, to be able to respond to
+	 * A Controller may set up listeners based on {@link gui.ComponentQuery ComponentQuery} selectors, to be able to respond to
 	 * events from components living under its configured {@link #view}. The {@link #listen} method handles this functionality,
 	 * and listeners are usually set up from the {@link #init} hook method. For example:
 	 * 
 	 *     define( [
-	 *         'jqg/Controller'
+	 *         'gui/Controller'
 	 *     ], function( Controller ) {
 	 *     
 	 *         var UserController = Controller.extend( {
@@ -7933,23 +7933,23 @@ define('jqg/app/Controller', [
 		
 		
 		/**
-		 * @cfg {jqg.Component} view (required)
+		 * @cfg {gui.Component} view (required)
 		 * 
 		 * The view Component that the Controller should manage. {@link #cfg-refs References} retrieved for components, and events 
 		 * listened to must either be on the Component provided to this config, or a descendant of the component (which
-		 * in this case is a {@link jqg.Container Container}) provided to this config.
+		 * in this case is a {@link gui.Container Container}) provided to this config.
 		 * 
-		 * Most often, this config will be the the page's outermost {@link jqg.Viewport Viewport} (which itself is a 
-		 * {@link jqg.Container Container} subclass). However, this may also be any 
-		 * {@link jqg.Component Component}/{@link jqg.Container Container}, which will limit the scope of what component(s) the 
+		 * Most often, this config will be the the page's outermost {@link gui.Viewport Viewport} (which itself is a 
+		 * {@link gui.Container Container} subclass). However, this may also be any 
+		 * {@link gui.Component Component}/{@link gui.Container Container}, which will limit the scope of what component(s) the 
 		 * Controller controls.
 		 * 
 		 * As an example setup for a page:
 		 * 
 		 *     require( [
 		 *         'jquery',
-		 *         'jqg/Viewport',
-		 *         'my/app/Controller'  // your own jqg.app.Controller subclass, which implements your page's logic
+		 *         'gui/Viewport',
+		 *         'my/app/Controller'  // your own gui.app.Controller subclass, which implements your page's logic
 		 *     ], function( $, Viewport, Controller ) {
 		 *         
 		 *         var viewport = new Viewport( {
@@ -7979,7 +7979,7 @@ define('jqg/app/Controller', [
 		 * **prototype** of the Controller, in a Controller subclass. See the documentation of this class for an example of
 		 * how to create a Controller subclass.
 		 * 
-		 * References are based on a {@link jqg.ComponentQuery ComponentQuery} selector, and make it easy to retrieve matching 
+		 * References are based on a {@link gui.ComponentQuery ComponentQuery} selector, and make it easy to retrieve matching 
 		 * component(s) throughout the Controller's code using {@link #getRef}.
 		 * 
 		 * This Object should be keyed by the ref names, and whose values are Objects with the following properties:
@@ -8017,7 +8017,7 @@ define('jqg/app/Controller', [
 		 *   when retrieving the ref), or `false` if the selector returns a single component.
 		 * - **noCache** (Boolean) : `true` if this ref should not cache its result, and instead re-query the {@link #view}
 		 *   when the ref is requested again.
-		 * - **cachedComponents** (jqg.Component[]) : An array of the cached component references. This is populated after the
+		 * - **cachedComponents** (gui.Component[]) : An array of the cached component references. This is populated after the
 		 *   first use of the ref.
 		 */
 		
@@ -8047,8 +8047,8 @@ define('jqg/app/Controller', [
 		 * @protected
 		 * @property {Boolean} eventBusSubscribed
 		 * 
-		 * Flag which is set to true once this controller has subscribed to the {@link jqg.app.EventBus}, to listen for all
-		 * {@link jqg.Component} events.
+		 * Flag which is set to true once this controller has subscribed to the {@link gui.app.EventBus}, to listen for all
+		 * {@link gui.Component} events.
 		 */
 		
 		
@@ -8065,7 +8065,7 @@ define('jqg/app/Controller', [
 				 * Fires when the Controller has been destroyed.
 				 * 
 				 * @event destroy
-				 * @param {jqg.app.Controller} controller This Controller instance.
+				 * @param {gui.app.Controller} controller This Controller instance.
 				 */
 				'destroy'
 			);
@@ -8094,7 +8094,7 @@ define('jqg/app/Controller', [
 		 * @template
 		 * @method init
 		 */
-		init : JqGui.emptyFn,
+		init : Gui.emptyFn,
 		
 		
 		// ------------------------------------
@@ -8104,7 +8104,7 @@ define('jqg/app/Controller', [
 		
 		/**
 		 * Adds a reference to one or more components that can be retrieved easily by name. A reference is related
-		 * to a {@link jqg.ComponentQuery ComponentQuery} selector, which is executed when the reference is retrieved
+		 * to a {@link gui.ComponentQuery ComponentQuery} selector, which is executed when the reference is retrieved
 		 * (via {@link #getRef}).
 		 * 
 		 * After the first retrieval of a reference with {@link #getRef}, the result is cached for subsequent {@link #getRef}
@@ -8126,7 +8126,7 @@ define('jqg/app/Controller', [
 		 * @param {String} selector The selector string to select components by.
 		 * @param {Object} [options] An object which may contain the following properties:
 		 * @param {Boolean} [options.multiple=false] `true` to create a reference which returns multiple
-		 *   components. The return from {@link #getRef} will be an array of {@link jqg.Component Components}
+		 *   components. The return from {@link #getRef} will be an array of {@link gui.Component Components}
 		 *   if this option is set to `true`. By default, a ref only retrieves a single component, and its
 		 *   instance is directly returned by {@link #getRef}. 
 		 * @param {Boolean} [options.noCache=true] `false` to prevent the caching of the retrieved components after they
@@ -8164,7 +8164,7 @@ define('jqg/app/Controller', [
 		
 		
 		/**
-		 * Retrieves a {@link jqg.Component Component} by ref name (or multiple {@link jqg.Component Components}, if the 
+		 * Retrieves a {@link gui.Component Component} by ref name (or multiple {@link gui.Component Components}, if the 
 		 * `multiple` flag was set to `true` when {@link #addRef adding the ref}).
 		 * 
 		 * @param {String} refName
@@ -8173,8 +8173,8 @@ define('jqg/app/Controller', [
 		 *   even if the component references have previously been cached. This may be useful for "multi-component"
 		 *   references, if the components on the page have changed, and a new query for them must be made. (Single
 		 *   component references are automatically handled if the component has been 
-		 *   {@link jqg.Component#method-destroy destroyed}.)
-		 * @return {jqg.Component/jqg.Component[]} A single component (in the case of singular references, which are
+		 *   {@link gui.Component#method-destroy destroyed}.)
+		 * @return {gui.Component/gui.Component[]} A single component (in the case of singular references, which are
 		 *   the default), or an array if the `multiple` flag was provided for the reference in {@link #addRef}.
 		 */
 		getRef : function( refName, options ) {
@@ -8200,14 +8200,14 @@ define('jqg/app/Controller', [
 		// Event Listening Functionality
 		
 		/**
-		 * Adds event listeners to components selected via {@link jqg.ComponentQuery} selectors. The `selectors` argument accepts an 
+		 * Adds event listeners to components selected via {@link gui.ComponentQuery} selectors. The `selectors` argument accepts an 
 		 * Object (map) of component selector strings as its keys, and a map of event names -&gt; handler functions as its values.
 		 * 
-		 * For example, in this controller, we may want to handle the click event of all {@link jqg.button.Button} components which 
-		 * exist under the {@link #view}, as well as a {@link jqg.Anchor} component with the id "myAnchor".
+		 * For example, in this controller, we may want to handle the click event of all {@link gui.button.Button} components which 
+		 * exist under the {@link #view}, as well as a {@link gui.Anchor} component with the id "myAnchor".
 		 * 
 		 *     define( [
-		 *         'jqg/app/Controller'
+		 *         'gui/app/Controller'
 		 *     ], function( Controller ) {
 		 *         
 		 *         var MyController = Controller.extend( {
@@ -8241,7 +8241,7 @@ define('jqg/app/Controller', [
 		 * 
 		 * Note that handlers are always called in the scope (`this` reference) of the Controller.
 		 * 
-		 * See {@link jqg.ComponentQuery} for more information on component selector strings.
+		 * See {@link gui.ComponentQuery} for more information on component selector strings.
 		 * 
 		 * @param {Object} selectors An Object (map) where the keys are component selector strings, and the values are Objects (maps)
 		 *   which map event names to handler functions. See the description of this method for details.
@@ -8268,11 +8268,11 @@ define('jqg/app/Controller', [
 		
 		
 		/**
-		 * Handles an event being fired by a component, from the {@link jqg.app.EventBus EventBus}. Calls the handlers
+		 * Handles an event being fired by a component, from the {@link gui.app.EventBus EventBus}. Calls the handlers
 		 * that are registered for the particular `eventName`, and that match the selector which was set up in {@link #listen}.
 		 * 
 		 * @protected
-		 * @param {jqg.Component} component The Component which fired the event.
+		 * @param {gui.Component} component The Component which fired the event.
 		 * @param {String} eventName The name of the event which was fired.
 		 * @param {Mixed[]} fireEventArgs The arguments provided to the original {@link Observable#fireEvent fireEvent} call.
 		 *   This does not include the event name.
@@ -8331,7 +8331,7 @@ define('jqg/app/Controller', [
 		 * @protected
 		 * @method onDestroy
 		 */
-		onDestroy : JqGui.emptyFn
+		onDestroy : Gui.emptyFn
 		
 	} );
 	
@@ -8340,19 +8340,19 @@ define('jqg/app/Controller', [
 	
 } );
 /*global define */
-define('jqg/form/field/Field', [
+define('gui/form/field/Field', [
 	'jquery',
 	'lodash',
 	'Class',
-	'jqg/Component',
-	'jqg/template/Template',
-	'jqg/template/LoDash'
+	'gui/Component',
+	'gui/template/Template',
+	'gui/template/LoDash'
 ], function( jQuery, _, Class, Component, Template, LoDashTpl ) {
 	
 	/**
 	 * @abstract
-	 * @class jqg.form.field.Field
-	 * @extends jqg.Component
+	 * @class gui.form.field.Field
+	 * @extends gui.Component
 	 * 
 	 * Abstract base class for form fields, which lays out a label and a container for form field(s), while also 
 	 * providing the base functionality and other common field related tasks.
@@ -8417,7 +8417,7 @@ define('jqg/form/field/Field', [
 		 * @property {String} inputId
 		 * 
 		 * The ID that will be used for the Component's input element. This is a combination of the Component's
-		 * {@link jqg.Component#elId elId} and, the suffix "-input". The label element (if {@link #label} is specified) 
+		 * {@link gui.Component#elId elId} and, the suffix "-input". The label element (if {@link #label} is specified) 
 		 * will be created with a `for` attribute with this id.
 		 */
 		
@@ -8456,7 +8456,7 @@ define('jqg/form/field/Field', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-form-field',
+		baseCls : 'gui-form-field',
 		
 		/**
 		 * @cfg
@@ -8466,13 +8466,13 @@ define('jqg/form/field/Field', [
 		
 		
 		/**
-		 * @cfg {String/String[]/Function/jqg.template.Template} labelRenderTpl
+		 * @cfg {String/String[]/Function/gui.template.Template} labelRenderTpl
 		 * 
 		 * The template to use as the HTML template for the Field's label.
 		 * 
-		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqg.template.Template} 
-		 * instance. For the string, array of strings, or function form, a {@link jqg.template.LoDash LoDash template} instance will be 
-		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqg.template.Template} 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link gui.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link gui.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link gui.template.Template} 
 		 * subclass to this config. 
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template) 
@@ -8523,7 +8523,7 @@ define('jqg/form/field/Field', [
 				 * Fires when the input field has been changed.
 				 * 
 				 * @event change
-				 * @param {jqg.form.field.Field} field This Field object.
+				 * @param {gui.form.field.Field} field This Field object.
 				 * @param {Object} newValue The new value of the field.
 				 */
 				'change',
@@ -8532,7 +8532,7 @@ define('jqg/form/field/Field', [
 				 * Fires when the input field has been focused.
 				 * 
 				 * @event focus
-				 * @param {jqg.form.field.Field} field This Field object.
+				 * @param {gui.form.field.Field} field This Field object.
 				 */
 				'focus',
 				
@@ -8540,7 +8540,7 @@ define('jqg/form/field/Field', [
 				 * Fires when the input field has been blurred.
 				 * 
 				 * @event blur
-				 * @param {jqg.form.field.Field} field This Field object.
+				 * @param {gui.form.field.Field} field This Field object.
 				 */
 				'blur'
 			);
@@ -8551,7 +8551,7 @@ define('jqg/form/field/Field', [
 			// Fix labelAlign to be lowercase for use with setting the class name (just in case),
 			// and apply the appropriate CSS class for the label state
 			var labelAlign = this.labelAlign = this.labelAlign.toLowerCase(),
-			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'jqg-form-field-noLabel' if there is no label, or 'jqg-form-field-leftLabel' or 'jqg-form-field-topLabel' if there is one
+			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'gui-form-field-noLabel' if there is no label, or 'gui-form-field-leftLabel' or 'gui-form-field-topLabel' if there is one
 			this.addCls( labelCls );
 			
 			
@@ -8786,16 +8786,16 @@ define('jqg/form/field/Field', [
 	
 } );
 /*global define */
-define('jqg/form/field/Checkbox', [
+define('gui/form/field/Checkbox', [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/form/field/Field'
+	'gui/ComponentManager',
+	'gui/form/field/Field'
 ], function( jQuery, _, ComponentManager, Field ) {
 	
 	/**
-	 * @class jqg.form.field.Checkbox
-	 * @extends jqg.form.field.Field
+	 * @class gui.form.field.Checkbox
+	 * @extends gui.form.field.Field
 	 * @alias type.checkbox
 	 * @alias type.checkboxfield
 	 *  
@@ -8807,11 +8807,11 @@ define('jqg/form/field/Checkbox', [
 		 * @cfg {String} checkboxLabel
 		 * 
 		 * The label for the checkbox itself, which will be placed to the right of the checkbox. This config is to differentiate from
-		 * the {@link jqg.form.field.Field#label label} provided by {@link jqg.form.field.Field Field} (the one which
+		 * the {@link gui.form.field.Field#label label} provided by {@link gui.form.field.Field Field} (the one which
 		 * affects all form field components uniformly).  Defaults to an empty string.
 		 * 
 		 * Note that if the checkbox should be aligned with other form fields that have "left side" labels (see 
-		 * {@link jqg.form.field.Field#labelAlign}, then set its {@link jqg.form.field.Field#label label} config to
+		 * {@link gui.form.field.Field#labelAlign}, then set its {@link gui.form.field.Field#label label} config to
 		 * a non-breaking space (&amp;nbsp;).
 		 */
 		checkboxLabel : "",
@@ -8826,7 +8826,7 @@ define('jqg/form/field/Checkbox', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-form-field-checkbox',
+		componentCls : 'gui-form-field-checkbox',
 		
 		
 		/**
@@ -8854,7 +8854,7 @@ define('jqg/form/field/Checkbox', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {Boolean} value The value of the field. If truthy, the checkbox will be checked. If falsy, the checkbox will be unchecked.
 		 */
@@ -8868,7 +8868,7 @@ define('jqg/form/field/Checkbox', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {Boolean} The value of the field (true if it's checked, false otherwise).
 		 */
@@ -8890,20 +8890,20 @@ define('jqg/form/field/Checkbox', [
 	
 } );
 /*global define */
-define('jqg/util/OptionsStore', [
+define('gui/util/OptionsStore', [
 	'lodash',
 	'Class'
 ], function( _, Class ) {
 	
 	/**
-	 * @class jqg.util.OptionsStore
+	 * @class gui.util.OptionsStore
 	 * @extends Object
 	 * 
 	 * Helper utility class used for making the management of text/value "options" data easy, for any classes that rely on this format 
-	 * of data. This is used as used, for example, by {@link jqg.form.field.Dropdown Dropdowns}. The purpose of this class 
+	 * of data. This is used as used, for example, by {@link gui.form.field.Dropdown Dropdowns}. The purpose of this class 
 	 * was to not duplicate functionality for the classes that use this format of data.
 	 * 
-	 * This class is currently used by {@link jqg.form.field.Dropdown} and {@link jqg.form.field.Radio}, which use it for 
+	 * This class is currently used by {@link gui.form.field.Dropdown} and {@link gui.form.field.Radio}, which use it for 
 	 * managing the options that they provide.
 	 */
 	var OptionsStore = Class.extend( Object, {
@@ -9110,19 +9110,19 @@ define('jqg/util/OptionsStore', [
 	
 } );
 /*global define */
-define('jqg/form/field/Dropdown', [
+define('gui/form/field/Dropdown', [
 	'jquery',
 	'lodash',
-	'jqg/util/Css',
-	'jqg/ComponentManager',
-	'jqg/form/field/Field',
-	'jqg/template/LoDash',
-	'jqg/util/OptionsStore'
+	'gui/util/Css',
+	'gui/ComponentManager',
+	'gui/form/field/Field',
+	'gui/template/LoDash',
+	'gui/util/OptionsStore'
 ], function( jQuery, _, Css, ComponentManager, Field, LoDashTpl, OptionsStore ) {
 	
 	/**
-	 * @class jqg.form.field.Dropdown
-	 * @extends jqg.form.field.Field
+	 * @class gui.form.field.Dropdown
+	 * @extends gui.form.field.Field
 	 * @alias type.dropdown
 	 * @alias type.dropdownfield
 	 * 
@@ -9133,7 +9133,7 @@ define('jqg/form/field/Dropdown', [
 		/**
 		 * @cfg {Array/Function} options
 		 * 
-		 * The options for the dropdown. See the description of the {@link jqg.util.OptionsStore#setOptions} method for accepted formats.
+		 * The options for the dropdown. See the description of the {@link gui.util.OptionsStore#setOptions} method for accepted formats.
 		 * 
 		 * Note that along with 'text' and 'value' properties, options can have the extra properties of 'cls' and 'style', which can specify the
 		 * css class name(s) to style the dropdown option with, or a hash of styles to style the dropdown option with, repectively. Ex:
@@ -9166,12 +9166,12 @@ define('jqg/form/field/Dropdown', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-form-field-dropdown',
+		componentCls : 'gui-form-field-dropdown',
 		
 		
 		/**
 		 * @private
-		 * @property {jqg.util.OptionsStore} optionsStore
+		 * @property {gui.util.OptionsStore} optionsStore
 		 * 
 		 * The OptionsStore instance used for managing the DropdownField's options.
 		 */
@@ -9215,7 +9215,7 @@ define('jqg/form/field/Dropdown', [
 			 * The template to use to render the dropdown's options menu elements.
 			 */
 			optionsMenuRenderTpl : new LoDashTpl( [
-				'<li data-elem="jqg-form-field-dropdown-menu-item" class="<%= componentCls %>-menu-item <%= menuItemCls %>" style="<%= menuItemStyle %>">',
+				'<li data-elem="gui-form-field-dropdown-menu-item" class="<%= componentCls %>-menu-item <%= menuItemCls %>" style="<%= menuItemStyle %>">',
 					'<%= text %>',
 				'</li>'
 			] )
@@ -9282,7 +9282,7 @@ define('jqg/form/field/Dropdown', [
 			// an actual dropdown field (<select> element). Leaving this (old) code here for now.  
 			/*
 			// Create the dropdown
-			this.$inputEl = jQuery( '<select id="' + this.inputId + '" name="' + this.inputName + '" class="jqg-corner-all dropdown"></select>' )
+			this.$inputEl = jQuery( '<select id="' + this.inputId + '" name="' + this.inputName + '" class="gui-corner-all dropdown"></select>' )
 				.bind( {
 					change : _.bind( function() { this.onChange( this.getValue() ); }, this ),  // Call onChange() with the new value
 					focus  : _.bind( this.onFocus, this ),
@@ -9334,7 +9334,7 @@ define('jqg/form/field/Dropdown', [
 			
 			// TODO: Add IE iframe shim
 			/*if ($.browser.msie && jQuery.browser.version < 7) {
-				$select.after($('<iframe src="javascript:\'\';" class="jqg-dropdownField-shim" marginwidth="0" marginheight="0" align="bottom" scrolling="no" tabIndex="-1" frameborder="0"></iframe>').css({ height: $select.height()+4 +'px' }));
+				$select.after($('<iframe src="javascript:\'\';" class="gui-dropdownField-shim" marginwidth="0" marginheight="0" align="bottom" scrolling="no" tabIndex="-1" frameborder="0"></iframe>').css({ height: $select.height()+4 +'px' }));
 			}*/
 			
 			// Now, draw the initial set of options
@@ -9595,7 +9595,7 @@ define('jqg/form/field/Dropdown', [
 				
 				// Now that the markup is appended and DOM nodes have been created, assign the values to the menu item
 				// elements using .data() (so that values of any datatype may be assigned)
-				var $itemEls = $optionsMenu.find( '[data-elem="jqg-form-field-dropdown-menu-item"]' );
+				var $itemEls = $optionsMenu.find( '[data-elem="gui-form-field-dropdown-menu-item"]' );
 				for( i = 0; i < numOptions; i++ ) {
 					// Add the "value" as data (instead of an attribute), so that any datatype can be stored for the value
 					$itemEls.eq( i ).data( 'value', options[ i ].value );
@@ -9660,7 +9660,7 @@ define('jqg/form/field/Dropdown', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * If the provided `value` is not an option, the value of the field will remain unchanged.
 		 * 
 		 * @param {String} value The value of the field.
@@ -9688,7 +9688,7 @@ define('jqg/form/field/Dropdown', [
 					$optionsMenu.find( 'li.' + selectedCls ).removeClass( selectedCls );  // De-select any currently selected item in the dropdown menu
 					
 					// Select the item with the given value
-					var $itemEls = $optionsMenu.find( 'li[data-elem="jqg-form-field-dropdown-menu-item"]' );
+					var $itemEls = $optionsMenu.find( 'li[data-elem="gui-form-field-dropdown-menu-item"]' );
 					for( var i = 0, len = $itemEls.length; i < len; i++ ) {
 						var $item = $itemEls.eq( i );
 						if( $item.data( 'value' ) === value ) {
@@ -9706,7 +9706,7 @@ define('jqg/form/field/Dropdown', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the option that is selected in the dropdown.
 		 */
@@ -9789,16 +9789,16 @@ define('jqg/form/field/Dropdown', [
 	
 } );
 /*global define */
-define('jqg/form/field/Hidden', [
+define('gui/form/field/Hidden', [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/form/field/Field'
+	'gui/ComponentManager',
+	'gui/form/field/Field'
 ], function( jQuery, _, ComponentManager, Field ) {
 	
 	/**
-	 * @class jqg.form.field.Hidden
-	 * @extends jqg.form.field.Field
+	 * @class gui.form.field.Hidden
+	 * @extends gui.form.field.Field
 	 * @alias type.hidden
 	 * @alias type.hiddenfield
 	 * 
@@ -9830,7 +9830,7 @@ define('jqg/form/field/Hidden', [
 			this.label = "";
 			this.extraMsg = "";
 			
-			// Make sure the outer element (created by jqg.Component) is hidden, as there should be no visible indication of the field
+			// Make sure the outer element (created by gui.Component) is hidden, as there should be no visible indication of the field
 			this.hidden = true;
 			
 			this._super( arguments );
@@ -9851,7 +9851,7 @@ define('jqg/form/field/Hidden', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {String} value The value of the field.
 		 */
@@ -9865,7 +9865,7 @@ define('jqg/form/field/Hidden', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the field.
 		 */
@@ -9887,18 +9887,18 @@ define('jqg/form/field/Hidden', [
 	
 } );
 /*global define */
-define('jqg/form/field/Radio', [
+define('gui/form/field/Radio', [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/form/field/Field',
-	'jqg/template/LoDash',
-	'jqg/util/OptionsStore'
+	'gui/ComponentManager',
+	'gui/form/field/Field',
+	'gui/template/LoDash',
+	'gui/util/OptionsStore'
 ], function( jQuery, _, ComponentManager, Field, LoDashTpl, OptionsStore ) {
 	
 	/**
-	 * @class jqg.form.field.Radio
-	 * @extends jqg.form.field.Field
+	 * @class gui.form.field.Radio
+	 * @extends gui.form.field.Field
 	 * @alias type.radio
 	 * @alias type.radiofield
 	 * 
@@ -9945,7 +9945,7 @@ define('jqg/form/field/Radio', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-form-field-radio',
+		componentCls : 'gui-form-field-radio',
 		
 		
 		/**
@@ -10050,7 +10050,7 @@ define('jqg/form/field/Radio', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {String} value The value of the field.
 		 */
@@ -10070,7 +10070,7 @@ define('jqg/form/field/Radio', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the field.
 		 */
@@ -10092,17 +10092,17 @@ define('jqg/form/field/Radio', [
 	
 } );
 /*global define */
-define('jqg/form/field/Text', [
+define('gui/form/field/Text', [
 	'jquery',
 	'lodash',
-	'jqg/util/Html',
-	'jqg/ComponentManager',
-	'jqg/form/field/Field'
+	'gui/util/Html',
+	'gui/ComponentManager',
+	'gui/form/field/Field'
 ], function( jQuery, _, Html, ComponentManager, Field ) {
 	
 	/**
-	 * @class jqg.form.field.Text
-	 * @extends jqg.form.field.Field
+	 * @class gui.form.field.Text
+	 * @extends gui.form.field.Field
 	 * @alias type.textfield
 	 * 
 	 * Text field component.
@@ -10145,7 +10145,7 @@ define('jqg/form/field/Text', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-form-field-text',
+		componentCls : 'gui-form-field-text',
 		
 		
 		/**
@@ -10183,7 +10183,7 @@ define('jqg/form/field/Text', [
 				 * Fires when a key is pressed down in the field.
 				 * 
 				 * @event keydown
-				 * @param {jqg.form.field.Field} field This TextField object.
+				 * @param {gui.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keydown',
@@ -10192,7 +10192,7 @@ define('jqg/form/field/Text', [
 				 * Fires when a key is pressed and let up in the field.
 				 * 
 				 * @event keyup
-				 * @param {jqg.form.field.Field} field This TextField object.
+				 * @param {gui.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keyup',
@@ -10201,7 +10201,7 @@ define('jqg/form/field/Text', [
 				 * Fires when a key is pressed in the field.
 				 * 
 				 * @event keypress
-				 * @param {jqg.form.field.Field} field This TextField object.
+				 * @param {gui.form.field.Field} field This TextField object.
 				 * @param {jQuery.Event} evt The jQuery event object for the event.
 				 */
 				'keypress'
@@ -10299,7 +10299,7 @@ define('jqg/form/field/Text', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {String} value The value of the field.
 		 */
@@ -10319,7 +10319,7 @@ define('jqg/form/field/Text', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {String} The value of the field.
 		 */
@@ -10497,17 +10497,17 @@ define('jqg/form/field/Text', [
 	
 } );
 /*global define */
-define('jqg/form/field/TextArea', [
+define('gui/form/field/TextArea', [
 	'jquery',
 	'lodash',
-	'jqg/util/Css',
-	'jqg/ComponentManager',
-	'jqg/form/field/Text'
+	'gui/util/Css',
+	'gui/ComponentManager',
+	'gui/form/field/Text'
 ], function( jQuery, _, Css, ComponentManager, TextField ) {
 	
 	/**
-	 * @class jqg.form.field.TextArea
-	 * @extends jqg.form.field.Text
+	 * @class gui.form.field.TextArea
+	 * @extends gui.form.field.Text
 	 * @alias type.textarea
 	 * @alias type.textareafield
 	 * 
@@ -10530,7 +10530,7 @@ define('jqg/form/field/TextArea', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-form-field-textarea',
+		componentCls : 'gui-form-field-textarea',
 		
 		
 		/**
@@ -10670,7 +10670,7 @@ define('jqg/form/field/TextArea', [
 		
 		/**
 		 * Overridden method for creating the input element for the TextAreaField. This implementation
-		 * creates a &lt;textarea&gt; element. See {@link jqg.form.field.Text#createInputEl} for more information.
+		 * creates a &lt;textarea&gt; element. See {@link gui.form.field.Text#createInputEl} for more information.
 		 * 
 		 * @protected
 		 * @return {jQuery}
@@ -10826,17 +10826,17 @@ define('jqg/form/field/TextArea', [
 	
 } );
 /*global define */
-define('jqg/layout/Card.Transition', [
+define('gui/layout/Card.Transition', [
 	'Class',
-	'jqg/JqGui'
-], function( Class, JqGui ) {
+	'gui/Gui'
+], function( Class, Gui ) {
 	
 	/**
 	 * @abstract
-	 * @class jqg.layout.Card.AbstractTransition
+	 * @class gui.layout.Card.AbstractTransition
 	 * @extends Object
 	 * 
-	 * Defines the interface for all {@link jqg.layout.Card} strategies for changing the active card.
+	 * Defines the interface for all {@link gui.layout.Card} strategies for changing the active card.
 	 */
 	var CardTransition = Class.extend( Object, {
 		abstractClass : true,
@@ -10847,9 +10847,9 @@ define('jqg/layout/Card.Transition', [
 		 * 
 		 * @abstract
 		 * @method setActiveItem
-		 * @param {jqg.layout.Card} cardsLayout The CardsLayout instance that is using this transition strategy.
-		 * @param {jqg.Component} currentItem The currently active item. This may be null if the CardsLayout does not currently have an active item.
-		 * @param {jqg.Component} newItem The item to activate. This may be null if there is no new item to activate (for just hiding the currentItem).
+		 * @param {gui.layout.Card} cardsLayout The CardsLayout instance that is using this transition strategy.
+		 * @param {gui.Component} currentItem The currently active item. This may be null if the CardsLayout does not currently have an active item.
+		 * @param {gui.Component} newItem The item to activate. This may be null if there is no new item to activate (for just hiding the currentItem).
 		 * @param {Object} options An object which may contain options for the given AbstractTransition subclass that is being used.
 		 */
 		setActiveItem : Class.abstractMethod,
@@ -10873,7 +10873,7 @@ define('jqg/layout/Card.Transition', [
 		 * @template
 		 * @method onDestroy
 		 */
-		onDestroy : JqGui.emptyFn
+		onDestroy : Gui.emptyFn
 		
 	} );
 	
@@ -10881,17 +10881,17 @@ define('jqg/layout/Card.Transition', [
 	
 } );
 /*global define */
-define('jqg/layout/Card.SwitchTransition', [
-	'jqg/Container',
-	'jqg/layout/Card.Transition'
+define('gui/layout/Card.SwitchTransition', [
+	'gui/Container',
+	'gui/layout/Card.Transition'
 ], function( Container, CardTransition ) {
 	
 	/**
-	 * @class jqg.layout.Card.SwitchTransition
-	 * @extends jqg.layout.Card.AbstractTransition
+	 * @class gui.layout.Card.SwitchTransition
+	 * @extends gui.layout.Card.AbstractTransition
 	 * 
-	 * {@link jqg.layout.Card} transition strategy for switching cards immediately by simply hiding the "currently active" card
-	 * and then showing the new card. This is the default {@link jqg.layout.Card CardsLayout} transition strategy for changing
+	 * {@link gui.layout.Card} transition strategy for switching cards immediately by simply hiding the "currently active" card
+	 * and then showing the new card. This is the default {@link gui.layout.Card CardsLayout} transition strategy for changing
 	 * the active card.
 	 */
 	var CardSwitchTransition = CardTransition.extend( {
@@ -10900,10 +10900,10 @@ define('jqg/layout/Card.SwitchTransition', [
 		 * Sets the active item that should be transitioned to.
 		 * 
 		 * @method setActiveItem
-		 * @param {jqg.layout.Card} cardsLayout The CardsLayout instance that is using this transition strategy.
-		 * @param {jqg.Component} currentItem The currently active item. This may be null if the CardsLayout does not currently have an active item.
-		 * @param {jqg.Component} newItem The item to activate. This may be null if there is no new item to activate (for just hiding the currentItem).
-		 * @param {Object} options There are no options for this {@link jqg.layout.Card.AbstractTransition} subclass, so this argument is ignored.
+		 * @param {gui.layout.Card} cardsLayout The CardsLayout instance that is using this transition strategy.
+		 * @param {gui.Component} currentItem The currently active item. This may be null if the CardsLayout does not currently have an active item.
+		 * @param {gui.Component} newItem The item to activate. This may be null if there is no new item to activate (for just hiding the currentItem).
+		 * @param {Object} options There are no options for this {@link gui.layout.Card.AbstractTransition} subclass, so this argument is ignored.
 		 */
 		setActiveItem : function( cardsLayout, currentItem, newItem, options ) {
 			// First, hide the currently active item, if the currently active item is an instantiated component (i.e. not null)
@@ -10927,19 +10927,19 @@ define('jqg/layout/Card.SwitchTransition', [
 	
 } );
 /*global define */
-define('jqg/layout/Card', [
-	'jqg/Component',
-	'jqg/Container',
-	'jqg/layout/Layout',
-	'jqg/layout/Card.SwitchTransition'
+define('gui/layout/Card', [
+	'gui/Component',
+	'gui/Container',
+	'gui/layout/Layout',
+	'gui/layout/Card.SwitchTransition'
 ], function( Component, Container, Layout, SwitchTransition ) {
 	
 	/**
-	 * @class jqg.layout.Card
-	 * @extends jqg.layout.Layout
+	 * @class gui.layout.Card
+	 * @extends gui.layout.Layout
 	 * @alias layout.card
 	 * 
-	 * A layout that renders a {@link jqg.Container Container's} child components where only one child (card) can be shown 
+	 * A layout that renders a {@link gui.Container Container's} child components where only one child (card) can be shown 
 	 * at a time (such as showing only the top card in a deck of cards).  Methods are available in this class to control
 	 * which card is shown.
 	 * 
@@ -10948,10 +10948,10 @@ define('jqg/layout/Card', [
 	var CardLayout = Layout.extend( {
 		
 		/**
-		 * @cfg {Number/jqg.Component} activeItem
+		 * @cfg {Number/gui.Component} activeItem
 		 * 
-		 * The item number or {@link jqg.Component} reference to set as the initially active item. Defaults to 0 (for the first item). 
-		 * If this is a {@link jqg.Component}, it should be a {@link jqg.Component Component} that exists in the {@link #container}.
+		 * The item number or {@link gui.Component} reference to set as the initially active item. Defaults to 0 (for the first item). 
+		 * If this is a {@link gui.Component}, it should be a {@link gui.Component Component} that exists in the {@link #container}.
 		 */
 		activeItem : 0,
 		
@@ -10960,20 +10960,20 @@ define('jqg/layout/Card', [
 		 * 
 		 * By default, the CardLayout lets each child component determine its own size ("auto" or "content" sizing), but this 
 		 * config may be set to `true` to have the width/height of the child component be sized to take up the available space 
-		 * in the target element (much like the {@link jqg.layout.Fit Fit} layout would do).
+		 * in the target element (much like the {@link gui.layout.Fit Fit} layout would do).
 		 */
 		fit : false,
 		
 		/**
-		 * @cfg {jqg.layout.Card.AbstractTransition} transition The {@link jqg.layout.Card.AbstractTransition AbstractTransition} subclass to use
-		 * for switching between cards. The default transition is the {@link jqg.layout.Card.SwitchTransition SwitchTransition}, which simply hides
+		 * @cfg {gui.layout.Card.AbstractTransition} transition The {@link gui.layout.Card.AbstractTransition AbstractTransition} subclass to use
+		 * for switching between cards. The default transition is the {@link gui.layout.Card.SwitchTransition SwitchTransition}, which simply hides
 		 * the currently active card, and shows the new card. This may be changed to provide a different method of changing cards, such as to implement
 		 * animation. 
 		 */
 		
 		/**
 		 * @cfg {Boolean} deferredRender
-		 * True to only render a child {@link jqg.Component component} once it is shown, false to render all child components immediately.
+		 * True to only render a child {@link gui.Component component} once it is shown, false to render all child components immediately.
 		 * Leaving this as true can improve initial rendering time, as only the shown component's rendering routine is actually performed.
 		 * However, switching to a new component the first time may be slightly delayed as that component must be rendered and laid out.
 		 */
@@ -10984,7 +10984,7 @@ define('jqg/layout/Card', [
 		 * @protected
 		 * @property {Object} componentSizeCache
 		 * 
-		 * A hashmap of component's uuid's (retrieved with {@link jqg.Component#getUuid}) and an inner hashmap
+		 * A hashmap of component's uuid's (retrieved with {@link gui.Component#getUuid}) and an inner hashmap
 		 * with width and height properties, which stores the last set width/height for each component in the CardLayout.
 		 */
 		
@@ -10999,11 +10999,11 @@ define('jqg/layout/Card', [
 				 * Fires when the active item has been changed.
 				 * 
 				 * @event cardchange
-				 * @param {jqg.layout.Card} cardLayout This CardLayout instance.
-				 * @param {jqg.Component} card The {@link jqg.Component} instance of the card that was activated. If no card has
+				 * @param {gui.layout.Card} cardLayout This CardLayout instance.
+				 * @param {gui.Component} card The {@link gui.Component} instance of the card that was activated. If no card has
 				 *   been activated (either by a null argument to {@link #setActiveItem}, or an index out of range), then this
 				 *   will be null.
-				 * @param {jqg.Component} previousCard The previously active card ({@link jqg.Component}), if there was one.
+				 * @param {gui.Component} previousCard The previously active card ({@link gui.Component}), if there was one.
 				 *   If there was no previously active card, then this will be `null`.
 				 */
 				'cardchange'
@@ -11023,17 +11023,17 @@ define('jqg/layout/Card', [
 		
 		/**
 		 * Layout implementation for CardLayout, which renders each child component into the Container's content target 
-		 * (see {@link jqg.Component#getContentTarget}), and then hides them.  The one given by the {@link #activeItem}
+		 * (see {@link gui.Component#getContentTarget}), and then hides them.  The one given by the {@link #activeItem}
 		 * config is then shown.
 		 * 
 		 * @protected
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
 			this._super( arguments );
 			
-			// First normalize the activeItem config to the jqg.Component it refers to.
+			// First normalize the activeItem config to the gui.Component it refers to.
 			if( typeof this.activeItem === 'number' ) {
 				this.activeItem = this.getContainer().getItemAt( this.activeItem );
 			}
@@ -11067,7 +11067,7 @@ define('jqg/layout/Card', [
 		 * Renders (if need be) and sizes the given `component` to the size of the `targetWidth` and `targetHeight`.
 		 * 
 		 * @protected
-		 * @param {jqg.Component} component The card ({@link jqg.Component}) which is to be rendered and sized.
+		 * @param {gui.Component} component The card ({@link gui.Component}) which is to be rendered and sized.
 		 * @param {jQuery} $targetEl The target element where the component is to be rendered.
 		 * @param {Number} targetWidth The width to size the card component to (if the {@link #fit} config is `true`).
 		 * @param {Number} targetHeight The height to size the card component to (if the {@link #fit} config is `true`).
@@ -11103,10 +11103,10 @@ define('jqg/layout/Card', [
 		/**
 		 * Sets the active item.
 		 * 
-		 * @param {jqg.Component/Number} item The jqg.Component to set as the active item, or the item index to set as the active item (0 for the first item).
-		 *   Note that if a jqg.Component is provided, it must be an *instantiated* jqg.Component, and not the anonymous config object used to create the jqg.Component.
+		 * @param {gui.Component/Number} item The gui.Component to set as the active item, or the item index to set as the active item (0 for the first item).
+		 *   Note that if a gui.Component is provided, it must be an *instantiated* gui.Component, and not the anonymous config object used to create the gui.Component.
 		 * @param {Object} options (optional) An object which will be passed along as options to the CardLayout {@link #transition}. See the setActiveItem method in the
-		 *   {jqg.layout.Card.AbstractTransition AbstractTransition} subclass that you are using for a list of valid options (if any).
+		 *   {gui.layout.Card.AbstractTransition AbstractTransition} subclass that you are using for a list of valid options (if any).
 		 */
 		setActiveItem : function( item, options ) {
 			// Item was provided as a number, find the Component
@@ -11137,7 +11137,7 @@ define('jqg/layout/Card', [
 				if( !item || this.activeItem !== item || !item.isRendered() || item.isHidden() ) {
 					
 					// Delegate to the transition strategy for the change in cards (active item)
-					// Make sure the activeItem is passed in only if it is an instantiated jqg.Component (i.e. not null, and not the numbered config)
+					// Make sure the activeItem is passed in only if it is an instantiated gui.Component (i.e. not null, and not the numbered config)
 					previousActiveItem = this.activeItem;
 					if( !( previousActiveItem instanceof Component ) ) {
 						previousActiveItem = null;
@@ -11163,7 +11163,7 @@ define('jqg/layout/Card', [
 		/**
 		 * Gets the currently active item. Returns null if there is no active item. 
 		 * 
-		 * @return {jqg.Component} The Component that is currently shown as the active item. Returns null if there is no active item.
+		 * @return {gui.Component} The Component that is currently shown as the active item. Returns null if there is no active item.
 		 */
 		getActiveItem : function() {
 			var activeItem = this.activeItem;
@@ -11200,7 +11200,7 @@ define('jqg/layout/Card', [
 		
 		
 		/**
-		 * Extended onDestroy method for the CardLayout to destroy its CardLayout {@link jqg.layout.Card.AbstractTransition} object.
+		 * Extended onDestroy method for the CardLayout to destroy its CardLayout {@link gui.layout.Card.AbstractTransition} object.
 		 * 
 		 * @protected
 		 */
@@ -11214,26 +11214,26 @@ define('jqg/layout/Card', [
 	} );
 	
 	
-	// Register the layout type with the jqg.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'card', CardLayout );
 	
 	return CardLayout;
 
 } );
 /*global define */
-define('jqg/layout/Column', [
+define('gui/layout/Column', [
 	'Class',
-	'jqg/Component',
-	'jqg/Container',
-	'jqg/layout/Layout'
+	'gui/Component',
+	'gui/Container',
+	'gui/layout/Layout'
 ], function( Class, Component, Container, Layout ) {
 
 	/**
-	 * @class jqg.layout.Column
-	 * @extends jqg.layout.Layout
+	 * @class gui.layout.Column
+	 * @extends gui.layout.Layout
 	 * @alias layout.column
 	 * 
-	 * A layout that renders a {@link jqg.Container Container's} child components into columns. Each child component
+	 * A layout that renders a {@link gui.Container Container's} child components into columns. Each child component
 	 * in the Container should have a special property named `columnWidth`, that determines how wide the column
 	 * should be.  This property can either be a number, or any css width value.
 	 * 
@@ -11258,13 +11258,13 @@ define('jqg/layout/Column', [
 		
 		/**
 		 * Layout implementation for ColumnsLayout, which renders each child component as columns into the 
-		 * Container's content target (see {@link jqg.Component#getContentTarget).  Each child component in the
+		 * Container's content target (see {@link gui.Component#getContentTarget).  Each child component in the
 		 * Container should have a special property named `columnWidth`, that determines how wide the column
 		 * should be.  This property can either be a number, or any css width value.
 		 * 
 		 * @protected
 		 * @method onLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {		
@@ -11284,7 +11284,7 @@ define('jqg/layout/Column', [
 		 * are handled by {@link #updateColumnsLayout}.
 		 * 
 		 * @method initColumnsLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		initColumnsLayout : function( childComponents, $targetEl ) {
@@ -11329,7 +11329,7 @@ define('jqg/layout/Column', [
 		 * Updates the ColumnsLayout for each layout run after the first (which is handled by {@link #initColumnsLayout}.
 		 * 
 		 * @method updateColumnsLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		updateColumnsLayout : function( childComponents, $targetEl ) {
@@ -11352,21 +11352,21 @@ define('jqg/layout/Column', [
 	} );
 	
 	
-	// Register the layout type with the jqg.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'column', ColumnLayout );
 	
 	return ColumnLayout;
 	
 } );
 /*global define */
-define('jqg/layout/VBox', [
-	'jqg/Container',
-	'jqg/layout/Layout'
+define('gui/layout/VBox', [
+	'gui/Container',
+	'gui/layout/Layout'
 ], function( Container, Layout ) {
 
 	/**
-	 * @class jqg.layout.VBox
-	 * @extends jqg.layout.Layout
+	 * @class gui.layout.VBox
+	 * @extends gui.layout.Layout
 	 * @alias layout.vbox
 	 * 
 	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
@@ -11423,7 +11423,7 @@ define('jqg/layout/VBox', [
 		 * @protected
 		 * @template
 		 * @method onLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {
@@ -11487,7 +11487,7 @@ define('jqg/layout/VBox', [
 	} );
 	
 	
-	// Register the layout type with the jqg.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'vbox', VBoxLayout );
 	
 	return VBoxLayout;
@@ -11495,35 +11495,35 @@ define('jqg/layout/VBox', [
 } );
 
 /*global define */
-define('jqg/tab/Tab', [
+define('gui/tab/Tab', [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/button/Button',
-	'jqg/template/LoDash'
+	'gui/ComponentManager',
+	'gui/button/Button',
+	'gui/template/LoDash'
 ], function( jQuery, _, ComponentManager, Button, LoDashTpl ) {
 
 	/**
-	 * @class jqg.tab.Tab
-	 * @extends jqg.button.Button
+	 * @class gui.tab.Tab
+	 * @extends gui.button.Button
 	 * @alias type.tab
 	 *
-	 * A specialized button used as the tabs of a {@link jqg.tab.Panel TabPanel}.
+	 * A specialized button used as the tabs of a {@link gui.tab.Panel TabPanel}.
 	 */
 	var Tab = Button.extend( {
 		
 		/**
-		 * @cfg {jqg.panel.Panel} correspondingPanel (required)
+		 * @cfg {gui.panel.Panel} correspondingPanel (required)
 		 * 
 		 * The Panel that this tab has been created for, and corresponds to. The Panel is a child item of the parent
-		 * {@link jqg.tab.Panel TabPanel}, and is needed to map the Tab to the Panel it shows.
+		 * {@link gui.tab.Panel TabPanel}, and is needed to map the Tab to the Panel it shows.
 		 */
 		
 		/**
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-tabPanel-tab',
+		componentCls : 'gui-tabPanel-tab',
 		
 		
 		/**
@@ -11531,7 +11531,7 @@ define('jqg/tab/Tab', [
 		 * @property {Boolean} active
 		 * 
 		 * Flag which is set to `true` when this is the active Tab. The active Tab is the one whose {@link #correspondingPanel}
-		 * is the one shown in the parent {@link jqg.tab.Panel TabPanel}.
+		 * is the one shown in the parent {@link gui.tab.Panel TabPanel}.
 		 */
 		active : false,
 		
@@ -11549,9 +11549,9 @@ define('jqg/tab/Tab', [
 		
 		
 		/**
-		 * Retrieves the {@link jqg.panel.Panel Panel} that this Tab corresponds to in the parent {@link jqg.tab.Panel TabPanel}.
+		 * Retrieves the {@link gui.panel.Panel Panel} that this Tab corresponds to in the parent {@link gui.tab.Panel TabPanel}.
 		 * 
-		 * @return {jqg.panel.Panel}
+		 * @return {gui.panel.Panel}
 		 */
 		getCorrespondingPanel : function() {
 			return this.correspondingPanel;
@@ -11560,7 +11560,7 @@ define('jqg/tab/Tab', [
 		
 		/**
 		 * Sets the tab as the "active" tab. The active Tab is the one whose {@link #correspondingPanel}
-		 * is the one shown in the parent {@link jqg.tab.Panel TabPanel}.
+		 * is the one shown in the parent {@link gui.tab.Panel TabPanel}.
 		 * 
 		 * @chainable
 		 */
@@ -11576,7 +11576,7 @@ define('jqg/tab/Tab', [
 		
 		/**
 		 * Sets the tab as an "inactive" tab. This is for when the {@link #correspondingPanel} is made invisible
-		 * in the parent {@link jqg.tab.Panel TabPanel}.
+		 * in the parent {@link gui.tab.Panel TabPanel}.
 		 * 
 		 * @chainable
 		 */
@@ -11592,7 +11592,7 @@ define('jqg/tab/Tab', [
 		
 		/**
 		 * Determines if the tab is the "active" tab. The active Tab is the one whose {@link #correspondingPanel}
-		 * is the one shown in the parent {@link jqg.tab.Panel TabPanel}.
+		 * is the one shown in the parent {@link gui.tab.Panel TabPanel}.
 		 * 
 		 * @return {Boolean}
 		 */
@@ -11610,18 +11610,18 @@ define('jqg/tab/Tab', [
 } );
 		
 /*global define */
-define('jqg/tab/Bar', [
-	'jqg/ComponentManager',
-	'jqg/Container',
-	'jqg/tab/Tab'
+define('gui/tab/Bar', [
+	'gui/ComponentManager',
+	'gui/Container',
+	'gui/tab/Tab'
 ], function( ComponentManager, Container, Tab ) {
 	
 	/**
-	 * @class jqg.tab.Bar
-	 * @extends jqg.Container
+	 * @class gui.tab.Bar
+	 * @extends gui.Container
 	 * @alias type.tabbar
 	 * 
-	 * Specialized container for a {@link jqg.tab.Panel Tab Panel's} tabs.
+	 * Specialized container for a {@link gui.tab.Panel Tab Panel's} tabs.
 	 */
 	var TabBar = Container.extend( {
 		
@@ -11635,14 +11635,14 @@ define('jqg/tab/Bar', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-tabPanel-bar',
+		componentCls : 'gui-tabPanel-bar',
 		
 		
 		/**
-		 * Sets the "active" tab based on the given activated {@link jqg.panel.Panel Panel} which corresponds
+		 * Sets the "active" tab based on the given activated {@link gui.panel.Panel Panel} which corresponds
 		 * to it. All other tabs will be set to "inactive".
 		 * 
-		 * @param {jqg.panel.Panel} panel The Panel that corresponds to the Tab that should be made active.
+		 * @param {gui.panel.Panel} panel The Panel that corresponds to the Tab that should be made active.
 		 *   If `null` is provided, or a Panel that does not have a corresponding Tab, then all tabs will
 		 *   be set to their "inactive" state.
 		 * @chainable
@@ -11668,48 +11668,48 @@ define('jqg/tab/Bar', [
 	
 } );
 /*global define */
-define('jqg/tab/Panel', [
+define('gui/tab/Panel', [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/Component',
-	'jqg/Container',
-	'jqg/panel/Panel',
-	'jqg/tab/Bar',
-	'jqg/tab/Tab',
-	'jqg/template/LoDash',
-	'jqg/layout/Card'
+	'gui/ComponentManager',
+	'gui/Component',
+	'gui/Container',
+	'gui/panel/Panel',
+	'gui/tab/Bar',
+	'gui/tab/Tab',
+	'gui/template/LoDash',
+	'gui/layout/Card'
 ], function( jQuery, _, ComponentManager, Component, Container, Panel, TabBar, Tab, LoDashTpl ) {
 
 	/**
-	 * @class jqg.tab.Panel
-	 * @extends jqg.panel.Panel
+	 * @class gui.tab.Panel
+	 * @extends gui.panel.Panel
 	 * @alias type.tabpanel
 	 *
-	 * A basic tab container panel. Child {@link #items} must be {@link jqg.panel.Panel Panels} or Panel subclasses,
-	 * as their {@link jqg.panel.Panel#title title} property is read to create the tabs.
+	 * A basic tab container panel. Child {@link #items} must be {@link gui.panel.Panel Panels} or Panel subclasses,
+	 * as their {@link gui.panel.Panel#title title} property is read to create the tabs.
 	 * 
-	 * The Tab Panel is internally configured with a {@link jqg.layout.Card Card} layout, which switches between
+	 * The Tab Panel is internally configured with a {@link gui.layout.Card Card} layout, which switches between
 	 * the panels when the tabs are clicked.
 	 * 
-	 * By default, each child Panel has its header hidden, and takes its {@link jqg.panel.Panel#title} config
+	 * By default, each child Panel has its header hidden, and takes its {@link gui.panel.Panel#title} config
 	 * to use as the tab's title. To not hide each panel's header, set the {@link #hideChildPanelHeaders} config
 	 * to `false`.
 	 */
 	var TabPanel = Panel.extend( {
 		
 		/**
-		 * @cfg {Number/jqg.Component} activeTab
+		 * @cfg {Number/gui.Component} activeTab
 		 * 
-		 * The tab number, or {@link jqg.Component} instance to set as the initially active tab. Defaults to 0 
-		 * (for the first tab). If this is a {@link jqg.Component} instance, it must exist within the TabPanel.
+		 * The tab number, or {@link gui.Component} instance to set as the initially active tab. Defaults to 0 
+		 * (for the first tab). If this is a {@link gui.Component} instance, it must exist within the TabPanel.
 		 */
 		activeTab : 0,
 		
 		/**
 		 * @cfg {Boolean} hideChildPanelHeaders
 		 * 
-		 * `true` to hide each child panel's {@link jqg.panel.Panel#property-header header} when added to the Tab Panel.
+		 * `true` to hide each child panel's {@link gui.panel.Panel#property-header header} when added to the Tab Panel.
 		 * The headers are hidden because the tabs that are created will have the panels' titles, and having
 		 * the header would just be showing that information twice. Set to `false` to disable this behavior.
 		 */
@@ -11737,24 +11737,24 @@ define('jqg/tab/Panel', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-tabPanel',
+		baseCls : 'gui-tabPanel',
 		
 		/**
 		 * @cfg {String} childPanelCls
 		 * 
-		 * The CSS class to add to the *child* {@link jqg.panel.Panel Panels} of this TabPanel, when they are added.
+		 * The CSS class to add to the *child* {@link gui.panel.Panel Panels} of this TabPanel, when they are added.
 		 * This allows for custom styling of the Panels which are direct children of the TabPanel.
 		 * 
-		 * This CSS class, plus the string '-body' is also added to the child Panel's {@link jqg.panel.Panel#$bodyEl body}
-		 * element. An example of this would be if this config was 'jqg-tabPanel-childPanel', then the body element of the child
-		 * Panel would get the CSS class: 'jqg-tabPanel-childPanel-body'.
+		 * This CSS class, plus the string '-body' is also added to the child Panel's {@link gui.panel.Panel#$bodyEl body}
+		 * element. An example of this would be if this config was 'gui-tabPanel-childPanel', then the body element of the child
+		 * Panel would get the CSS class: 'gui-tabPanel-childPanel-body'.
 		 */
-		childPanelCls : 'jqg-tabPanel-childPanel',
+		childPanelCls : 'gui-tabPanel-childPanel',
 		
 		
 		/**
 		 * @protected
-		 * @property {jqg.tab.Bar} tabBar
+		 * @property {gui.tab.Bar} tabBar
 		 * 
 		 * The Container that holds the TabPanel's tabs.
 		 */
@@ -11769,9 +11769,9 @@ define('jqg/tab/Panel', [
 				 * Fires before the {@link #activeTab} is changed.
 				 * 
 				 * @event beforetabchange
-				 * @param {jqg.tab.Panel} tabPanel This TabPanel instance.
-				 * @param {jqg.panel.Panel} panel The Panel instance for the tab is to be activated.
-				 * @param {jqg.panel.Panel} oldPanel The Panel instance of the tab that is to be de-activated. 
+				 * @param {gui.tab.Panel} tabPanel This TabPanel instance.
+				 * @param {gui.panel.Panel} panel The Panel instance for the tab is to be activated.
+				 * @param {gui.panel.Panel} oldPanel The Panel instance of the tab that is to be de-activated. 
 				 *   Will be null if there is no currently activated tab.
 				 * @preventable
 				 */
@@ -11781,9 +11781,9 @@ define('jqg/tab/Panel', [
 				 * Fires when the {@link #activeTab} has been changed. 
 				 * 
 				 * @event tabchange
-				 * @param {jqg.tab.Panel} tabPanel This TabPanel instance.
-				 * @param {jqg.panel.Panel} panel The Panel instance for the tab that was activated.
-				 * @param {jqg.panel.Panel} oldPanel The Panel instance of the tab that was de-activated. 
+				 * @param {gui.tab.Panel} tabPanel This TabPanel instance.
+				 * @param {gui.panel.Panel} panel The Panel instance for the tab that was activated.
+				 * @param {gui.panel.Panel} oldPanel The Panel instance of the tab that was de-activated. 
 				 *   Will be null if there was no previously activated tab.
 				 */
 				'tabchange'
@@ -11812,7 +11812,7 @@ define('jqg/tab/Panel', [
 		 * Factory method to create the TabPanel's {@link #tabBar}.
 		 * 
 		 * @protected
-		 * @return {jqg.tab.Bar}
+		 * @return {gui.tab.Bar}
 		 */
 		createTabBar : function() {
 			return new TabBar();
@@ -11820,7 +11820,7 @@ define('jqg/tab/Panel', [
 		
 		
 		/**
-		 * Retrieves the TabPanel's internal {@link jqg.tab.Bar TabBar} instance. 
+		 * Retrieves the TabPanel's internal {@link gui.tab.Bar TabBar} instance. 
 		 * 
 		 * Normally, the {@link #tabBar} is managed solely by the TabPanel itself, but this accessor allows for 
 		 * the ability to manipulate the {@link #tabBar} directly to support certain scenarios.
@@ -11831,11 +11831,11 @@ define('jqg/tab/Panel', [
 		
 		
 		/**
-		 * Factory method used to create a {@link jqg.tab.Tab Tab} for the {@link #tabBar}.
+		 * Factory method used to create a {@link gui.tab.Tab Tab} for the {@link #tabBar}.
 		 * 
 		 * @protected
-		 * @param {jqg.panel.Panel} The Panel which a Tab is being created for. 
-		 * @return {jqg.tab.Tab}
+		 * @param {gui.panel.Panel} The Panel which a Tab is being created for. 
+		 * @return {gui.tab.Tab}
 		 */
 		createTab : function( panel ) {
 			return new Tab( {
@@ -11906,10 +11906,10 @@ define('jqg/tab/Panel', [
 		
 		
 		/**
-		 * Sets the active tab {@link jqg.panel.Panel Panel}.
+		 * Sets the active tab {@link gui.panel.Panel Panel}.
 		 * 
-		 * @param {jqg.panel.Panel/Number} panel The Panel to activate in the TabPanel, or the index of the Panel in the TabPanel
-		 *   (0 for the first Panel). Note that if a {@link jqg.panel.Panel Panel} is provided, it must be an *instantiated* Panel,
+		 * @param {gui.panel.Panel/Number} panel The Panel to activate in the TabPanel, or the index of the Panel in the TabPanel
+		 *   (0 for the first Panel). Note that if a {@link gui.panel.Panel Panel} is provided, it must be an *instantiated* Panel,
 		 *   and not the anonymous config object used to create the Panel.
 		 */
 		setActiveTab : function( panel ) {
@@ -11927,9 +11927,9 @@ define('jqg/tab/Panel', [
 		
 		
 		/**
-		 * Gets the active tab ({@link jqg.panel.Panel Panel}).
+		 * Gets the active tab ({@link gui.panel.Panel Panel}).
 		 * 
-		 * @return {jqg.panel.Panel} The Panel that is currently shown as the active tab, or `null` if there is no active tab.
+		 * @return {gui.panel.Panel} The Panel that is currently shown as the active tab, or `null` if there is no active tab.
 		 */
 		getActiveTab : function() {
 			return this.layout.getActiveItem();
@@ -11947,10 +11947,10 @@ define('jqg/tab/Panel', [
 		
 		
 		/**
-		 * Handles a click to a {@link jqg.tab.Tab Tab} in the TabBar.
+		 * Handles a click to a {@link gui.tab.Tab Tab} in the TabBar.
 		 *
 		 * @protected
-		 * @param {jqg.tab.Tab} tab The Tab that was clicked.
+		 * @param {gui.tab.Tab} tab The Tab that was clicked.
 		 */
 		onTabClick : function( tab ) {
 			this.setActiveTab( tab.getCorrespondingPanel() );  // show the Panel that corresponds to the tab
@@ -11961,9 +11961,9 @@ define('jqg/tab/Panel', [
 		 * Method that is run after a new tab has been activated (shown).
 		 * 
 		 * @protected
-		 * @param {jqg.layout.Card} cardLayout
-		 * @param {jqg.panel.Panel} newPanel The newly activated Panel.
-		 * @param {jqg.panel.Panel} oldPanel The previously activated Panel.
+		 * @param {gui.layout.Card} cardLayout
+		 * @param {gui.panel.Panel} newPanel The newly activated Panel.
+		 * @param {gui.panel.Panel} oldPanel The previously activated Panel.
 		 */
 		onTabChange : function( cardLayout, newPanel, oldPanel ) {
 			this.fireEvent( 'tabchange', this, newPanel, oldPanel );
@@ -11990,13 +11990,13 @@ define('jqg/tab/Panel', [
 	
 } );
 /*global define */
-define('jqg/util/CallbackList', [
+define('gui/util/CallbackList', [
 	'lodash',
 	'Class'
 ], function( _, Class ) {
 	
 	/**
-	 * @class jqg.util.CallbackList
+	 * @class gui.util.CallbackList
 	 * @extends Object
 	 * 
 	 * Simple utility used to maintain a list of callback functions, and their associated scope objects.
@@ -12155,14 +12155,14 @@ define('jqg/util/CallbackList', [
 	
 } );
 /*global define */
-define('jqg/util/CollectionBindable', [
+define('gui/util/CollectionBindable', [
 	'lodash',
 	'Class',
-	'jqg/JqGui'
-], function( _, Class, JqGui ) {
+	'gui/Gui'
+], function( _, Class, Gui ) {
 	
 	/**
-	 * @class jqg.util.CollectionBindable
+	 * @class gui.util.CollectionBindable
 	 * @extends Object
 	 * 
 	 * This class is intended to be used as a mixin. It allows any class that it is mixed into (the "target" class in these docs) to have 
@@ -12177,11 +12177,11 @@ define('jqg/util/CollectionBindable', [
 	 * The target class may also implement the {@link #onCollectionBind} method, to detect and handle when a new {@link data.Collection} has
 	 * been bound, and/or when the currently-bound collection has been unbound.
 	 * 
-	 * Here is an example of mixing this class into a {@link jqg.Component Component}, to make the Component data-bound to a Collection:
+	 * Here is an example of mixing this class into a {@link gui.Component Component}, to make the Component data-bound to a Collection:
 	 * 
 	 *     define( [
-	 *         'jqg/Component',
-	 *         'jqg/util/CollectionBindable'
+	 *         'gui/Component',
+	 *         'gui/util/CollectionBindable'
 	 *     ], function( Component, CollectionBindable ) {
 	 *         
 	 *         var MyBindableComponent = Component.extend( {
@@ -12337,7 +12337,7 @@ define('jqg/util/CollectionBindable', [
 		 * @param {data.Collection} oldCollection The collection that was just unbound. Will be `null` if there was no
 		 *   previously-bound collection.
 		 */
-		onCollectionBind : JqGui.emptyFn,
+		onCollectionBind : Gui.emptyFn,
 		
 		
 		/**
@@ -12373,7 +12373,7 @@ define('jqg/util/CollectionBindable', [
 		 * 
 		 *     require( [
 		 *         'Class',
-		 *         'jqg/util/CollectionBindable'
+		 *         'gui/util/CollectionBindable'
 		 *     ], function( Class, CollectionBindable ) {
 		 *         
 		 *         var MyBindableClass = Class.create( {
@@ -12435,14 +12435,14 @@ define('jqg/util/CollectionBindable', [
 	
 } );
 /*global define */
-define('jqg/util/ModelBindable', [
+define('gui/util/ModelBindable', [
 	'lodash',
 	'Class',
-	'jqg/JqGui'
-], function( _, Class, JqGui ) {
+	'gui/Gui'
+], function( _, Class, Gui ) {
 	
 	/**
-	 * @class jqg.util.ModelBindable
+	 * @class gui.util.ModelBindable
 	 * @extends Object
 	 * 
 	 * This class is intended to be used as a mixin. It allows any class that it is mixed into (the "target" class in these docs) to have 
@@ -12457,11 +12457,11 @@ define('jqg/util/ModelBindable', [
 	 * The target class may also implement the {@link #onModelBind} method, to detect and handle when a new {@link data.Model} has
 	 * been bound, and/or when the currently-bound model has been unbound.
 	 * 
-	 * Here is an example of mixing this class into a {@link jqg.Component Component}, to make the Component data-bound to a Model:
+	 * Here is an example of mixing this class into a {@link gui.Component Component}, to make the Component data-bound to a Model:
 	 * 
 	 *     define( [
-	 *         'jqg/Component',
-	 *         'jqg/util/ModelBindable'
+	 *         'gui/Component',
+	 *         'gui/util/ModelBindable'
 	 *     ], function( Component, ModelBindable ) {
 	 *         
 	 *         var MyBindableComponent = Component.extend( {
@@ -12621,7 +12621,7 @@ define('jqg/util/ModelBindable', [
 		 * @param {data.Model} oldModel The model that was just unbound. Will be `null` if there was no
 		 *   previously-bound model.
 		 */
-		onModelBind : JqGui.emptyFn,
+		onModelBind : Gui.emptyFn,
 		
 		
 		/**
@@ -12657,7 +12657,7 @@ define('jqg/util/ModelBindable', [
 		 * 
 		 *     require( [
 		 *         'Class',
-		 *         'jqg/util/ModelBindable'
+		 *         'gui/util/ModelBindable'
 		 *     ], function( Class, ModelBindable ) {
 		 *         
 		 *         var MyBindableClass = Class.create( {
@@ -12724,18 +12724,18 @@ define('jqg/util/ModelBindable', [
 	
 } );
 /*global define */
-define('jqg/view/Collection', [
+define('gui/view/Collection', [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/Component',
-	'jqg/util/CollectionBindable'
+	'gui/ComponentManager',
+	'gui/Component',
+	'gui/util/CollectionBindable'
 ], function( jQuery, _, ComponentManager, Component, CollectionBindable ) {
 	
 	/**
-	 * @class jqg.view.Collection
-	 * @extends jqg.Component
-	 * @mixins jqg.util.CollectionBindable
+	 * @class gui.view.Collection
+	 * @extends gui.Component
+	 * @mixins gui.util.CollectionBindable
 	 * @alias type.collectionview
 	 * 
 	 * A view of the {@link data.Model Models} in a {@link data.Collection}. The view uses the {@link #tpl} config, which 
@@ -12743,7 +12743,7 @@ define('jqg/view/Collection', [
 	 * {@link #collection} changes, or any of its {@link data.Model Models} change, the Collection View is 
 	 * automatically refreshed to reflect the change.  
 	 * 
-	 * This view is similar to the {@link jqg.view.Model Model View}, but instead of showing a single {@link data.Model Model},
+	 * This view is similar to the {@link gui.view.Model Model View}, but instead of showing a single {@link data.Model Model},
 	 * it shows a {@link data.Collection Collection} of them.
 	 */
 	var CollectionView = Component.extend( {
@@ -12761,7 +12761,7 @@ define('jqg/view/Collection', [
 		 */
 		
 		/**
-		 * @cfg {String/String[]/Function/jqg.template.Template} tpl (required)
+		 * @cfg {String/String[]/Function/gui.template.Template} tpl (required)
 		 * 
 		 * The template which will be used to populate the Collection View. By default, this template will be provided
 		 * the variable `models`, which is an array of the {@link data.Model Models} that should be rendered
@@ -12771,7 +12771,7 @@ define('jqg/view/Collection', [
 		 * that holds the models may be configured using the {@link #modelsVar} config.
 		 * 
 		 * For example, if we had a "User" model, which had fields `id`, `firstName`, and `lastName`, then we
-		 * might want to display this information in a template as such: (using a {@link jqg.template.LoDash Lo-Dash template}
+		 * might want to display this information in a template as such: (using a {@link gui.template.LoDash Lo-Dash template}
 		 * in this case)
 		 * 
 		 *     tpl : new LoDashTpl( [
@@ -12810,8 +12810,8 @@ define('jqg/view/Collection', [
 		 *    That is, do not use `if` statements to filter out certain models. If this needs to be done, do so in an overridden
 		 *    {@link #collectModels} method instead, so the Collection View knows what it's working with.
 		 * 
-		 * For more information on templates themselves, see the {@link jqg.Component#tpl tpl} config in the superclass, 
-		 * {@link jqg.Component Component}.
+		 * For more information on templates themselves, see the {@link gui.Component#tpl tpl} config in the superclass, 
+		 * {@link gui.Component Component}.
 		 */
 		
 		/**
@@ -12850,7 +12850,7 @@ define('jqg/view/Collection', [
 		 * 
 		 * This may be used to provide a variable name that makes more sense inside the template for the type of models 
 		 * being used. For example, if the Collection View is working with "User" models, one might want to
-		 * set this config to `users`. Example: (using a {@link jqg.template.LoDash Lo-Dash template} in this case)
+		 * set this config to `users`. Example: (using a {@link gui.template.LoDash Lo-Dash template} in this case)
 		 * 
 		 *     modelsVar : 'users',
 		 *     tpl : new LoDashTpl( [
@@ -12956,7 +12956,7 @@ define('jqg/view/Collection', [
 		// Implementation of CollectionBindable mixin methods
 		
 		/**
-		 * Implementation of {@link jqg.util.CollectionBindable} mixin method used to retrieve the Object (map) of the listeners 
+		 * Implementation of {@link gui.util.CollectionBindable} mixin method used to retrieve the Object (map) of the listeners 
 		 * that should be set up on the {@link #collection}, when a {@link data.Collection} is bound to the view. This method may 
 		 * be overridden in a subclass to add events that should be listened for.
 		 * 
@@ -12978,7 +12978,7 @@ define('jqg/view/Collection', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.util.CollectionBindable} mixin method. Handles when a new {@link #collection} has been 
+		 * Implementation of {@link gui.util.CollectionBindable} mixin method. Handles when a new {@link #collection} has been 
 		 * bound to the view.
 		 * 
 		 * @protected
@@ -13087,7 +13087,7 @@ define('jqg/view/Collection', [
 		
 		
 		/**
-		 * Retrieves the data that will be {@link jqg.template.Template#apply applied} to the {@link #tpl} upon 
+		 * Retrieves the data that will be {@link gui.template.Template#apply applied} to the {@link #tpl} upon 
 		 * {@link #refresh}. 
 		 * 
 		 * This method may be overridden by subclasses to add additional properties which will be provided
@@ -13096,7 +13096,7 @@ define('jqg/view/Collection', [
 		 * @protected
 		 * @param {data.Model[]} models The models that are to be rendered by the {@link #tpl} (collected from 
 		 *   {@link #collectModels}).
-		 * @return {Object} An Object (map) of the properties which will be {@link jqg.template.Template#apply applied}
+		 * @return {Object} An Object (map) of the properties which will be {@link gui.template.Template#apply applied}
 		 *   to the {@link #tpl}, to produce the output.
 		 */
 		prepareTplData : function( models ) {
@@ -13216,25 +13216,25 @@ define('jqg/view/Collection', [
 	
 } );
 /*global define */
-define('jqg/view/Model', [
+define('gui/view/Model', [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/Component',
-	'jqg/util/ModelBindable'
+	'gui/ComponentManager',
+	'gui/Component',
+	'gui/util/ModelBindable'
 ], function( jQuery, _, ComponentManager, Component, ModelBindable ) {
 	
 	/**
-	 * @class jqg.view.Model
-	 * @extends jqg.Component
-	 * @mixins jqg.util.ModelBindable
+	 * @class gui.view.Model
+	 * @extends gui.Component
+	 * @mixins gui.util.ModelBindable
 	 * @alias type.modelview
 	 * 
 	 * A view of the data in a single {@link data.Model}. The view uses the {@link #tpl} config, which 
 	 * is automatically passed the {@link #model} to populate the template. When any of the {@link #model model's} 
 	 * attributes change, the Model View is automatically refreshed to reflect the change.  
 	 * 
-	 * This view is similar to the {@link jqg.view.Collection Collection View}, which shows a {@link data.Collection Collection}
+	 * This view is similar to the {@link gui.view.Collection Collection View}, which shows a {@link data.Collection Collection}
 	 * of {@link data.Model Models} instead of a single one.  
 	 */
 	var ModelView = Component.extend( {
@@ -13251,14 +13251,14 @@ define('jqg/view/Model', [
 		 */
 		
 		/**
-		 * @cfg {String/String[]/Function/jqg.template.Template} tpl (required)
+		 * @cfg {String/String[]/Function/gui.template.Template} tpl (required)
 		 * 
 		 * The template which will be used to populate the Model View. By default, this template will be provided
 		 * the variable `model`, which is the {@link #model} instance bound to this Model View. The name of the 
 		 * variable provided to the {@link #tpl} that holds the models may be configured using the {@link #modelVar} config.
 		 * 
 		 * For example, if we had a "User" model, which had fields `id`, `firstName`, and `lastName`, then we
-		 * might want to display this information in a template as such: (using a {@link jqg.template.LoDash Lo-Dash template}
+		 * might want to display this information in a template as such: (using a {@link gui.template.LoDash Lo-Dash template}
 		 * in this case)
 		 * 
 		 *     tpl : new LoDashTpl( [
@@ -13282,8 +13282,8 @@ define('jqg/view/Model', [
 		 * a subset of the attributes in the {@link data.Model Model} are needed for the template, it would be more efficient 
 		 * to only retrieve those particular attributes using {@link data.Model#get}.
 		 * 
-		 * For more information on templates themselves, see the {@link jqg.Component#tpl tpl} config in the superclass, 
-		 * {@link jqg.Component Component}.
+		 * For more information on templates themselves, see the {@link gui.Component#tpl tpl} config in the superclass, 
+		 * {@link gui.Component Component}.
 		 */
 		
 		/**
@@ -13294,7 +13294,7 @@ define('jqg/view/Model', [
 		 * 
 		 * This may be used to provide a variable name that makes more sense inside the template for the type of model 
 		 * being used. For example, if the Model View is working with a "User" model, one might want to
-		 * set this config to `user`. Example: (using a {@link jqg.template.LoDash Lo-Dash template} in this case)
+		 * set this config to `user`. Example: (using a {@link gui.template.LoDash Lo-Dash template} in this case)
 		 * 
 		 *     modelVar : 'user',
 		 *     tpl : new LoDashTpl( [
@@ -13360,7 +13360,7 @@ define('jqg/view/Model', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.util.ModelBindable} mixin method, which retrieves an Object (map) of the listeners that 
+		 * Implementation of {@link gui.util.ModelBindable} mixin method, which retrieves an Object (map) of the listeners that 
 		 * should be set up on the {@link #model}, when a {@link data.Model} is bound to the view. This method may be overridden 
 		 * in a subclass to add extra events that should be listened for.
 		 * 
@@ -13380,7 +13380,7 @@ define('jqg/view/Model', [
 		
 		
 		/**
-		 * Implementation of {@link jqg.util.ModelBindable} mixin method. Handles when a new {@link #model} has been 
+		 * Implementation of {@link gui.util.ModelBindable} mixin method. Handles when a new {@link #model} has been 
 		 * bound to the view.
 		 * 
 		 * @protected
@@ -13442,7 +13442,7 @@ define('jqg/view/Model', [
 		
 		
 		/**
-		 * Retrieves the data that will be {@link jqg.template.Template#apply applied} to the {@link #tpl} upon 
+		 * Retrieves the data that will be {@link gui.template.Template#apply applied} to the {@link #tpl} upon 
 		 * {@link #refresh}. 
 		 * 
 		 * This method may be overridden by subclasses to add additional properties which will be provided
@@ -13450,7 +13450,7 @@ define('jqg/view/Model', [
 		 * 
 		 * @protected
 		 * @param {data.Model} model The model that is to be rendered by the {@link #tpl}.
-		 * @return {Object} An Object (map) of the properties which will be {@link jqg.template.Template#apply applied}
+		 * @return {Object} An Object (map) of the properties which will be {@link gui.template.Template#apply applied}
 		 *   to the {@link #tpl}, to produce the output.
 		 */
 		prepareTplData : function( model ) {
@@ -13482,19 +13482,19 @@ define('jqg/view/Model', [
 	
 } );
 /*global define */
-define('jqg/window/Window', [
+define('gui/window/Window', [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/Overlay'
+	'gui/ComponentManager',
+	'gui/Overlay'
 ], function( jQuery, _, ComponentManager, Overlay ) {
 	
 	/**
-	 * @class jqg.window.Window
-	 * @extends jqg.Overlay
+	 * @class gui.window.Window
+	 * @extends gui.Overlay
 	 * @alias type.window
 	 * 
-	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link jqg.panel.Panel Panel}, the Window
+	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link gui.panel.Panel Panel}, the Window
 	 * may accept a {@link #title}, and it also adds a {@link #closeButton close button} to the top right  
 	 */
 	var Window = Overlay.extend( {
@@ -13541,7 +13541,7 @@ define('jqg/window/Window', [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-window',
+		baseCls : 'gui-window',
 		
 		/**
 		 * @cfg
@@ -13726,4 +13726,4 @@ define('jqg/window/Window', [
 	return Window;
 	
 } );
-require(["jqg/Anchor", "jqg/Component", "jqg/ComponentManager", "jqg/ComponentQuery", "jqg/Container", "jqg/Image", "jqg/JqGui", "jqg/Label", "jqg/Mask", "jqg/Overlay", "jqg/Viewport", "jqg/anim/Animation", "jqg/app/Controller", "jqg/app/EventBus", "jqg/button/Button", "jqg/form/field/Checkbox", "jqg/form/field/Dropdown", "jqg/form/field/Field", "jqg/form/field/Hidden", "jqg/form/field/Radio", "jqg/form/field/Text", "jqg/form/field/TextArea", "jqg/layout/Auto", "jqg/layout/Card.SwitchTransition", "jqg/layout/Card.Transition", "jqg/layout/Card", "jqg/layout/Column", "jqg/layout/Fit", "jqg/layout/HBox", "jqg/layout/Layout", "jqg/layout/VBox", "jqg/panel/Header", "jqg/panel/Panel", "jqg/panel/ToolButton", "jqg/plugin/Plugin", "jqg/tab/Bar", "jqg/tab/Panel", "jqg/tab/Tab", "jqg/template/LoDash", "jqg/template/Template", "jqg/util/CallbackList", "jqg/util/CollectionBindable", "jqg/util/Css", "jqg/util/Html", "jqg/util/ModelBindable", "jqg/util/OptionsStore", "jqg/view/Collection", "jqg/view/Model", "jqg/window/Window"]);
+require(["gui/Anchor", "gui/Component", "gui/ComponentManager", "gui/ComponentQuery", "gui/Container", "gui/Gui", "gui/Image", "gui/Label", "gui/Mask", "gui/Overlay", "gui/Viewport", "gui/anim/Animation", "gui/app/Controller", "gui/app/EventBus", "gui/button/Button", "gui/form/field/Checkbox", "gui/form/field/Dropdown", "gui/form/field/Field", "gui/form/field/Hidden", "gui/form/field/Radio", "gui/form/field/Text", "gui/form/field/TextArea", "gui/layout/Auto", "gui/layout/Card.SwitchTransition", "gui/layout/Card.Transition", "gui/layout/Card", "gui/layout/Column", "gui/layout/Fit", "gui/layout/HBox", "gui/layout/Layout", "gui/layout/VBox", "gui/panel/Header", "gui/panel/Panel", "gui/panel/ToolButton", "gui/plugin/Plugin", "gui/tab/Bar", "gui/tab/Panel", "gui/tab/Tab", "gui/template/LoDash", "gui/template/Template", "gui/util/CallbackList", "gui/util/CollectionBindable", "gui/util/Css", "gui/util/Html", "gui/util/ModelBindable", "gui/util/OptionsStore", "gui/view/Collection", "gui/view/Model", "gui/window/Window"]);

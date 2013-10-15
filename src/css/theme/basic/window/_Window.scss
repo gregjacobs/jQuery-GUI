@@ -1,12 +1,12 @@
-.jqg-window { border-color: #000; border-style: solid; border-width: 0 1px 1px 1px; }
+.gui-window { border-color: #000; border-style: solid; border-width: 0 1px 1px 1px; }
 
-.jqg-window-header { border-color: #000; border-style: solid; border-width: 1px 0 0 0; background-color: #2383B3; }
-.jqg-window-header-title { font-weight: bold; color: #FFF; }
-.jqg-window-header-toolButtons { 
-	@extend .jqg-panel-header-toolButtons
+.gui-window-header { border-color: #000; border-style: solid; border-width: 1px 0 0 0; background-color: #2383B3; }
+.gui-window-header-title { font-weight: bold; color: #FFF; }
+.gui-window-header-toolButtons { 
+	@extend .gui-panel-header-toolButtons
 }
 
-.jqg-window-body { border-color: #000; border-style: solid; border-width: 1px 0 0 0; background-color: #FFF; }
+.gui-window-body { border-color: #000; border-style: solid; border-width: 1px 0 0 0; background-color: #FFF; }
 
 
-.jqg-window-modalMask { background-color: #CCC; @include opacity( 0.5 ); }
+.gui-window-modalMask { background-color: #CCC; @include opacity( 0.5 ); }

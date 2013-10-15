@@ -2,21 +2,21 @@
 define( [
 	'lodash',
 	'Observable',
-	'jqg/JqGui'
-], function( _, Observable, JqGui ) {
+	'gui/Gui'
+], function( _, Observable, Gui ) {
 	
 	/**
 	 * @abstract 
-	 * @class jqg.layout.Layout
+	 * @class gui.layout.Layout
 	 * @extends Observable
 	 * 
 	 * Base class Layout that defines the public interface of all Layout subclasses. Layouts are stateful strategy objects 
-	 * that are used by {@link jqg.Container jqg.Containers} to implement how their child items are displayed. Because of their 
-	 * stateful nature, the same layout may not be used by multiple {@link jqg.Container jqg.Containers}.
+	 * that are used by {@link gui.Container gui.Containers} to implement how their child items are displayed. Because of their 
+	 * stateful nature, the same layout may not be used by multiple {@link gui.Container gui.Containers}.
 	 * 
-	 * The default layout that is used for a {@link jqg.Container Container} is the {@link jqg.layout.Auto}, 
-	 * which simply renders each child component directly into the {@link jqg.Container jqg.Container's} 
-	 * {@link jqg.Component#getContentTarget content target element}, and does no further sizing or formatting.
+	 * The default layout that is used for a {@link gui.Container Container} is the {@link gui.layout.Auto}, 
+	 * which simply renders each child component directly into the {@link gui.Container gui.Container's} 
+	 * {@link gui.Component#getContentTarget content target element}, and does no further sizing or formatting.
 	 * 
 	 * 
 	 * ## Building a Layout
@@ -26,7 +26,7 @@ define( [
 	 * Note the following items:
 	 * 
 	 * - {@link #onLayout} and {@link #afterLayout} will be executed each time the {@link #container container's} 
-	 *   {@link jqg.Container#doLayout} method is executed. This means that {@link #onLayout} and {@link #afterLayout}
+	 *   {@link gui.Container#doLayout} method is executed. This means that {@link #onLayout} and {@link #afterLayout}
 	 *   may be called multiple times during the lifetime of the Layout, and this should be handled. Some layouts choose
 	 *   to have completely separate "first run" and "update layout" methods.
 	 * - Use the helper methods in this Layout class to {@link #renderComponent render} and {link #sizeComponent size}
@@ -35,17 +35,17 @@ define( [
 	 *   {@link #renderComponent} and {@link #sizeComponent} methods for details.
 	 * - Layouts should handle the case of the {@link #container} they are laying out having 0 child components, and it should
 	 *   also handle the cases where child components are added, removed, or reordered. However, try not execute the
-	 *   {@link #renderComponent} method (and thus the {@link jqg.Component#method-render} method) when the component is already
+	 *   {@link #renderComponent} method (and thus the {@link gui.Component#method-render} method) when the component is already
 	 *   rendered and in the correct position. This adds DOM overhead, and can cause some weird behavior such as having
-	 *   {@link jqg.form.field.Text Text Fields} to lose focus if a layout runs that does this.
-	 * - Browser window resize events should not be handled within the Layout. The top level {@link jqg.Viewport} will
-	 *   call its {@link jqg.Container#doLayout doLayout} method to fix the layout automatically, on resize.
+	 *   {@link gui.form.field.Text Text Fields} to lose focus if a layout runs that does this.
+	 * - Browser window resize events should not be handled within the Layout. The top level {@link gui.Viewport} will
+	 *   call its {@link gui.Container#doLayout doLayout} method to fix the layout automatically, on resize.
 	 * 
 	 * Layouts are required to manage any HTML elements that they create, and should clean up after themselves
 	 * when they are done. This includes cleaning up old HTML elements when {@link #doLayout} (and therefore,
 	 * {@link #onLayout}) is run again, and when the Layout is {@link #method-destroy destroyed}. Subclasses should
 	 * implement the {@link #onDestroy} method to implement their clean up as part of the destruction process.
-	 * Note that a layout may be destroyed by a {@link jqg.Container} if another layout is set to it, and therefore
+	 * Note that a layout may be destroyed by a {@link gui.Container} if another layout is set to it, and therefore
 	 * it cannot be relied on that the Container will clean up any stray elements that a Layout has created.
 	 */
 	var Layout = Observable.extend( {
@@ -53,9 +53,9 @@ define( [
 		
 		
 		/**
-		 * @cfg {jqg.Container} container
+		 * @cfg {gui.Container} container
 		 * 
-		 * The {@link jqg.Container} that this Layout object belongs to. Defaults to null, and can be set
+		 * The {@link gui.Container} that this Layout object belongs to. Defaults to null, and can be set
 		 * after instantiation with {@link #setContainer}. 
 		 */
 		container : null,
@@ -90,7 +90,7 @@ define( [
 				 * Fires when this layout is destroyed.
 				 * 
 				 * @event destroy
-				 * @param {jqg.layout.Layout} layout This AbstractLayout instance.
+				 * @param {gui.layout.Layout} layout This AbstractLayout instance.
 				 */
 				'destroy'
 			);
@@ -122,13 +122,13 @@ define( [
 		 * @template
 		 * @method initLayout
 		 */
-		initLayout : JqGui.emptyFn,
+		initLayout : Gui.emptyFn,
 		
 		
 		/**
-		 * Sets the {@link jqg.Container} instance that this Layout belongs to.
+		 * Sets the {@link gui.Container} instance that this Layout belongs to.
 		 * 
-		 * @param {jqg.Container} container
+		 * @param {gui.Container} container
 		 */
 		setContainer : function( container ) {
 			this.container = container;
@@ -137,9 +137,9 @@ define( [
 		
 		
 		/**
-		 * Gets the {@link jqg.Container} instance that this Layout belongs to.
+		 * Gets the {@link gui.Container} instance that this Layout belongs to.
 		 * 
-		 * @return {jqg.Container} The container
+		 * @return {gui.Container} The container
 		 */
 		getContainer : function() {
 			return this.container;
@@ -157,9 +157,9 @@ define( [
 		 * @protected
 		 * @template
 		 * @method onContainerSet
-		 * @param {jqg.Container} container The Container that was set.
+		 * @param {gui.Container} container The Container that was set.
 		 */
-		onContainerSet : JqGui.emptyFn,
+		onContainerSet : Gui.emptyFn,
 		
 		
 		/**
@@ -192,7 +192,7 @@ define( [
 			this.onLayout( childComponents, $targetEl );
 			
 			
-			// Now that each child jqg.Component has been rendered, we need to run the layouts on each component 
+			// Now that each child gui.Component has been rendered, we need to run the layouts on each component 
 			// that has not yet had a layout executed on it
 			for( i = 0; i < numChildComponents; i++ ) {
 				childComponent = childComponents[ i ];
@@ -218,10 +218,10 @@ define( [
 		 * @protected
 		 * @template
 		 * @method onLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
-		onLayout : JqGui.emptyFn,
+		onLayout : Gui.emptyFn,
 		
 		
 		/**
@@ -232,10 +232,10 @@ define( [
 		 * @protected
 		 * @template
 		 * @method afterLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
-		afterLayout : JqGui.emptyFn,
+		afterLayout : Gui.emptyFn,
 		
 		
 		/**
@@ -243,7 +243,7 @@ define( [
 		 * ({@link #doLayout}/{@link #onLayout}). This is so that we know that we don't have to lay out components
 		 * that have already been manually laid out.
 		 * 
-		 * @param {jqg.Component} component The Component that a layout was performed on.
+		 * @param {gui.Component} component The Component that a layout was performed on.
 		 */
 		markLayoutComplete : function( component ) {
 			this.needsLayoutMap[ component.getUuid() ] = false;
@@ -254,36 +254,36 @@ define( [
 		
 		
 		/**
-		 * Utility method used to render a child {@link jqg.Component} into the layout's target element. This method renders
-		 * the child component, deferring any layout of child {@link jqg.Container containers} until after the layout process 
+		 * Utility method used to render a child {@link gui.Component} into the layout's target element. This method renders
+		 * the child component, deferring any layout of child {@link gui.Container containers} until after the layout process 
 		 * is complete.
 		 * 
-		 * This method lazily renders the provided `component`. A call to the component's {@link jqg.Component#method-render render}
+		 * This method lazily renders the provided `component`. A call to the component's {@link gui.Component#method-render render}
 		 * method will only be made if:
 		 * 
-		 * 1) The `component` is not yet {@link jqg.Component#method-render rendered}.
-		 * 2) The `component` is rendered, but not a child of the `$targetEl`. Calling {@link jqg.Component#method-render render} here
+		 * 1) The `component` is not yet {@link gui.Component#method-render rendered}.
+		 * 2) The `component` is rendered, but not a child of the `$targetEl`. Calling {@link gui.Component#method-render render} here
 		 *    will move it.
 		 * 3) The `component` is not at the provided `position` in the $targetEl. Basically if the `position` option is provided, 
 		 *    an extra check will be made to determine if the component already exists at that position, and if so, no call to 
-		 *    {@link jqg.Component#method-render render} will be made.
+		 *    {@link gui.Component#method-render render} will be made.
 		 * 
-		 * The main reason that this method checks to see if the {@link jqg.Component#method-render} method needs to be called before
+		 * The main reason that this method checks to see if the {@link gui.Component#method-render} method needs to be called before
 		 * doing so is so that we do not end up moving components around the DOM when they don't need to be. Doing so will
 		 * make the browser do more work, and can also cause unwanted side effects. One of these side effects could be if the user 
-		 * is editing a {@link jqg.form.field.TextArea TextArea Field}, and the field resizes, triggering a layout routine 
-		 * (see {@link jqg.form.field.TextArea#autoGrow}). If a parent layout of the TextArea moves a component in the DOM, 
+		 * is editing a {@link gui.form.field.TextArea TextArea Field}, and the field resizes, triggering a layout routine 
+		 * (see {@link gui.form.field.TextArea#autoGrow}). If a parent layout of the TextArea moves a component in the DOM, 
 		 * the TextArea will lose focus, and the user would have to click into it again to continue editing.
 		 * 
 		 * @protected
-		 * @param {jqg.Component} component The component to render.
+		 * @param {gui.Component} component The component to render.
 		 * @param {jQuery} $targetEl The target element to render the `component` into.
 		 * @param {Object} [options] Any additional options to provide to the `options` argument of the 
-		 *   `component`'s {@link jqg.Component#method-render} method. 
+		 *   `component`'s {@link gui.Component#method-render} method. 
 		 * @param {Number/String/HTMLElement/jQuery} [options.position] This property is handled in particular 
 		 *   by this method (if provided), to determine if the `component` needs to be moved (by way
-		 *   of the {@link jqg.Component#method-render render} method). If provided, an extra test will check if
-		 *   the component is already in the correct position, or else no call to {@link jqg.Component#method-render}
+		 *   of the {@link gui.Component#method-render render} method). If provided, an extra test will check if
+		 *   the component is already in the correct position, or else no call to {@link gui.Component#method-render}
 		 *   will be made (as an optimization). This may be a numeric position index, a jQuery selector, an HTML 
 		 *   element, or a jQuery wrapped set itself.
 		 */
@@ -311,12 +311,12 @@ define( [
 		
 		
 		/**
-		 * Utility method used to size a child {@link jqg.Component} to the given `width` and `height`, based on the `component`'s 
+		 * Utility method used to size a child {@link gui.Component} to the given `width` and `height`, based on the `component`'s 
 		 * margin/padding/border widths. This method should only be called after the `component` has already been rendered, so that 
 		 * it can access the margin/padding/border widths on the `component`.
 		 * 
 		 * @protected
-		 * @param {jqg.Component} component The {@link jqg.Component component} to size.
+		 * @param {gui.Component} component The {@link gui.Component component} to size.
 		 * @param {Number} targetWidth The width the component should be sized to. If the width should not be changed, this argument
 		 *   may be passed as `undefined`.
 		 * @param {Number} targetHeight The height the component should be sized to. If the height should not be changed, this argument
@@ -366,7 +366,7 @@ define( [
 		 * @template
 		 * @method onDestroy
 		 */
-		onDestroy : JqGui.emptyFn
+		onDestroy : Gui.emptyFn
 		
 	} );
 

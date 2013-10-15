@@ -4,21 +4,21 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'jqg/JqGui',
+	'gui/Gui',
 	'Observable',
-	'jqg/util/Css',
-	'jqg/util/Html',
-	'jqg/Mask',
-	'jqg/anim/Animation',
-	'jqg/plugin/Plugin',
-	'jqg/template/Template',
-	'jqg/template/LoDash',
-	'jqg/ComponentManager'   // circular dependency. used via require() call in code below
+	'gui/util/Css',
+	'gui/util/Html',
+	'gui/Mask',
+	'gui/anim/Animation',
+	'gui/plugin/Plugin',
+	'gui/template/Template',
+	'gui/template/LoDash',
+	'gui/ComponentManager'   // circular dependency. used via require() call in code below
 ],
-function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
+function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
 
 	/**
-	 * @class jqg.Component
+	 * @class gui.Component
 	 * @extends Observable
 	 * @alias type.component
 	 * 
@@ -27,7 +27,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 	 * each step of the way.
 	 * 
 	 * Components can be constructed via anonymous config objects, based on their `type` property. This is useful for defining components in
-	 * an anonymous object, when added as items of a {@link jqg.Container}.
+	 * an anonymous object, when added as items of a {@link gui.Container}.
 	 * 
 	 * Some other things to note about Component and its subclasses are:
 	 * 
@@ -77,12 +77,12 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * is applied to the Component's {@link #$el element}. 
 		 * 
 		 * The value of this config, by convention, is also used to prefix descendent elements of a Component subclass. For 
-		 * example, {@link jqg.panel.Panel Panel} sets this config to 'jqg-panel', and its header and body elements are prefixed with 
-		 * this to become 'jqg-panel-header' and 'jqg-panel-body', respectively. However when a {@link jqg.window.Window Window} is 
-		 * created (which is a subclass of {@link jqg.panel.Panel Panel}, the value is 'jqg-window', and the header and body become 
-		 * 'jqg-window-header' and 'jqg-window-body' instead.
+		 * example, {@link gui.panel.Panel Panel} sets this config to 'gui-panel', and its header and body elements are prefixed with 
+		 * this to become 'gui-panel-header' and 'gui-panel-body', respectively. However when a {@link gui.window.Window Window} is 
+		 * created (which is a subclass of {@link gui.panel.Panel Panel}, the value is 'gui-window', and the header and body become 
+		 * 'gui-window-header' and 'gui-window-body' instead.
 		 */
-		baseCls : 'jqg-component',
+		baseCls : 'gui-component',
 		
 		/**
 		 * @protected
@@ -92,11 +92,11 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * This is used for subclasses whose parent defines a {@link #baseCls}, but then have to add additional styling
 		 * themselves. 
 		 * 
-		 * For example, the base form {@link jqg.form.field.Field Field} class adds the {@link #baseCls} 'jqg-form-field', and
-		 * the {@link jqg.form.field.Text TextField} subclass wants to keep that class, and also add 'jqg-form-field-text'
-		 * to allow for any different styling of that particular subclass. The result is two css classes: 'jqg-form-field' 
-		 * and 'jqg-form-field-text'. In the case of {@link jqg.form.field.TextArea TextAreaField} (a subclass of TextField}, 
-		 * its componentCls is 'jqg-form-field-textarea', which overrides TextField's componentCls.
+		 * For example, the base form {@link gui.form.field.Field Field} class adds the {@link #baseCls} 'gui-form-field', and
+		 * the {@link gui.form.field.Text TextField} subclass wants to keep that class, and also add 'gui-form-field-text'
+		 * to allow for any different styling of that particular subclass. The result is two css classes: 'gui-form-field' 
+		 * and 'gui-form-field-text'. In the case of {@link gui.form.field.TextArea TextAreaField} (a subclass of TextField}, 
+		 * its componentCls is 'gui-form-field-textarea', which overrides TextField's componentCls.
 		 */
 		
 		/**
@@ -131,7 +131,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		/**
 		 * @protected
-		 * @cfg {String/String[]/Function/jqg.template.LoDash} renderTpl
+		 * @cfg {String/String[]/Function/gui.template.LoDash} renderTpl
 		 * 
 		 * The template to use to render the Component's **internal** structure. This is used for Component subclasses to
 		 * generate the markup that will make up the Component's structure that does not change. This is opposed to the {@link #tpl}
@@ -158,9 +158,9 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * If, for example, the {@link #html} config is provided, then the value of the config will be placed into the "body" div.
 		 * 
 		 * 
-		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqg.template.Template} 
-		 * instance. For the string, array of strings, or function form, a {@link jqg.template.LoDash LoDash template} instance will be 
-		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqg.template.Template} 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link gui.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link gui.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link gui.template.Template} 
 		 * subclass to this config. 
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
@@ -192,9 +192,9 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * 
 		 * - **elId**: The value of the {@link #elId} property (an auto-generated, unique value).
 		 * - **baseCls**: The {@link #baseCls} config, which is the base CSS class to prefix descendent elements' CSS
-		 *   classes with. Ex: a {@link #baseCls} of 'jqg-panel' is used to prefix a {@link jqg.panel.Panel Panel's} body
-		 *   element to become 'jqg-panel-body', but when a {@link jqg.window.Window Window} is created, the value is
-		 *   'jqg-window', and the body becomes 'jqg-window-body' instead. 
+		 *   classes with. Ex: a {@link #baseCls} of 'gui-panel' is used to prefix a {@link gui.panel.Panel Panel's} body
+		 *   element to become 'gui-panel-body', but when a {@link gui.window.Window Window} is created, the value is
+		 *   'gui-window', and the body becomes 'gui-window-body' instead. 
 		 * - **componentCls**: The {@link #componentCls} config.
 		 */
 		
@@ -218,7 +218,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 */
 		
 		/**
-		 * @cfg {String/String[]/Function/jqg.template.Template} tpl
+		 * @cfg {String/String[]/Function/gui.template.Template} tpl
 		 * 
 		 * The template to use as the HTML template of the Component. 
 		 * 
@@ -230,9 +230,9 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * outputs can be updated with new data by using the {@link #update} method, and providing an Object as its first argument.
 		 * 
 		 * 
-		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqg.template.Template} 
-		 * instance. For the string, array of strings, or function form, a {@link jqg.template.LoDash LoDash template} instance will be 
-		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqg.template.Template} 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link gui.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link gui.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link gui.template.Template} 
 		 * subclass to this config. 
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
@@ -288,7 +288,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * when it is first rendered).  This default maskConfig can be overrided when calling {@link #mask} by passing a configuration object for its argument.
 		 * 
 		 * Masks are shown and hidden using the {@link #mask} and {@link #unMask} methods. If this configuration option is not provided, the configuration
-		 * options default to the default values of the configuration options for {@link jqg.Mask}.
+		 * options default to the default values of the configuration options for {@link gui.Mask}.
 		 */
 		
 		/**
@@ -299,10 +299,10 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * @cfg {jqg.plugin.Plugin/jqg.plugin.Plugin[]} plugins
+		 * @cfg {gui.plugin.Plugin/gui.plugin.Plugin[]} plugins
 		 * 
-		 * A single plugin or array of plugins to attach to the Component. Plugins must extend the class {@link jqg.plugin.Plugin}.
-		 * See {@link jqg.plugin.Plugin} for details on creating plugins.
+		 * A single plugin or array of plugins to attach to the Component. Plugins must extend the class {@link gui.plugin.Plugin}.
+		 * See {@link gui.plugin.Plugin} for details on creating plugins.
 		 * 
 		 * Note that Component will normalize this config into an array, converting a single plugin into a one-element array, or creating
 		 * an empty array if no plugins were provided.  This is done so that subclasses may add plugins by pushing them directly
@@ -312,10 +312,10 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		/**
 		 * @protected
-		 * @cfg {jqg.Container} parentContainer
+		 * @cfg {gui.Container} parentContainer
 		 * 
-		 * The parent {@link jqg.Container Container} of this Component (if any), which this Component is a child of. This is set 
-		 * by the {@link jqg.Container Container} that is adding this Component as a child, and should not be supplied directly.
+		 * The parent {@link gui.Container Container} of this Component (if any), which this Component is a child of. This is set 
+		 * by the {@link gui.Container Container} that is adding this Component as a child, and should not be supplied directly.
 		 */
 		parentContainer: null,
 		
@@ -391,7 +391,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 	
 		/**
 		 * @private
-		 * @property {jqg.anim.Animation} currentAnimation
+		 * @property {gui.anim.Animation} currentAnimation
 		 * 
 		 * The currently running {@link #method-show}/{@link #method-hide} animation, if any. Will be null if the Component
 		 * is not currently in the process of showing or hiding. This is only relevant when {@link #method-show} or
@@ -412,7 +412,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @property {Boolean} deferMaskShow
 		 * 
 		 * Flag that is set to true if the {@link #mask} method is run, but the Component is currently hidden.
-		 * The Component must be in a visible state to show the mask, as the jqg.Mask class makes a calculation of 
+		 * The Component must be in a visible state to show the mask, as the gui.Mask class makes a calculation of 
 		 * the height of the mask target element.  When the Component's {@link #method-show} method runs, this flag will be
 		 * tested to see if it is true, and if so, will run the {@link #mask} method at that time.
 		 */
@@ -420,10 +420,10 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		/**
 		 * @private
-		 * @property {jqg.Mask} _mask
+		 * @property {gui.Mask} _mask
 		 * 
-		 * The jqg.Mask instance that the Component is currently using to mask over the Component. This will be null
-		 * if no jqg.Mask has been created (i.e. the {@link #mask} method has never been called). 
+		 * The gui.Mask instance that the Component is currently using to mask over the Component. This will be null
+		 * if no gui.Mask has been created (i.e. the {@link #mask} method has never been called). 
 		 */
 		
 		/**
@@ -489,7 +489,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Fires when this Component has been {@link #method-render rendered}.
 				 * 
 				 * @event render
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'render',
 				
@@ -500,7 +500,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event beforeshow
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 * @preventable
 				 */
 				'beforeshow',
@@ -518,7 +518,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 * 
 				 * @event show
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'show',
 	
@@ -529,7 +529,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event showbegin
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'showbegin',
 	
@@ -540,7 +540,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event aftershow
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'aftershow',
 				
@@ -551,7 +551,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event beforehide
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 * @preventable
 				 */
 				'beforehide',
@@ -569,7 +569,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 * 
 				 * @event hide
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'hide',
 	
@@ -583,7 +583,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event hidebegin
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'hidebegin',
 	
@@ -594,7 +594,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Only fires if the Component has been {@link #method-render rendered}.
 				 *
 				 * @event afterhide
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'afterhide',
 				
@@ -603,7 +603,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * the destruction process for the Component.
 				 * 
 				 * @event beforedestroy
-				 * @param {jqg.Component} component This Component instance. 
+				 * @param {gui.Component} component This Component instance. 
 				 * @preventable
 				 */
 				'beforedestroy',
@@ -612,7 +612,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				 * Fires when this Component has been destroyed.
 				 * 
 				 * @event destroy
-				 * @param {jqg.Component} component This Component instance.
+				 * @param {gui.Component} component This Component instance.
 				 */
 				'destroy'
 			);
@@ -620,7 +620,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 			
 			// Generate a globally unique identifier for the Component, which is unique for all Components on the page.
 			// This will also be used as the `elId`, and the default value for the `id` config if one was not provided.
-			this.uuid = this.elId = 'jqg-cmp-' + _.uniqueId();
+			this.uuid = this.elId = 'gui-cmp-' + _.uniqueId();
 			this.id = this.id || this.uuid;  // default the Component's id to the uuid if not provided
 			
 			
@@ -656,14 +656,14 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @protected
 		 * @method initComponent
 		 */
-		initComponent : JqGui.emptyFn,
+		initComponent : Gui.emptyFn,
 		
 		
 		/**
 		 * Initializes the plugins for the Component.
 		 * 
 		 * @private
-		 * @param {jqg.plugin.Plugin/jqg.plugin.Plugin[]} plugin A single plugin, or array of plugins to initialize.
+		 * @param {gui.plugin.Plugin/gui.plugin.Plugin[]} plugin A single plugin, or array of plugins to initialize.
 		 */
 		initPlugins : function( plugin ) {
 			if( _.isArray( plugin ) ) {
@@ -674,7 +674,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 			}
 			
 			if( !( plugin instanceof Plugin ) ) {
-				throw new Error( "error: a plugin provided to this Component was not of type jqg.plugin.Plugin" );
+				throw new Error( "error: a plugin provided to this Component was not of type gui.plugin.Plugin" );
 			}
 			
 			// Initialize the plugin, passing a reference to this Component into it.
@@ -834,7 +834,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				this.fireEvent( 'render', this );
 				
 				// Finally, if the deferLayout option was not provided as true, run the layout on the Component (or Container, 
-				// if it's a jqg.Container subclass!)
+				// if it's a gui.Container subclass!)
 				if( !options.deferLayout ) {
 					this.doLayout();
 				}
@@ -925,7 +925,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component is being rendered into.
 		 * @param {Object} options The options provided to {@link #method-render}.
 		 */
-		onRender : JqGui.emptyFn,
+		onRender : Gui.emptyFn,
 		
 		
 		/**
@@ -940,7 +940,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @param {jQuery} $containerEl The HTML element wrapped in a jQuery set that the component has been rendered into.
 		 * @param {Object} options The options provided to {@link #method-render}.
 		 */
-		onAfterRender : JqGui.emptyFn,
+		onAfterRender : Gui.emptyFn,
 		
 		
 		/**
@@ -984,25 +984,25 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		// Layout Functionality
 		
 		/**
-		 * This method was initially intended to bring Component layouts into the mix (instead of only having {@link jqg.Container Container}
-		 * layouts, which lay out {@link jqg.Container#items child components}). A Component layout was going to size and position the HTML 
+		 * This method was initially intended to bring Component layouts into the mix (instead of only having {@link gui.Container Container}
+		 * layouts, which lay out {@link gui.Container#items child components}). A Component layout was going to size and position the HTML 
 		 * elements that a particular Component had created in its {@link #onRender} method.
 		 * 
-		 * However, at the time of this writing, we never got around to implementing this feature, and {@link jqg.Container} extends
-		 * this method for its {@link jqg.Container#layout layout} of {@link jqg.Container#items child components}. This method was added into 
+		 * However, at the time of this writing, we never got around to implementing this feature, and {@link gui.Container} extends
+		 * this method for its {@link gui.Container#layout layout} of {@link gui.Container#items child components}. This method was added into 
 		 * the Component class (this class) later though, in an effort to allow Components to respond to being laid out by their {@link #parentContainer}.
-		 * When the Component's {@link #parentContainer} runs its {@link jqg.Container#layout layout}, this method is executed from it. A 
+		 * When the Component's {@link #parentContainer} runs its {@link gui.Container#layout layout}, this method is executed from it. A 
 		 * Component author may implement an extension of the {@link #onComponentLayout} hook method to respond to the Component being laid 
 		 * out by its {@link #parentContainer}, such as to implement updating the size or positioning of its child elements upon being laid out.
 		 * Note that {@link #onComponentLayout} will eventually be called just from the Component's initial {@link #method-render rendering} 
 		 * process as well, if the Component is not being rendered by a {@link #parentContainer} layout (i.e. it is a standalone Component,
-		 * not part of a {@link jqg.Container Container}/Component hierarchy).
+		 * not part of a {@link gui.Container Container}/Component hierarchy).
 		 * 
 		 * So, bottom line, if you wish for your Component to do something when it is laid out by its {@link #parentContainer},
 		 * implement the {@link #onComponentLayout} method. See {@link #onComponentLayout} for details.
 		 */
 		doLayout : function() {
-			// Note: this method is extended in the jqg.Container subclass. Keep this in mind if ever implementing Component
+			// Note: this method is extended in the gui.Container subclass. Keep this in mind if ever implementing Component
 			// layouts properly, which should both run both the Component's layout, *and* the Container's layout (in that order).
 			
 			// Simply call the hook method to allow subclasses to participate in the Component being laid out, and fire the event.
@@ -1014,12 +1014,12 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * Hook method that is executed when {@link #doLayout} has executed. Extend this method (calling the superclass method first)
 		 * to implement any logic that the Component subclass should perform when it is either: 
 		 * 
-		 * a) Initially rendered (as a standalone component, not part of a {@link jqg.Container Container}/Component hierarchy), or
+		 * a) Initially rendered (as a standalone component, not part of a {@link gui.Container Container}/Component hierarchy), or
 		 * b) Has been laid out by its {@link #parentContainer}. If initially rendered by its {@link #parentContainer parent container's}
 		 * layout, then this will be the same event.
 		 * 
 		 * For example, a Component could resize its inner elements for new dimensions set on the Component by its 
-		 * {@link #parentContainer parentContainer's} {@link jqg.Container#layout layout} algorithm. The layout may size the Component
+		 * {@link #parentContainer parentContainer's} {@link gui.Container#layout layout} algorithm. The layout may size the Component
 		 * upon its initial rendering, an update to the child components of the {@link #parentContainer}, or from say, a browser resize
 		 * where the layout runs again.
 		 *
@@ -1027,11 +1027,11 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @template
 		 * @method onComponentLayout
 		 */
-		onComponentLayout : JqGui.emptyFn,
+		onComponentLayout : Gui.emptyFn,
 		
 		
 		/**
-		 * When called on the Component, this method bubbles up to the top of the {@link jqg.Container Container}/Component hierarchy,
+		 * When called on the Component, this method bubbles up to the top of the {@link gui.Container Container}/Component hierarchy,
 		 * and runs {@link #doLayout} on the top-most component. This has the effect of re-doing the layout for all Containers/Components
 		 * in that particular hierarchy. As such, this may be an expensive operation; use with care. This may be useful however for components
 		 * that are sized based on their content, and when their content size changes, they should force a layout to adjust for the new
@@ -1057,7 +1057,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @param {String/Object} name The attribute name. This first argument may also be provided as an Object of key/value
 		 *   pairs for attribute names/values to apply to the Component's {@link #$el element}.
 		 * @param {String} value The value for the attribute. Optional if the first argument is an Object.
-		 * @return {jqg.Component} This Component, to allow method chaining.
+		 * @return {gui.Component} This Component, to allow method chaining.
 		 */
 		setAttr : function( name, value ) {
 			if( !this.rendered ) {
@@ -1081,7 +1081,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * 
 		 * @param {String} cssClass One or more CSS classes to add to the Component's element. If specifying multiple CSS classes,
 		 *   they should be separated with a space. Ex: "class1 class2"
-		 * @return {jqg.Component} This Component, to allow method chaining.
+		 * @return {gui.Component} This Component, to allow method chaining.
 		 */
 		addCls : function( cssClass ) {
 			if( !this.rendered ) {
@@ -1098,7 +1098,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * 
 		 * @param {String} cssClass One or more CSS classes to remove from the Component's element. If specifying multiple CSS classes,
 		 *   they should be separated with a space. Ex: "class1 class2"
-		 * @return {jqg.Component} This Component, to allow method chaining.
+		 * @return {gui.Component} This Component, to allow method chaining.
 		 */
 		removeCls : function( cssClass ) {
 			if( !this.rendered ) {
@@ -1118,7 +1118,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 *   they should be separated with a space. Ex: "class1 class2"
 		 * @param {Boolean} [flag] True if the class(es) should be added, false if they should be removed. This argument is optional,
 		 *   and if provided, determines if the class should be added or removed.
-		 * @return {jqg.Component} This Component, to allow method chaining.
+		 * @return {gui.Component} This Component, to allow method chaining.
 		 */
 		toggleCls : function( cssClass, flag ) {
 			if( typeof flag === 'undefined' ) {
@@ -1151,7 +1151,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @param {String/Object} name The CSS property name. This first argument may also be provided as an Object of key/value
 		 *   pairs for CSS property names/values to apply to the Component's {@link #$el element}.
 		 * @param {String} value The value for the CSS property. Optional if the first argument is an Object.
-		 * @return {jqg.Component} This Component, to allow method chaining.
+		 * @return {gui.Component} This Component, to allow method chaining.
 		 */
 		setStyle : function( name, value ) {
 			if( !this.rendered ) {
@@ -1174,7 +1174,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * Retrieves the element that should be the target for the Component's content (html).  For jqg.Component, this is just the Component's
+		 * Retrieves the element that should be the target for the Component's content (html).  For gui.Component, this is just the Component's
 		 * base element (see {@link #$el}), but this method can be overridden in subclasses that define a more complex structure, where their
 		 * content should be placed elsewhere. 
 		 * 
@@ -1459,7 +1459,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * Convenience method to show or hide the Component using a boolean.
 		 * 
 		 * @param {Boolean} visible True to show the Component, false to hide it.
-		 * @return {jqg.Component} This Component, to allow method chaining.
+		 * @return {gui.Component} This Component, to allow method chaining.
 		 */
 		setVisible : function( visible ) {
 			return this[ visible ? 'show' : 'hide' ]();
@@ -1470,8 +1470,8 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * Shows the Component. 
 		 *
 		 * @param {Object} [options] An object which may contain the following options:
-		 * @param {Object} [options.anim] An {@link jqg.anim.Animation Animation} config object (minus the 
-		 *   {@link jqg.anim.Animation#target target} property) for animating the showing of the Component. 
+		 * @param {Object} [options.anim] An {@link gui.anim.Animation Animation} config object (minus the 
+		 *   {@link gui.anim.Animation#target target} property) for animating the showing of the Component. 
 		 *   Note that this will only be run if the Component is currently {@link #rendered}.
 		 * @chainable
 		 */
@@ -1556,7 +1556,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @method onBeforeShow
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onBeforeShow : JqGui.emptyFn,
+		onBeforeShow : Gui.emptyFn,
 		
 		
 		/**
@@ -1569,7 +1569,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @method onShow
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onShow : JqGui.emptyFn,
+		onShow : Gui.emptyFn,
 		
 		
 		/**
@@ -1581,7 +1581,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @method onAfterShow
 		 * @param {Object} options The options object which was originally provided to the {@link #method-show} method.
 		 */
-		onAfterShow : JqGui.emptyFn,
+		onAfterShow : Gui.emptyFn,
 		
 		
 		
@@ -1589,8 +1589,8 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * Hides the Component.
 		 *
 		 * @param {Object} [options] An object which may contain the following options:
-		 * @param {Object} [options.anim] An {@link jqg.anim.Animation Animation} config object (minus the 
-		 *   {@link jqg.anim.Animation#target target) property) for animating the showing of the Component. 
+		 * @param {Object} [options.anim] An {@link gui.anim.Animation Animation} config object (minus the 
+		 *   {@link gui.anim.Animation#target target) property) for animating the showing of the Component. 
 		 *   Note that this will only be run if the Component is currently {@link #rendered}.
 		 * @chainable
 		 */
@@ -1664,7 +1664,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @method onBeforeHide
 		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
-		onBeforeHide : JqGui.emptyFn,
+		onBeforeHide : Gui.emptyFn,
 		
 		
 		/**
@@ -1677,7 +1677,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @method onHide
 		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
-		onHide : JqGui.emptyFn,
+		onHide : Gui.emptyFn,
 	
 	
 		/**
@@ -1690,7 +1690,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @method onAfterHide
 		 * @param {Object} options The options object which was originally provided to the {@link #method-hide} method.
 		 */
-		onAfterHide : JqGui.emptyFn,
+		onAfterHide : Gui.emptyFn,
 		
 		
 		/**
@@ -1815,10 +1815,10 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * Masks the component with a {@link jqg.Mask}. Uses the default mask configuration provided by the {@link #maskConfig} configuration object,
+		 * Masks the component with a {@link gui.Mask}. Uses the default mask configuration provided by the {@link #maskConfig} configuration object,
 		 * or optionally, the provided `maskConfig` argument.
 		 * 
-		 * @param {Object} maskConfig (optional) The explicit configuration options to set the {@link jqg.Mask} that will mask over the Component.
+		 * @param {Object} maskConfig (optional) The explicit configuration options to set the {@link gui.Mask} that will mask over the Component.
 		 *   If not provided, will use the default options provided by the {@link #maskConfig} configuration option.
 		 */
 		mask : function( maskConfig ) {
@@ -1832,7 +1832,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 				
 			} else {
 				// If the Component is currently hidden when the mask() request is made, we need to defer
-				// it to when the Component's show() method is run. This is because jqg.Mask has to make a calculation
+				// it to when the Component's show() method is run. This is because gui.Mask has to make a calculation
 				// of the mask target's height. 
 				if( this.isHidden() ) {
 					this.deferMaskShow = true;
@@ -1885,7 +1885,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * Method that defines which element the Component's mask should be shown over. For jqg.Component,
+		 * Method that defines which element the Component's mask should be shown over. For gui.Component,
 		 * this is the Component's base {@link #$el element}, but this may be redefined by subclasses.
 		 * 
 		 * @protected
@@ -1902,7 +1902,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		/**
 		 * Sets the Container that owns (i.e. is a parent of) this Component.
 		 * 
-		 * @param {jqg.Container} container
+		 * @param {gui.Container} container
 		 */
 		setParentContainer : function( container ) {
 			this.parentContainer = container;
@@ -1912,7 +1912,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		/**
 		 * Gets the Container that owns (i.e. is a parent of) this Component.
 		 * 
-		 * @return {jqg.Container} The Container that owns this Component, or null if there is none.
+		 * @return {gui.Container} The Container that owns this Component, or null if there is none.
 		 */
 		getParentContainer : function() {
 			return this.parentContainer;
@@ -1944,11 +1944,11 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * Finds a {@link jqg.Container Container} above this Component at any level by a custom function. If the passed function returns
-		 * true, the {@link jqg.Container Container} will be returned.
+		 * Finds a {@link gui.Container Container} above this Component at any level by a custom function. If the passed function returns
+		 * true, the {@link gui.Container Container} will be returned.
 		 * 
 		 * @param {Function} fn The custom function to call with the arguments (Container, this Component).
-		 * @return {jqg.Container} The first Container for which the custom function returns true.
+		 * @return {gui.Container} The first Container for which the custom function returns true.
 		 */
 		findParentBy : function( fn ) {
 			for( var p = this.parentContainer; (p !== null) && !fn( p, this ); p = p.parentContainer );  // intentional semicolon, loop does the work
@@ -1957,11 +1957,11 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * Finds a {@link jqg.Container Container} above this Component at any level by {@link #id}.  If there is no parent Container
+		 * Finds a {@link gui.Container Container} above this Component at any level by {@link #id}.  If there is no parent Container
 		 * with the supplied `id`, this method returns null.
 		 * 
 		 * @param {String} id The {@link #id} of the parent Container to look for.
-		 * @return {jqg.Container} The first Container which matches the supplied {@link #id}.
+		 * @return {gui.Container} The first Container which matches the supplied {@link #id}.
 		 *   If no Container for the supplied {@link #id} is found, this method returns null.
 		 */
 		findParentById : function( id ) {
@@ -1971,16 +1971,16 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		
 		
 		/**
-		 * Finds the closest {@link jqg.Container Container} above this Component by Container `type`.  The Container `type` can be either
-		 * the type name that is registered to the {@link jqg.ComponentManager ComponentManager} (see the description of this class), or the JavaScript
+		 * Finds the closest {@link gui.Container Container} above this Component by Container `type`.  The Container `type` can be either
+		 * the type name that is registered to the {@link gui.ComponentManager ComponentManager} (see the description of this class), or the JavaScript
 		 * class (constructor function) of the Container.
 		 * 
-		 * @param {Function} type The type name registered with the {@link jqg.ComponentManager ComponentManager}, or the constructor function (class) of the Container.
-		 * @return {jqg.Container} The first Container which is an instance of the supplied type. 
+		 * @param {Function} type The type name registered with the {@link gui.ComponentManager ComponentManager}, or the constructor function (class) of the Container.
+		 * @return {gui.Container} The first Container which is an instance of the supplied type. 
 		 */
 		findParentByType : function( type ) {
 			if( typeof type === 'string' ) {
-				type = require( 'jqg/ComponentManager' ).getType( type );
+				type = require( 'gui/ComponentManager' ).getType( type );
 				
 				// No type found for the given type name, return null immediately
 				if( !type ) {
@@ -1997,7 +1997,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		/**
 		 * Determines if this Component is a descendent of the provided `container`.
 		 * 
-		 * @param {jqg.Container} container
+		 * @param {gui.Container} container
 		 * @return {Boolean} `true` if the Component is a descendant of the `container`, otherwise `false`.
 		 */
 		isDescendantOf : function( container ) {
@@ -2031,7 +2031,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 					this.currentAnimation.end();
 				}
 				
-				// Destroy the mask, if it is an instantiated jqg.Mask object (it may not be if the mask was never used)
+				// Destroy the mask, if it is an instantiated gui.Mask object (it may not be if the mask was never used)
 				if( this._mask instanceof Mask ) {
 					this._mask.destroy();
 				}
@@ -2069,7 +2069,7 @@ function( require, jQuery, _, Class, JqGui, Observable, Css, Html, Mask, Animati
 		 * @protected
 		 * @method onDestroy
 		 */
-		onDestroy : JqGui.emptyFn
+		onDestroy : Gui.emptyFn
 	
 	} );
 	

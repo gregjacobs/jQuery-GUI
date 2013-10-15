@@ -3,16 +3,16 @@ define( [
 	'require',
 	'lodash',
 	'Class',
-	'jqg/JqGui',
-	'jqg/ComponentManager',
-	'jqg/Component',
-	'jqg/layout/Layout',   // circular dependency, used with require() call
-	'jqg/layout/Auto'      // circular dependency, used with require() call
-], function( require, _, Class, JqGui, ComponentManager, Component ) {
+	'gui/Gui',
+	'gui/ComponentManager',
+	'gui/Component',
+	'gui/layout/Layout',   // circular dependency, used with require() call
+	'gui/layout/Auto'      // circular dependency, used with require() call
+], function( require, _, Class, Gui, ComponentManager, Component ) {
 
 	/**
-	 * @class jqg.Container
-	 * @extends jqg.Component
+	 * @class gui.Container
+	 * @extends gui.Component
 	 * @alias type.container
 	 *
 	 * Base class for a component that holds other child components. Provides a default
@@ -27,32 +27,32 @@ define( [
 			 * @static
 			 * @property {Object} layouts
 			 * 
-			 * Map that stores "registered" layout types. The layouts are in the `jqg.layout` package, and each
+			 * Map that stores "registered" layout types. The layouts are in the `gui.layout` package, and each
 			 * specifies a type name that is used to instantiate them.
 			 */
 			layouts : {},
 			
 			/**
-			 * Registers a {@link jqg.layout.Layout Layout} with the Container class, allowing {@link #layout layouts}
+			 * Registers a {@link gui.layout.Layout Layout} with the Container class, allowing {@link #layout layouts}
 			 * to be specified by their string `typeName`.
 			 *
 			 * @static
 			 * @param {String} typeName The type name for the Layout.
-			 * @param {Function} layoutClass A {@link jqg.layout.Layout} subclass.
+			 * @param {Function} layoutClass A {@link gui.layout.Layout} subclass.
 			 */
 			registerLayout : function( typeName, layoutClass ) {
 				Container.layouts[ typeName.toLowerCase() ] = layoutClass;
 			},
 			
 			/**
-			 * Retrieves a registered {@link jqg.layout.Layout Layout} class by "type" name.
+			 * Retrieves a registered {@link gui.layout.Layout Layout} class by "type" name.
 			 * 
 			 * @static
 			 * @protected
 			 * @param {String} typeName The type name that the layout was registered with. This is case-insensitive.
-			 * @return {Function} The {@link jqg.layout.Layout Layout} that was registered with the
+			 * @return {Function} The {@link gui.layout.Layout Layout} that was registered with the
 			 *   given `typeName`.
-			 * @throws {Error} If the `typeName` did not resolve to a registered {@link jqg.layout.Layout Layout}.
+			 * @throws {Error} If the `typeName` did not resolve to a registered {@link gui.layout.Layout Layout}.
 			 */
 			getLayoutType : function( typeName ) {
 				typeName = typeName.toLowerCase();
@@ -68,7 +68,7 @@ define( [
 				// Return the AutoLayout explicitly if asked for, since that class is not registered due to issues 
 				// with RequireJS and the circular dependency of this class requiring it. Other Layout classes are 
 				// registered normally. 
-				return ( typeName === 'auto' ) ? require( 'jqg/layout/Auto' ) : Container.layouts[ typeName ];
+				return ( typeName === 'auto' ) ? require( 'gui/layout/Auto' ) : Container.layouts[ typeName ];
 			}
 			
 		},
@@ -84,18 +84,18 @@ define( [
 		/**
 		 * @cfg {String/Function} acceptType
 		 * 
-		 * The {@link jqg.Component} class (or subclass) to accept in the Container for child {@link #items}. If an added component 
-		 * is not an instance of this type, an error will be thrown. This should be set to a {@link jqg.Component} subclass (as only 
-		 * {@link jqg.Component Components} may be added to a Container in the first place).
+		 * The {@link gui.Component} class (or subclass) to accept in the Container for child {@link #items}. If an added component 
+		 * is not an instance of this type, an error will be thrown. This should be set to a {@link gui.Component} subclass (as only 
+		 * {@link gui.Component Components} may be added to a Container in the first place).
 		 * 
-		 * This config is useful for subclasses to set/override if they require a specific {@link jqg.Component} subclass to be added to
-		 * them, so as to not allow just any {@link jqg.Component} to be added, and direct the user as such.
+		 * This config is useful for subclasses to set/override if they require a specific {@link gui.Component} subclass to be added to
+		 * them, so as to not allow just any {@link gui.Component} to be added, and direct the user as such.
 		 * 
-		 * The value for this configuration option can either be the constructor function for a {@link jqg.Component} class, or a
-		 * 'type' string which will be resolved to a {@link jqg.Component} class via {@link jqg.ComponentManager#getType}.
+		 * The value for this configuration option can either be the constructor function for a {@link gui.Component} class, or a
+		 * 'type' string which will be resolved to a {@link gui.Component} class via {@link gui.ComponentManager#getType}.
 		 * 
 		 * Note that the check for this is performed after any anonymous config objects have been converted into their corresponding
-		 * {@link jqg.Component} instance.
+		 * {@link gui.Component} instance.
 		 */
 		acceptType : Component,
 	
@@ -106,31 +106,31 @@ define( [
 		destroyRemoved : true,
 	
 		/**
-		 * @cfg {String/Object/jqg.layout.Layout} layout
+		 * @cfg {String/Object/gui.layout.Layout} layout
 		 * The layout strategy object to use for laying out (displaying) the Container's child items.  This can either be a string with the
 		 * type name of the layout, an object which should have the property `type` (for the layout's type name) and any other layout
-		 * configuration options, or an instantiated {@link jqg.layout.Layout} subclass.
+		 * configuration options, or an instantiated {@link gui.layout.Layout} subclass.
 		 */
 	
 		/**
-		 * @cfg {Object/Object[]/jqg.Component/jqg.Component[]} items
+		 * @cfg {Object/Object[]/gui.Component/gui.Component[]} items
 		 * Any Components/Containers that will become children of this Container, and will be instantiated at
 		 * construction time.  These can be retrieved from the Container using {@link #getItems}.
 		 *
-		 * Note that specifying child items is mutually exclusive with setting the {@link jqg.Component#html} and
-		 * {@link jqg.Component#contentEl} configs, and will take precedence over them.
+		 * Note that specifying child items is mutually exclusive with setting the {@link gui.Component#html} and
+		 * {@link gui.Component#contentEl} configs, and will take precedence over them.
 		 */
 	
 		/**
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-container',
+		baseCls : 'gui-container',
 	
 	
 		/**
 		 * @private
-		 * @property {jqg.Component[]} childComponents
+		 * @property {gui.Component[]} childComponents
 		 * 
 		 * An array of child components. Created from the "items" config, or call(s) to the {@link #method-add} method.
 		 */
@@ -165,8 +165,8 @@ define( [
 				 * this event may return false to cancel the addition of the Component.
 				 *
 				 * @event beforeadd
-				 * @param {jqg.Container} container This Container.
-				 * @param {jqg.Component} component The Component that is to be added.
+				 * @param {gui.Container} container This Container.
+				 * @param {gui.Component} component The Component that is to be added.
 				 */
 				'beforeadd',
 	
@@ -174,8 +174,8 @@ define( [
 				 * Fires after a Component has been added to this Container. This event bubbles.
 				 *
 				 * @event add
-				 * @param {jqg.Container} container This Container.
-				 * @param {jqg.Component} component The Component that was added.
+				 * @param {gui.Container} container This Container.
+				 * @param {gui.Component} component The Component that was added.
 				 * @param {Number} index The index in this Container's child items array that the Component was added to.
 				 */
 				'add',
@@ -187,8 +187,8 @@ define( [
 				 * Container, then the {@link #event-add} event is fired.
 				 *
 				 * @event reorder
-				 * @param {jqg.Container} container This Container.
-				 * @param {jqg.Component} component The Component that was reordered within the Container.
+				 * @param {gui.Container} container This Container.
+				 * @param {gui.Component} component The Component that was reordered within the Container.
 				 * @param {Number} index The new index of the Component in this Container's child items array.
 				 * @param {Number} previousIndex The previous index of the Component in this Container's child items array.
 				 */
@@ -199,8 +199,8 @@ define( [
 				 * this event may return false to cancel the removal of the Component.
 				 *
 				 * @event beforeremove
-				 * @param {jqg.Container} container This Container.
-				 * @param {jqg.Component} component The Component that is to be removed.
+				 * @param {gui.Container} container This Container.
+				 * @param {gui.Component} component The Component that is to be removed.
 				 */
 				'beforeremove',
 	
@@ -208,8 +208,8 @@ define( [
 				 * Fires after a Component has been removed from this Container. This event bubbles.
 				 *
 				 * @event remove
-				 * @param {jqg.Container} container This Container.
-				 * @param {jqg.Component} component The Component that was removed.
+				 * @param {gui.Container} container This Container.
+				 * @param {gui.Component} component The Component that was removed.
 				 * @param {Number} index The index in this Container's child items array that the Component was removed from.
 				 */
 				'remove',
@@ -221,7 +221,7 @@ define( [
 				 * point).
 				 *
 				 * @event afterlayout
-				 * @param {jqg.Container} container This Container.
+				 * @param {gui.Container} container This Container.
 				 */
 				'afterlayout'
 			);
@@ -253,7 +253,7 @@ define( [
 		/**
 		 * Resolves the constructor function for the value provided to the `type` argument. If a string is provided,
 		 * it is assumed to be a 'type' name and a lookup for the constructor function is performed via 
-		 * {@link jqg.ComponentManager#getType}. If a function is provided, the function is returned as-is.
+		 * {@link gui.ComponentManager#getType}. If a function is provided, the function is returned as-is.
 		 * 
 		 * This method is used to support the {@link #defaultType} and {@link #acceptType} configs.
 		 * 
@@ -290,7 +290,7 @@ define( [
 		 * @protected
 		 * @method createComponent
 		 * @param {Object} config The configuration object for the Component.
-		 * @return {jqg.Component} The instantiated Component.
+		 * @return {gui.Component} The instantiated Component.
 		 */
 		createComponent : function( config ) {
 			// Set the Component's parentContainer property to this Container, and use the default component 'type' if one wasn't specified
@@ -306,8 +306,8 @@ define( [
 	
 	
 		/**
-		 * Adds child {@link jqg.Component Component(s)} to this Container, instantiating them into their appropriate
-		 * jqg.Component subclass.  When all Components are added, this method automatically calls {@link #doLayout} to
+		 * Adds child {@link gui.Component Component(s)} to this Container, instantiating them into their appropriate
+		 * gui.Component subclass.  When all Components are added, this method automatically calls {@link #doLayout} to
 		 * refresh the layout.
 		 *
 		 * Note that if multiple Components are being added, it is recommended that they all be provided to this method
@@ -318,9 +318,9 @@ define( [
 		 *
 		 *
 		 * @method add
-		 * @param {jqg.Component/Object/jqg.Component[]/Array} cmp A single child {@link jqg.Component} or config object, or an array of
-		 *   child {@link jqg.Component Components} or config objects.
-		 * @return {jqg.Component/jqg.Component[]} Returns the Component that was added, or an array of the Components that were added, depending on
+		 * @param {gui.Component/Object/gui.Component[]/Array} cmp A single child {@link gui.Component} or config object, or an array of
+		 *   child {@link gui.Component Components} or config objects.
+		 * @return {gui.Component/gui.Component[]} Returns the Component that was added, or an array of the Components that were added, depending on
 		 *   the type provided to the `cmp` argument.  Single Component addition returns a single Component; array addition returns an array. See
 		 *   the return value of {@link #insert}.
 		 */
@@ -345,12 +345,12 @@ define( [
 	
 	
 		/**
-		 * Inserts (or moves) a {@link jqg.Component Component} into this Container.
+		 * Inserts (or moves) a {@link gui.Component Component} into this Container.
 		 *
 		 * @method insert
-		 * @param {jqg.Component/Object} cmp The Component or config object of a Component to insert.
+		 * @param {gui.Component/Object} cmp The Component or config object of a Component to insert.
 		 * @param {Number} position (optional) The position (index) to insert the Component at. If omitted, the component will be appended to the Container.
-		 * @return {jqg.Component} The Component that was inserted, or null if the Component was not added because a beforeadd event handler returned false.
+		 * @return {gui.Component} The Component that was inserted, or null if the Component was not added because a beforeadd event handler returned false.
 		 */
 		insert : function( cmp, position ) {
 			cmp = this.doInsert( cmp, position );
@@ -368,9 +368,9 @@ define( [
 		 *
 		 * @private
 		 * @method doInsert
-		 * @param {jqg.Component/Object} component The Component or config object of a Component to insert.
+		 * @param {gui.Component/Object} component The Component or config object of a Component to insert.
 		 * @param {Number} position (optional) The position (index) to insert the Component at. If omitted, the component will be appended to the Container.
-		 * @return {jqg.Component} The Component that was inserted, or null if the component was not added because a beforeadd event handler returned false.
+		 * @return {gui.Component} The Component that was inserted, or null if the component was not added because a beforeadd event handler returned false.
 		 */
 		doInsert : function( component, position ) {
 			// First, fix position if it is out of the bounds of the childComponents array
@@ -383,7 +383,7 @@ define( [
 			}
 	
 	
-			var isInstantiatedComponent = ( component instanceof Component ),   // if the component argument is an actual instantiated jqg.Component, and not just a configuration object
+			var isInstantiatedComponent = ( component instanceof Component ),   // if the component argument is an actual instantiated gui.Component, and not just a configuration object
 			    isReorder = isInstantiatedComponent && this.has( component );  // Determines if this is an actual addition of the Component to the Container, or a reorder of the Component within the Container
 	
 			if( isReorder ) {
@@ -407,14 +407,14 @@ define( [
 				return component;
 	
 			} else {
-				// If the component is not yet a jqg.Component instance at this point (i.e. it is a configuration object), instantiate it now so
+				// If the component is not yet a gui.Component instance at this point (i.e. it is a configuration object), instantiate it now so
 				// we can provide it to the beforeadd event
 				if( !isInstantiatedComponent ) {
 					component = this.createComponent( component );
 				}
 				
 				// Perform the check that the component is of the correct class type (governed by the 'acceptType' config).
-				if( !( component instanceof this.acceptType ) ) {  // Note: this.acceptType defaults to jqg.Component
+				if( !( component instanceof this.acceptType ) ) {  // Note: this.acceptType defaults to gui.Component
 					throw new Error( "A Component added to the Container was not of the correct class type ('acceptType' config)" );
 				}
 	
@@ -451,10 +451,10 @@ define( [
 		 * @protected
 		 * @template
 		 * @method onAdd
-		 * @param {jqg.Component} component The component that was added or inserted into this Container.
+		 * @param {gui.Component} component The component that was added or inserted into this Container.
 		 * @param {Number} index The index in this Container's child items array where the new Component was added.
 		 */
-		onAdd : JqGui.emptyFn,
+		onAdd : Gui.emptyFn,
 	
 	
 		/**
@@ -463,20 +463,20 @@ define( [
 		 * @protected
 		 * @template
 		 * @method onReorder
-		 * @param {jqg.Component} component The Component that was reordered within the Container.
+		 * @param {gui.Component} component The Component that was reordered within the Container.
 		 * @param {Number} index The new index of the Component in this Container's child items array.
 		 * @param {Number} previousIndex The previous index of the Component in this Container's child items array.
 		 */
-		onReorder : JqGui.emptyFn,
+		onReorder : Gui.emptyFn,
 	
 	
 	
 		/**
-		 * Removes one or more child {@link jqg.Component Component(s)} from this Container.  
+		 * Removes one or more child {@link gui.Component Component(s)} from this Container.  
 		 * 
-		 * Removed {@link jqg.Component Components} will automatically have their {@link jqg.Component#method-destroy} method called if 
+		 * Removed {@link gui.Component Components} will automatically have their {@link gui.Component#method-destroy} method called if 
 		 * the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is explicitly set to true. 
-		 * If the Component is not destroyed, its main {@link jqg.Component#$el element} is detached from this Container.  When all 
+		 * If the Component is not destroyed, its main {@link gui.Component#$el element} is detached from this Container.  When all 
 		 * Components are removed, this method automatically calls {@link #doLayout} to refresh the layout.
 		 *
 		 * Note that if multiple Components are being removed, it is recommended that they all be provided to this method
@@ -487,9 +487,9 @@ define( [
 		 * Container, and a {@link #beforeremove} event handler did not return false for it).
 		 *
 		 * @method remove
-		 * @param {jqg.Component/jqg.Component[]} cmp A single child {@link jqg.Component Component}, or an array of child Components.
+		 * @param {gui.Component/gui.Component[]} cmp A single child {@link gui.Component Component}, or an array of child Components.
 		 * @param {Boolean} destroyRemoved (optional) True to automatically destroy the removed component. Defaults to the value of this Container's {@link #destroyRemoved} config.
-		 * @return {jqg.Component/jqg.Component[]} Returns the Component that was removed, or an array of the Components that were removed, depending on
+		 * @return {gui.Component/gui.Component[]} Returns the Component that was removed, or an array of the Components that were removed, depending on
 		 *   the type provided to the `cmp` argument.  Single Component removal returns a single Component (or null if the Component was not removed);
 		 *   array removal returns an array of the Components that were successfully removed.
 		 */
@@ -520,9 +520,9 @@ define( [
 		 * Removes the child Component at the given `idx`, and returns the removed component. If there is no component 
 		 * at the given `idx`, then this method has no effect and returns `null`.
 		 * 
-		 * Note that the removed {@link jqg.Component Component} will automatically have its {@link jqg.Component#method-destroy destroy} 
+		 * Note that the removed {@link gui.Component Component} will automatically have its {@link gui.Component#method-destroy destroy} 
 		 * method called if the {@link #destroyRemoved} config is true (the default), or if the `destroyRemoved` argument is 
-		 * explicitly set to true. If the Component is not destroyed, its main {@link jqg.Component#$el element} is detached from 
+		 * explicitly set to true. If the Component is not destroyed, its main {@link gui.Component#$el element} is detached from 
 		 * this Container.  
 		 * 
 		 * When the Component is removed, this method automatically calls {@link #doLayout} to refresh the layout.
@@ -531,7 +531,7 @@ define( [
 		 * Container, and a {@link #beforeremove} event handler did not return false for it).
 		 * 
 		 * @param {Number} idx The index of the child component to remove.
-		 * @return {jqg.Component} Returns the Component that was removed, or `null` if there was no Component at the given `idx`.
+		 * @return {gui.Component} Returns the Component that was removed, or `null` if there was no Component at the given `idx`.
 		 */
 		removeAt : function( idx ) {
 			return this.remove( this.getItemAt( idx ) );
@@ -555,16 +555,16 @@ define( [
 	
 	
 		/**
-		 * Removes a child {@link jqg.Component Component(s)} from this Container.  If a Component is successfully removed, the 'remove' event will be fired.
-		 * Removed {@link jqg.Component Components} will automatically have their destroy() method called if the {@link #destroyRemoved} config is true, or
-		 * if the `destroyRemoved` argument is explicitly set to true.  If the Component is not destroyed, its main {@link jqg.Component#getEl element} is
+		 * Removes a child {@link gui.Component Component(s)} from this Container.  If a Component is successfully removed, the 'remove' event will be fired.
+		 * Removed {@link gui.Component Components} will automatically have their destroy() method called if the {@link #destroyRemoved} config is true, or
+		 * if the `destroyRemoved` argument is explicitly set to true.  If the Component is not destroyed, its main {@link gui.Component#getEl element} is
 		 * detached from this Container.
 		 *
 		 * @private
 		 * @method doRemove
-		 * @param {jqg.Component/jqg.Component[]} cmp A single child {@link jqg.Component Component}, or an array of child Components.
+		 * @param {gui.Component/gui.Component[]} cmp A single child {@link gui.Component Component}, or an array of child Components.
 		 * @param {Boolean} destroyRemoved (optional) True to automatically destroy the removed component. Defaults to the value of this Container's {@link #destroyRemoved} config.
-		 * @return {jqg.Component} The Component that was removed, or null if no Component was removed (i.e. a {@link #beforeremove}
+		 * @return {gui.Component} The Component that was removed, or null if no Component was removed (i.e. a {@link #beforeremove}
 		 *   event handler returned false, or the Component to be removed was not found).
 		 */
 		doRemove : function( cmp, destroyRemoved ) {
@@ -621,10 +621,10 @@ define( [
 		 * @protected
 		 * @template
 		 * @method onRemove
-		 * @param {jqg.Component} component The component that was removed.
+		 * @param {gui.Component} component The component that was removed.
 		 * @param {Number} index The index in this Container's child items array where the Component was removed from.
 		 */
-		onRemove : JqGui.emptyFn,
+		onRemove : Gui.emptyFn,
 	
 	
 	
@@ -633,7 +633,7 @@ define( [
 		// Child Component Accessor Methods
 	
 		/**
-		 * Retrives the number of child items ({@link jqg.Component components}) that are currently held by this Container.
+		 * Retrives the number of child items ({@link gui.Component components}) that are currently held by this Container.
 		 * 
 		 * @method getCount
 		 * @return {Number}
@@ -644,10 +644,10 @@ define( [
 	
 	
 		/**
-		 * Retrieves the child items ({@link jqg.Component components}) that are currently held by this Container.
+		 * Retrieves the child items ({@link gui.Component components}) that are currently held by this Container.
 		 *
 		 * @method getItems
-		 * @return {jqg.Component[]}
+		 * @return {gui.Component[]}
 		 */
 		getItems : function() {
 			return this.childComponents;
@@ -655,12 +655,12 @@ define( [
 	
 	
 		/**
-		 * Retrieves the child item ({@link jqg.Component Component} at the specified `index`. If the
+		 * Retrieves the child item ({@link gui.Component Component} at the specified `index`. If the
 		 * index is out of range of the child items, this method returns null.
 		 *
 		 * @method getItemAt
 		 * @param {Number} index
-		 * @return {jqg.Component} The child item ({@link jqg.Component Component}) at the specified index, or null if the index is out of range.
+		 * @return {gui.Component} The child item ({@link gui.Component Component}) at the specified index, or null if the index is out of range.
 		 */
 		getItemAt : function( index ) {
 			return this.childComponents[ index ] || null;
@@ -668,11 +668,11 @@ define( [
 	
 	
 		/**
-		 * Retrieves the index of the given child item ({@link jqg.Component Component}). Returns -1 if the if the item
+		 * Retrieves the index of the given child item ({@link gui.Component Component}). Returns -1 if the if the item
 		 * is not found.
 		 *
 		 * @method getItemIndex
-		 * @param {jqg.Component} item The item to get the index of.
+		 * @param {gui.Component} item The item to get the index of.
 		 * @return {Number} The index of the item (component), or -1 if it was not found.
 		 */
 		getItemIndex : function( item ) {
@@ -690,7 +690,7 @@ define( [
 		 * Determine if this Container has a given `component` as a direct child component of this Container.
 		 *
 		 * @method has
-		 * @param {jqg.Component} component The {@link jqg.Component Component} to look for as a child of this Container.
+		 * @param {gui.Component} component The {@link gui.Component Component} to look for as a child of this Container.
 		 * @return {Boolean} True if the Component is found as a direct child of this Container, false otherwise.
 		 */
 		has : function( component ) {
@@ -739,7 +739,7 @@ define( [
 	
 		/**
 		 * Lays out the Container's child components ({@link #items}) using the configured {@link #layout} strategy object.
-		 * If no {@link #layout} has been configured, the default {@link jqg.layout.Auto} is used.
+		 * If no {@link #layout} has been configured, the default {@link gui.layout.Auto} is used.
 		 *
 		 * Note that a layout can only be done if the Container is rendered and visible. This method will automatically
 		 * be run when the Container's {@link #method-render} method runs. If the Container isn' visible when this method is called,
@@ -748,7 +748,7 @@ define( [
 		 * @method doLayout
 		 */
 		doLayout : function() {
-			// Run the superclass's (jqg.Component's) layout functionality first
+			// Run the superclass's (gui.Component's) layout functionality first
 			this._super( arguments );
 			
 			if( !this.canLayout() ) {
@@ -775,14 +775,14 @@ define( [
 		
 		
 		/**
-		 * Hook method that is executed just before the {@link #layout layout's} {@link jqg.layout.Layout#doLayout doLayout}
+		 * Hook method that is executed just before the {@link #layout layout's} {@link gui.layout.Layout#doLayout doLayout}
 		 * method is executed to run the layout.
 		 * 
 		 * @protected
 		 * @template
 		 * @method onBeforeLayout
 		 */
-		onBeforeLayout : JqGui.emptyFn,
+		onBeforeLayout : Gui.emptyFn,
 		
 		
 		/**
@@ -794,13 +794,13 @@ define( [
 		 * @template
 		 * @method onLayout
 		 */
-		onLayout : JqGui.emptyFn,
+		onLayout : Gui.emptyFn,
 		
 	
 		/**
 		 * Determines if the Container can be laid out at this time. The Container must be rendered, and visible.
 		 * It must be visible because for some layouts, especially those that use jQuery UI components or that
-		 * need to calculate the size of elements, we can not lay out their child {@link jqg.Component Components}
+		 * need to calculate the size of elements, we can not lay out their child {@link gui.Component Components}
 		 * when the Container's element is hidden (i.e. no css visibility/display).
 		 *
 		 * This method is basically used to determine if we can lay the child Components out, and if not, a layout
@@ -818,15 +818,15 @@ define( [
 	
 	
 		/**
-		 * Retrieves the {@link jqg.layout.Layout Layout} object that the Container is currently
+		 * Retrieves the {@link gui.layout.Layout Layout} object that the Container is currently
 		 * configured to use.  If no {@link #layout} is currently configured for the Container, this method
-		 * creates a {@link jqg.layout.Auto} to use for this Container, and returns that.
+		 * creates a {@link gui.layout.Auto} to use for this Container, and returns that.
 		 *
 		 * @method getLayout
 		 */
 		getLayout : function() {
 			if( !this.layout ) {
-				var AutoLayout = require( 'jqg/layout/Auto' );
+				var AutoLayout = require( 'gui/layout/Auto' );
 				this.setLayout( new AutoLayout() );
 			}
 			return this.layout;
@@ -838,10 +838,10 @@ define( [
 		 * the Container (its container reference set to null).
 		 *
 		 * @method setLayout
-		 * @param {String/Object/jqg.layout.Layout} layout See the {@link #layout} config.
+		 * @param {String/Object/gui.layout.Layout} layout See the {@link #layout} config.
 		 */
 		setLayout : function( layout ) {
-			var Layout = require( 'jqg/layout/Layout' );  // for dealing with circular dependency
+			var Layout = require( 'gui/layout/Layout' );  // for dealing with circular dependency
 			
 			// Destroy the current layout if we have a new one, and detach all Components in the Container, as 
 			// a new layout is going to have to render them anyway.
@@ -876,7 +876,7 @@ define( [
 					delete layoutConfig.type;  // remove the 'type' property from the config object now, as to not shadow the Layout object's prototype 'type' property when applied
 	
 				} else {
-					// Not a jqg.layout.Layout, String, or Object...
+					// Not a gui.layout.Layout, String, or Object...
 					throw new Error( "Invalid layout argument provided to setLayout. See method description in docs." );
 				}
 
@@ -892,7 +892,7 @@ define( [
 	
 	
 		/**
-		 * Cascades down the {@link jqg.Component Component}/Container heirarchy from this Container (called first), calling the specified
+		 * Cascades down the {@link gui.Component Component}/Container heirarchy from this Container (called first), calling the specified
 		 * function for each Component. The scope (`this` reference) of the function call will be the scope provided,
 		 * or the current Component that is being processed.
 		 *
@@ -900,7 +900,7 @@ define( [
 		 * that was being processed when the function returned false are still processed.
 		 *
 		 * @param {Function} fn The function to call
-		 * @param {Object} [scope] The scope of the function. Defaults to the {@link jqg.Component Component} that is currently being
+		 * @param {Object} [scope] The scope of the function. Defaults to the {@link gui.Component Component} that is currently being
 		 *   processed.
 		 */
 		cascade : function( fn, scope, args ) {
@@ -919,10 +919,10 @@ define( [
 	
 	
 		/**
-		 * Finds a Component under this container at any level by {@link jqg.Component#id id}.
+		 * Finds a Component under this container at any level by {@link gui.Component#id id}.
 		 *
 		 * @param {String} id The ID of the Component to search for.
-		 * @return {jqg.Component} The component with the given `id`, or `null` if none was found.
+		 * @return {gui.Component} The component with the given `id`, or `null` if none was found.
 		 */
 		findById : function( id ) {
 			var returnVal = null,
@@ -939,14 +939,14 @@ define( [
 	
 	
 		/**
-		 * Finds the {@link jqg.Component Components} under this Container at any level by a custom function. If the passed function 
+		 * Finds the {@link gui.Component Components} under this Container at any level by a custom function. If the passed function 
 		 * returns true for a given Component, then that Component will be included in the results.
 		 *
 		 * @param {Function} fn The function to call. The function will be called with the following arguments:
-		 * @param {jqg.Component} fn.component The Component that is being inspected.
-		 * @param {jqg.Container} fn.thisContainer This Container instance.
+		 * @param {gui.Component} fn.component The Component that is being inspected.
+		 * @param {gui.Container} fn.thisContainer This Container instance.
 		 * @param {Object} [scope] The scope to call the function in. Defaults to the Component being inspected.
-		 * @return {jqg.Component[]} Array of {@link jqg.Component Components}
+		 * @return {gui.Component[]} Array of {@link gui.Component Components}
 		 */
 		findBy : function( fn, scope ) {
 			var returnVal = [],
@@ -962,12 +962,12 @@ define( [
 	
 	
 		/**
-		 * Finds the {@link jqg.Component Components} under this Container at any level by Component `type`. The Component `type` can be either 
-		 * the type name that is registered to the {@link jqg.ComponentManager} (see the description of the {@link jqg.Component} class), 
-		 * or the JavaScript class (constructor function) of the {@link jqg.Component Component}.
+		 * Finds the {@link gui.Component Components} under this Container at any level by Component `type`. The Component `type` can be either 
+		 * the type name that is registered to the {@link gui.ComponentManager} (see the description of the {@link gui.Component} class), 
+		 * or the JavaScript class (constructor function) of the {@link gui.Component Component}.
 		 *
-		 * @param {Function} type The type name registered with the {@link jqg.ComponentManager}, or the constructor function (class) of the Component.
-		 * @return {jqg.Component[]} Array of {@link jqg.Component Components} which match the `type`.
+		 * @param {Function} type The type name registered with the {@link gui.ComponentManager}, or the constructor function (class) of the Component.
+		 * @return {gui.Component[]} Array of {@link gui.Component Components} which match the `type`.
 		 */
 		findByType : function( type ) {
 			if( typeof type === 'string' ) {
@@ -1002,7 +1002,7 @@ define( [
 			this.removeAll();
 	
 			// Destroy the Container's layout, if it has one
-			var Layout = require( 'jqg/layout/Layout' );
+			var Layout = require( 'gui/layout/Layout' );
 			if( this.layout instanceof Layout ) {  // just in case it's still the string config
 				this.layout.destroy();
 			}

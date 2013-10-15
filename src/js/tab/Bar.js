@@ -1,16 +1,16 @@
 /*global define */
 define( [
-	'jqg/ComponentManager',
-	'jqg/Container',
-	'jqg/tab/Tab'
+	'gui/ComponentManager',
+	'gui/Container',
+	'gui/tab/Tab'
 ], function( ComponentManager, Container, Tab ) {
 	
 	/**
-	 * @class jqg.tab.Bar
-	 * @extends jqg.Container
+	 * @class gui.tab.Bar
+	 * @extends gui.Container
 	 * @alias type.tabbar
 	 * 
-	 * Specialized container for a {@link jqg.tab.Panel Tab Panel's} tabs.
+	 * Specialized container for a {@link gui.tab.Panel Tab Panel's} tabs.
 	 */
 	var TabBar = Container.extend( {
 		
@@ -24,14 +24,14 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-tabPanel-bar',
+		componentCls : 'gui-tabPanel-bar',
 		
 		
 		/**
-		 * Sets the "active" tab based on the given activated {@link jqg.panel.Panel Panel} which corresponds
+		 * Sets the "active" tab based on the given activated {@link gui.panel.Panel Panel} which corresponds
 		 * to it. All other tabs will be set to "inactive".
 		 * 
-		 * @param {jqg.panel.Panel} panel The Panel that corresponds to the Tab that should be made active.
+		 * @param {gui.panel.Panel} panel The Panel that corresponds to the Tab that should be made active.
 		 *   If `null` is provided, or a Panel that does not have a corresponding Tab, then all tabs will
 		 *   be set to their "inactive" state.
 		 * @chainable

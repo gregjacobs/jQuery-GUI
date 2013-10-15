@@ -2,45 +2,45 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/Component',
-	'jqg/Container',
-	'jqg/panel/Panel',
-	'jqg/tab/Bar',
-	'jqg/tab/Tab',
-	'jqg/template/LoDash',
-	'jqg/layout/Card'
+	'gui/ComponentManager',
+	'gui/Component',
+	'gui/Container',
+	'gui/panel/Panel',
+	'gui/tab/Bar',
+	'gui/tab/Tab',
+	'gui/template/LoDash',
+	'gui/layout/Card'
 ], function( jQuery, _, ComponentManager, Component, Container, Panel, TabBar, Tab, LoDashTpl ) {
 
 	/**
-	 * @class jqg.tab.Panel
-	 * @extends jqg.panel.Panel
+	 * @class gui.tab.Panel
+	 * @extends gui.panel.Panel
 	 * @alias type.tabpanel
 	 *
-	 * A basic tab container panel. Child {@link #items} must be {@link jqg.panel.Panel Panels} or Panel subclasses,
-	 * as their {@link jqg.panel.Panel#title title} property is read to create the tabs.
+	 * A basic tab container panel. Child {@link #items} must be {@link gui.panel.Panel Panels} or Panel subclasses,
+	 * as their {@link gui.panel.Panel#title title} property is read to create the tabs.
 	 * 
-	 * The Tab Panel is internally configured with a {@link jqg.layout.Card Card} layout, which switches between
+	 * The Tab Panel is internally configured with a {@link gui.layout.Card Card} layout, which switches between
 	 * the panels when the tabs are clicked.
 	 * 
-	 * By default, each child Panel has its header hidden, and takes its {@link jqg.panel.Panel#title} config
+	 * By default, each child Panel has its header hidden, and takes its {@link gui.panel.Panel#title} config
 	 * to use as the tab's title. To not hide each panel's header, set the {@link #hideChildPanelHeaders} config
 	 * to `false`.
 	 */
 	var TabPanel = Panel.extend( {
 		
 		/**
-		 * @cfg {Number/jqg.Component} activeTab
+		 * @cfg {Number/gui.Component} activeTab
 		 * 
-		 * The tab number, or {@link jqg.Component} instance to set as the initially active tab. Defaults to 0 
-		 * (for the first tab). If this is a {@link jqg.Component} instance, it must exist within the TabPanel.
+		 * The tab number, or {@link gui.Component} instance to set as the initially active tab. Defaults to 0 
+		 * (for the first tab). If this is a {@link gui.Component} instance, it must exist within the TabPanel.
 		 */
 		activeTab : 0,
 		
 		/**
 		 * @cfg {Boolean} hideChildPanelHeaders
 		 * 
-		 * `true` to hide each child panel's {@link jqg.panel.Panel#property-header header} when added to the Tab Panel.
+		 * `true` to hide each child panel's {@link gui.panel.Panel#property-header header} when added to the Tab Panel.
 		 * The headers are hidden because the tabs that are created will have the panels' titles, and having
 		 * the header would just be showing that information twice. Set to `false` to disable this behavior.
 		 */
@@ -68,24 +68,24 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-tabPanel',
+		baseCls : 'gui-tabPanel',
 		
 		/**
 		 * @cfg {String} childPanelCls
 		 * 
-		 * The CSS class to add to the *child* {@link jqg.panel.Panel Panels} of this TabPanel, when they are added.
+		 * The CSS class to add to the *child* {@link gui.panel.Panel Panels} of this TabPanel, when they are added.
 		 * This allows for custom styling of the Panels which are direct children of the TabPanel.
 		 * 
-		 * This CSS class, plus the string '-body' is also added to the child Panel's {@link jqg.panel.Panel#$bodyEl body}
-		 * element. An example of this would be if this config was 'jqg-tabPanel-childPanel', then the body element of the child
-		 * Panel would get the CSS class: 'jqg-tabPanel-childPanel-body'.
+		 * This CSS class, plus the string '-body' is also added to the child Panel's {@link gui.panel.Panel#$bodyEl body}
+		 * element. An example of this would be if this config was 'gui-tabPanel-childPanel', then the body element of the child
+		 * Panel would get the CSS class: 'gui-tabPanel-childPanel-body'.
 		 */
-		childPanelCls : 'jqg-tabPanel-childPanel',
+		childPanelCls : 'gui-tabPanel-childPanel',
 		
 		
 		/**
 		 * @protected
-		 * @property {jqg.tab.Bar} tabBar
+		 * @property {gui.tab.Bar} tabBar
 		 * 
 		 * The Container that holds the TabPanel's tabs.
 		 */
@@ -100,9 +100,9 @@ define( [
 				 * Fires before the {@link #activeTab} is changed.
 				 * 
 				 * @event beforetabchange
-				 * @param {jqg.tab.Panel} tabPanel This TabPanel instance.
-				 * @param {jqg.panel.Panel} panel The Panel instance for the tab is to be activated.
-				 * @param {jqg.panel.Panel} oldPanel The Panel instance of the tab that is to be de-activated. 
+				 * @param {gui.tab.Panel} tabPanel This TabPanel instance.
+				 * @param {gui.panel.Panel} panel The Panel instance for the tab is to be activated.
+				 * @param {gui.panel.Panel} oldPanel The Panel instance of the tab that is to be de-activated. 
 				 *   Will be null if there is no currently activated tab.
 				 * @preventable
 				 */
@@ -112,9 +112,9 @@ define( [
 				 * Fires when the {@link #activeTab} has been changed. 
 				 * 
 				 * @event tabchange
-				 * @param {jqg.tab.Panel} tabPanel This TabPanel instance.
-				 * @param {jqg.panel.Panel} panel The Panel instance for the tab that was activated.
-				 * @param {jqg.panel.Panel} oldPanel The Panel instance of the tab that was de-activated. 
+				 * @param {gui.tab.Panel} tabPanel This TabPanel instance.
+				 * @param {gui.panel.Panel} panel The Panel instance for the tab that was activated.
+				 * @param {gui.panel.Panel} oldPanel The Panel instance of the tab that was de-activated. 
 				 *   Will be null if there was no previously activated tab.
 				 */
 				'tabchange'
@@ -143,7 +143,7 @@ define( [
 		 * Factory method to create the TabPanel's {@link #tabBar}.
 		 * 
 		 * @protected
-		 * @return {jqg.tab.Bar}
+		 * @return {gui.tab.Bar}
 		 */
 		createTabBar : function() {
 			return new TabBar();
@@ -151,7 +151,7 @@ define( [
 		
 		
 		/**
-		 * Retrieves the TabPanel's internal {@link jqg.tab.Bar TabBar} instance. 
+		 * Retrieves the TabPanel's internal {@link gui.tab.Bar TabBar} instance. 
 		 * 
 		 * Normally, the {@link #tabBar} is managed solely by the TabPanel itself, but this accessor allows for 
 		 * the ability to manipulate the {@link #tabBar} directly to support certain scenarios.
@@ -162,11 +162,11 @@ define( [
 		
 		
 		/**
-		 * Factory method used to create a {@link jqg.tab.Tab Tab} for the {@link #tabBar}.
+		 * Factory method used to create a {@link gui.tab.Tab Tab} for the {@link #tabBar}.
 		 * 
 		 * @protected
-		 * @param {jqg.panel.Panel} The Panel which a Tab is being created for. 
-		 * @return {jqg.tab.Tab}
+		 * @param {gui.panel.Panel} The Panel which a Tab is being created for. 
+		 * @return {gui.tab.Tab}
 		 */
 		createTab : function( panel ) {
 			return new Tab( {
@@ -237,10 +237,10 @@ define( [
 		
 		
 		/**
-		 * Sets the active tab {@link jqg.panel.Panel Panel}.
+		 * Sets the active tab {@link gui.panel.Panel Panel}.
 		 * 
-		 * @param {jqg.panel.Panel/Number} panel The Panel to activate in the TabPanel, or the index of the Panel in the TabPanel
-		 *   (0 for the first Panel). Note that if a {@link jqg.panel.Panel Panel} is provided, it must be an *instantiated* Panel,
+		 * @param {gui.panel.Panel/Number} panel The Panel to activate in the TabPanel, or the index of the Panel in the TabPanel
+		 *   (0 for the first Panel). Note that if a {@link gui.panel.Panel Panel} is provided, it must be an *instantiated* Panel,
 		 *   and not the anonymous config object used to create the Panel.
 		 */
 		setActiveTab : function( panel ) {
@@ -258,9 +258,9 @@ define( [
 		
 		
 		/**
-		 * Gets the active tab ({@link jqg.panel.Panel Panel}).
+		 * Gets the active tab ({@link gui.panel.Panel Panel}).
 		 * 
-		 * @return {jqg.panel.Panel} The Panel that is currently shown as the active tab, or `null` if there is no active tab.
+		 * @return {gui.panel.Panel} The Panel that is currently shown as the active tab, or `null` if there is no active tab.
 		 */
 		getActiveTab : function() {
 			return this.layout.getActiveItem();
@@ -278,10 +278,10 @@ define( [
 		
 		
 		/**
-		 * Handles a click to a {@link jqg.tab.Tab Tab} in the TabBar.
+		 * Handles a click to a {@link gui.tab.Tab Tab} in the TabBar.
 		 *
 		 * @protected
-		 * @param {jqg.tab.Tab} tab The Tab that was clicked.
+		 * @param {gui.tab.Tab} tab The Tab that was clicked.
 		 */
 		onTabClick : function( tab ) {
 			this.setActiveTab( tab.getCorrespondingPanel() );  // show the Panel that corresponds to the tab
@@ -292,9 +292,9 @@ define( [
 		 * Method that is run after a new tab has been activated (shown).
 		 * 
 		 * @protected
-		 * @param {jqg.layout.Card} cardLayout
-		 * @param {jqg.panel.Panel} newPanel The newly activated Panel.
-		 * @param {jqg.panel.Panel} oldPanel The previously activated Panel.
+		 * @param {gui.layout.Card} cardLayout
+		 * @param {gui.panel.Panel} newPanel The newly activated Panel.
+		 * @param {gui.panel.Panel} oldPanel The previously activated Panel.
 		 */
 		onTabChange : function( cardLayout, newPanel, oldPanel ) {
 			this.fireEvent( 'tabchange', this, newPanel, oldPanel );

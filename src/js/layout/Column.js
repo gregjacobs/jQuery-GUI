@@ -1,17 +1,17 @@
 /*global define */
 define( [
 	'Class',
-	'jqg/Component',
-	'jqg/Container',
-	'jqg/layout/Layout'
+	'gui/Component',
+	'gui/Container',
+	'gui/layout/Layout'
 ], function( Class, Component, Container, Layout ) {
 
 	/**
-	 * @class jqg.layout.Column
-	 * @extends jqg.layout.Layout
+	 * @class gui.layout.Column
+	 * @extends gui.layout.Layout
 	 * @alias layout.column
 	 * 
-	 * A layout that renders a {@link jqg.Container Container's} child components into columns. Each child component
+	 * A layout that renders a {@link gui.Container Container's} child components into columns. Each child component
 	 * in the Container should have a special property named `columnWidth`, that determines how wide the column
 	 * should be.  This property can either be a number, or any css width value.
 	 * 
@@ -36,13 +36,13 @@ define( [
 		
 		/**
 		 * Layout implementation for ColumnsLayout, which renders each child component as columns into the 
-		 * Container's content target (see {@link jqg.Component#getContentTarget).  Each child component in the
+		 * Container's content target (see {@link gui.Component#getContentTarget).  Each child component in the
 		 * Container should have a special property named `columnWidth`, that determines how wide the column
 		 * should be.  This property can either be a number, or any css width value.
 		 * 
 		 * @protected
 		 * @method onLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		onLayout : function( childComponents, $targetEl ) {		
@@ -62,7 +62,7 @@ define( [
 		 * are handled by {@link #updateColumnsLayout}.
 		 * 
 		 * @method initColumnsLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		initColumnsLayout : function( childComponents, $targetEl ) {
@@ -107,7 +107,7 @@ define( [
 		 * Updates the ColumnsLayout for each layout run after the first (which is handled by {@link #initColumnsLayout}.
 		 * 
 		 * @method updateColumnsLayout
-		 * @param {jqg.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
 		updateColumnsLayout : function( childComponents, $targetEl ) {
@@ -130,7 +130,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the jqg.Container class, which is used to be able to instantiate the layout via its type name.
+	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
 	Container.registerLayout( 'column', ColumnLayout );
 	
 	return ColumnLayout;

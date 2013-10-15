@@ -1,13 +1,13 @@
 /*global define, describe, beforeEach, afterEach, it, expect, spyOn */
 define( [
 	'jquery',
-	'jqg/Component',
-	'jqg/Container',
-	'jqg/layout/Layout',
+	'gui/Component',
+	'gui/Container',
+	'gui/layout/Layout',
 	'spec/layout/LayoutFixture'
 ], function( jQuery, Component, Container, Layout, LayoutFixture ) {
 
-	describe( 'jqg.layout.Layout', function() {
+	describe( 'gui.layout.Layout', function() {
 		var fixture;
 		
 		beforeEach( function() {

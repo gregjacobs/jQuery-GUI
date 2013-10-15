@@ -1,12 +1,12 @@
-.jqg-form-field-textarea {
+.gui-form-field-textarea {
 	
 	
 }
 
-.jqg-form-field-textarea-input {
+.gui-form-field-textarea-input {
 	resize: none;  // don't allow resizing for Chrome. Layout system can't update when resized by user.
 }
 
-.jqg-form-field-textarea-emptyText {
-	@extend .jqg-form-field-text-emptyText;
+.gui-form-field-textarea-emptyText {
+	@extend .gui-form-field-text-emptyText;
 }

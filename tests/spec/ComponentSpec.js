@@ -4,14 +4,14 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'jqg/anim/Animation',
-	'jqg/plugin/Plugin',
-	'jqg/Component',
-	'jqg/Container'
+	'gui/anim/Animation',
+	'gui/plugin/Plugin',
+	'gui/Component',
+	'gui/Container'
 ],
 function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 	
-	describe( 'jqg.Component', function() {
+	describe( 'gui.Component', function() {
 		
 		describe( 'constructor', function() {
 			
@@ -128,15 +128,15 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );		
 				
 			
-			it( "should throw an error when trying to add a non jqg.plugin.Plugin object as a plugin", function() {
+			it( "should throw an error when trying to add a non gui.plugin.Plugin object as a plugin", function() {
 				expect( function() {
 					var component = new Component( {
 						plugins : {
-							// non jqg.plugin.Plugin implementation. should error
+							// non gui.plugin.Plugin implementation. should error
 							init : function() { }
 						}
 					} );
-				} ).toThrow( "error: a plugin provided to this Component was not of type jqg.plugin.Plugin" );
+				} ).toThrow( "error: a plugin provided to this Component was not of type gui.plugin.Plugin" );
 			} );
 		} );
 		
@@ -169,11 +169,11 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			it( "CSS class names given to the `baseCls` config should be applied to the element", function() {
 				var component = new Component( {
 					renderTo : document.body,   // to cause it to render
-					baseCls: 'jqg-testComponent'
+					baseCls: 'gui-testComponent'
 				} );
 				
 				var $el = component.getEl();
-				expect( $el.hasClass( "jqg-testComponent" ) ).toBe( true );
+				expect( $el.hasClass( "gui-testComponent" ) ).toBe( true );
 				
 				component.destroy();
 			} );
@@ -182,12 +182,12 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			it( "CSS class names given to the `componentCls` config should be applied to the element", function() {
 				var component = new Component( {
 					renderTo : document.body,   // to cause it to render
-					componentCls: 'jqg-testComponent'
+					componentCls: 'gui-testComponent'
 				} );
 				
 				var $el = component.getEl();
-				expect( $el.hasClass( "jqg-component" ) ).toBe( true );
-				expect( $el.hasClass( "jqg-testComponent" ) ).toBe( true );
+				expect( $el.hasClass( "gui-component" ) ).toBe( true );
+				expect( $el.hasClass( "gui-testComponent" ) ).toBe( true );
 				
 				component.destroy();
 			} );
@@ -2271,8 +2271,8 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var parentTabs = container.findById( 'parentTabs' );
 				var testChild1 = container.findById( 'testChild1' );
 				var testChild2 = container.findById( 'testChild2' );
-				//expect( testChild1.findParentByType( jqg.containers.TabsContainer ) ).toBe( parentTabs );  // Parent TabsContainer not found from testChild1
-				//expect( testChild2.findParentByType( jqg.containers.TabsContainer ) ).toBe( parentTabs );  // Parent TabsContainer not found from testChild2
+				//expect( testChild1.findParentByType( gui.containers.TabsContainer ) ).toBe( parentTabs );  // Parent TabsContainer not found from testChild1
+				//expect( testChild2.findParentByType( gui.containers.TabsContainer ) ).toBe( parentTabs );  // Parent TabsContainer not found from testChild2
 				
 				var parentContainer = container.findById( 'parentContainer' );
 				var myKey2 = container.findById( 'myKey2' );
@@ -2564,12 +2564,12 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 					initComponent : function() {
 						// NOTE: These two elements are intentionally not appended to the Component's element, so that the automatic recursive
 						// removal of $el does not effect them. It is possible that Components add elements in other places in the DOM, such as
-						// with the overlay dropdown menu in jqg.form.field.Dropdown.
-						this.$wrappedSet = jQuery( '<div id="jqg-component-test-destruction-1" />' )
+						// with the overlay dropdown menu in gui.form.field.Dropdown.
+						this.$wrappedSet = jQuery( '<div id="gui-component-test-destruction-1" />' )
 							.appendTo( document.body );
 						
 						this.divElement = document.createElement( 'DIV' );
-						this.divElement.id = "jqg-component-test-destruction-2";
+						this.divElement.id = "gui-component-test-destruction-2";
 						document.body.appendChild( this.divElement );
 					}
 				} );
@@ -2577,13 +2577,13 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				var myComponent = new ComponentSubClass();
 				
 				// Initial conditions - elements should exist in the DOM
-				expect( document.getElementById( 'jqg-component-test-destruction-1' ) ).not.toBe( null );  // The wrapped set's element ($wrappedSet[0]) should initially exist in the DOM
-				expect( document.getElementById( 'jqg-component-test-destruction-2' ) ).not.toBe( null );  // The HTMLElement (divElement) should initially exist in the DOM
+				expect( document.getElementById( 'gui-component-test-destruction-1' ) ).not.toBe( null );  // The wrapped set's element ($wrappedSet[0]) should initially exist in the DOM
+				expect( document.getElementById( 'gui-component-test-destruction-2' ) ).not.toBe( null );  // The HTMLElement (divElement) should initially exist in the DOM
 				
 				myComponent.destroy();
 				
-				expect( document.getElementById( 'jqg-component-test-destruction-1' ) ).toBe( null );  // The wrapped set's element ($wrappedSet[0]) should no longer exist in the DOM
-				expect( document.getElementById( 'jqg-component-test-destruction-2' ) ).toBe( null );  // The HTMLElement (divElement) should no longer exist in the DOM
+				expect( document.getElementById( 'gui-component-test-destruction-1' ) ).toBe( null );  // The wrapped set's element ($wrappedSet[0]) should no longer exist in the DOM
+				expect( document.getElementById( 'gui-component-test-destruction-2' ) ).toBe( null );  // The HTMLElement (divElement) should no longer exist in the DOM
 			} );
 			
 		} );  // eo destroy() tests

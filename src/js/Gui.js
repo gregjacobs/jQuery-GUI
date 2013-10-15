@@ -14,18 +14,18 @@ define( [
 ], function( Class, jQuery, _ ) {
 
 	/**
-	 * @class jqg.JqGui
+	 * @class gui.Gui
 	 * @singleton
 	 * 
 	 * Main singleton class of the jQuery-GUI library, with a few base utility functions. 
 	 * 
-	 * This class can be included in implementations by using the RequireJS path of 'jqg/JqGui'. Ex:
+	 * This class can be included in implementations by using the RequireJS path of 'gui/Gui'. Ex:
 	 * 
-	 *     require( [ 'jqg/JqGui' ], function( JqGui ) {
-	 *         console.log( "This browser's scrollbar width: ", JqGui.getScrollbarWidth(), "px" );
+	 *     require( [ 'gui/Gui' ], function( Gui ) {
+	 *         console.log( "This browser's scrollbar width: ", Gui.getScrollbarWidth(), "px" );
 	 *     } );
 	 */
-	var JqGui = Class.extend( Object, {
+	var Gui = Class.extend( Object, {
 
 		/**
 		 * @readonly
@@ -71,7 +71,7 @@ define( [
 		 * This may be placed into CSS styles as such:
 		 * 
 		 *     var $div = jQuery( '<div />' );
-		 *     $div.css( 'background-image', 'url(' + JqGui.getBlankImgUrl() + ')' );
+		 *     $div.css( 'background-image', 'url(' + Gui.getBlankImgUrl() + ')' );
 		 * 
 		 * @method getBlankImgUrl
 		 * @return {String}
@@ -195,6 +195,6 @@ define( [
 	
 	
 	// Return singleton instance
-	return new JqGui();
+	return new Gui();
 	
 } );

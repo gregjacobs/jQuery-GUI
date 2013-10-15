@@ -3,13 +3,13 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/Component'
+	'gui/ComponentManager',
+	'gui/Component'
 ], function( jQuery, _, ComponentManager, Component ) {
 	
 	/**
-	 * @class jqg.Anchor
-	 * @extends jqg.Component
+	 * @class gui.Anchor
+	 * @extends gui.Component
 	 * @alias type.anchor
 	 *
 	 * A simple anchor component. This component can be used as a standard anchor (&lt;a&gt; tag) by setting
@@ -18,7 +18,7 @@ define( [
 	 * 
 	 *     @example
 	 *     require( [
-	 *         'jqg/Anchor'
+	 *         'gui/Anchor'
 	 *     ], function( Anchor ) {
 	 *     
 	 *         var standardAnchor = new Anchor( {
@@ -73,7 +73,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-anchor',
+		baseCls : 'gui-anchor',
 	
 	
 		// protected
@@ -83,7 +83,7 @@ define( [
 				 * Fires before the Anchor is clicked. Handlers may return false to cancel the action of the anchor.
 				 * 
 				 * @event beforeclick
-				 * @param {jqg.Anchor} anchor This Anchor instance.
+				 * @param {gui.Anchor} anchor This Anchor instance.
 				 * @preventable
 				 */
 				'beforeclick',
@@ -92,7 +92,7 @@ define( [
 				 * Fires when the Anchor is clicked.
 				 * 
 				 * @event click
-				 * @param {jqg.Anchor} anchor This Anchor instance.
+				 * @param {gui.Anchor} anchor This Anchor instance.
 				 */
 				'click'
 			);

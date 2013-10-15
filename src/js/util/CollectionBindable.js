@@ -2,11 +2,11 @@
 define( [
 	'lodash',
 	'Class',
-	'jqg/JqGui'
-], function( _, Class, JqGui ) {
+	'gui/Gui'
+], function( _, Class, Gui ) {
 	
 	/**
-	 * @class jqg.util.CollectionBindable
+	 * @class gui.util.CollectionBindable
 	 * @extends Object
 	 * 
 	 * This class is intended to be used as a mixin. It allows any class that it is mixed into (the "target" class in these docs) to have 
@@ -21,11 +21,11 @@ define( [
 	 * The target class may also implement the {@link #onCollectionBind} method, to detect and handle when a new {@link data.Collection} has
 	 * been bound, and/or when the currently-bound collection has been unbound.
 	 * 
-	 * Here is an example of mixing this class into a {@link jqg.Component Component}, to make the Component data-bound to a Collection:
+	 * Here is an example of mixing this class into a {@link gui.Component Component}, to make the Component data-bound to a Collection:
 	 * 
 	 *     define( [
-	 *         'jqg/Component',
-	 *         'jqg/util/CollectionBindable'
+	 *         'gui/Component',
+	 *         'gui/util/CollectionBindable'
 	 *     ], function( Component, CollectionBindable ) {
 	 *         
 	 *         var MyBindableComponent = Component.extend( {
@@ -181,7 +181,7 @@ define( [
 		 * @param {data.Collection} oldCollection The collection that was just unbound. Will be `null` if there was no
 		 *   previously-bound collection.
 		 */
-		onCollectionBind : JqGui.emptyFn,
+		onCollectionBind : Gui.emptyFn,
 		
 		
 		/**
@@ -217,7 +217,7 @@ define( [
 		 * 
 		 *     require( [
 		 *         'Class',
-		 *         'jqg/util/CollectionBindable'
+		 *         'gui/util/CollectionBindable'
 		 *     ], function( Class, CollectionBindable ) {
 		 *         
 		 *         var MyBindableClass = Class.create( {

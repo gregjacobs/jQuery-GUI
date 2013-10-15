@@ -2,25 +2,25 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/Container',
-	'jqg/layout/Fit'  // default layout
+	'gui/ComponentManager',
+	'gui/Container',
+	'gui/layout/Fit'  // default layout
 ], function( jQuery, _, ComponentManager, Container ) {
 
 	/**
-	 * @class jqg.Viewport
-	 * @extends jqg.Container
+	 * @class gui.Viewport
+	 * @extends gui.Container
 	 * @alias type.viewport
 	 *  
-	 * A special {@link jqg.Container Container} which keeps itself at the size of its parent element, and responds to window resizes
-	 * to re-layout its child {@link jqg.Component Components}.
+	 * A special {@link gui.Container Container} which keeps itself at the size of its parent element, and responds to window resizes
+	 * to re-layout its child {@link gui.Component Components}.
 	 * 
 	 * Ideally, there should only be one Viewport on a page, and it should automatically be rendered into the document body.
 	 * However, until everything uses the UI framework, this is used on an individual basis in some areas. 
 	 * 
 	 * Note that a Viewport should not contain another Viewport though. A set of parent/child relationships should end at the
-	 * top with a Viewport, and all children should simply be {@link jqg.Container Containers}. If they need to be sized to 100% height/width,
-	 * their parent {@link jqg.Container Container} should be configured with a {@link jqg.layout.Fit FitLayout}.
+	 * top with a Viewport, and all children should simply be {@link gui.Container Containers}. If they need to be sized to 100% height/width,
+	 * their parent {@link gui.Container Container} should be configured with a {@link gui.layout.Fit FitLayout}.
 	 */
 	var Viewport = Container.extend( {
 		

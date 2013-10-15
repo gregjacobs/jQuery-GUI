@@ -2,13 +2,13 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/form/field/Field'
+	'gui/ComponentManager',
+	'gui/form/field/Field'
 ], function( jQuery, _, ComponentManager, Field ) {
 	
 	/**
-	 * @class jqg.form.field.Checkbox
-	 * @extends jqg.form.field.Field
+	 * @class gui.form.field.Checkbox
+	 * @extends gui.form.field.Field
 	 * @alias type.checkbox
 	 * @alias type.checkboxfield
 	 *  
@@ -20,11 +20,11 @@ define( [
 		 * @cfg {String} checkboxLabel
 		 * 
 		 * The label for the checkbox itself, which will be placed to the right of the checkbox. This config is to differentiate from
-		 * the {@link jqg.form.field.Field#label label} provided by {@link jqg.form.field.Field Field} (the one which
+		 * the {@link gui.form.field.Field#label label} provided by {@link gui.form.field.Field Field} (the one which
 		 * affects all form field components uniformly).  Defaults to an empty string.
 		 * 
 		 * Note that if the checkbox should be aligned with other form fields that have "left side" labels (see 
-		 * {@link jqg.form.field.Field#labelAlign}, then set its {@link jqg.form.field.Field#label label} config to
+		 * {@link gui.form.field.Field#labelAlign}, then set its {@link gui.form.field.Field#label label} config to
 		 * a non-breaking space (&amp;nbsp;).
 		 */
 		checkboxLabel : "",
@@ -39,7 +39,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-form-field-checkbox',
+		componentCls : 'gui-form-field-checkbox',
 		
 		
 		/**
@@ -67,7 +67,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s setValue() method, which sets the value to the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s setValue() method, which sets the value to the field.
 		 * 
 		 * @param {Boolean} value The value of the field. If truthy, the checkbox will be checked. If falsy, the checkbox will be unchecked.
 		 */
@@ -81,7 +81,7 @@ define( [
 		
 		
 		/**
-		 * Implementation of {@link jqg.form.field.Field Field}'s getValue() method, which returns the value of the field.
+		 * Implementation of {@link gui.form.field.Field Field}'s getValue() method, which returns the value of the field.
 		 * 
 		 * @return {Boolean} The value of the field (true if it's checked, false otherwise).
 		 */

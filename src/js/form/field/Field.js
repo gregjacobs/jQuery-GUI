@@ -3,15 +3,15 @@ define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'jqg/Component',
-	'jqg/template/Template',
-	'jqg/template/LoDash'
+	'gui/Component',
+	'gui/template/Template',
+	'gui/template/LoDash'
 ], function( jQuery, _, Class, Component, Template, LoDashTpl ) {
 	
 	/**
 	 * @abstract
-	 * @class jqg.form.field.Field
-	 * @extends jqg.Component
+	 * @class gui.form.field.Field
+	 * @extends gui.Component
 	 * 
 	 * Abstract base class for form fields, which lays out a label and a container for form field(s), while also 
 	 * providing the base functionality and other common field related tasks.
@@ -76,7 +76,7 @@ define( [
 		 * @property {String} inputId
 		 * 
 		 * The ID that will be used for the Component's input element. This is a combination of the Component's
-		 * {@link jqg.Component#elId elId} and, the suffix "-input". The label element (if {@link #label} is specified) 
+		 * {@link gui.Component#elId elId} and, the suffix "-input". The label element (if {@link #label} is specified) 
 		 * will be created with a `for` attribute with this id.
 		 */
 		
@@ -115,7 +115,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-form-field',
+		baseCls : 'gui-form-field',
 		
 		/**
 		 * @cfg
@@ -125,13 +125,13 @@ define( [
 		
 		
 		/**
-		 * @cfg {String/String[]/Function/jqg.template.Template} labelRenderTpl
+		 * @cfg {String/String[]/Function/gui.template.Template} labelRenderTpl
 		 * 
 		 * The template to use as the HTML template for the Field's label.
 		 * 
-		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link jqg.template.Template} 
-		 * instance. For the string, array of strings, or function form, a {@link jqg.template.LoDash LoDash template} instance will be 
-		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link jqg.template.Template} 
+		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link gui.template.Template} 
+		 * instance. For the string, array of strings, or function form, a {@link gui.template.LoDash LoDash template} instance will be 
+		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link gui.template.Template} 
 		 * subclass to this config. 
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template) 
@@ -182,7 +182,7 @@ define( [
 				 * Fires when the input field has been changed.
 				 * 
 				 * @event change
-				 * @param {jqg.form.field.Field} field This Field object.
+				 * @param {gui.form.field.Field} field This Field object.
 				 * @param {Object} newValue The new value of the field.
 				 */
 				'change',
@@ -191,7 +191,7 @@ define( [
 				 * Fires when the input field has been focused.
 				 * 
 				 * @event focus
-				 * @param {jqg.form.field.Field} field This Field object.
+				 * @param {gui.form.field.Field} field This Field object.
 				 */
 				'focus',
 				
@@ -199,7 +199,7 @@ define( [
 				 * Fires when the input field has been blurred.
 				 * 
 				 * @event blur
-				 * @param {jqg.form.field.Field} field This Field object.
+				 * @param {gui.form.field.Field} field This Field object.
 				 */
 				'blur'
 			);
@@ -210,7 +210,7 @@ define( [
 			// Fix labelAlign to be lowercase for use with setting the class name (just in case),
 			// and apply the appropriate CSS class for the label state
 			var labelAlign = this.labelAlign = this.labelAlign.toLowerCase(),
-			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'jqg-form-field-noLabel' if there is no label, or 'jqg-form-field-leftLabel' or 'jqg-form-field-topLabel' if there is one
+			    labelCls = this.baseCls + '-' + ( !this.label ? 'noLabel' : labelAlign + 'Label' );  // ex: 'gui-form-field-noLabel' if there is no label, or 'gui-form-field-leftLabel' or 'gui-form-field-topLabel' if there is one
 			this.addCls( labelCls );
 			
 			

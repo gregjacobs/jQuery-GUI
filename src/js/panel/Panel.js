@@ -2,20 +2,20 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqg/util/Css',
-	'jqg/ComponentManager',
-	'jqg/Container',
-	'jqg/panel/Header',
-	'jqg/template/LoDash',
-	'jqg/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
+	'gui/util/Css',
+	'gui/ComponentManager',
+	'gui/Container',
+	'gui/panel/Header',
+	'gui/template/LoDash',
+	'gui/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
 ], function( jQuery, _, Css, ComponentManager, Container, PanelHeader, LoDashTpl ) {
 
 	/**
-	 * @class jqg.panel.Panel
-	 * @extends jqg.Container
+	 * @class gui.panel.Panel
+	 * @extends gui.Container
 	 * @alias type.panel
 	 *
-	 * An application-oriented {@link jqg.Container} subclass which supports adding a {@link #title} bar and 
+	 * An application-oriented {@link gui.Container} subclass which supports adding a {@link #title} bar and 
 	 * {@link #toolButtons}.
 	 */
 	var Panel = Container.extend( {
@@ -50,9 +50,9 @@ define( [
 		title : "",
 		
 		/**
-		 * @cfg {Object/Object[]/jqg.panel.ToolButton/jqg.panel.ToolButton[]} toolButtons
+		 * @cfg {Object/Object[]/gui.panel.ToolButton/gui.panel.ToolButton[]} toolButtons
 		 * 
-		 * One or more {@link jqg.panel.ToolButton ToolButtons} or ToolButton config objects. These will
+		 * One or more {@link gui.panel.ToolButton ToolButtons} or ToolButton config objects. These will
 		 * be placed on the right side of the Panel's header (i.e. top right of the Panel).
 		 */
 		
@@ -60,13 +60,13 @@ define( [
 		 * @cfg {Object} header
 		 * 
 		 * Any configuration options to pass to the {@link #property-header} component. This may include
-		 * a `type` property to specify a different Header subclass than the default {@link jqg.panel.Header}.
+		 * a `type` property to specify a different Header subclass than the default {@link gui.panel.Header}.
 		 */
 		
 		/**
-		 * @cfg {Object/Object[]/jqg.button.Button/jqg.button.Button[]} buttons
+		 * @cfg {Object/Object[]/gui.button.Button/gui.button.Button[]} buttons
 		 * 
-		 * One or more {@link jqg.button.Button Buttons} or Button config objects for buttons to place
+		 * One or more {@link gui.button.Button Buttons} or Button config objects for buttons to place
 		 * in the footer of the Panel. These will be placed on the right side of the Panel's footer 
 		 * (i.e. bottom right of the Panel).
 		 */
@@ -82,7 +82,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-panel',
+		baseCls : 'gui-panel',
 		
 		/**
 		 * @cfg
@@ -106,7 +106,7 @@ define( [
 		
 		/**
 		 * @protected
-		 * @property {jqg.Container} header
+		 * @property {gui.Container} header
 		 * 
 		 * The Container which acts as the Panel's header. The header holds the {@link #title}, and any {@link #toolButtons} 
 		 * specified. 
@@ -116,7 +116,7 @@ define( [
 		
 		/**
 		 * @protected
-		 * @property {jqg.Container} footer
+		 * @property {gui.Container} footer
 		 * 
 		 * The Container which acts as the Panel's footer. The footer holds the any {@link #buttons} specified. 
 		 * 
@@ -130,7 +130,7 @@ define( [
 		initComponent : function() {
 			this._super( arguments );
 			
-			// Move the `header` config to `headerCfg`, as to not be confusing when an actual jqg.panel.Header is created in the `header` property
+			// Move the `header` config to `headerCfg`, as to not be confusing when an actual gui.panel.Header is created in the `header` property
 			this.headerCfg = this.header;
 			delete this.header;
 			
@@ -211,7 +211,7 @@ define( [
 		doCreateHeader : function() {
 			this.header = this.createHeader( _.defaults( {}, this.headerCfg, {
 				type         : 'panelheader',
-				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'jqg-panel-header'. For Window, 'jqg-window-header'
+				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'gui-panel-header'. For Window, 'gui-window-header'
 				title        : this.title,
 				toolButtons  : this.toolButtons
 			} ) );
@@ -229,7 +229,7 @@ define( [
 		 * 
 		 * @protected
 		 * @param {Object} headerConfig The configuration for the header, with defaults applied from the Panel.
-		 * @return {jqg.panel.Header}
+		 * @return {gui.panel.Header}
 		 */
 		createHeader : function( headerConfig ) {
 			return ComponentManager.create( headerConfig );
@@ -259,7 +259,7 @@ define( [
 		 * Creates the {@link #footer} Container, which contains any {@link #buttons} that were configured.
 		 * 
 		 * @protected
-		 * @return {jqg.Container}
+		 * @return {gui.Container}
 		 */
 		createFooter : function() {
 			return new Container( {
@@ -272,7 +272,7 @@ define( [
 						type : 'container',
 						cls  : this.baseCls + '-footer-buttons',
 						
-						defaultType : 'button',   // jqg.button.Button
+						defaultType : 'button',   // gui.button.Button
 						items       : this.buttons
 					}
 				]
@@ -295,7 +295,7 @@ define( [
 		 * the header. In this case, be aware that the header is created with components of its own, and you will need
 		 * to inject yours at the correct indexes.
 		 * 
-		 * @return {jqg.panel.Header}
+		 * @return {gui.panel.Header}
 		 */
 		getHeader : function() {
 			if( !this.header ) {
@@ -374,7 +374,7 @@ define( [
 		 * 
 		 * @param {String} cssClass One or more CSS classes to add to the Panel's {@link #$bodyEl body} element. If specifying 
 		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
-		 * @return {jqg.panel.Panel} This Panel, to allow method chaining.
+		 * @return {gui.panel.Panel} This Panel, to allow method chaining.
 		 */
 		addBodyCls : function( cssClass ) {
 			if( !this.rendered ) {
@@ -391,7 +391,7 @@ define( [
 		 * 
 		 * @param {String} cssClass One or more CSS classes to remove from the Panel's {@link #$bodyEl body} element. If specifying 
 		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
-		 * @return {jqg.panel.Panel} This Panel, to allow method chaining.
+		 * @return {gui.panel.Panel} This Panel, to allow method chaining.
 		 */
 		removeBodyCls : function( cssClass ) {
 			if( !this.rendered ) {
@@ -421,7 +421,7 @@ define( [
 		 * @param {String/Object} name The CSS property name. This first argument may also be provided as an Object of key/value
 		 *   pairs for CSS property names/values to apply to the Panel's {@link #$bodyEl body} element.
 		 * @param {String} value The value for the CSS property. Optional if the first argument is an Object.
-		 * @return {jqg.panel.Panel} This Panel, to allow method chaining.
+		 * @return {gui.panel.Panel} This Panel, to allow method chaining.
 		 */
 		setBodyStyle : function( name, value ) {
 			if( !this.rendered ) {

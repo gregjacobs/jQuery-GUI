@@ -2,16 +2,16 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqg/ComponentManager',
-	'jqg/Overlay'
+	'gui/ComponentManager',
+	'gui/Overlay'
 ], function( jQuery, _, ComponentManager, Overlay ) {
 	
 	/**
-	 * @class jqg.window.Window
-	 * @extends jqg.Overlay
+	 * @class gui.window.Window
+	 * @extends gui.Overlay
 	 * @alias type.window
 	 * 
-	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link jqg.panel.Panel Panel}, the Window
+	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link gui.panel.Panel Panel}, the Window
 	 * may accept a {@link #title}, and it also adds a {@link #closeButton close button} to the top right  
 	 */
 	var Window = Overlay.extend( {
@@ -58,7 +58,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-window',
+		baseCls : 'gui-window',
 		
 		/**
 		 * @cfg

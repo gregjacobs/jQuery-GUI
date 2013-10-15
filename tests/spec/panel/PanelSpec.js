@@ -1,10 +1,10 @@
 /*global define, describe, beforeEach, afterEach, it, expect */
 define( [
-	'jqg/panel/Panel'
+	'gui/panel/Panel'
 ],
 function( Panel ) {
 	
-	describe( 'jqg.panel.Panel', function() {
+	describe( 'gui.panel.Panel', function() {
 		
 		describe( "sanity", function() {
 			

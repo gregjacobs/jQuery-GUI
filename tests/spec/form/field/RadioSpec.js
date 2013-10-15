@@ -2,10 +2,10 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqg/form/field/Radio'
+	'gui/form/field/Radio'
 ], function( jQuery, _, RadioField ) {
 		
-	describe( 'jqg.form.field.Radio', function() {		
+	describe( 'gui.form.field.Radio', function() {		
 		
 		it( "No initial value should cause the RadioField to have the value of its first option", function() {
 			for( var rendered = 0; rendered <= 1; rendered++ ) {

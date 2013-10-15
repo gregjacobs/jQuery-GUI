@@ -1,12 +1,12 @@
 /*global define */
 define( [
-	'jqg/ComponentManager',
-	'jqg/Component'
+	'gui/ComponentManager',
+	'gui/Component'
 ], function( ComponentManager, Component ) {
 	
 	/**
-	 * @class jqg.Label
-	 * @extends jqg.Component
+	 * @class gui.Label
+	 * @extends gui.Component
 	 * @alias type.label
 	 * 
 	 * Creates a label (piece of text).
@@ -24,7 +24,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		baseCls : 'jqg-label',
+		baseCls : 'gui-label',
 		
 	
 		/**

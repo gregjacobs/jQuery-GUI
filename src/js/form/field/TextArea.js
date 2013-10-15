@@ -2,14 +2,14 @@
 define( [
 	'jquery',
 	'lodash',
-	'jqg/util/Css',
-	'jqg/ComponentManager',
-	'jqg/form/field/Text'
+	'gui/util/Css',
+	'gui/ComponentManager',
+	'gui/form/field/Text'
 ], function( jQuery, _, Css, ComponentManager, TextField ) {
 	
 	/**
-	 * @class jqg.form.field.TextArea
-	 * @extends jqg.form.field.Text
+	 * @class gui.form.field.TextArea
+	 * @extends gui.form.field.Text
 	 * @alias type.textarea
 	 * @alias type.textareafield
 	 * 
@@ -32,7 +32,7 @@ define( [
 		 * @cfg
 		 * @inheritdoc
 		 */
-		componentCls : 'jqg-form-field-textarea',
+		componentCls : 'gui-form-field-textarea',
 		
 		
 		/**
@@ -172,7 +172,7 @@ define( [
 		
 		/**
 		 * Overridden method for creating the input element for the TextAreaField. This implementation
-		 * creates a &lt;textarea&gt; element. See {@link jqg.form.field.Text#createInputEl} for more information.
+		 * creates a &lt;textarea&gt; element. See {@link gui.form.field.Text#createInputEl} for more information.
 		 * 
 		 * @protected
 		 * @return {jQuery}

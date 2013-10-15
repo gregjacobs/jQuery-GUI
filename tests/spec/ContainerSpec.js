@@ -2,13 +2,13 @@
 define( [
 	'jquery',
 	'Class',
-	'jqg/Component',
-	'jqg/Container',
-	'jqg/layout/Layout',
-	'jqg/layout/Auto'
+	'gui/Component',
+	'gui/Container',
+	'gui/layout/Layout',
+	'gui/layout/Auto'
 ], function( jQuery, Class, Component, Container, Layout, AutoLayout ) {
 	
-	describe( 'jqg.Container', function() {
+	describe( 'gui.Container', function() {
 		
 		describe( 'initComponent()', function() {
 			
@@ -188,7 +188,7 @@ define( [
 						'beforeadd' : function( container, component ) {
 							eventFired = true;
 							
-							expect( component instanceof Component ).toBe( true );  // component should be an instantiated jqg.Component, not a config object
+							expect( component instanceof Component ).toBe( true );  // component should be an instantiated gui.Component, not a config object
 						}
 					}
 				} );
@@ -971,7 +971,7 @@ define( [
 			Container.registerLayout( '__getLayoutTest_testLayout', TestLayout );
 			
 			
-			it( "should return a jqg.layout.Auto layout instance when no layout has been configured", function() {
+			it( "should return a gui.layout.Auto layout instance when no layout has been configured", function() {
 				var container = new Container();
 				var layout = container.getLayout();
 				expect( layout instanceof AutoLayout ).toBe( true );  // A Auto should have been created on the fly from getLayout() on a Container with no layout
@@ -1025,7 +1025,7 @@ define( [
 			it( "setLayout() should accept a layout's string name", function() {
 				var container = new Container();
 				container.setLayout( '__setLayoutTest_testLayout' );
-				expect( container.getLayout() instanceof TestLayout ).toBe( true );  // Setting a layout with the string 'columns' should have created a jqg.layout.Column
+				expect( container.getLayout() instanceof TestLayout ).toBe( true );  // Setting a layout with the string 'columns' should have created a gui.layout.Column
 				expect( container.getLayout().getContainer() ).toEqual( container );  // The layout's Container reference was not set to the Container when instantiated by its string type
 			} );
 			
@@ -1034,7 +1034,7 @@ define( [
 				var container = new Container();
 				container.setLayout( {} );
 				
-				expect( container.getLayout() instanceof AutoLayout ).toBe( true );  // Setting a layout with an empty object should have created a jqg.layout.Auto
+				expect( container.getLayout() instanceof AutoLayout ).toBe( true );  // Setting a layout with an empty object should have created a gui.layout.Auto
 				expect( container.getLayout().getContainer() ).toEqual( container );  // The layout's Container reference was not set to the Container when instantiated by an object without a 'type' property
 			} );
 			
@@ -1043,7 +1043,7 @@ define( [
 				var container = new Container();
 				container.setLayout( { customProp: 1 } );   // test with a custom property, to make sure it gets applied
 				
-				expect( container.getLayout() instanceof AutoLayout ).toBe( true );  // Setting a layout with an object with no type property should have created a jqg.layout.Auto
+				expect( container.getLayout() instanceof AutoLayout ).toBe( true );  // Setting a layout with an object with no type property should have created a gui.layout.Auto
 				expect( 1 ).toBe( container.getLayout().customProp );  // setLayout() didn't seem to create the Layout with the config object (customProp wasn't applied)
 				expect( container.getLayout().getContainer() ).toEqual( container );  // The layout's Container reference was not set to the Container when instantiated by an object without a 'type' property, and with a custom property
 			} );
@@ -1053,7 +1053,7 @@ define( [
 				var container = new Container();
 				container.setLayout( { type : '__setLayoutTest_testLayout' } );
 				
-				expect( container.getLayout() instanceof TestLayout ).toBe( true );  // Setting a layout with an object with type 'Columns' should have created a jqg.layout.Column
+				expect( container.getLayout() instanceof TestLayout ).toBe( true );  // Setting a layout with an object with type 'Columns' should have created a gui.layout.Column
 				expect( container.getLayout().getContainer() ).toEqual( container );  // The layout's Container reference was not set to the Container when instantiated by an object with a 'type' property
 			} );
 			
@@ -1062,13 +1062,13 @@ define( [
 				var container = new Container();
 				container.setLayout( { type : '__setLayoutTest_testLayout', customProp: 1 } );   // test with a custom property, to make sure it gets applied
 				
-				expect( container.getLayout() instanceof TestLayout ).toBe( true );  // Setting a layout with an object with type 'Columns' should have created a jqg.layout.Column (with a custom property)
+				expect( container.getLayout() instanceof TestLayout ).toBe( true );  // Setting a layout with an object with type 'Columns' should have created a gui.layout.Column (with a custom property)
 				expect( 1 ).toBe( container.getLayout().customProp );  // setLayout() didn't seem to create the Layout with the config object (customProp wasn't applied)
 				expect( container.getLayout().getContainer() ).toEqual( container );  // The layout's Container reference was not set to the Container when instantiated by an object with a 'type' property, and with a custom property
 			} );
 			
 			
-			it( "setLayout() should set a layout that is provided to it if it is already an instantiated jqg.layout.Layout subclass", function() {
+			it( "setLayout() should set a layout that is provided to it if it is already an instantiated gui.layout.Layout subclass", function() {
 				var container = new Container();
 				var myLayout = new TestLayout();
 				container.setLayout( myLayout );
