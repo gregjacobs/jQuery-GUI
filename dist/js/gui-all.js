@@ -13336,7 +13336,7 @@ define('gui/view/Model', [
 			
 			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
 			// while the model is loading.
-			this.maskConfig = this.maskConfig || { msg: "Loading..." };
+			this.maskConfig = this.maskConfig || { spinner: true, msg: "Loading..." };
 		},
 		
 		
