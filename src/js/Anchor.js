@@ -22,7 +22,7 @@ define( [
 	 *     ], function( Anchor ) {
 	 *     
 	 *         var standardAnchor = new Anchor( {
-	 *             renderTo : 'body'
+	 *             renderTo : 'body',
 	 *             
 	 *             text : "Google.com",
 	 *             href : "http://www.google.com",
@@ -30,7 +30,7 @@ define( [
 	 *         } );
 	 *         
 	 *         var listenerAnchor = new Anchor( {
-	 *             renderTo : 'body'
+	 *             renderTo : 'body',
 	 *             
 	 *             text : "Click Me",
 	 *             listeners : {
