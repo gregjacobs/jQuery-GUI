@@ -323,12 +323,19 @@ define( [
 		
 		
 		describe( 'focus()', function() {
+
+			// Normally this test of focusing the field would scroll the body of the test harness to where the field is appended,
+			// so resetting the scroll value after the test.
+			afterEach( function() {
+				jQuery( 'body' ).scrollTop( 0 );
+			} );
+			
 			
 			it( "should return a reference to the field, to allow for method chaining", function() {
 				var textField = new TextField( { renderTo: 'body' } );
 				
 				expect( textField.focus() ).toBe( textField );
-					
+				
 				textField.destroy();  // clean up
 			} );
 			
