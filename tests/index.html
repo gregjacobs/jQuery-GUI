@@ -1,21 +1,21 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-  "http://www.w3.org/TR/html4/loose.dtd">
+	"http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-  <title>jQuery-GUI Tests</title>
+	<title>jQuery-GUI Tests</title>
 
-  <link rel="stylesheet" type="text/css" href="../bower_components/jasmine/lib/jasmine-core/jasmine.css">
-  <script type="text/javascript" src="../bower_components/jasmine/lib/jasmine-core/jasmine.js"></script>
-  <script type="text/javascript" src="../bower_components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+	<link rel="stylesheet" type="text/css" href="../bower_components/jasmine/lib/jasmine-core/jasmine.css">
+	<script type="text/javascript" src="../bower_components/jasmine/lib/jasmine-core/jasmine.js"></script>
+	<script type="text/javascript" src="../bower_components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
 
-  <script type="text/javascript" src="../vendor/jsmockito/JsHamcrest.js"></script>
-  <script type="text/javascript" src="../vendor/jsmockito/JsMockito.js"></script>
+	<script type="text/javascript" src="../vendor/jsmockito/JsHamcrest.js"></script>
+	<script type="text/javascript" src="../vendor/jsmockito/JsMockito.js"></script>
 
-  <link rel="stylesheet" type="text/css" href="../dist/css/base/base.css">
-  
-  <script type="text/javascript" src="../bower_components/requirejs/require.js"></script>
-  <script type="text/javascript">
-  	require.config( {
+	<link rel="stylesheet" type="text/css" href="../dist/css/base/base.css">
+	
+	<script type="text/javascript" src="../bower_components/requirejs/require.js"></script>
+	<script type="text/javascript">
+		require.config( {
 			baseUrl : '../',
 
 			paths : {
@@ -33,76 +33,74 @@
 				// Specs
 				'spec' : 'tests/spec'
 			}
-  	} );
-  	
-  	
-    (function() {
-      var jasmineEnv = jasmine.getEnv();
-      jasmineEnv.updateInterval = 1000;
+		} );
+		
+		
+		(function() {
+			var jasmineEnv = jasmine.getEnv();
+			jasmineEnv.updateInterval = 1000;
 
-      var htmlReporter = new jasmine.HtmlReporter();
-      jasmineEnv.addReporter(htmlReporter);
-      jasmineEnv.specFilter = function(spec) {
-        return htmlReporter.specFilter(spec);
-      };
+			var htmlReporter = new jasmine.HtmlReporter();
+			jasmineEnv.addReporter(htmlReporter);
+			jasmineEnv.specFilter = function(spec) {
+				return htmlReporter.specFilter(spec);
+			};
 
-    	require(
-    		[
-    			'jquery',
-    			'spec/AnchorSpec',
-    			'spec/ComponentManagerSpec',
-    			'spec/ComponentSpec',
-    			'spec/ComponentQuerySpec',
-    			'spec/ContainerSpec',
-    			'spec/ImageSpec',
-    			'spec/LabelSpec',
-    			'spec/MaskSpec',
-    			'spec/ViewportSpec',
-    			'spec/app/ControllerSpec',
-    			'spec/app/EventBusSpec',
-    			'spec/anim/AnimationSpec',
-    			'spec/button/ButtonSpec',
-    			'spec/form/field/CheckboxSpec',
-    			'spec/form/field/DropdownSpec',
-    			'spec/form/field/FieldSpec',
-    			'spec/form/field/HiddenSpec',
-    			'spec/form/field/RadioSpec',
-    			'spec/form/field/TextSpec',
-    			'spec/form/field/TextAreaSpec',
-    			'spec/layout/CardSpec',
-    			'spec/layout/FitSpec',
-    			'spec/layout/LayoutSpec',
-    			'spec/layout/HBoxSpec',
-    			'spec/layout/VBoxSpec',
-    			'spec/panel/PanelSpec',
-    			'spec/plugin/PluginSpec',
-    			'spec/tab/BarSpec',
-    			'spec/tab/PanelSpec',
-    			'spec/template/LoDashSpec',
-    			'spec/view/CollectionSpec',
-    			'spec/view/ModelSpec',
-    			'spec/window/WindowSpec',
-    			'spec/util/CollectionBindableSpec',
-    			'spec/util/CssSpec',
-    			'spec/util/HtmlSpec',
-    			'spec/util/ModelBindableSpec',
-    			'spec/util/OptionsStoreSpec'
-    		], 
-    		function( $ ) {
-    			$( document ).ready( function() {
-    				jasmineEnv.execute();
-    			} );
-    	} );
+			require( [
+				'jquery',
+				'spec/AnchorSpec',
+				'spec/ComponentManagerSpec',
+				'spec/ComponentSpec',
+				'spec/ComponentQuerySpec',
+				'spec/ContainerSpec',
+				'spec/ImageSpec',
+				'spec/LabelSpec',
+				'spec/MaskSpec',
+				'spec/ViewportSpec',
+				'spec/app/ControllerSpec',
+				'spec/app/EventBusSpec',
+				'spec/anim/AnimationSpec',
+				'spec/button/ButtonSpec',
+				'spec/form/field/CheckboxSpec',
+				'spec/form/field/DropdownSpec',
+				'spec/form/field/FieldSpec',
+				'spec/form/field/HiddenSpec',
+				'spec/form/field/RadioSpec',
+				'spec/form/field/TextSpec',
+				'spec/form/field/TextAreaSpec',
+				'spec/layout/CardSpec',
+				'spec/layout/FitSpec',
+				'spec/layout/LayoutSpec',
+				'spec/layout/HBoxSpec',
+				'spec/layout/VBoxSpec',
+				'spec/panel/PanelSpec',
+				'spec/plugin/PluginSpec',
+				'spec/tab/BarSpec',
+				'spec/tab/PanelSpec',
+				'spec/template/LoDashSpec',
+				'spec/view/CollectionSpec',
+				'spec/view/ModelSpec',
+				'spec/window/WindowSpec',
+				'spec/util/CollectionBindableSpec',
+				'spec/util/CssSpec',
+				'spec/util/HtmlSpec',
+				'spec/util/ModelBindableSpec',
+				'spec/util/OptionsStoreSpec'
+			], function( $ ) {
+				$( document ).ready( function() {
+					jasmineEnv.execute();
+				} );
+			} );
 
-    })();
-  </script>
-  
-  
-  <style>
-  	.visual-tests { text-align: right; padding-right: 10px; }
-  	.visual-tests a { text-decoration: none; }
-  	.visual-tests a:hover { text-decoration: underline; }
-  </style>
+		} )();
+	</script>
+	
+	
+	<style>
+		.visual-tests { text-align: right; padding-right: 10px; }
+		.visual-tests a { text-decoration: none; }
+		.visual-tests a:hover { text-decoration: underline; }
+	</style>
 
 </head>
 
