@@ -252,8 +252,15 @@ define( [
 		 * @protected
 		 * @property {Boolean} eventBusSubscribed
 		 * 
-		 * Flag which is set to true once this controller has subscribed to the {@link gui.app.EventBus}, to listen for all
-		 * {@link gui.Component} events.
+		 * Flag which is set to `true` once this controller has subscribed to the {@link gui.app.EventBus}, to listen for all
+		 * {@link gui.Component} events. This is done in the {@link #listen} method.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {Boolean} destroyed
+		 * 
+		 * Set to `true` if the Controller has been destroyed.
 		 */
 		
 		
@@ -452,8 +459,10 @@ define( [
 		 *   which map event names to handler functions. See the description of this method for details.
 		 */
 		listen : function( selectors ) {
-			if( !this.eventBusSubscribed )
+			if( !this.eventBusSubscribed ) {
 				EventBus.subscribe( this.onComponentEvent, this );
+				this.eventBusSubscribed = true;
+			}
 			
 			var listeners = this.listeners;
 			
@@ -519,13 +528,17 @@ define( [
 		 * should call the superclass method at the end of their subclass-specific processing.
 		 */
 		destroy : function() {
-			this.onDestroy();
-			
-			this.fireEvent( 'destroy', this );
-			this.purgeListeners();  // Note: purgeListeners() must be called after 'destroy' event has fired!
-			
-			if( this.eventBusSubscribed )
-				EventBus.unsubscribe( this.onComponentEvent, this );
+			if( !this.destroyed ) {
+				this.onDestroy();
+				
+				this.destroyed = true;
+				
+				this.fireEvent( 'destroy', this );
+				this.purgeListeners();  // Note: purgeListeners() must be called after 'destroy' event has fired!
+				
+				if( this.eventBusSubscribed )
+					EventBus.unsubscribe( this.onComponentEvent, this );
+			}
 		},
 		
 		

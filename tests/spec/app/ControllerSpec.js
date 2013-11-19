@@ -4,11 +4,12 @@ define( [
 	'lodash',
 	'gui/ComponentQuery',
 	'gui/app/Controller',
+	'gui/app/EventBus',
 	
 	'gui/Component',     // type: 'component'
 	'gui/Container',     // type: 'container'
 	'gui/panel/Panel'    // type: 'panel'
-], function( _, ComponentQuery, Controller, Component, Container, Panel ) {
+], function( _, ComponentQuery, Controller, EventBus, Component, Container, Panel ) {
 	
 	describe( 'gui.app.Controller', function() {
 		
@@ -348,6 +349,8 @@ define( [
 			beforeEach( function() {
 				view = new Container();
 				controller = new Controller( { view: view } );
+				
+				spyOn( EventBus, 'subscribe' ).andCallThrough();
 			} );
 			
 			afterEach( function() {
@@ -385,6 +388,43 @@ define( [
 						{ selector: 'component', handlerFn: doSomethingElseHandler }
 					]
 				} );
+			} );
+			
+			
+			it( "should only subscribe to the EventBus once, even if listen() is called multiple times", function() {
+				expect( EventBus.subscribe ).not.toHaveBeenCalled();  // initial condition
+
+				controller.listen( {
+					'component' : { 'dosomething': function() {} }
+				} );
+				expect( EventBus.subscribe.calls.length ).toBe( 1 );
+
+				controller.listen( {
+					'component' : { 'dosomethingelse': function() {} }
+				} );
+				expect( EventBus.subscribe.calls.length ).toBe( 1 );  // should still be 1
+			} );
+			
+			
+			it( "should subscribe events from multiple calls to the method", function() {
+				var component = new Component(),
+				    dosomethingCallCount = 0,
+				    dosomethingelseCallCount = 0;
+				
+				view.add( component );
+				
+				controller.listen( {
+					'component' : { 'dosomething': function() { dosomethingCallCount++; } }
+				} );
+				controller.listen( {
+					'component' : { 'dosomethingelse': function() { dosomethingelseCallCount++; } }
+				} );
+
+				component.fireEvent( 'dosomething' );
+				component.fireEvent( 'dosomethingelse' );
+				
+				expect( dosomethingCallCount ).toBe( 1 );
+				expect( dosomethingelseCallCount ).toBe( 1 );
 			} );
 			
 		} );
@@ -541,6 +581,64 @@ define( [
 				// Simulate 'click' event on the random "other" component
 				randomOtherComponent.fireEvent( 'click' );
 				expect( componentClickCount ).toBe( 2 );  // should not have changed; `randomOtherComponent` is not a component in the scope of the Controller's `view`
+			} );
+			
+		} );
+		
+		
+		
+		describe( 'destroy()', function() {
+			var view,
+			    controller;
+			
+			beforeEach( function() {
+				view = new Container();
+				controller = new Controller( { view: view } );
+
+				spyOn( EventBus, 'subscribe' ).andCallThrough();
+				spyOn( EventBus, 'unsubscribe' ).andCallThrough();
+			} );
+			
+			afterEach( function() {
+				view.destroy();
+				controller.destroy();
+			} );
+			
+			
+			it( "should only be able to be called once", function() {
+				var onDestroyCallCount = 0;
+				spyOn( controller, 'onDestroy' ).andCallFake( function() { onDestroyCallCount++; } );
+				
+				controller.destroy();
+				expect( onDestroyCallCount ).toBe( 1 );
+				
+				// Now try again
+				controller.destroy();
+				expect( onDestroyCallCount ).toBe( 1 );  // should still be 1
+			} );
+			
+			
+			it( "should unsubscribe from the EventBus if the EventBus has been subscribed to (from listen())", function() {
+				expect( EventBus.subscribe ).not.toHaveBeenCalled();    // initial condition
+				expect( EventBus.unsubscribe ).not.toHaveBeenCalled();  // initial condition
+
+				controller.listen( { 'component' : { 'dosomething': function() {} } } );
+				expect( EventBus.subscribe.calls.length ).toBe( 1 );
+				expect( EventBus.unsubscribe ).not.toHaveBeenCalled();
+				
+				controller.destroy();
+				expect( EventBus.subscribe.calls.length ).toBe( 1 );  // this should still only be 1
+				expect( EventBus.unsubscribe.calls.length ).toBe( 1 );
+			} );
+			
+			
+			it( "should not call EventBus.unsubscribe() if the EventBus has not been subscribed to (i.e. no calls to listen())", function() {
+				expect( EventBus.subscribe ).not.toHaveBeenCalled();    // initial condition
+				expect( EventBus.unsubscribe ).not.toHaveBeenCalled();  // initial condition
+
+				controller.destroy();
+				expect( EventBus.subscribe ).not.toHaveBeenCalled();
+				expect( EventBus.unsubscribe ).not.toHaveBeenCalled();
 			} );
 			
 		} );
