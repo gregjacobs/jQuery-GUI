@@ -16,6 +16,7 @@ define( [
 				{ name : 'lastName',  type: 'string' }
 			]
 		} );
+		var TestModel = UserModel;
 		
 		// A properly-configured Model View which is used to test functionality
 		var ConfiguredModelView = ModelView.extend( {
@@ -89,6 +90,183 @@ define( [
 					expect( modelView.getEl().html() ).toBe( "<div>Smith, John</div>" );
 					
 					modelView.destroy();  // clean up
+				} );
+				
+			} );
+			
+			
+			describe( "`maskOnLoad` config", function() {
+				var model,
+				    modelView;
+				
+				beforeEach( function() {
+					model = new TestModel();
+				} );
+				
+				afterEach( function() {
+					modelView.destroy();  // note: modelView is instantiated in each test
+				} );
+				
+				
+				
+				it( "when set to `true`, should mask the ModelView when the model starts loading, and unmask it when finished", function() {
+					modelView = new ConfiguredModelView( {
+						model : model,
+						maskOnLoad: true
+					} );
+					
+					expect( modelView.isMasked() ).toBe( false );
+					
+					// Now start loading
+					spyOn( model, 'isLoading' ).andReturn( true );
+					model.fireEvent( 'loadbegin', model );
+					
+					expect( modelView.isMasked() ).toBe( true );
+					
+					
+					// Now finish loading
+					model.isLoading.andReturn( false );
+					model.fireEvent( 'load', model );
+					
+					expect( modelView.isMasked() ).toBe( false );
+				} );
+				
+				
+				it( "when set to `false`, should *not* mask the ModelView when the model starts loading", function() {
+					modelView = new ConfiguredModelView( {
+						model : model,
+						maskOnLoad: false
+					} );
+					
+					expect( modelView.isMasked() ).toBe( false );
+					
+					// Now start loading
+					spyOn( model, 'isLoading' ).andReturn( true );
+					model.fireEvent( 'loadbegin', model );
+					
+					expect( modelView.isMasked() ).toBe( false );
+					
+					
+					// Now finish loading - just double checking no errors, and that it is still unmasked
+					model.isLoading.andReturn( false );
+					model.fireEvent( 'load', model );
+					
+					expect( modelView.isMasked() ).toBe( false );
+				} );
+				
+				
+				it( "when set to `true`, should cause the ModelView to be instantiated and render with the mask shown if the model has started loading before the ModelView is instantiated", function() {
+					// "Start" loading
+					spyOn( model, 'isLoading' ).andReturn( true );
+					model.fireEvent( 'loadbegin', model );  // no need for this here, but keeping just to be clear
+					
+					modelView = new ConfiguredModelView( {
+						model : model,
+						maskOnLoad: true
+					} );
+					
+					expect( modelView.isMasked() ).toBe( true );
+					
+					// Render, and check again
+					modelView.render( 'body' );
+					expect( modelView.isMasked() ).toBe( true );
+				} );
+				
+				
+				it( "when set to `false`, should *not* cause the ModelView to be instantiated and render with the mask shown if the model has started loading before the ModelView is instantiated", function() {
+					// "Start" loading
+					spyOn( model, 'isLoading' ).andReturn( true );
+					model.fireEvent( 'loadbegin', model );  // no need for this here, but keeping just to be clear
+					
+					modelView = new ConfiguredModelView( {
+						model : model,
+						maskOnLoad: false
+					} );
+					
+					expect( modelView.isMasked() ).toBe( false );
+					
+					// Render, and check again
+					modelView.render( 'body' );
+					expect( modelView.isMasked() ).toBe( false );
+				} );
+				
+				
+				it( "when set to `true`, should cause the ModelView to show the mask if an already-loading model is bound to it", function() {
+					modelView = new ConfiguredModelView( {
+						maskOnLoad: true
+					} );
+					expect( modelView.isMasked() ).toBe( false );  // initial condition
+					
+					
+					spyOn( model, 'isLoading' ).andReturn( true );  // pretend it's loading
+					modelView.bindModel( model );
+					
+					expect( modelView.isMasked() ).toBe( true ); 
+				} );
+				
+				
+				it( "when set to `true`, should cause the ModelView to hide the mask if unbinding an already-loading model, while binding a new, non-loading model", function() {
+					spyOn( model, 'isLoading' ).andReturn( true );
+					
+					modelView = new ConfiguredModelView( {
+						model : model,  // this model is already loading
+						maskOnLoad: true
+					} );
+					expect( modelView.isMasked() ).toBe( true );  // initial condition - due to the model already loading
+					
+					
+					var model2 = new TestModel();
+					spyOn( model2, 'isLoading' ).andReturn( false );  // this one is *not* loading
+					modelView.bindModel( model2 );
+					
+					expect( modelView.isMasked() ).toBe( false ); // no longer masked, since new model is *not* loading 
+				} );
+				
+				
+				it( "when set to `true`, should cause the ModelView to hide the mask if unbinding an already-loading model, when not binding any new model", function() {
+					spyOn( model, 'isLoading' ).andReturn( true );
+					
+					modelView = new ConfiguredModelView( {
+						model : model,  // this model is already loading
+						maskOnLoad: true
+					} );
+					expect( modelView.isMasked() ).toBe( true );  // initial condition - due to the model already loading
+					
+					
+					// Unbind the current series model
+					modelView.bindModel( null );
+					expect( modelView.isMasked() ).toBe( false ); // no longer masked, since there is no new model 
+				} );
+				
+				
+				it( "when set to `false`, shouldn't change the masked state of the ModelView when binding a model that is loading", function() {
+					modelView = new ConfiguredModelView( {
+						maskOnLoad: false
+					} );
+					expect( modelView.isMasked() ).toBe( false );  // initial condition
+					
+					
+					// Bind a loading series model
+					spyOn( model, 'isLoading' ).andReturn( true );
+					modelView.bindModel( model );
+					
+					expect( modelView.isMasked() ).toBe( false ); // should still not be masked, since `maskOnLoad` is false 
+				} );
+				
+				
+				it( "when set to `false`, shouldn't change the masked state of the ModelView when binding a model that is not loading, even if the ModelView has been manually masked", function() {
+					modelView = new ConfiguredModelView( {
+						maskOnLoad: false
+					} );
+					modelView.mask( { msg: "Loading..." } );      // *** manually mask the ModelView ***
+					expect( modelView.isMasked() ).toBe( true );  // initial condition
+					
+					
+					// Bind a series model that is *not* loading
+					spyOn( model, 'isLoading' ).andReturn( false );
+					modelView.bindModel( model );
+					
+					expect( modelView.isMasked() ).toBe( true ); // should still be masked, since `maskOnLoad` is false. The mask which was manually applied in this case should not be touched.
 				} );
 				
 			} );

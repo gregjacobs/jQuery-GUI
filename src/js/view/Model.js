@@ -111,29 +111,15 @@ define( [
 			if( !this.tpl ) throw new Error( "`tpl` config required" );
 			// </debug>
 			
+			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
+			// while the model is loading.
+			this.maskConfig = this.maskConfig || { spinner: true, msg: "Loading..." };
+			
 			if( this.model ) {
 				this.bindModel( this.model );
 			} else {
 				this.refresh();  // do an initial refresh if no model, which simply sets up the ModelView to not show anything (and not run the template, since we don't have a model to run it with)
 			}
-			
-			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
-			// while the model is loading.
-			this.maskConfig = this.maskConfig || { spinner: true, msg: "Loading..." };
-		},
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		onAfterRender : function() {
-			this._super( arguments );
-			
-			// Mask the view if the Model is currently loading when the view is rendered
-			/*var model = this.model;
-			if( model && this.maskOnLoad && model.isLoading() ) {
-				this.mask();
-			}*/
 		},
 		
 		
@@ -167,12 +153,18 @@ define( [
 		 * bound to the view.
 		 * 
 		 * @protected
-		 * @param {data.Model} model The newly bound model. Will be `null` if the previous model was
+		 * @param {data.Model} newModel The newly bound model. Will be `null` if the previous model was
 		 *   simply unbound (i.e. `null` was passed to {@link #bindModel}, or {@link #unbindModel} was called). 
 		 * @param {data.Model} oldModel The model that was just unbound. Will be `null` if there was no
 		 *   previously-bound model.
 		 */
-		onModelBind : function( model ) {
+		onModelBind : function( newModel ) {
+			// Handle `maskOnLoad` behavior for the new bind. If the "new" model is loading, mask.
+			// Otherwise, make sure the ModelView is unmasked.
+			if( this.maskOnLoad ) {
+				this[ newModel && newModel.isLoading() ? 'mask' : 'unMask' ]();
+			}
+			
 			this.refresh();
 		},
 		
