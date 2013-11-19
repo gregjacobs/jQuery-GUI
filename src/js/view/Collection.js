@@ -194,16 +194,16 @@ define( [
 			if( !this.modelSelector ) throw new Error( "`modelSelector` config required" );
 			// </debug>
 			
+			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
+			// while the collection is loading.
+			this.maskConfig = this.maskConfig || { spinner: true, msg: "Loading..." };
+			
 			this.modelElCache = {};
 			if( this.collection ) {
 				this.bindCollection( this.collection );
 			} else {
 				this.refresh();  // do an initial refresh if no collection, which simply sets up the CollectionView to not show anything (and not run the template, since we don't have models to run it with)
 			}
-			
-			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
-			// while the collection is loading.
-			this.maskConfig = this.maskConfig || { spinner: true, msg: "Loading..." };
 		},
 		
 		
@@ -217,10 +217,9 @@ define( [
 			if( collection ) {
 				this.collectModelElements( this.collectModels() );  // need to determine the initial set of models that were rendered (if any)
 				
-				// Mask the view if the Collection is currently loading when the view is rendered
+				// Apply the loading height if the Collection is currently loading when the view is rendered (and the CollectionView is supposed to be masked on load)
 				if( this.maskOnLoad && collection.isLoading() ) {
 					this.applyLoadingHeight();
-					this.mask();
 				}
 			}
 		},
@@ -257,12 +256,18 @@ define( [
 		 * bound to the view.
 		 * 
 		 * @protected
-		 * @param {data.Collection} collection The newly bound collection. Will be `null` if the previous collection was
+		 * @param {data.Collection} newCollection The newly bound collection. Will be `null` if the previous collection was
 		 *   simply unbound (i.e. `null` was passed to {@link #bindCollection}, or {@link #unbindCollection} was called). 
 		 * @param {data.Collection} oldCollection The collection that was just unbound. Will be `null` if there was no
 		 *   previously-bound collection.
 		 */
-		onCollectionBind : function( collection ) {
+		onCollectionBind : function( newCollection, oldCollection ) {
+			// Handle `maskOnLoad` behavior for the new bind. If the "new" collection is loading, mask.
+			// Otherwise, make sure the CollectionView is unmasked.
+			if( this.maskOnLoad ) {
+				this[ newCollection && newCollection.isLoading() ? 'mask' : 'unMask' ]();
+			}
+			
 			this.refresh();
 		},
 		
@@ -277,10 +282,9 @@ define( [
 		 * @protected
 		 */
 		onLoadBegin : function() {
-			if( this.maskOnLoad && this.rendered ) {
-				this.applyLoadingHeight();
-				
+			if( this.maskOnLoad ) {
 				this.mask();
+				this.applyLoadingHeight();
 			}
 		},
 		
@@ -295,9 +299,8 @@ define( [
 		 * @protected
 		 */
 		onLoadComplete : function() {
-			if( this.maskOnLoad && this.rendered ) {
+			if( this.maskOnLoad ) {
 				this.unMask();
-				
 				this.removeLoadingHeight();
 			}
 		},
@@ -313,12 +316,14 @@ define( [
 		 * @protected
 		 */
 		applyLoadingHeight : function() {
-			var loadingHeight = this.loadingHeight,
-			    $el = this.$el;
-			
-			if( loadingHeight > this.getHeight() ) {
-				this.hasLoadingHeight = true;
-				$el.css( 'min-height', loadingHeight + 'px' );
+			if( this.rendered ) {
+				var loadingHeight = this.loadingHeight,
+				    $el = this.$el;
+				
+				if( loadingHeight > this.getHeight() ) {
+					this.hasLoadingHeight = true;
+					$el.css( 'min-height', loadingHeight + 'px' );
+				}
 			}
 		},
 		

@@ -22,12 +22,12 @@ define( [
 		var ConfiguredCollectionView = CollectionView.extend( {
 			tpl : new LoDashTpl( [
 				'<% _.forEach( models, function( model, idx ) { %>',
-					'<div>',
+					'<div data-elem="modelDiv">',
 						'<%= model.get( "lastName" ) %>, <%= model.get( "firstName" ) %>',
 					'</div>',
 				'<% } ) %>'
 			] ),
-			modelSelector : 'div'
+			modelSelector : 'div[data-elem="modelDiv"]'
 		} );
 		
 		
@@ -127,6 +127,183 @@ define( [
 			} );
 			
 			
+			describe( "`maskOnLoad` config", function() {
+				var collection,
+				    collectionView;
+				
+				beforeEach( function() {
+					collection = new Collection();
+				} );
+				
+				afterEach( function() {
+					collectionView.destroy();  // note: collectionView is instantiated in each test
+				} );
+				
+				
+				
+				it( "when set to `true`, should mask the CollectionView when the collection starts loading, and unmask it when finished", function() {
+					collectionView = new ConfiguredCollectionView( {
+						collection : collection,
+						maskOnLoad: true
+					} );
+					
+					expect( collectionView.isMasked() ).toBe( false );
+					
+					// Now start loading
+					spyOn( collection, 'isLoading' ).andReturn( true );
+					collection.fireEvent( 'loadbegin', collection );
+					
+					expect( collectionView.isMasked() ).toBe( true );
+					
+					
+					// Now finish loading
+					collection.isLoading.andReturn( false );
+					collection.fireEvent( 'load', collection );
+					
+					expect( collectionView.isMasked() ).toBe( false );
+				} );
+				
+				
+				it( "when set to `false`, should *not* mask the CollectionView when the collection starts loading", function() {
+					collectionView = new ConfiguredCollectionView( {
+						collection : collection,
+						maskOnLoad: false
+					} );
+					
+					expect( collectionView.isMasked() ).toBe( false );
+					
+					// Now start loading
+					spyOn( collection, 'isLoading' ).andReturn( true );
+					collection.fireEvent( 'loadbegin', collection );
+					
+					expect( collectionView.isMasked() ).toBe( false );
+					
+					
+					// Now finish loading - just double checking no errors, and that it is still unmasked
+					collection.isLoading.andReturn( false );
+					collection.fireEvent( 'load', collection );
+					
+					expect( collectionView.isMasked() ).toBe( false );
+				} );
+				
+				
+				it( "when set to `true`, should cause the CollectionView to be instantiated and render with the mask shown if the collection has started loading before the CollectionView is instantiated", function() {
+					// "Start" loading
+					spyOn( collection, 'isLoading' ).andReturn( true );
+					collection.fireEvent( 'loadbegin', collection );  // no need for this here, but keeping just to be clear
+					
+					collectionView = new ConfiguredCollectionView( {
+						collection : collection,
+						maskOnLoad: true
+					} );
+					
+					expect( collectionView.isMasked() ).toBe( true );
+					
+					// Render, and check again
+					collectionView.render( 'body' );
+					expect( collectionView.isMasked() ).toBe( true );
+				} );
+				
+				
+				it( "when set to `false`, should *not* cause the CollectionView to be instantiated and render with the mask shown if the collection has started loading before the CollectionView is instantiated", function() {
+					// "Start" loading
+					spyOn( collection, 'isLoading' ).andReturn( true );
+					collection.fireEvent( 'loadbegin', collection );  // no need for this here, but keeping just to be clear
+					
+					collectionView = new ConfiguredCollectionView( {
+						collection : collection,
+						maskOnLoad: false
+					} );
+					
+					expect( collectionView.isMasked() ).toBe( false );
+					
+					// Render, and check again
+					collectionView.render( 'body' );
+					expect( collectionView.isMasked() ).toBe( false );
+				} );
+				
+				
+				it( "when set to `true`, should cause the CollectionView to show the mask if an already-loading collection is bound to it", function() {
+					collectionView = new ConfiguredCollectionView( {
+						maskOnLoad: true
+					} );
+					expect( collectionView.isMasked() ).toBe( false );  // initial condition
+					
+					
+					spyOn( collection, 'isLoading' ).andReturn( true );  // pretend it's loading
+					collectionView.bindCollection( collection );
+					
+					expect( collectionView.isMasked() ).toBe( true ); 
+				} );
+				
+				
+				it( "when set to `true`, should cause the CollectionView to hide the mask if unbinding an already-loading collection, while binding a new, non-loading collection", function() {
+					spyOn( collection, 'isLoading' ).andReturn( true );
+					
+					collectionView = new ConfiguredCollectionView( {
+						collection : collection,  // this collection is already loading
+						maskOnLoad: true
+					} );
+					expect( collectionView.isMasked() ).toBe( true );  // initial condition - due to the collection already loading
+					
+					
+					var collection2 = new Collection();
+					spyOn( collection2, 'isLoading' ).andReturn( false );  // this one is *not* loading
+					collectionView.bindCollection( collection2 );
+					
+					expect( collectionView.isMasked() ).toBe( false ); // no longer masked, since new collection is *not* loading 
+				} );
+				
+				
+				it( "when set to `true`, should cause the CollectionView to hide the mask if unbinding an already-loading collection, when not binding any new collection", function() {
+					spyOn( collection, 'isLoading' ).andReturn( true );
+					
+					collectionView = new ConfiguredCollectionView( {
+						collection : collection,  // this collection is already loading
+						maskOnLoad: true
+					} );
+					expect( collectionView.isMasked() ).toBe( true );  // initial condition - due to the collection already loading
+					
+					
+					// Unbind the current series collection
+					collectionView.bindCollection( null );
+					expect( collectionView.isMasked() ).toBe( false ); // no longer masked, since there is no new collection 
+				} );
+				
+				
+				it( "when set to `false`, shouldn't change the masked state of the CollectionView when binding a collection that is loading", function() {
+					collectionView = new ConfiguredCollectionView( {
+						maskOnLoad: false
+					} );
+					expect( collectionView.isMasked() ).toBe( false );  // initial condition
+					
+					
+					// Bind a loading series collection
+					spyOn( collection, 'isLoading' ).andReturn( true );
+					collectionView.bindCollection( collection );
+					
+					expect( collectionView.isMasked() ).toBe( false ); // should still not be masked, since `maskOnLoad` is false 
+				} );
+				
+				
+				it( "when set to `false`, shouldn't change the masked state of the CollectionView when binding a collection that is not loading, even if the CollectionView has been manually masked", function() {
+					collectionView = new ConfiguredCollectionView( {
+						maskOnLoad: false
+					} );
+					collectionView.mask( { msg: "Loading..." } );      // *** manually mask the CollectionView ***
+					expect( collectionView.isMasked() ).toBe( true );  // initial condition
+					
+					
+					// Bind a series collection that is *not* loading
+					spyOn( collection, 'isLoading' ).andReturn( false );
+					collectionView.bindCollection( collection );
+					
+					expect( collectionView.isMasked() ).toBe( true ); // should still be masked, since `maskOnLoad` is false. The mask which was manually applied in this case should not be touched.
+				} );
+				
+			} );
+			
+			
 			describe( "`loadingHeight` config", function() {
 				var collection,
 				    collectionView;
@@ -162,7 +339,7 @@ define( [
 					
 					// Now start loading
 					spyOn( collection, 'isLoading' ).andReturn( true );
-					collection.fireEvent( 'loadBegin', collection );
+					collection.fireEvent( 'loadbegin', collection );
 					
 					expect( collectionView.getHeight() ).toBe( 0 );  // still 0 - no loading height applied
 				} );
@@ -187,7 +364,7 @@ define( [
 					
 					// Now start loading
 					spyOn( collection, 'isLoading' ).andReturn( true );
-					collection.fireEvent( 'loadBegin', collection );
+					collection.fireEvent( 'loadbegin', collection );
 					
 					expect( collectionView.getHeight() ).toBe( 100 );
 					
@@ -207,7 +384,7 @@ define( [
 					
 					// Now start loading
 					spyOn( collection, 'isLoading' ).andReturn( true );
-					collection.fireEvent( 'loadBegin', collection );
+					collection.fireEvent( 'loadbegin', collection );
 					
 					expect( collectionView.getHeight() ).toBe( 100 );  // the loading height
 					
