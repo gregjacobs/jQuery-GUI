@@ -13,7 +13,7 @@ function( Panel ) {
 				
 				panel.render( 'body' );
 				
-				panel.destroy();
+				panel.destroy();  // clean up
 			} );
 			
 		} );
@@ -30,6 +30,8 @@ function( Panel ) {
 					panel.render( 'body' );  // render to the document body
 					
 					expect( panel.$bodyEl.hasClass( 'myBodyClass' ) ).toBe( true );
+					
+					panel.destroy();  // clean up
 				} );
 				
 				it( "should add the given multiple CSS classes to the Panel's body element when provided", function() {
@@ -40,6 +42,8 @@ function( Panel ) {
 
 					expect( panel.$bodyEl.hasClass( 'myBodyClass1' ) ).toBe( true );
 					expect( panel.$bodyEl.hasClass( 'myBodyClass2' ) ).toBe( true );
+					
+					panel.destroy();  // clean up
 				} );
 				
 			} );
@@ -51,6 +55,8 @@ function( Panel ) {
 					panel.render( 'body' );  // render to the document body
 					
 					expect( panel.$bodyEl.attr( 'style' ) ).toBeUndefined();
+					
+					panel.destroy();  // clean up
 				} );
 				
 				it( "should add any styles to the Panel's body element when provided", function() {
@@ -62,6 +68,8 @@ function( Panel ) {
 					panel.render( 'body' );  // render to the document body
 					
 					expect( panel.$bodyEl.attr( 'style' ) ).toMatch( /^text-decoration:\s*underline;$/ );
+					
+					panel.destroy();  // clean up
 				} );
 				
 			} );
