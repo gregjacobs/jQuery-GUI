@@ -3,13 +3,13 @@ define( [
 	'jquery',
 	'lodash',
 	'gui/ComponentManager',
-	'gui/Component',
+	'gui/view/DataBound',
 	'gui/util/CollectionBindable'
-], function( jQuery, _, ComponentManager, Component, CollectionBindable ) {
+], function( jQuery, _, ComponentManager, DataBoundView, CollectionBindable ) {
 	
 	/**
 	 * @class gui.view.Collection
-	 * @extends gui.Component
+	 * @extends gui.view.DataBound
 	 * @mixins gui.util.CollectionBindable
 	 * @alias type.collectionview
 	 * 
@@ -21,7 +21,7 @@ define( [
 	 * This view is similar to the {@link gui.view.Model Model View}, but instead of showing a single {@link data.Model Model},
 	 * it shows a {@link data.Collection Collection} of them.
 	 */
-	var CollectionView = Component.extend( {
+	var CollectionView = DataBoundView.extend( {
 		mixins : [ CollectionBindable ],
 		
 		
@@ -190,13 +190,8 @@ define( [
 			this._super( arguments );
 			
 			// <debug>
-			if( !this.tpl ) throw new Error( "`tpl` config required" );
 			if( !this.modelSelector ) throw new Error( "`modelSelector` config required" );
 			// </debug>
-			
-			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
-			// while the collection is loading.
-			this.maskConfig = this.maskConfig || { spinner: true, msg: "Loading..." };
 			
 			this.modelElCache = {};
 			if( this.collection ) {
@@ -213,15 +208,30 @@ define( [
 		onAfterRender : function() {
 			this._super( arguments );
 			
-			var collection = this.collection;
-			if( collection ) {
+			if( this.collection ) {
 				this.collectModelElements( this.collectModels() );  // need to determine the initial set of models that were rendered (if any)
-				
-				// Apply the loading height if the Collection is currently loading when the view is rendered (and the CollectionView is supposed to be masked on load)
-				if( this.maskOnLoad && collection.isLoading() ) {
-					this.applyLoadingHeight();
-				}
 			}
+		},
+		
+		
+		/**
+		 * Implementation of abstract method from superclass. Returns the {@link #collection}, if one is bound.
+		 * 
+		 * @protected
+		 * @return {data.Collection} The bound {@link #collection}, or `null` if there is no collection bound.
+		 */
+		getDataComponent : function() {
+			return this.getCollection();
+		},
+		
+		
+		/**
+		 * Implementation of abstract method from superclass. Unbinds the {@link #collection} one is bound.
+		 * 
+		 * @protected
+		 */
+		unbindDataComponent : function() {
+			this.unbindCollection();
 		},
 		
 		
@@ -240,8 +250,8 @@ define( [
 		 */
 		getCollectionListeners : function( collection ) {
 			return {
-				'loadbegin' : this.onLoadBegin,
-				'load'      : this.onLoadComplete,
+				'loadbegin' : this.onLoadBegin,    // method in superclass
+				'load'      : this.onLoadComplete, // method in superclass
 				'addset'    : this.refresh,
 				'removeset' : this.refresh,
 				'reorder'   : this.refresh,
@@ -273,77 +283,6 @@ define( [
 		
 		
 		// -----------------------------------
-		
-		
-		/**
-		 * Handles the {@link #collection} starting to load, by displaying the "loading" mask over the Collection View
-		 * if the {@link #maskOnLoad} config is true.
-		 * 
-		 * @protected
-		 */
-		onLoadBegin : function() {
-			if( this.maskOnLoad ) {
-				this.mask();
-				this.applyLoadingHeight();
-			}
-		},
-		
-		
-		/**
-		 * Handles the {@link #collection} completing its load, by removing the "loading" mask from the Collection View,
-		 * which was shown by {@link #onLoadBegin} if the {@link #maskOnLoad} config was true.
-		 * 
-		 * Note: The view will be refreshed due to the addition/removal of models, and doesn't need to be refreshed
-		 * from this method.
-		 * 
-		 * @protected
-		 */
-		onLoadComplete : function() {
-			if( this.maskOnLoad ) {
-				this.unMask();
-				this.removeLoadingHeight();
-			}
-		},
-		
-		
-		/**
-		 * Applies the {@link #loadingHeight} to the CollectionView's {@link #$el element}, if the current height of the
-		 * CollectionView is less than the configured {@link #loadingHeight}. It also only applies the {@link #loadingHeight}
-		 * if the {@link #maskOnLoad} config is `true`.
-		 * 
-		 * This is called when the {@link #collection} is in its loading state.
-		 * 
-		 * @protected
-		 */
-		applyLoadingHeight : function() {
-			if( this.rendered ) {
-				var loadingHeight = this.loadingHeight,
-				    $el = this.$el;
-				
-				if( loadingHeight > this.getHeight() ) {
-					this.hasLoadingHeight = true;
-					$el.css( 'min-height', loadingHeight + 'px' );
-				}
-			}
-		},
-		
-		
-		/**
-		 * Removes the {@link #loadingHeight} from the CollectionView's {@link #$el element}, restoring any {@link #minHeight} that
-		 * the CollectionView has configured. This is only done if the {@link #loadingHeight} was applied in {@link #applyLoadingHeight}.
-		 * 
-		 * This is called when the {@link #collection} has finished loading.
-		 * 
-		 * @protected
-		 */
-		removeLoadingHeight : function() {
-			if( this.hasLoadingHeight ) {
-				var minHeight = ( this.minHeight ) ? this.minHeight + 'px' : '';
-				this.$el.css( 'min-height', minHeight );  // re-apply any configured `minHeight` to the component's element
-				
-				this.hasLoadingHeight = false;
-			}
-		},
 		
 		
 		/**
@@ -472,19 +411,6 @@ define( [
 		 */
 		getElementFromModel : function( model ) {
 			return ( !this.rendered ) ? null : this.modelElCache[ model.getClientId() ] || null;
-		},
-		
-		
-		// ---------------------------------------
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		onDestroy : function() {
-			this.unbindCollection();  // unbind any bound collection
-			
-			this._super( arguments );
 		}
 		
 	} );

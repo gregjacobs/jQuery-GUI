@@ -3,13 +3,13 @@ define( [
 	'jquery',
 	'lodash',
 	'gui/ComponentManager',
-	'gui/Component',
+	'gui/view/DataBound',
 	'gui/util/ModelBindable'
-], function( jQuery, _, ComponentManager, Component, ModelBindable ) {
+], function( jQuery, _, ComponentManager, DataBoundView, ModelBindable ) {
 	
 	/**
 	 * @class gui.view.Model
-	 * @extends gui.Component
+	 * @extends gui.view.DataBound
 	 * @mixins gui.util.ModelBindable
 	 * @alias type.modelview
 	 * 
@@ -20,7 +20,7 @@ define( [
 	 * This view is similar to the {@link gui.view.Collection Collection View}, which shows a {@link data.Collection Collection}
 	 * of {@link data.Model Models} instead of a single one.  
 	 */
-	var ModelView = Component.extend( {
+	var ModelView = DataBoundView.extend( {
 		mixins : [ ModelBindable ],
 		
 		/**
@@ -86,17 +86,6 @@ define( [
 		 */
 		modelVar : 'model',
 		
-		/**
-		 * @cfg {Boolean} maskOnLoad
-		 * 
-		 * True to automatically mask the Model View while the backing {@link #model} is loading. The mask that is shown
-		 * can be configured with the {@link #maskConfig} configuration option, or defaults to showing the message "Loading..."
-		 * 
-		 * This really only applies to a {@link data.Model Model} that is being {@link data.Model#method-load reloaded} from 
-		 * its backing data source (ex: a web server).
-		 */
-		maskOnLoad : true,
-		
 		
 		/**
 		 * @inheritdoc
@@ -107,19 +96,32 @@ define( [
 			
 			this._super( arguments );
 			
-			// <debug>
-			if( !this.tpl ) throw new Error( "`tpl` config required" );
-			// </debug>
-			
-			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
-			// while the model is loading.
-			this.maskConfig = this.maskConfig || { spinner: true, msg: "Loading..." };
-			
 			if( this.model ) {
 				this.bindModel( this.model );
 			} else {
 				this.refresh();  // do an initial refresh if no model, which simply sets up the ModelView to not show anything (and not run the template, since we don't have a model to run it with)
 			}
+		},
+		
+		
+		/**
+		 * Implementation of abstract method from superclass. Returns the {@link #model}, if one is bound.
+		 * 
+		 * @protected
+		 * @return {data.Model} The bound {@link #model}, or `null` if there is no model bound.
+		 */
+		getDataComponent : function() {
+			return this.getModel();
+		},
+		
+		
+		/**
+		 * Implementation of abstract method from superclass. Unbinds the {@link #model}, if one is bound.
+		 * 
+		 * @protected
+		 */
+		unbindDataComponent : function() {
+			this.unbindModel();
 		},
 		
 		
@@ -139,8 +141,8 @@ define( [
 		 */
 		getModelListeners : function( model ) {
 			return {
-				'loadbegin' : this.onLoadBegin,
-				'load'      : this.onLoadComplete,
+				'loadbegin' : this.onLoadBegin,    // method in superclass
+				'load'      : this.onLoadComplete, // method in superclass
 				'changeset' : this.refresh,
 				'rollback'  : this.refresh,
 				scope : this
@@ -170,35 +172,6 @@ define( [
 		
 		
 		// -----------------------------------
-		
-		
-		/**
-		 * Handles the {@link #model} starting to load, by displaying the "loading" mask over the Model View
-		 * if the {@link #maskOnLoad} config is true.
-		 * 
-		 * @protected
-		 */
-		onLoadBegin : function() {
-			if( this.maskOnLoad ) {
-				this.mask();
-			}
-		},
-		
-		
-		/**
-		 * Handles the {@link #model} completing its load, by removing the "loading" mask from the Model View,
-		 * which was shown by {@link #onLoadBegin} if the {@link #maskOnLoad} config was true.
-		 * 
-		 * Note: The view will be refreshed due to the addition/removal of models, and doesn't need to be refreshed
-		 * from this method.
-		 * 
-		 * @protected
-		 */
-		onLoadComplete : function() {
-			if( this.maskOnLoad ) {
-				this.unMask();
-			}
-		},
 		
 		
 		/**
@@ -233,19 +206,6 @@ define( [
 			data[ this.modelVar ] = model;
 			
 			return data;
-		},
-		
-		
-		// ---------------------------------------
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		onDestroy : function() {
-			this.unbindModel();
-			
-			this._super( arguments );
 		}
 		
 	} );

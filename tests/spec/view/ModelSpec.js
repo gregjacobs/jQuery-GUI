@@ -271,6 +271,101 @@ define( [
 				
 			} );
 			
+			
+			describe( "`loadingHeight` config", function() {
+				var model,
+				    modelView;
+				
+				beforeEach( function() {
+					model = new TestModel();
+					
+					modelView = new ModelView( {
+						model : model,
+						
+						maskOnLoad : true,
+						loadingHeight : 100,
+						
+						tpl: "<div></div>"
+					} );
+				} );
+				
+				afterEach( function() {
+					modelView.destroy();
+				} );
+				
+				
+				it( "should not apply any `loadingHeight` if it is not configured", function() {
+					// Make a new ModelView (not the one on the test level)
+					var modelView = new ModelView( {
+						renderTo : 'body',
+						model : model,
+						
+						maskOnLoad : true,
+						// loadingHeight : 100  -- not applying
+						
+						tpl: "<div></div>"
+					} );
+					expect( modelView.getHeight() ).toBe( 0 );  // initial condition
+					
+					// Now start loading
+					spyOn( model, 'isLoading' ).andReturn( true );
+					model.fireEvent( 'loadbegin', model );
+					
+					expect( modelView.getHeight() ).toBe( 0 );  // still 0 - no loading height applied
+				} );
+				
+				
+				it( "should apply the `loadingHeight` if the ModelView is first rendered while the `model` is loading", function() {
+					spyOn( model, 'isLoading' ).andReturn( true );
+					
+					modelView.render( 'body' );
+					expect( modelView.getHeight() ).toBe( 100 );
+					
+					// Now pretend loading is complete
+					model.isLoading.andReturn( false );
+					model.fireEvent( 'load', model );
+					expect( modelView.getHeight() ).toBe( 0 );  // no content
+				} );
+				
+				
+				it( "should apply the `loadingHeight` if the ModelView is currently rendered, and then the `model` starts loading", function() {
+					modelView.render( 'body' );
+					expect( modelView.getHeight() ).toBe( 0 );
+					
+					// Now start loading
+					spyOn( model, 'isLoading' ).andReturn( true );
+					model.fireEvent( 'loadbegin', model );
+					
+					expect( modelView.getHeight() ).toBe( 100 );
+					
+					// Now pretend loading is complete
+					model.isLoading.andReturn( false );
+					model.fireEvent( 'load', model );
+					expect( modelView.getHeight() ).toBe( 0 );  // no content
+				} );
+				
+				
+				it( "should re-apply the configured `minHeight` after loading is complete", function() {
+					var minHeight = 25;
+					
+					modelView.minHeight = minHeight;
+					modelView.render( 'body' );
+					expect( modelView.getHeight() ).toBe( minHeight );
+					
+					// Now start loading
+					spyOn( model, 'isLoading' ).andReturn( true );
+					model.fireEvent( 'loadbegin', model );
+					
+					expect( modelView.getHeight() ).toBe( 100 );  // the loading height
+					
+					// Now pretend loading is complete
+					model.isLoading.andReturn( false );
+					model.fireEvent( 'load', model );
+					expect( modelView.getHeight() ).toBe( minHeight );  // `minHeight` re-applied
+				} );
+				
+			} );
+			
 		} );
 		
 		
