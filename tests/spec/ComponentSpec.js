@@ -293,15 +293,16 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				} );
 				
 				
-				it( "the `renderTpl` should automatically be provided the following vars from the Component: `elId`, `baseCls`, `componentCls`", function() {
+				it( "the `renderTpl` should automatically be provided the following vars from the Component: `component`, `elId`, `baseCls`, `componentCls`", function() {
 					var TestComponent = Component.extend( {
 						baseCls : 'testCls',
 						componentCls : 'testCls2',
-						renderTpl : "Testing <%= elId %>, w/ baseCls: <%= baseCls %>, w/ componentCls: <%= componentCls %>"
+						testProp : "test",
+						renderTpl : "Testing <%= elId %>, w/ baseCls: <%= baseCls %>, w/ componentCls: <%= componentCls %>, and the component itself: <%= component.testProp %>"
 					} );
 					
 					var component = new TestComponent( { renderTo: 'body' } );
-					expect( component.getEl().html() ).toBe( "Testing " + component.elId + ", w/ baseCls: testCls, w/ componentCls: testCls2" );
+					expect( component.getEl().html() ).toBe( "Testing " + component.elId + ", w/ baseCls: testCls, w/ componentCls: testCls2, and the component itself: test" );
 					
 					component.destroy();  // clean up
 				} );
@@ -354,28 +355,35 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			
 			describe( "content rendering (`tpl`, `html`, and `contentEl` configs)", function() {
 				
-				it( "should render a `tpl` into the component's element with an empty object for the data if no `tplData` config is provided", function() {
-					var component = new Component( {
-						tpl : "<span>Testing 123</span>"
+				it( "the `tpl` should automatically be provided the following vars from the Component: `component`, `elId`, `baseCls`, `componentCls`", function() {
+					var TestComponent = Component.extend( {
+						baseCls : 'testCls',
+						componentCls : 'testCls2',
+						testProp : "test",
+						tpl : "Testing <%= elId %>, baseCls: <%= baseCls %>, componentCls: <%= componentCls %>, component itself: <%= component.testProp %>"
 					} );
 					
-					component.render( 'body' );
-					expect( component.getEl().html() ).toMatch( "<span>Testing 123</span>" );
+					var component = new TestComponent( { renderTo: 'body' } );
+					expect( component.getEl().html() ).toBe( "Testing " + component.elId + ", baseCls: testCls, componentCls: testCls2, component itself: test" );
 					
 					component.destroy();  // clean up
 				} );
 				
 				
-				it( "should render a `tpl` into the component's element using any provided `tplData`", function() {
+				it( "should render a `tpl` into the component's element using any provided `tplData` (along with the default set of tpl variables)", function() {
 					var component = new Component( {
-						tpl : "<span>Testing <%= num %></span>",
+						baseCls : 'testCls',
+						componentCls : 'testCls2',
+						testProp : "test",
+						
+						tpl : "<span>Testing <%= num %></span>. elId: <%= elId %>, baseCls: <%= baseCls %>, componentCls: <%= componentCls %>, component itself: <%= component.testProp %>",
 						tplData : {
 							num: 123
 						}
 					} );
 					
 					component.render( 'body' );
-					expect( component.getEl().html() ).toMatch( "<span>Testing 123</span>" );
+					expect( component.getEl().html() ).toMatch( "<span>Testing 123</span>. elId: " + component.elId + ", baseCls: testCls, componentCls: testCls2, component itself: test" );
 					
 					component.destroy();  // clean up
 				} );
@@ -492,11 +500,13 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			
 			beforeEach( function() {
 				component = new Component( {
-					tpl  : "Hello, <%= thing %>",
+					tpl  : "Hello, <%= thing %>. Component: <%= component.name %>",  // using `component` to make sure the default set of variables are provided to the template
 					tplData : { thing: "Town" },
 					
 					html : "html_config",
-					contentEl : jQuery( '<span>contentEl_config</span>' )
+					contentEl : jQuery( '<span>contentEl_config</span>' ),
+					
+					name : "myComponent"  // a custom config just to test that the variable `component` is passed to the `tpl`
 				} );	
 			} );
 			
@@ -514,7 +524,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				component.render( 'body' );  // render after
 				
 				var componentHtml = component.getEl().html();
-				expect( componentHtml ).toMatch( "Hello, World" );
+				expect( componentHtml ).toMatch( "Hello, World. Component: myComponent" );
 				expect( componentHtml ).not.toMatch( "html_config" );
 				expect( componentHtml ).not.toMatch( "contentEl_config" );
 			} );
@@ -527,7 +537,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				} );
 				
 				var componentHtml = component.getEl().html();
-				expect( componentHtml ).toMatch( "Hello, World" );
+				expect( componentHtml ).toMatch( "Hello, World. Component: myComponent" );
 				expect( componentHtml ).not.toMatch( "html_config" );
 				expect( componentHtml ).not.toMatch( "contentEl_config" );
 			} );
@@ -596,7 +606,6 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 		 */
 		describe( "Test setAttr()", function() {
 			
-			
 			it( "setAttr() should add an attribute when unrendered", function() {
 				var cmp = new Component();
 				cmp.setAttr( 'data-myAttr', 'value' );
@@ -606,6 +615,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				cmp.destroy();  // clean up
 			} );
+			
 			
 			it( "setAttr() should overwrite an attribute when unrendered", function() {
 				var cmp = new Component( { 
@@ -619,6 +629,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.destroy();  // clean up
 			} );
 			
+			
 			it( "setAttr() should add an attribute when rendered", function() {
 				var cmp = new Component( { renderTo: 'body' } );
 				
@@ -627,6 +638,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				cmp.destroy();  // clean up
 			} );
+			
 			
 			it( "setAttr() should overwrite an attribute when rendered", function() {
 				var cmp = new Component( { 
@@ -653,6 +665,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.destroy();  // clean up
 			} );
 			
+			
 			it( "setAttr() should overwrite a set of attributes when unrendered", function() {
 				var cmp = new Component( {
 					attr: { 'data-myAttr1': 'value1', 'data-myAttr2': 'value2' } 
@@ -667,6 +680,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				cmp.destroy();  // clean up
 			} );
 			
+			
 			it( "setAttr() should add a set of attributes when rendered", function() {
 				var cmp = new Component( {
 					renderTo: 'body' 
@@ -679,6 +693,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				
 				cmp.destroy();  // clean up
 			} );
+			
 			
 			it( "setAttr() should overwrite a set of attributes when rendered", function() {
 				var cmp = new Component( {
