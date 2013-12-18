@@ -22,12 +22,104 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 	 * @extends Observable
 	 * @alias type.component
 	 * 
-	 * Generalized component that defines a displayable item that can be placed onto a page. Provides a base element (by default, a div),
-	 * and a framework for the instantiation, rendering, and (eventually) the destruction process, with events that can be listened to
-	 * each step of the way.
+	 * Generalized component that defines a displayable item that can be placed onto a page. This class is the base class of all components in
+	 * the library.
+	 * 
+	 * The Component class provides a base HTML element (by default, a &lt;div&gt;), and a framework for the instantiation, rendering, and (eventually) 
+	 * destruction of the component, with events that can be listened to each step of the way.
+	 * 
+	 * 
+	 * ## Lazy Instantiation
 	 * 
 	 * Components can be constructed via anonymous config objects, based on their `type` property. This is useful for defining components in
-	 * an anonymous object, when added as items of a {@link gui.Container}.
+	 * an anonymous object, when added as items of a {@link gui.Container}. For example:
+	 * 
+	 *     @example
+	 *     require( [
+	 *         'gui/Container',
+	 *         'gui/Component'
+	 *     ], function( Container ) {
+	 *     
+	 *         var container = new Container( {
+	 *             renderTo : 'body',
+	 *             
+	 *             items : [
+	 *                 { type: 'component', html: "Component1" },
+	 *                 { type: 'component', html: "Component2" }
+	 *             ]
+	 *         } );
+	 *     
+	 *     } );
+	 * 
+	 * Other components from the library may be added as well. See each component's "type" property in the docs.
+	 * 
+	 * 
+	 * ## Unrendered vs. Rendered State
+	 * 
+	 * When a Component is first instantiated, it is "unrendered." This means that no HTML elements have been created for it yet. Only when
+	 * the {@link #method-render} method is executed will any HTML elements be generated.
+	 * 
+	 * For example:
+	 * 
+	 *     // Instantiate a new component
+	 *     var component = new Component( { id: 'myComponent', html: '<span class="test-component">Test Component</span>' } );  // this HTML is *not* yet rendered to the page
+	 *     
+	 *     // Now render the component to the document body
+	 *     component.render( 'body' );  // the HTML is generated, and appended to the document body
+	 * 
+	 * The component's {@link #$el element} will not exist until the component has been rendered.
+	 * 
+	 * This is an important distinction for when building components, in that methods that operate on a Component's DOM should properly handle 
+	 * both an unrendered and rendered state. For example, assume one is building a simple TextField component:
+	 * 
+	 *     require( [
+	 *         'gui/Component'
+	 *     ], function( Component ) {
+	 *     
+	 *         // TextField class
+	 *         var TextField = Component.extend( {
+	 *             value : "",  // a configuration option
+	 *         
+	 *             renderTpl : '<input type="text" value="<%= component.value %>">',
+	 *             
+	 *             onRender : function() {
+	 *                 this._super( arguments );
+	 *                 
+	 *                 this.$inputEl = this.$el.find( 'input' );  // store a reference to the input field when rendered
+	 *             },
+	 *             
+	 *             // This method must check the rendered/unrendered state, in case it is called 
+	 *             // before the Component is actually rendered anywhere
+	 *             setValue : function( newValue ) {
+	 *                 if( !this.isRendered() ) {
+	 *                     this.value = newValue;          // Component not yet rendered, store the value for when it is
+	 *                 } else {
+	 *                     this.$inputEl.val( newValue );  // Component already rendered, update the HTML element directly
+	 *                 }
+	 *             }
+	 *         } );
+	 *         
+	 *         
+	 *         // Usage
+	 *         var textField = new TextField( { value: "value1" } );
+	 *         textField.setValue( "value2" );
+	 *         
+	 *         textField.render( 'body' );       // the TextField will render with the value "value2"
+	 *         
+	 *         textField.setValue( "value3" );   // the TextField will now show the value "value3"
+	 *     } );
+	 * 
+	 * 
+	 * The unrendered state of a Component allows for lazy rendering (i.e. rendering only when needed). This may be the case, for example, if
+	 * a component exists within a {@link gui.tab.Panel TabPanel}. There is no reason to have the browser perform the extra work necessary to 
+	 * render the components of a tab which hasn't been clicked on yet, so these components are left in their unrendered state until that time. 
+	 * 
+	 * These instantiated but unrendered components may still be updated by a {@link gui.app.Controller Controller} however. The client code 
+	 * in the Controller should not have to first test if the component is rendered before calling methods on it, so the automatic handling 
+	 * of rendered/unrendered state within the components makes this distinction transparent.
+	 * 
+	 * 
+	 * ## Other notes
 	 * 
 	 * Some other things to note about Component and its subclasses are:
 	 * 
