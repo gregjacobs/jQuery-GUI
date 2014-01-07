@@ -643,6 +643,35 @@ define( [
 			
 		} );
 		
+		
+		describe( 'isDestroyed()', function() {
+			var view,
+			    controller;
+			
+			beforeEach( function() {
+				view = new Container();
+				controller = new Controller( { view: view } );
+			} );
+			
+			afterEach( function() {
+				view.destroy();
+				controller.destroy();
+			} );
+			
+
+			it( "should return `false` if the controller has not been destroyed", function() {
+				expect( controller.isDestroyed() ).toBe( false );
+			} );
+			
+			
+			it( "should return `true` if the controller has been destroyed", function() {
+				controller.destroy();
+
+				expect( controller.isDestroyed() ).toBe( true );
+			} );
+			
+		} );
+		
 	} );
 	
 	
