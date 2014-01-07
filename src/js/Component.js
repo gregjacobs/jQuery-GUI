@@ -2210,7 +2210,17 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		 * @protected
 		 * @method onDestroy
 		 */
-		onDestroy : Gui.emptyFn
+		onDestroy : Gui.emptyFn,
+		
+		
+		/**
+		 * Determines if the Component has been destroyed.
+		 * 
+		 * @return {Boolean} `true` if the Component has been {@link #method-destroy destroyed}, `false` otherwise.
+		 */
+		isDestroyed : function() {
+			return this.destroyed;
+		}
 	
 	} );
 	
