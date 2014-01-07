@@ -182,6 +182,61 @@ define( [
 				'destroy'
 			);
 			
+			// First load any dynamic dependencies (asynchronously), and when that is complete, call
+			// `onDependenciesLoaded()` to complete initialization. If there are no dynamic dependencies to
+			// load, then onDependenciesLoaded() will be called immediately.
+			this.loadDynamicDependencies().then( _.bind( this.onDynamicDependenciesLoaded, this ) );
+		},
+		
+		
+		/**
+		 * Asynchronously loads any **dynamic** dependencies for the Application. The Application is only initialized after
+		 * all dynamic dependencies have loaded. 
+		 * 
+		 * Normally, all dependencies for an Application are loaded from the dependency list for a given Application subclass,
+		 * in the dependency list provided to `define()`. However, there is a case to be able to load certain dependencies 
+		 * dynamically, based on Application configuration. This method supports this use case, where the Application isn't 
+		 * initialized until all dynamic dependencies are loaded.
+		 * 
+		 * Note that in most production cases, all dynamic dependencies will be bundled into a single file and included as such
+		 * from an HTML page, which will effectively make this a synchronous method. However during development, this bundle
+		 * file is usually not available, and hence dependencies are loaded one by one through this method.
+		 * 
+		 * This method uses the RequireJS loader to pull in dependencies dynamically. If another loader needs to be used, this
+		 * method may be overridden by a subclass in order to do so. A subclass implementation simply needs to return a jQuery
+		 * promise that is resolved when the dependencies have been loaded successfully.
+		 * 
+		 * ## Specifying Dynamic Dependencies
+		 * 
+		 * A subclass should override the {@link #getDependencyList} method in order to return the dependencies that should
+		 * be loaded. This method should return an array of strings, where each string is the RequireJS path for the dependency
+		 * to load.
+		 * 
+		 * @protected
+		 * @return {jQuery.Promise} A Promise object which is resolved once the dynamic dependencies have been retrieved. The
+		 *   promise's Deferred should be resolved with a single argument: an Object (map) of the dependencies keyed by their
+		 *   dependency name, and whose values are the dependencies themselves.
+		 */
+		loadDynamicDependencies : function() {
+			// TEMPORARY - simply return a resolved promise
+			return jQuery.when( {} );
+		},
+		
+		
+		/**
+		 * Completes initialization of the Application once all dynamic dependencies have loaded.
+		 * 
+		 * @protected
+		 * @param {Object} dependencies An Object (map) of the dependencies, where the keys are the dependency names, and the
+		 *   values are the dependencies themselves. 
+		 */
+		onDependenciesLoaded : function( dependencies ) {
+			// <debug>
+			if( !dependencies ) throw new Error( "Error: the loaded dependencies were not provided in an Object (map) as the argument which resolved the loadDependencies() promise" );
+			// </debug>
+			
+			this.dependencies = dependencies;
+			
 			this.createDataContainers();
 			
 			var viewport = this.viewport = this.createViewport();
