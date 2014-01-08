@@ -1,10 +1,12 @@
-/*global define, require */
+/*global define */
 define( [
 	'jquery',
 	'lodash',
 	'Class',
-	'Observable'
-], function( jQuery, _, Class, Observable ) {
+	'Observable',
+	
+	'gui/loader/RequireJs'
+], function( jQuery, _, Class, Observable, RequireJsLoader ) {
 	
 	/**
 	 * @abstract
@@ -101,7 +103,7 @@ define( [
 	 *     } );
 	 * 
 	 * 
-	 * ## Example Usage from HTML Page
+	 * Example usage from HTML page:
 	 * 
 	 *     <html>
 	 *         <head>
@@ -122,6 +124,52 @@ define( [
 	 *     
 	 *         <body></body>
 	 *     </html>
+	 * 
+	 * 
+	 * ## Loading Dynamic Dependencies
+	 * 
+	 * Normally, all dependencies are loaded from the RequireJS wrapper module for an Application subclass (in its `define()` dependency
+	 * list). However, there is a case to be able to load certain dependencies dynamically, based on Application configuration. This can
+	 * be achieved by overriding the {@link #getDynamicDependencyList} method to return an array of the dynamic dependencies that are needed,
+	 * and then using {@link #getDynamicDependency} later to access these dependencies. The Application will wait until all dynamic dependencies
+	 * have been loaded before being initialized.
+	 * 
+	 * An example of this may be:
+	 * 
+	 *     define( [
+	 *         'gui/app/Application',
+	 *         
+	 *         'path/to/static/Dependency1',
+	 *         'path/to/static/Dependency2'
+	 *     ], function( Application, StaticDependency1, StaticDependency2 ) {
+	 *     
+	 *         var MyApplication = Application.extend( {
+	 *             
+	 *             getDynamicDependencyList : function() {
+	 *                 // assume `useSpecialController` was a boolean configuration option provided to the Application
+	 *                 if( this.useSpecialController ) {
+	 *                     this.dynamicControllerPath = 'path/to/special/Controller';
+	 *                 else
+	 *                     this.dynamicControllerPath = 'path/to/normal/Controller;
+	 *                 
+	 *                 return [ this.dynamicControllerPath, 'path/to/another/dynamic/Dependency' ];  // return list of dynamic dependencies
+	 *             },
+	 *             
+	 *             ...
+	 *             
+	 *             createControllers : function() {
+	 *                 var ControllerClass = this.getDynamicDependency( this.dynamicControllerPath );
+	 *                 
+	 *                 return {
+	 *                     appController: new ControllerClass();
+	 *                 };
+	 *             }
+	 *             
+	 *         } );
+	 *     
+	 *     } );
+	 * 
+	 * See the {@link loadDynamicDependencies} method for more information.
 	 */
 	var Application = Observable.extend( {
 		abstractClass: true,
@@ -193,14 +241,14 @@ define( [
 			// First load any dynamic dependencies (asynchronously), and when that is complete, call
 			// `onDependenciesLoaded()` to complete initialization. If there are no dynamic dependencies to
 			// load, then onDependenciesLoaded() will be called immediately.
-			this.loadDynamicDependencies().then( _.bind( this.onDynamicDependenciesLoaded, this ) );
+			var onDynamicDependenciesLoaded = _.bind( this.onDynamicDependenciesLoaded, this );
+			this.loadDynamicDependencies().then( onDynamicDependenciesLoaded );
 		},
 		
 		
 		// -----------------------------------
 		
 		// Dynamic Dependency Loading Functionality
-		
 		
 		/**
 		 * Asynchronously loads any **dynamic** dependencies for the Application. The Application is only initialized after
@@ -212,7 +260,7 @@ define( [
 		 * initialized until all dynamic dependencies are loaded.
 		 * 
 		 * Note that in most production cases, all dynamic dependencies will be bundled into a single file and included as such
-		 * from an HTML page, which will effectively make this a synchronous method. However, during development, this bundle
+		 * from an HTML page, which will make this method execute very quickly. However, during development, this bundle
 		 * file is usually not available, and hence dynamic dependencies are loaded individually through this method.
 		 * 
 		 * ## RequireJS and Creating Other Implementations
@@ -241,36 +289,21 @@ define( [
 				return jQuery.when( {} );  // no dynamic dependencies, return a resolved promise. Note: must do this instead of using the require() function with an empty list, because require() executes asynchronously.
 				
 			} else {
-				var deferred = new jQuery.Deferred();
-				
-				this.require( dependencyPaths, function() {
-					var dependencyMap = {},
-					    dependencies = arguments;  // for clarity
-					
-					for( var i = 0, len = dependencyPaths.length; i < len; i++ ) {
-						dependencyMap[ dependencyPaths[ i ] ] = dependencies[ i ];
-					}
-					
-					deferred.resolve( dependencyMap );
-				} );
-				
-				return deferred.promise();
+				var loader = this.createDependencyLoader();
+				return loader.load( dependencyPaths );
 			}
 		},
 		
 		
 		/**
-		 * Performs the actual loading of the dependencies for the {@link #loadDynamicDependencies} method. This is a separate
-		 * method in order to override for the unit tests, but may also be used to use a different asynchronous module loader
-		 * instead of RequireJS.
+		 * Factory method to instantiate the dynamic dependency loader. May be overridden to provide a different
+		 * implementation.
 		 * 
 		 * @protected
-		 * @param {String[]} dependencyPaths An array of the paths for the dynamic dependencies to load.
-		 * @param {Function} callback The callback function to execute when the paths have been loaded. The callback is
-		 *   executed with one argument for each dependency, in the order of the `dependencyPaths`.
+		 * @return {gui.loader.Loader}
 		 */
-		require : function( dependencyPaths, callback ) {
-			require( dependencyPaths, callback );  // call the RequireJS `require()` function
+		createDependencyLoader : function() {
+			return new RequireJsLoader();
 		},
 		
 		
@@ -305,10 +338,17 @@ define( [
 		 * 
 		 * @protected
 		 * @param {String} dependencyPath The path for the dynamic dependency.
-		 * @return {Mixed} The dependency that was loaded from the `dependencyPath`.
+		 * @return {Mixed} The dependency that was loaded from the `dependencyPath`. If no dependency was loaded for the given
+		 *   `dependencyPath` an error is thrown.
 		 */
 		getDynamicDependency : function( dependencyPath ) {
-			return this.dynamicDependencies[ dependencyPath ];
+			var dependency = this.dynamicDependencies[ dependencyPath ];
+			
+			// <debug>
+			if( !dependency ) throw new Error( "Error: No dependency for the path '" + dependencyPath + "' was requested." );
+			// </debug>
+			
+			return dependency;
 		},
 		
 		
@@ -317,31 +357,36 @@ define( [
 		 * 
 		 * @protected
 		 * @param {Object} dependencies An Object (map) of the dependencies, where the keys are the dependency names, and the
-		 *   values are the dependencies themselves. 
+		 *   values are the dependencies themselves. If there were no dynamic dependencies, this should be an empty Object.
 		 */
 		onDynamicDependenciesLoaded : function( dependencies ) {
-			// <debug>
-			if( !dependencies ) throw new Error( "Error: the loaded dependencies were not provided in an Object (map) as the argument which resolved the loadDependencies() promise" );
-			// </debug>
-			
 			this.dynamicDependencies = dependencies;  // for the `getDynamicDependency()` method to have access to them
 			
+			// Create any Data Containers
 			this.createDataContainers();
 			
+			// Create the Viewport
 			var viewport = this.viewport = this.createViewport();
 			// <debug>
 			if( !viewport ) throw new Error( "Error: No viewport returned by createViewport() method" );
 			// </debug>
 			
+			// Create any Controllers
 			var controllers = this.controllers = this.createControllers( viewport );
 			// <debug>
 			if( !controllers ) throw new Error( "Error: No Object (map) returned by the createControllers() method" );
 			// </debug>
 			
+			// Initialize the Application
 			this.init();
 			
 			jQuery( document ).ready( _.bind( this.onDocumentReady, this ) );
 		},
+		
+		
+		// -----------------------------------
+		
+		// Initialization Hook Methods
 		
 		
 		/**
@@ -382,6 +427,7 @@ define( [
 		 * 
 		 * @protected
 		 * @abstract
+		 * @method createViewport
 		 * @return {gui.Viewport}
 		 */
 		createViewport : Class.abstractMethod,

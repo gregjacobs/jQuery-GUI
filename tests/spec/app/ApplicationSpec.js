@@ -1,11 +1,14 @@
 /*global define, describe, beforeEach, afterEach, it, expect, spyOn */
 define( [
+	'jquery',
 	'lodash',
 	
 	'gui/app/Application',
 	'gui/app/Controller',
-	'gui/Viewport'
-], function( _, Application, Controller, Viewport ) {
+	'gui/Viewport',
+	
+	'gui/loader/Loader'
+], function( jQuery, _, Application, Controller, Viewport, Loader ) {
 	
 	describe( 'gui.app.Application', function() {
 		var viewport,
@@ -141,6 +144,19 @@ define( [
 			
 			
 			describe( 'dynamic dependency loading', function() {
+				var loaderDeferred,
+				    ConcreteLoader,
+				    loader;
+				
+				beforeEach( function() {
+					loaderDeferred = new jQuery.Deferred();
+					
+					ConcreteLoader = Loader.extend( {
+						doLoad : function() { return loaderDeferred; }
+					} );
+					
+					loader = new ConcreteLoader();
+				} );
 				
 				it( "should initialize the Application synchronously if there are no dynamic dependencies to load", function() {
 					var initialized = false;
@@ -167,9 +183,9 @@ define( [
 							return [ 'path/to/Dep1', 'path/to/Dep2' ];
 						},
 						
-						// Override of `require()` method so we can call the callback at a later time
-						require : function( dependencyList, callback ) {
-							requireCallback = callback;
+						// Override of `createDynamicDependencyLoader()` method so we can resolve the loader's deferred later
+						createDependencyLoader : function() {
+							return loader;
 						},
 						
 						init : function() { 
@@ -183,7 +199,7 @@ define( [
 					expect( initialized ).toBe( false );
 					
 					// Now call the callback provided to the `require()` function, with our fake dependencies
-					requireCallback( dep1, dep2 );
+					loaderDeferred.resolve( { 'path/to/Dep1': dep1, 'path/to/Dep2': dep2 } );
 					expect( initialized ).toBe( true );
 					expect( pulledDep1 ).toBe( dep1 );
 					expect( pulledDep2 ).toBe( dep2 );
