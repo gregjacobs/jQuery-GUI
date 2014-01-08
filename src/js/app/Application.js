@@ -1,4 +1,4 @@
-/*global define */
+/*global define, require */
 define( [
 	'jquery',
 	'lodash',
@@ -139,6 +139,14 @@ define( [
 		
 		
 		/**
+		 * @private
+		 * @property {Object} dynamicDependencies
+		 * 
+		 * An Object (map) of the dynamic dependencies loaded from {@link #loadDynamicDependencies} (if any).
+		 * This will be an empty map if no dynamic dependencies were loaded.
+		 */
+		
+		/**
 		 * @protected
 		 * @property {gui.Viewport} viewport
 		 * 
@@ -189,6 +197,11 @@ define( [
 		},
 		
 		
+		// -----------------------------------
+		
+		// Dynamic Dependency Loading Functionality
+		
+		
 		/**
 		 * Asynchronously loads any **dynamic** dependencies for the Application. The Application is only initialized after
 		 * all dynamic dependencies have loaded. 
@@ -199,27 +212,103 @@ define( [
 		 * initialized until all dynamic dependencies are loaded.
 		 * 
 		 * Note that in most production cases, all dynamic dependencies will be bundled into a single file and included as such
-		 * from an HTML page, which will effectively make this a synchronous method. However during development, this bundle
-		 * file is usually not available, and hence dependencies are loaded one by one through this method.
+		 * from an HTML page, which will effectively make this a synchronous method. However, during development, this bundle
+		 * file is usually not available, and hence dynamic dependencies are loaded individually through this method.
 		 * 
-		 * This method uses the RequireJS loader to pull in dependencies dynamically. If another loader needs to be used, this
-		 * method may be overridden by a subclass in order to do so. A subclass implementation simply needs to return a jQuery
-		 * promise that is resolved when the dependencies have been loaded successfully.
+		 * ## RequireJS and Creating Other Implementations
+		 * 
+		 * This method, by default, uses the RequireJS loader to pull in dependencies dynamically. If another loader needs to be 
+		 * used, this method may be overridden by a subclass in order to do so. A subclass implementation simply needs to return 
+		 * a jQuery promise that is resolved when the dependencies have been loaded successfully. The deferred must be resolved 
+		 * with one argument: an Object (map) where the keys are the dependency names, and the values are the dependencies 
+		 * themselves.
 		 * 
 		 * ## Specifying Dynamic Dependencies
 		 * 
-		 * A subclass should override the {@link #getDependencyList} method in order to return the dependencies that should
-		 * be loaded. This method should return an array of strings, where each string is the RequireJS path for the dependency
-		 * to load.
+		 * To specify the dynamic dependencies for RequireJS to load, a subclass should override the 
+		 * {@link #getDynamicDependencyList} method. This method should return an array of strings, where each string is a 
+		 * RequireJS path for the dependency to load.
 		 * 
 		 * @protected
 		 * @return {jQuery.Promise} A Promise object which is resolved once the dynamic dependencies have been retrieved. The
-		 *   promise's Deferred should be resolved with a single argument: an Object (map) of the dependencies keyed by their
+		 *   promise's Deferred must be resolved with a single argument: an Object (map) of the dependencies keyed by their
 		 *   dependency name, and whose values are the dependencies themselves.
 		 */
 		loadDynamicDependencies : function() {
-			// TEMPORARY - simply return a resolved promise
-			return jQuery.when( {} );
+			var dependencyPaths = this.getDynamicDependencyList();  // array of strings for the RequireJS paths of the dependencies
+			
+			if( dependencyPaths.length === 0 ) {
+				return jQuery.when( {} );  // no dynamic dependencies, return a resolved promise. Note: must do this instead of using the require() function with an empty list, because require() executes asynchronously.
+				
+			} else {
+				var deferred = new jQuery.Deferred();
+				
+				this.require( dependencyPaths, function() {
+					var dependencyMap = {},
+					    dependencies = arguments;  // for clarity
+					
+					for( var i = 0, len = dependencyPaths.length; i < len; i++ ) {
+						dependencyMap[ dependencyPaths[ i ] ] = dependencies[ i ];
+					}
+					
+					deferred.resolve( dependencyMap );
+				} );
+				
+				return deferred.promise();
+			}
+		},
+		
+		
+		/**
+		 * Performs the actual loading of the dependencies for the {@link #loadDynamicDependencies} method. This is a separate
+		 * method in order to override for the unit tests, but may also be used to use a different asynchronous module loader
+		 * instead of RequireJS.
+		 * 
+		 * @protected
+		 * @param {String[]} dependencyPaths An array of the paths for the dynamic dependencies to load.
+		 * @param {Function} callback The callback function to execute when the paths have been loaded. The callback is
+		 *   executed with one argument for each dependency, in the order of the `dependencyPaths`.
+		 */
+		require : function( dependencyPaths, callback ) {
+			require( dependencyPaths, callback );  // call the RequireJS `require()` function
+		},
+		
+		
+		/**
+		 * Method which should be overridden to provide any **dynamic** dependencies that the application may require.
+		 * This method should return an array of strings, where each string is a RequireJS path to a dependency.
+		 * 
+		 * Example:
+		 * 
+		 *     getDynamicDependencyList : function() {
+		 *         return [
+		 *             'path/to/dynamicDependency1',
+		 *             'path/to/dynamicDependency2'
+		 *         ];
+		 *     }
+		 * 
+		 * See {@link #loadDynamicDependencies} for more details.
+		 * 
+		 * @protected
+		 * @return {String[]} The array of dependencies to load dynamically before the Application is initialized.
+		 */
+		getDynamicDependencyList : function() {
+			return [];  // empty list by default
+		},
+		
+		
+		/**
+		 * Allows any **dynamic** dependencies (specified by the {@link #getDynamicDependencyList} method) to be retrieved
+		 * after they are loaded. The dynamic dependencies will be available to all Application hook methods when they are
+		 * called, including {@link #createDataContainers}, {@link #createViewport}, {@link #createControllers}, and 
+		 * {@link #init}.
+		 * 
+		 * @protected
+		 * @param {String} dependencyPath The path for the dynamic dependency.
+		 * @return {Mixed} The dependency that was loaded from the `dependencyPath`.
+		 */
+		getDynamicDependency : function( dependencyPath ) {
+			return this.dynamicDependencies[ dependencyPath ];
 		},
 		
 		
@@ -230,12 +319,12 @@ define( [
 		 * @param {Object} dependencies An Object (map) of the dependencies, where the keys are the dependency names, and the
 		 *   values are the dependencies themselves. 
 		 */
-		onDependenciesLoaded : function( dependencies ) {
+		onDynamicDependenciesLoaded : function( dependencies ) {
 			// <debug>
 			if( !dependencies ) throw new Error( "Error: the loaded dependencies were not provided in an Object (map) as the argument which resolved the loadDependencies() promise" );
 			// </debug>
 			
-			this.dependencies = dependencies;
+			this.dynamicDependencies = dependencies;  // for the `getDynamicDependency()` method to have access to them
 			
 			this.createDataContainers();
 			

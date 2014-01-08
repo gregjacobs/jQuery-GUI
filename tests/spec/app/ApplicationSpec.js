@@ -139,6 +139,58 @@ define( [
 				
 			} );
 			
+			
+			describe( 'dynamic dependency loading', function() {
+				
+				it( "should initialize the Application synchronously if there are no dynamic dependencies to load", function() {
+					var initialized = false;
+					
+					var TestApplication = ConcreteApplication.extend( {
+						getDynamicDependencyList : function() { return []; },  // no dynamic dependencies
+						
+						init : function() { initialized = true; }
+					} );
+					
+					var application = new TestApplication();
+					expect( initialized ).toBe( true );
+				} );
+				
+				
+				it( "should wait to initialize the Application until the dependencies are loaded, and allow the dependencies to be accessed via getDynamicDependency() when they are loaded", function() {
+					var initialized = false,
+					    requireCallback,
+					    dep1 = {}, dep2 = {},   // some fake dependencies
+					    pulledDep1, pulledDep2; // for checking the dependencies we pull from getDynamicDependency() 
+					
+					var TestApplication = ConcreteApplication.extend( {
+						getDynamicDependencyList : function() { 
+							return [ 'path/to/Dep1', 'path/to/Dep2' ];
+						},
+						
+						// Override of `require()` method so we can call the callback at a later time
+						require : function( dependencyList, callback ) {
+							requireCallback = callback;
+						},
+						
+						init : function() { 
+							initialized = true;
+							pulledDep1 = this.getDynamicDependency( 'path/to/Dep1' );
+							pulledDep2 = this.getDynamicDependency( 'path/to/Dep2' );
+						}
+					} );
+					
+					var application = new TestApplication();
+					expect( initialized ).toBe( false );
+					
+					// Now call the callback provided to the `require()` function, with our fake dependencies
+					requireCallback( dep1, dep2 );
+					expect( initialized ).toBe( true );
+					expect( pulledDep1 ).toBe( dep1 );
+					expect( pulledDep2 ).toBe( dep2 );
+				} );
+				
+			} );
+			
 		} );
 		
 		
