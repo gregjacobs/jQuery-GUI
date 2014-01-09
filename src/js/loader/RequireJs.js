@@ -34,7 +34,7 @@ define( [
 				deferred.resolve( dependencyMap );
 			} );
 			
-			return deferred;
+			return deferred.promise();
 		},
 		
 		
