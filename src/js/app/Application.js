@@ -220,6 +220,14 @@ define( [
 		 */
 		
 		/**
+		 * @protected
+		 * @property {Boolean} initialized
+		 * 
+		 * Flag that is set to `true` once the application has been fully initialized (i.e. when all dynamic
+		 * dependencies have loaded, and all of the hook methods up to {@link #init} have finished executing).
+		 */
+		
+		/**
 		 * @private
 		 * @property {Boolean} destroyed
 		 * 
@@ -239,6 +247,19 @@ define( [
 			
 			this.addEvents(
 				/**
+				 * Fires when the Application has been initialized. This means that all dynamic
+				 * dependencies have loaded, and the {@link #init} method has completed.
+				 * 
+				 * Note that it is possible for the Application to be {@link #method-destroy destroyed}
+				 * while dynamic dependencies were in the process of loading, so in this case, this event 
+				 * will never fire.
+				 * 
+				 * @event initialize
+				 * @param {gui.app.Application} application This Application instance.
+				 */
+				'initialize',
+			
+				/**
 				 * Fires when the Application has been {@link #method-destroy destroyed}.
 				 * 
 				 * @event destroy
@@ -253,6 +274,8 @@ define( [
 			// `onDependenciesLoaded()` to complete initialization. If there are no dynamic dependencies 
 			// to load, then `onDependenciesLoaded()` will be called immediately.
 			this.loadDynamicDependencies().then( function( dependencies ) {
+				if( me.isDestroyed() ) return;  // if the Application was destroyed while dependencies were loading, simply return out. We will not complete the initialization routine in this case.
+				
 				me.dynamicDependencies = dependencies;  // for the `getDynamicDependency()` method to have access to them. This is an Object (map) of the dependencies, where the keys are the dependency names, and the values are the dependencies themselves. If there were no dynamic dependencies, this should be an empty Object.
 				
 				me.onDynamicDependenciesLoaded();
@@ -345,28 +368,6 @@ define( [
 		
 		
 		/**
-		 * Allows any **dynamic** dependencies (specified by the {@link #getDynamicDependencyList} method) to be retrieved
-		 * after they are loaded. The dynamic dependencies will be available to all Application hook methods when they are
-		 * called, including {@link #createDataContainers}, {@link #createViewport}, {@link #createControllers}, and 
-		 * {@link #init}.
-		 * 
-		 * @protected
-		 * @param {String} dependencyPath The path for the dynamic dependency.
-		 * @return {Mixed} The dependency that was loaded from the `dependencyPath`. If no dependency was loaded for the given
-		 *   `dependencyPath` an error is thrown.
-		 */
-		getDynamicDependency : function( dependencyPath ) {
-			var dependency = this.dynamicDependencies[ dependencyPath ];
-			
-			// <debug>
-			if( !dependency ) throw new Error( "Error: No dependency for the path '" + dependencyPath + "' was requested." );
-			// </debug>
-			
-			return dependency;
-		},
-		
-		
-		/**
 		 * Completes initialization of the Application after all dynamic dependencies have been loaded. Calls the rest of
 		 * the initialization hook methods.
 		 * 
@@ -389,7 +390,9 @@ define( [
 			// </debug>
 			
 			// Initialize the Application
-			this.init();
+			this.init();  // call hook method
+			this.initialized = true;
+			this.fireEvent( 'initialize', this );
 			
 			jQuery( document ).ready( _.bind( this.onDocumentReady, this ) );
 		},
@@ -642,6 +645,40 @@ define( [
 		},
 		
 		
+		/**
+		 * Allows any **dynamic** dependencies (specified by the {@link #getDynamicDependencyList} method) to be retrieved
+		 * after they are loaded. The dynamic dependencies will be available to all Application hook methods when they are
+		 * called, including {@link #createDataContainers}, {@link #createViewport}, {@link #createControllers}, and 
+		 * {@link #init}.
+		 * 
+		 * @protected
+		 * @param {String} dependencyPath The path for the dynamic dependency.
+		 * @return {Mixed} The dependency that was loaded from the `dependencyPath`. If no dependency was loaded for the given
+		 *   `dependencyPath` an error is thrown.
+		 */
+		getDynamicDependency : function( dependencyPath ) {
+			var dependency = this.dynamicDependencies[ dependencyPath ];
+			
+			// <debug>
+			if( !dependency ) throw new Error( "Error: No dependency for the path '" + dependencyPath + "' was requested." );
+			// </debug>
+			
+			return dependency;
+		},
+		
+		
+		/**
+		 * Determines if the Application has fully {@link #initialized}. This will return `false` while the Application is waiting
+		 * for dynamic dependencies to be loaded, and will return `true` after the {@link #init} method has been executed.
+		 * 
+		 * Note that this method may return `true` before the {@link #viewport} is rendered, as the {@link #viewport} is only 
+		 * rendered after the document is ready.
+		 */
+		isInitialized : function() {
+			return !!this.initialized;
+		},
+		
+		
 		// ------------------------------------
 		
 		// Destruction Functionality
@@ -657,11 +694,15 @@ define( [
 			if( !this.isDestroyed() ) {
 				this.onDestroy();  // call hook method
 				
-				// Destroy controllers first
-				_.forOwn( this.controllers, function( controller ) { controller.destroy(); } );
-				
-				// Destroy the viewport second
-				this.viewport.destroy();
+				// Only destroy the controllers and the viewport if the Application was fully initialized. If the Application was
+				// destroyed while loading dynamic dependencies, then these will not have been created.
+				if( this.isInitialized() ) {
+					// Destroy controllers first
+					_.forOwn( this.controllers, function( controller ) { controller.destroy(); } );
+					
+					// Destroy the viewport second
+					this.viewport.destroy();
+				}
 				
 				this.destroyed = true;
 				this.fireEvent( 'destroy', this );  // note: fire 'destroy' event before purging listeners!
@@ -679,6 +720,33 @@ define( [
 		 *         this.popupWindow.destroy();  // destroy a {@link gui.window.Window} that was created by the subclass
 		 *         
 		 *         this._super( arguments );    // now call the superclass method
+		 *     }
+		 * 
+		 * 
+		 * Important: If your subclass loads dynamic dependencies, it is possible that {@link #destroy} is called before those
+		 * dependencies have loaded (and therefore before your class has finished initializing). If this is the case where 
+		 * {@link #destroy} is called during this time, the Application class will not continue initializing. Check the state of 
+		 * the {@link #isInitialized initialized} flag to know whether or not you need to destroy any objects that would have been 
+		 * created during the initialization process.
+		 * 
+		 * For example:
+		 * 
+		 *     beforeInit : function() {
+		 *         this.logger = new Logger();  // will always be instantiated since it is happening before dynamic dependencies are loaded
+		 *     },
+		 *     
+		 *     init : function() {
+		 *         this.modalWindow = new Window();  // will only be instantiated if the Application finished initializing
+		 *     },
+		 *     
+		 *     onDestroy : function() {
+		 *         this.logger.destroy();  // always destroy this, since {@link #beforeInit} is always executed (before dependencies are even requested)
+		 *         
+		 *         if( this.isInitialized() ) {
+		 *             this.modalWindow.destroy();  // only destroy this if the application made it to the {@link #init} method
+		 *         }
+		 *     
+		 *         this._super( arguments );
 		 *     }
 		 * 
 		 * @protected

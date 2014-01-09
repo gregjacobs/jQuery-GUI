@@ -12,7 +12,8 @@ define( [
 	
 	describe( 'gui.app.Application', function() {
 		var viewport,
-		    ConcreteApplication;  // a concrete subclass for testing
+		    ConcreteApplication,           // a simple concrete subclass for testing
+		    DynamicDependencyApplication;  // a subclass which when the `resolveDynamicDependencies` method is called, will finish initializing
 		
 		
 		beforeEach( function() {
@@ -20,6 +21,26 @@ define( [
 			
 			ConcreteApplication = Application.extend( {
 				createViewport : function() { return viewport; }
+			} );
+			
+
+			// For testing dynamic dependencies
+			var loaderDeferred = new jQuery.Deferred();
+			var ConcreteLoader = Loader.extend( {
+				doLoad : function() { return loaderDeferred; }
+		    } );
+			var loader = new ConcreteLoader();
+			
+			DynamicDependencyApplication = ConcreteApplication.extend( {
+				getDynamicDependencyList : function() { 
+					return [ 'path/to/Dep1', 'path/to/Dep2' ];
+				},
+				
+				// Override of `createDynamicDependencyLoader()` method so we can resolve the loader's deferred later
+				createDependencyLoader : function() { return loader; },
+				
+				// Call this method when the dependencies should be considered "loaded". Call with map of dependency paths -> dependencies. Ex: { 'path/to/Dep1': {...}, 'path/to/Dep2': {...} }
+				resolveDynamicDependencies : function( dependencyMap ) { loaderDeferred.resolve( dependencyMap ); }
 			} );
 		} );
 		
@@ -47,63 +68,34 @@ define( [
 			
 			
 			describe( 'dynamic dependency loading', function() {
-				var loaderDeferred,
-				    ConcreteLoader,
-				    loader;
-				
-				beforeEach( function() {
-					loaderDeferred = new jQuery.Deferred();
-					
-					ConcreteLoader = Loader.extend( {
-						doLoad : function() { return loaderDeferred; }
-					} );
-					
-					loader = new ConcreteLoader();
-				} );
 				
 				it( "should initialize the Application synchronously if there are no dynamic dependencies to load", function() {
-					var initialized = false;
-					
-					var TestApplication = ConcreteApplication.extend( {
-						getDynamicDependencyList : function() { return []; },  // no dynamic dependencies
-						
-						init : function() { initialized = true; }
+					var TestApplication = DynamicDependencyApplication.extend( {
+						getDynamicDependencyList : function() { return []; }  // no dynamic dependencies
 					} );
 					
 					var application = new TestApplication();
-					expect( initialized ).toBe( true );
+					expect( application.isInitialized() ).toBe( true );
 				} );
 				
 				
 				it( "should wait to initialize the Application until the dependencies are loaded, and allow the dependencies to be accessed via getDynamicDependency() when they are loaded", function() {
-					var initialized = false,
-					    requireCallback,
-					    dep1 = {}, dep2 = {},   // some fake dependencies
+					var dep1 = {}, dep2 = {},   // some fake dependencies
 					    pulledDep1, pulledDep2; // for checking the dependencies we pull from getDynamicDependency() 
 					
-					var TestApplication = ConcreteApplication.extend( {
-						getDynamicDependencyList : function() { 
-							return [ 'path/to/Dep1', 'path/to/Dep2' ];
-						},
-						
-						// Override of `createDynamicDependencyLoader()` method so we can resolve the loader's deferred later
-						createDependencyLoader : function() {
-							return loader;
-						},
-						
+					var TestApplication = DynamicDependencyApplication.extend( {
 						init : function() { 
-							initialized = true;
 							pulledDep1 = this.getDynamicDependency( 'path/to/Dep1' );
 							pulledDep2 = this.getDynamicDependency( 'path/to/Dep2' );
 						}
 					} );
 					
 					var application = new TestApplication();
-					expect( initialized ).toBe( false );
+					expect( application.isInitialized() ).toBe( false );
 					
 					// Now call the callback provided to the `require()` function, with our fake dependencies
-					loaderDeferred.resolve( { 'path/to/Dep1': dep1, 'path/to/Dep2': dep2 } );
-					expect( initialized ).toBe( true );
+					application.resolveDynamicDependencies( { 'path/to/Dep1': dep1, 'path/to/Dep2': dep2 } );
+					expect( application.isInitialized() ).toBe( true );
 					expect( pulledDep1 ).toBe( dep1 );
 					expect( pulledDep2 ).toBe( dep2 );
 				} );
@@ -230,6 +222,63 @@ define( [
 				
 			} );
 			
+			
+			describe( "'initialize' event", function() {
+				
+				it( "should fire immediately when the Application is instantiated, if there are no dynamic dependencies to load", function() {
+					var initializeEventCount = 0;
+					
+					var TestApplication = DynamicDependencyApplication.extend( {
+						getDynamicDependencyList : function() { return []; }  // no dynamic dependencies
+					} );
+					
+					var application = new TestApplication( {
+						listeners : { 'initialize': function() { initializeEventCount++; } }
+					} );
+					expect( initializeEventCount ).toBe( 1 );
+				} );
+
+				
+				it( "should fire after all dynamic dependencies have been loaded, and the application has been initialized", function() {
+					var ordering = [],
+					    initializeEventCount = 0;
+					
+					var TestApplication = DynamicDependencyApplication.extend( {
+						init : function() { 
+							ordering.push( "init method" );
+							
+							this._super( arguments );
+						}
+					} );
+					
+					var application = new TestApplication( {
+						listeners : { 
+							'initialize' : function() { ordering.push( "init event" ); initializeEventCount++; }
+						}
+					} );
+					expect( application.isInitialized() ).toBe( false );  // initial condition
+					expect( initializeEventCount ).toBe( 0 );             // initial condition
+					
+					application.resolveDynamicDependencies( {} );
+					expect( ordering ).toEqual( [ "init method", "init event" ] );
+					expect( initializeEventCount ).toBe( 1 );
+				} );
+				
+			} );
+			
+		} );
+		
+		
+		describe( 'isInitialized()', function() {
+			
+			it( "should return `false` while the Application is loading dynamic dependencies, and `true` after they have finished loading and the app has been initialized", function() {
+				var application = new DynamicDependencyApplication();
+				expect( application.isInitialized() ).toBe( false );
+				
+				application.resolveDynamicDependencies( { 'path/to/Dep1': "a", 'path/to/Dep2': "b" } );
+				expect( application.isInitialized() ).toBe( true );
+			} );
+			
 		} );
 		
 		
@@ -302,6 +351,29 @@ define( [
 				
 				application.destroy();
 				expect( application.onDestroy.calls.length ).toBe( 1 );  // should still be 1 (i.e. shouldn't have been called again)
+			} );
+			
+			
+			it( "should properly handle destroying the Application if the Application is still in the process of loading dynamic dependencies", function() {
+				var application = new DynamicDependencyApplication();
+				expect( application.isInitialized() ).toBe( false );  // just checking
+				
+				expect( function() {
+					application.destroy();
+				} ).not.toThrow();
+			} );
+			
+			
+			it( "should not continue initializing the Application if `destroy()` is called while the Application is still loading dynamic dependencies", function() {
+				var application = new DynamicDependencyApplication();
+				expect( application.isInitialized() ).toBe( false );  // initial condition
+				
+				// destroy while Application is loading dynamic dependencies
+				application.destroy();
+				expect( application.isInitialized() ).toBe( false );  // should still not be initialized, which at this point is expected
+				
+				application.resolveDynamicDependencies( {} );
+				expect( application.isInitialized() ).toBe( false );  // should still not be initialized, even though the dependencies have finished loading
 			} );
 			
 		} );
