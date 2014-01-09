@@ -15,35 +15,41 @@ define( [
 	 * 
 	 * Represents a single Application that uses a {@link gui.Viewport} for its display components. The purpose of this 
 	 * class is to give some structure to Application initialization, and to facilitate inter-controller communication
-	 * for a given application. 
+	 * for a given application via {@link gui.app.Controller Controller} events. 
 	 * 
-	 * Note that it is certainly possible to initialize a given application by manually instantiating a Viewport, and one or
-	 * more Controller(s) for it from an HTML page. However, this class seeks to provide a common skeleton for initialization, 
-	 * and the ability to test the initialization code, which includes substituting mock objects by overriding the "create" 
-	 * methods in tests.
+	 * Note that it is certainly possible to initialize and set up a given application by manually instantiating a Viewport, 
+	 * and one or more Controller(s) for it directly from an HTML page. However, this class seeks to provide a common skeleton 
+	 * for initialization, and the ability to test the initialization code, which includes substituting mock objects by 
+	 * overriding the "create" methods in tests.
 	 * 
 	 * 
 	 * ## Details
 	 * 
-	 * This class implements the initial set up for an Application as the page loads. It instantiates any data containers
-	 * ({@link data.Model Models} or {@link data.Collection Collections}) that the app may need from the 
-	 * {@link #createDataContainers} method, a {@link gui.Viewport Viewport} from the {@link #createViewport} method, and 
-	 * one or more {@link gui.app.Controller Controllers} from the {@link #createControllers} method, which will manage 
-	 * interactions with the data containers and components in the Viewport. When the page (document) is ready, the 
-	 * {@link #onDocumentReady} method is called to automatically render the Viewport at the appropriate time.
+	 * This class implements the initial set up for an Application as the page loads. It is intended to be extended to implement 
+	 * the hook methods, and also to set up any interactions between the controllers that might be needed. The basic process for a 
+	 * subclass is this:
 	 * 
-	 * Subclasses must implement the {@link #createViewport} method. They may also override the {@link #createDataContainers}, 
-	 * {@link #createControllers}, and the {@link #init} method for any subclass-specific initialization. The {@link #init} 
-	 * method is called after the Data Containers, Viewport, and the Controllers have been instantiated, but before the document 
-	 * is ready.
+	 * 1. It should instantiate any data containers ({@link data.Model Models} or {@link data.Collection Collections}) that the app 
+	 *    may need from the {@link #createDataContainers} method.
+	 * 2. It should instantiate and return a {@link gui.Viewport Viewport} from the {@link #createViewport} method. This is the only
+	 *    hook method which must be implemented.
+	 * 3. It should instantiate and return any controllers {@link gui.app.Controller Controllers} from the {@link #createControllers} 
+	 *    method, which will manage interactions with both the data containers and view components in the Viewport. 
+	 * 4. It should complete initialization in the {@link #init} method, finalizing any setup, and setting up any interactions that
+	 *    are needed between controllers via controller events.
+	 *    
+	 * When the page (document) is ready, the {@link #onDocumentReady} method is called to automatically render the Viewport at the 
+	 * appropriate time.
 	 * 
 	 * The hook methods are called in the following order:
 	 * 
-	 * 1. {@link #createDataContainers} - For initializing {@link data.Model Models} and {@link data.Collection Collections}
+	 * 1. {@link #beforeInit}: For checking required configs, and setting up any properties that are needed for the rest of
+	 *    the initialization methods. This method is called before any 
+	 * 2. {@link #createDataContainers}: For initializing any {@link data.Model Models} and {@link data.Collection Collections}
 	 *    for the app.
-	 * 2. {@link #createViewport} - For creating the {@link gui.Viewport Viewport} instance for the app.
-	 * 3. {@link #createControllers} - For creating the {@link gui.app.Controller Controller(s)} to manage the app.
-	 * 4. {@link #init} - For setting up interactions between {@link gui.app.Controller Controllers} via event listeners, 
+	 * 3. {@link #createViewport}: For creating the {@link gui.Viewport Viewport} instance for the app.
+	 * 4. {@link #createControllers}: For creating the {@link gui.app.Controller Controller(s)} to manage the app.
+	 * 5. {@link #init}: For setting up interactions between {@link gui.app.Controller Controllers} via event listeners, 
 	 *    and any other application-specific initialization that might be needed.
 	 * 
 	 * 
@@ -91,6 +97,7 @@ define( [
 	 *             },
 	 *             
 	 *             
+	 *             // Implementation of a multiple-controller interaction
 	 *             onFilterSelect : function() {
 	 *                 var selectedFilters = this.getController( 'filters' ).getSelectedFilters();
 	 *                 this.getController( 'mainDisplay' ).update( selectedFilters );
@@ -128,7 +135,7 @@ define( [
 	 * 
 	 * ## Loading Dynamic Dependencies
 	 * 
-	 * Normally, all dependencies are loaded from the RequireJS wrapper module for an Application subclass (in its `define()` dependency
+	 * Normally, all dependencies are loaded from the RequireJS wrapper module for an Application subclass (i.e. in its `define()` dependency
 	 * list). However, there is a case to be able to load certain dependencies dynamically, based on Application configuration. This can
 	 * be achieved by overriding the {@link #getDynamicDependencyList} method to return an array of the dynamic dependencies that are needed,
 	 * and then using {@link #getDynamicDependency} later to access these dependencies. The Application will wait until all dynamic dependencies
@@ -228,6 +235,8 @@ define( [
 			_.assign( this, cfg );     // assign the configuration options onto this object
 			this._super( arguments );  // call the superclass constructor (Observable)
 
+			var me = this;  // for closure
+			
 			this.addEvents(
 				/**
 				 * Fires when the Application has been {@link #method-destroy destroyed}.
@@ -238,11 +247,16 @@ define( [
 				'destroy'
 			);
 			
-			// First load any dynamic dependencies (asynchronously), and when that is complete, call
-			// `onDependenciesLoaded()` to complete initialization. If there are no dynamic dependencies to
-			// load, then onDependenciesLoaded() will be called immediately.
-			var onDynamicDependenciesLoaded = _.bind( this.onDynamicDependenciesLoaded, this );
-			this.loadDynamicDependencies().then( onDynamicDependenciesLoaded );
+			this.beforeInit();  // call hook method for any pre-initialization logic
+			
+			// Load any dynamic dependencies (asynchronously), and when that is complete, call
+			// `onDependenciesLoaded()` to complete initialization. If there are no dynamic dependencies 
+			// to load, then `onDependenciesLoaded()` will be called immediately.
+			this.loadDynamicDependencies().then( function( dependencies ) {
+				me.dynamicDependencies = dependencies;  // for the `getDynamicDependency()` method to have access to them. This is an Object (map) of the dependencies, where the keys are the dependency names, and the values are the dependencies themselves. If there were no dynamic dependencies, this should be an empty Object.
+				
+				me.onDynamicDependenciesLoaded();
+			} );
 		},
 		
 		
@@ -308,7 +322,7 @@ define( [
 		
 		
 		/**
-		 * Method which should be overridden to provide any **dynamic** dependencies that the application may require.
+		 * Hook method which should be overridden to provide any **dynamic** dependencies that the application may require.
 		 * This method should return an array of strings, where each string is a RequireJS path to a dependency.
 		 * 
 		 * Example:
@@ -353,15 +367,12 @@ define( [
 		
 		
 		/**
-		 * Completes initialization of the Application once all dynamic dependencies have loaded.
+		 * Completes initialization of the Application after all dynamic dependencies have been loaded. Calls the rest of
+		 * the initialization hook methods.
 		 * 
 		 * @protected
-		 * @param {Object} dependencies An Object (map) of the dependencies, where the keys are the dependency names, and the
-		 *   values are the dependencies themselves. If there were no dynamic dependencies, this should be an empty Object.
 		 */
-		onDynamicDependenciesLoaded : function( dependencies ) {
-			this.dynamicDependencies = dependencies;  // for the `getDynamicDependency()` method to have access to them
-			
+		onDynamicDependenciesLoaded : function() {
 			// Create any Data Containers
 			this.createDataContainers();
 			
@@ -388,9 +399,46 @@ define( [
 		
 		// Initialization Hook Methods
 		
+		/**
+		 * Hook method which may be overridden in subclasses to provide any subclass-specific logic that should occur
+		 * before initialization. This method is called before any dynamic dependencies are loaded, and before any other 
+		 * hook method (i.e. before {@link #createDataContainers}, {@link #createViewport}, {@link #createControllers}, etc.)
+		 * is called. For maintainability purposes, this superclass method should be called first from any implementation.
+		 * 
+		 * This method may be used to check required configs, and set up any properties that are needed for the other initialization
+		 * methods.
+		 * 
+		 * ## Example
+		 * 
+		 *     beforeInit : function() {
+		 *         this._super( arguments );
+		 *         
+		 *         // Check required configs
+		 *         if( !this.env ) throw new Error( "`env` cfg required" );
+		 *         if( !this.userId ) throw new Error( "`userId` cfg required" );
+		 *         
+		 *         // Set up a performance timer
+		 *         this.performanceTimer = new PerformanceTimer();
+		 *     },
+		 *     
+		 *     ...
+		 *     
+		 *     init : function() {
+		 *         this._super( arguments );
+		 *         
+		 *         this.viewport.on( 'render', function() { this.performanceTimer.log(); }, this );
+		 *     }
+		 * 
+		 * 
+		 * @protected
+		 * @template
+		 * @method beforeInit
+		 */
+		beforeInit : _.noop,
+		
 		
 		/**
-		 * Method which may be overridden by subclasses to instantiate one or more {@link data.Model Models} and/or
+		 * Hook method which may be overridden by subclasses to instantiate one or more {@link data.Model Models} and/or
 		 * {@link data.Collection Collections} that will be used by the application. References to these data containers 
 		 * may be saved to this Application object from this method.
 		 * 
@@ -418,15 +466,18 @@ define( [
 		 *     }
 		 * 
 		 * @protected
+		 * @template
+		 * @method createDataContainers
 		 */
 		createDataContainers : _.noop,
 		
 		
 		/**
-		 * Method which must be overridden by subclasses to instantiate and return a {@link gui.Viewport}.
+		 * Hook method which must be overridden by subclasses to instantiate and return a {@link gui.Viewport}.
 		 * 
 		 * @protected
 		 * @abstract
+		 * @template
 		 * @method createViewport
 		 * @return {gui.Viewport}
 		 */
@@ -434,7 +485,7 @@ define( [
 		
 		
 		/**
-		 * Method which may be overridden by subclasses to instantiate and return one or more 
+		 * Hook method which may be overridden by subclasses to instantiate and return one or more 
 		 * {@link gui.app.Controller Controllers}. 
 		 * 
 		 * The return value from this method is an Object (map) where the keys are the names to reference the controller(s) by, 
@@ -506,6 +557,7 @@ define( [
 		 *     }
 		 * 
 		 * @protected
+		 * @template
 		 * @param {gui.Viewport} viewport A reference to the Viewport created from {@link #createViewport}. This is
 		 *   usually passed to a Controller as the {@link gui.app.Controller#view view} config.
 		 * @return {Object} An Object (map) of the controllers, where the key names are the controller names, and the
@@ -535,12 +587,15 @@ define( [
 		 * 
 		 * @protected
 		 * @template
+		 * @method init
 		 */
 		init : _.noop,
 		
 		
 		/**
-		 * Handles when the page (document) is ready by rendering the Viewport.
+		 * Handles when the page (document) is ready by rendering the Viewport. This method may be overridden (extended) to
+		 * add any post-rendering logic, although one might want to listen to the {@link #viewport viewport's} 
+		 * {@link gui.Viewport#event-render render} event from the {@link #init} method instead.
 		 * 
 		 * @protected
 		 */

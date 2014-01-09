@@ -46,6 +46,94 @@ define( [
 			} );
 			
 			
+			describe( 'dynamic dependency loading', function() {
+				var loaderDeferred,
+				    ConcreteLoader,
+				    loader;
+				
+				beforeEach( function() {
+					loaderDeferred = new jQuery.Deferred();
+					
+					ConcreteLoader = Loader.extend( {
+						doLoad : function() { return loaderDeferred; }
+					} );
+					
+					loader = new ConcreteLoader();
+				} );
+				
+				it( "should initialize the Application synchronously if there are no dynamic dependencies to load", function() {
+					var initialized = false;
+					
+					var TestApplication = ConcreteApplication.extend( {
+						getDynamicDependencyList : function() { return []; },  // no dynamic dependencies
+						
+						init : function() { initialized = true; }
+					} );
+					
+					var application = new TestApplication();
+					expect( initialized ).toBe( true );
+				} );
+				
+				
+				it( "should wait to initialize the Application until the dependencies are loaded, and allow the dependencies to be accessed via getDynamicDependency() when they are loaded", function() {
+					var initialized = false,
+					    requireCallback,
+					    dep1 = {}, dep2 = {},   // some fake dependencies
+					    pulledDep1, pulledDep2; // for checking the dependencies we pull from getDynamicDependency() 
+					
+					var TestApplication = ConcreteApplication.extend( {
+						getDynamicDependencyList : function() { 
+							return [ 'path/to/Dep1', 'path/to/Dep2' ];
+						},
+						
+						// Override of `createDynamicDependencyLoader()` method so we can resolve the loader's deferred later
+						createDependencyLoader : function() {
+							return loader;
+						},
+						
+						init : function() { 
+							initialized = true;
+							pulledDep1 = this.getDynamicDependency( 'path/to/Dep1' );
+							pulledDep2 = this.getDynamicDependency( 'path/to/Dep2' );
+						}
+					} );
+					
+					var application = new TestApplication();
+					expect( initialized ).toBe( false );
+					
+					// Now call the callback provided to the `require()` function, with our fake dependencies
+					loaderDeferred.resolve( { 'path/to/Dep1': dep1, 'path/to/Dep2': dep2 } );
+					expect( initialized ).toBe( true );
+					expect( pulledDep1 ).toBe( dep1 );
+					expect( pulledDep2 ).toBe( dep2 );
+				} );
+				
+			} );
+			
+			
+			describe( "hook method functionality", function() {
+				
+				it( "should call the hook methods in the correct order", function() {
+					var ordering = [];
+					var MyApplication = ConcreteApplication.extend( {
+						beforeInit              : function() { ordering.push( "beforeInit" );              return this._super( arguments ); },
+						loadDynamicDependencies : function() { ordering.push( "loadDynamicDependencies" ); return this._super( arguments ); },
+						createDataContainers    : function() { ordering.push( "createDataContainers" );    return this._super( arguments ); },
+						createViewport          : function() { ordering.push( "createViewport" );          return this._super( arguments ); },
+						createControllers       : function() { ordering.push( "createControllers" );       return this._super( arguments ); },
+						init                    : function() { ordering.push( "init" );                    return this._super( arguments ); },
+						onDocumentReady         : function() { ordering.push( "onDocumentReady" );         return this._super( arguments ); }
+					} );
+					
+					var app = new MyApplication();
+					expect( ordering ).toEqual( [ 
+						"beforeInit", "loadDynamicDependencies", "createDataContainers", "createViewport", "createControllers", "init", "onDocumentReady"
+					] );
+				} );
+				
+			} );
+			
+			
 			describe( "viewport functionality", function() {
 			
 				it( "should throw an error if a Viewport is not returned from createViewport()", function() {
@@ -138,71 +226,6 @@ define( [
 					expect( application.getController( 'controller1' ) ).toBe( controller1 );
 					expect( application.getController( 'controller2' ) ).toBe( controller2 );
 					expect( application.getController( 'controller3' ) ).toBe( null );
-				} );
-				
-			} );
-			
-			
-			describe( 'dynamic dependency loading', function() {
-				var loaderDeferred,
-				    ConcreteLoader,
-				    loader;
-				
-				beforeEach( function() {
-					loaderDeferred = new jQuery.Deferred();
-					
-					ConcreteLoader = Loader.extend( {
-						doLoad : function() { return loaderDeferred; }
-					} );
-					
-					loader = new ConcreteLoader();
-				} );
-				
-				it( "should initialize the Application synchronously if there are no dynamic dependencies to load", function() {
-					var initialized = false;
-					
-					var TestApplication = ConcreteApplication.extend( {
-						getDynamicDependencyList : function() { return []; },  // no dynamic dependencies
-						
-						init : function() { initialized = true; }
-					} );
-					
-					var application = new TestApplication();
-					expect( initialized ).toBe( true );
-				} );
-				
-				
-				it( "should wait to initialize the Application until the dependencies are loaded, and allow the dependencies to be accessed via getDynamicDependency() when they are loaded", function() {
-					var initialized = false,
-					    requireCallback,
-					    dep1 = {}, dep2 = {},   // some fake dependencies
-					    pulledDep1, pulledDep2; // for checking the dependencies we pull from getDynamicDependency() 
-					
-					var TestApplication = ConcreteApplication.extend( {
-						getDynamicDependencyList : function() { 
-							return [ 'path/to/Dep1', 'path/to/Dep2' ];
-						},
-						
-						// Override of `createDynamicDependencyLoader()` method so we can resolve the loader's deferred later
-						createDependencyLoader : function() {
-							return loader;
-						},
-						
-						init : function() { 
-							initialized = true;
-							pulledDep1 = this.getDynamicDependency( 'path/to/Dep1' );
-							pulledDep2 = this.getDynamicDependency( 'path/to/Dep2' );
-						}
-					} );
-					
-					var application = new TestApplication();
-					expect( initialized ).toBe( false );
-					
-					// Now call the callback provided to the `require()` function, with our fake dependencies
-					loaderDeferred.resolve( { 'path/to/Dep1': dep1, 'path/to/Dep2': dep2 } );
-					expect( initialized ).toBe( true );
-					expect( pulledDep1 ).toBe( dep1 );
-					expect( pulledDep2 ).toBe( dep2 );
 				} );
 				
 			} );
