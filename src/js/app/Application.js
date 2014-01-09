@@ -440,7 +440,10 @@ define( [
 		/**
 		 * Hook method which may be overridden by subclasses to instantiate one or more {@link data.Model Models} and/or
 		 * {@link data.Collection Collections} that will be used by the application. References to these data containers 
-		 * may be saved to this Application object from this method.
+		 * may be saved to this Application object from this method. 
+		 * 
+		 * This method is just a tidy place to instantiate any data containers that will be needed application-wide, before
+		 * the viewport and controllers are instantiated.
 		 * 
 		 * ## Example
 		 * 
