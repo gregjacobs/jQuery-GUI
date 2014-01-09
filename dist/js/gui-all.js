@@ -1501,12 +1501,104 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 	 * @extends Observable
 	 * @alias type.component
 	 * 
-	 * Generalized component that defines a displayable item that can be placed onto a page. Provides a base element (by default, a div),
-	 * and a framework for the instantiation, rendering, and (eventually) the destruction process, with events that can be listened to
-	 * each step of the way.
+	 * Generalized component that defines a displayable item that can be placed onto a page. This class is the base class of all components in
+	 * the library.
+	 * 
+	 * The Component class provides a base HTML element (by default, a &lt;div&gt;), and a framework for the instantiation, rendering, and (eventually) 
+	 * destruction of the component, with events that can be listened to each step of the way.
+	 * 
+	 * 
+	 * ## Lazy Instantiation
 	 * 
 	 * Components can be constructed via anonymous config objects, based on their `type` property. This is useful for defining components in
-	 * an anonymous object, when added as items of a {@link gui.Container}.
+	 * an anonymous object, when added as items of a {@link gui.Container}. For example:
+	 * 
+	 *     @example
+	 *     require( [
+	 *         'gui/Container',
+	 *         'gui/Component'
+	 *     ], function( Container ) {
+	 *     
+	 *         var container = new Container( {
+	 *             renderTo : 'body',
+	 *             
+	 *             items : [
+	 *                 { type: 'component', html: "Component1" },
+	 *                 { type: 'component', html: "Component2" }
+	 *             ]
+	 *         } );
+	 *     
+	 *     } );
+	 * 
+	 * Other components from the library may be added as well. See each component's "type" property in the docs.
+	 * 
+	 * 
+	 * ## Unrendered vs. Rendered State
+	 * 
+	 * When a Component is first instantiated, it is "unrendered." This means that no HTML elements have been created for it yet. Only when
+	 * the {@link #method-render} method is executed will any HTML elements be generated.
+	 * 
+	 * For example:
+	 * 
+	 *     // Instantiate a new component
+	 *     var component = new Component( { id: 'myComponent', html: '<span class="test-component">Test Component</span>' } );  // this HTML is *not* yet rendered to the page
+	 *     
+	 *     // Now render the component to the document body
+	 *     component.render( 'body' );  // the HTML is generated, and appended to the document body
+	 * 
+	 * The component's {@link #$el element} will not exist until the component has been rendered.
+	 * 
+	 * This is an important distinction for when building components, in that methods that operate on a Component's DOM should properly handle 
+	 * both an unrendered and rendered state. For example, assume one is building a simple TextField component:
+	 * 
+	 *     require( [
+	 *         'gui/Component'
+	 *     ], function( Component ) {
+	 *     
+	 *         // TextField class
+	 *         var TextField = Component.extend( {
+	 *             value : "",  // a configuration option
+	 *         
+	 *             renderTpl : '<input type="text" value="<%= component.value %>">',
+	 *             
+	 *             onRender : function() {
+	 *                 this._super( arguments );
+	 *                 
+	 *                 this.$inputEl = this.$el.find( 'input' );  // store a reference to the input field when rendered
+	 *             },
+	 *             
+	 *             // This method must check the rendered/unrendered state, in case it is called 
+	 *             // before the Component is actually rendered anywhere
+	 *             setValue : function( newValue ) {
+	 *                 if( !this.isRendered() ) {
+	 *                     this.value = newValue;          // Component not yet rendered, store the value for when it is
+	 *                 } else {
+	 *                     this.$inputEl.val( newValue );  // Component already rendered, update the HTML element directly
+	 *                 }
+	 *             }
+	 *         } );
+	 *         
+	 *         
+	 *         // Usage
+	 *         var textField = new TextField( { value: "value1" } );
+	 *         textField.setValue( "value2" );
+	 *         
+	 *         textField.render( 'body' );       // the TextField will render with the value "value2"
+	 *         
+	 *         textField.setValue( "value3" );   // the TextField will now show the value "value3"
+	 *     } );
+	 * 
+	 * 
+	 * The unrendered state of a Component allows for lazy rendering (i.e. rendering only when needed). This may be the case, for example, if
+	 * a component exists within a {@link gui.tab.Panel TabPanel}. There is no reason to have the browser perform the extra work necessary to 
+	 * render the components of a tab which hasn't been clicked on yet, so these components are left in their unrendered state until that time. 
+	 * 
+	 * These instantiated but unrendered components may still be updated by a {@link gui.app.Controller Controller} however. The client code 
+	 * in the Controller should not have to first test if the component is rendered before calling methods on it, so the automatic handling 
+	 * of rendered/unrendered state within the components makes this distinction transparent.
+	 * 
+	 * 
+	 * ## Other notes
 	 * 
 	 * Some other things to note about Component and its subclasses are:
 	 * 
@@ -1612,9 +1704,11 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		 * @protected
 		 * @cfg {String/String[]/Function/gui.template.LoDash} renderTpl
 		 * 
-		 * The template to use to render the Component's **internal** structure. This is used for Component subclasses to
-		 * generate the markup that will make up the Component's structure that does not change. This is opposed to the {@link #tpl}
+		 * The template to use to render the Component's **internal** structure when first rendered. This is used for Component subclasses 
+		 * to generate the markup that will make up the Component's structure that does not change. This is opposed to the {@link #tpl}
 		 * config, which if present, is used to update the component's markup with new data via {@link #update}.
+		 * 
+		 * ## Details
 		 * 
 		 * The markup generated by this template (in conjunction with the {@link #renderTplData} config) will be created during the
 		 * {@link #method-render rendering process}, before the {@link #onRender} hook method is called. This allows the code in 
@@ -1636,11 +1730,18 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		 * 
 		 * If, for example, the {@link #html} config is provided, then the value of the config will be placed into the "body" div.
 		 * 
+		 * ## Forms
 		 * 
 		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link gui.template.Template} 
 		 * instance. For the string, array of strings, or function form, a {@link gui.template.LoDash LoDash template} instance will be 
 		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link gui.template.Template} 
 		 * subclass to this config. 
+		 * 
+		 * ## Variables Provided to the Template
+		 * 
+		 * For the set of common variables that are automatically provided to this template, see {@link #renderTplData}.
+		 * 
+		 * ## More Information About Templating
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
 		 */
@@ -1664,11 +1765,12 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		 * or it may be returned by an override of the {@link #getRenderTplData} method.
 		 * 
 		 * 
-		 * ### Common Properties
+		 * ## Common Variables
 		 * 
 		 * A set of common properties will always be available on this object for the {@link #renderTpl} (which are supplied by the 
 		 * {@link #getRenderTplData} method), including:
 		 * 
+		 * - **component**: This Component instance. This may be used to retrieve configs, call methods, etc., from within the template.
 		 * - **elId**: The value of the {@link #elId} property (an auto-generated, unique value).
 		 * - **baseCls**: The {@link #baseCls} config, which is the base CSS class to prefix descendent elements' CSS
 		 *   classes with. Ex: a {@link #baseCls} of 'gui-panel' is used to prefix a {@link gui.panel.Panel Panel's} body
@@ -1699,20 +1801,40 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		/**
 		 * @cfg {String/String[]/Function/gui.template.Template} tpl
 		 * 
-		 * The template to use as the HTML template of the Component. 
+		 * The template to use as the HTML template of the Component, which may be {@link #update updated} at a later time. For 
+		 * specifying the one-time internal structure of the Component, use {@link #renderTpl} instead.
 		 * 
-		 * Used in conjunction with the {@link #tplData} config (which will be the data that is provided to the template
-		 * function), this template can be used as the component's markup. Its output is injected into the element specified by
-		 * the {@link #getContentTarget content target}, after the {@link #onRender} method has been executed. 
+		 * ## Details
+		 * 
+		 * This config is used in conjunction with the {@link #tplData} config (which will be the data that is provided to the template
+		 * function) to create the component's markup. Its output is injected into the element specified by the 
+		 * {@link #getContentTarget content target}, after the {@link #onRender} method has been executed. 
 		 * 
 		 * If this config is specified, it will override the {@link #html} and {@link #contentEl} configs. The markup that it 
 		 * outputs can be updated with new data by using the {@link #update} method, and providing an Object as its first argument.
 		 * 
+		 * ## Forms
 		 * 
 		 * This config may be a string, an array of strings, a compiled Lo-Dash template function, or a {@link gui.template.Template} 
 		 * instance. For the string, array of strings, or function form, a {@link gui.template.LoDash LoDash template} instance will be 
 		 * created when the Component is rendered. To use another Template type, pass in an instance of a {@link gui.template.Template} 
 		 * subclass to this config. 
+		 * 
+		 * ## Variables Provided to the Template
+		 * 
+		 * The variables provided to this template are specified either by the {@link #tplData} config (during initial render time), or 
+		 * will be the variables provided to the {@link #update} method when updating at a later time.
+		 * 
+		 * There are also a common set of variables that will always be available to the template, which are:
+		 * - **component**: This Component instance. This may be used to retrieve configs, call methods, etc., from within the template.
+		 * - **elId**: The value of the {@link #elId} property (an auto-generated, unique value).
+		 * - **baseCls**: The {@link #baseCls} config, which is the base CSS class to prefix descendent elements' CSS
+		 *   classes with. Ex: a {@link #baseCls} of 'gui-panel' is used to prefix a {@link gui.panel.Panel Panel's} body
+		 *   element to become 'gui-panel-body', but when a {@link gui.window.Window Window} is created, the value is
+		 *   'gui-window', and the body becomes 'gui-window-body' instead. 
+		 * - **componentCls**: The {@link #componentCls} config.
+		 * 
+		 * ## More Information About Templating
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
 		 */
@@ -1721,7 +1843,8 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		 * @cfg {Object} tplData
 		 * 
 		 * The data to provide to the {@link #tpl} when initially rendering the Component. If this config is not
-		 * specified, but a {@link #tpl} config is, then the {@link #tpl} will simply be provided an empty object as its data.
+		 * specified, but a {@link #tpl} config is, then the {@link #tpl} will simply be provided the default set of variables as its 
+		 * data (see {@link #tpl}).
 		 * 
 		 * Note that the template data can be provided after {@link #method-render} time to update the markup of the Component using 
 		 * the {@link #update} method. However, if initial data is available, it should be provided with this config so that the 
@@ -2281,7 +2404,8 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 				// more complex HTML structure.
 				var $contentTarget = this.getContentTarget();
 				if( this.tpl && !this.updateCalledWithContent ) {  // tpl config takes precedence over html/contentEl configs, *unless* update() has been called with HTML content
-					$contentTarget.append( this.tpl.apply( this.tplData ) );
+					var tplData = _.assign( {}, this.getDefaultTplData(), this.tplData );
+					$contentTarget.append( this.tpl.apply( tplData ) );
 					
 				} else {
 					if( this.html ) {
@@ -2367,6 +2491,22 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		
 		
 		/**
+		 * Retrieves the common set of properties to pass to both the {@link #renderTpl} and {@link #tpl} as variables.
+		 * 
+		 * @protected
+		 * @return {Object} An Object (map) with the properties. See {@link #renderTpl} and {@link #tpl} for details.
+		 */
+		getDefaultTplData : function() {
+			return {
+				component    : this,
+				elId         : this.elId,
+				baseCls      : this.baseCls,
+				componentCls : this.componentCls
+			};
+		},
+		
+		
+		/**
 		 * Retrieves the data to be used by the {@link #renderTpl}. Adds the common properties to any {@link #renderTplData} config
 		 * provided before returning. These properties are enumerated in the {@link #renderTplData} config doc.
 		 * 
@@ -2377,11 +2517,7 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		 * @return {Object} An Object (map) with the properties needed for the {@link #renderTpl}.
 		 */
 		getRenderTplData : function() {
-			return _.assign( {}, {
-				elId         : this.elId,
-				baseCls      : this.baseCls,
-				componentCls : this.componentCls
-			}, this.renderTplData || {} );
+			return _.assign( {}, this.getDefaultTplData(), this.renderTplData || {} );
 		},
 		
 		
@@ -2440,7 +2576,7 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 					this.updateCalledWithContent = false; // in case update() was previously called with `html` (string) content,
 					                                      // and this flag was set to true, then we must set it back to false. See
 					                                      // case below where it is set to `true` for more details.
-					
+				
 				} else {  // Not a plain JavaScript Object, must be HTML content
 					// Remove this config, just in case it was specified. Setting the 'html' config (next) has the same effect as 'contentEl'.
 					delete this.contentEl;
@@ -2452,9 +2588,14 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
                                                           // config, since it may be used with data provided to this method at a later time.
 				}
 			} else {
-				this.getContentTarget()
-					.empty()
-					.append( isTplData ? this.tpl.apply( content ) : content );
+				var contentTarget = this.getContentTarget().empty();  // empty out the element first
+				
+				if( isTplData ) {
+					var tplData = _.assign( {}, this.getDefaultTplData(), content );
+					contentTarget.append( this.tpl.apply( tplData ) );
+				} else {
+					contentTarget.append( content );
+				}
 			}
 		},
 		
@@ -3548,7 +3689,17 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		 * @protected
 		 * @method onDestroy
 		 */
-		onDestroy : Gui.emptyFn
+		onDestroy : Gui.emptyFn,
+		
+		
+		/**
+		 * Determines if the Component has been destroyed.
+		 * 
+		 * @return {Boolean} `true` if the Component has been {@link #method-destroy destroyed}, `false` otherwise.
+		 */
+		isDestroyed : function() {
+			return this.destroyed;
+		}
 	
 	} );
 	
@@ -3712,7 +3863,7 @@ define('gui/Anchor', [
 	 *     ], function( Anchor ) {
 	 *     
 	 *         var standardAnchor = new Anchor( {
-	 *             renderTo : 'body'
+	 *             renderTo : 'body',
 	 *             
 	 *             text : "Google.com",
 	 *             href : "http://www.google.com",
@@ -3720,7 +3871,7 @@ define('gui/Anchor', [
 	 *         } );
 	 *         
 	 *         var listenerAnchor = new Anchor( {
-	 *             renderTo : 'body'
+	 *             renderTo : 'body',
 	 *             
 	 *             text : "Click Me",
 	 *             listeners : {
@@ -7624,6 +7775,853 @@ define('gui/Viewport', [
 	
 } );
 /*global define */
+define('gui/loader/Loader', [
+	'jquery',
+	'Class'
+], function( jQuery, Class ) {
+	
+	/**
+	 * @abstract
+	 * @class gui.loader.Loader
+	 * 
+	 * Base class for the abstraction of a dynamic dependency loader (such as RequireJS). This allows dependencies to be loaded 
+	 * on the fly and have those dependencies provided as an Object (map) for later consumption.
+	 * 
+	 * Normally, dependencies for classes are loaded using RequireJS directly. However, there are cases where dependencies need 
+	 * to be loaded dynamically, and that is where this class comes in. 
+	 * 
+	 * ## Use
+	 * 
+	 * This class allows classes like {@link gui.app.Application} to dynamically load dependencies when needed. (See 
+	 * {@link gui.app.Application} for more details on that.) It also provides an abstraction point so that other implementations
+	 * can implement different dynamic loading functionality. An example of this might be an implementation which may interact with 
+	 * a server-side component to dynamically load "packages" of dependencies more efficiently than on a file-by-file basis.
+	 */
+	var Loader = Class.create( {
+		abstractClass : true,
+		
+		
+		/**
+		 * Dynamically loads the given dependencies.
+		 * 
+		 * @param {String[]} paths An array of strings for the paths to load.
+		 * @return {jQuery.Promise} A Promise which is resolved when the dependencies have been loaded. The promise is resolved with
+		 *   an Object (map) where the keys are the dependency paths, and the values are the dependencies themselves. If the dependencies
+		 *   fail to load, the promise is rejected with an error message.
+		 */
+		load : function( paths ) {
+			// Note: This method may be updated to allow an Object (map) argument which will allow dependency aliases in the future, and
+			// thus it calls a separate method to do the work so this method can be updated at a later time to support this feature.
+			return this.doLoad( paths );
+		},
+		
+		
+		/**
+		 * Method which subclasses must implement to perform the actual loading of the dependencies.
+		 * 
+		 * @abstract
+		 * @protected
+		 * @method doLoad
+		 * @param {String[]} paths An array of strings for the paths to load.
+		 * @return {jQuery.Promise} A Promise which is resolved when the dependencies have been loaded. The promise is resolved with
+		 *   an Object (map) where the keys are the dependency paths, and the values are the dependencies themselves. If the dependencies
+		 *   fail to load, the promise is rejected with an error message.
+		 */
+		doLoad : Class.abstractMethod
+		
+	} );
+	
+	return Loader;
+	
+} );
+/*global define, require */
+define('gui/loader/RequireJs', [
+	'jquery',
+	'lodash',
+	
+	'gui/loader/Loader'
+], function( jQuery, _, Loader ) {
+	
+	/**
+	 * @class gui.loader.RequireJs
+	 * @extends gui.loader.Loader
+	 * 
+	 * Abstraction of the RequireJS dependency loader, which can load dependencies on the fly and return an Object (map) of the
+	 * loaded dependencies. See superclass for details on its use.
+	 */
+	var RequireJsLoader = Loader.extend( {
+		
+		/**
+		 * Implementation of superclass method to perform the actual loading of the dependencies.
+		 * 
+		 * @protected
+		 * @param {String[]} paths An array of strings for the paths to load.
+		 * @return {jQuery.Promise} A Promise which is resolved when the dependencies have been loaded. The promise is resolved with
+		 *   an Object (map) where the keys are the dependency paths, and the values are the dependencies themselves. If the dependencies
+		 *   fail to load, the promise is rejected with an error message.
+		 */
+		doLoad : function( paths ) {
+			var me = this,   // for closure
+			    deferred = new jQuery.Deferred();
+			
+			this.require( paths ).then( function( dependencies ) {
+				var dependencyMap = me.buildDependencyMap( paths, dependencies );
+				
+				deferred.resolve( dependencyMap );
+			} );
+			
+			return deferred.promise();
+		},
+		
+		
+		/**
+		 * Performs the actual loading of the dependencies for the {@link #doLoad} method using the RequireJS `require()` function. 
+		 * 
+		 * This is a separate method in order to override for the unit tests.
+		 * 
+		 * @protected
+		 * @param {String[]} paths An array of the paths for the dependencies to load.
+		 * @return {jQuery.Promise} A Promise which is resolved with one argument: An array of the loaded dependencies, in the
+		 *   order of the original `paths`.
+		 */
+		require : function( dependencyPaths, callback ) {
+			var deferred = new jQuery.Deferred();
+			
+			// call the RequireJS `require()` function
+			require( dependencyPaths, function() { 
+				deferred.resolve( _.toArray( arguments ) );
+			} );
+			return deferred.promise();
+		},
+		
+		
+		/**
+		 * Builds the dependency map for the value that the {@link #doLoad} promise is resolved with. This method takes
+		 * the array of string paths, and the array of the loaded dependencies, and creates a map of path -> dependency.
+		 * 
+		 * @protected
+		 * @param {String[]} paths The original array of paths that were loaded.
+		 * @param {Mixed[]} dependencies The loaded dependencies, in the order of the `paths`.
+		 * @return {Object} An Object (map) where the keys are the original paths, and the values are the loaded dependencies.
+		 */
+		buildDependencyMap : function( paths, dependencies ) {
+			var dependencyMap = {};
+			
+			for( var i = 0, len = paths.length; i < len; i++ ) {
+				dependencyMap[ paths[ i ] ] = dependencies[ i ];
+			}
+			return dependencyMap;
+		}
+		
+	} );
+	
+	return RequireJsLoader;
+	
+} );
+/*global define */
+define('gui/app/Application', [
+	'jquery',
+	'lodash',
+	'Class',
+	'Observable',
+	
+	'gui/loader/RequireJs'
+], function( jQuery, _, Class, Observable, RequireJsLoader ) {
+	
+	/**
+	 * @abstract
+	 * @class gui.app.Application
+	 * @extends Observable
+	 * 
+	 * Represents a single Application that uses a {@link gui.Viewport} for its display components. The purpose of this 
+	 * class is to give some structure to Application initialization, and to facilitate inter-controller communication
+	 * for a given application via {@link gui.app.Controller Controller} events. 
+	 * 
+	 * Note that it is certainly possible to initialize and set up a given application by manually instantiating a Viewport, 
+	 * and one or more Controller(s) for it directly from an HTML page. However, this class seeks to provide a common skeleton 
+	 * for initialization, and the ability to test the initialization code, which includes substituting mock objects by 
+	 * overriding the "create" methods in tests.
+	 * 
+	 * 
+	 * ## Details
+	 * 
+	 * This class implements the initial set up for an Application as the page loads. It is intended to be extended to implement 
+	 * the hook methods, and also to set up any interactions between the controllers that might be needed. The basic process for a 
+	 * subclass is this:
+	 * 
+	 * 1. It should instantiate any data containers ({@link data.Model Models} or {@link data.Collection Collections}) that the app 
+	 *    may need from the {@link #createDataContainers} method.
+	 * 2. It should instantiate and return a {@link gui.Viewport Viewport} from the {@link #createViewport} method. This is the only
+	 *    hook method which must be implemented.
+	 * 3. It should instantiate and return any controllers {@link gui.app.Controller Controllers} from the {@link #createControllers} 
+	 *    method, which will manage interactions with both the data containers and view components in the Viewport. 
+	 * 4. It should complete initialization in the {@link #init} method, finalizing any setup, and setting up any interactions that
+	 *    are needed between controllers via controller events.
+	 *    
+	 * When the page (document) is ready, the {@link #onDocumentReady} method is called to automatically render the Viewport at the 
+	 * appropriate time.
+	 * 
+	 * The hook methods are called in the following order:
+	 * 
+	 * 1. {@link #beforeInit}: For checking required configs, and setting up any properties that are needed for the rest of
+	 *    the initialization methods. This method is called before any 
+	 * 2. {@link #createDataContainers}: For initializing any {@link data.Model Models} and {@link data.Collection Collections}
+	 *    for the app.
+	 * 3. {@link #createViewport}: For creating the {@link gui.Viewport Viewport} instance for the app.
+	 * 4. {@link #createControllers}: For creating the {@link gui.app.Controller Controller(s)} to manage the app.
+	 * 5. {@link #init}: For setting up interactions between {@link gui.app.Controller Controllers} via event listeners, 
+	 *    and any other application-specific initialization that might be needed.
+	 * 
+	 * 
+	 * ## Example Implementation
+	 * 
+	 * my/app/Application.js
+	 * 
+	 *     define( [
+	 *         'gui/app/Application',
+	 *         
+	 *         'my/app/view/Viewport',
+	 *         'my/app/controller/Filters',
+	 *         'my/app/controller/MainDisplay',
+	 *         'my/app/collection/Users'
+	 *     ], function( Application, AppViewport, FiltersController, MainDisplayController, UsersCollection ) {
+	 *         
+	 *         var MyApplication = Application.extend( {
+	 *         
+	 *             createDataContainers : function() {
+	 *                 this.usersCollection = new UsersCollection();
+	 *             },
+	 *             
+	 *             createViewport : function() {
+	 *                 return new AppViewport( {
+	 *                     usersCollection: this.usersCollection  // this would be passed to the view component(s) which will be bound to it by the AppViewport class
+	 *                 } );
+	 *             },
+	 *             
+	 *             createControllers : function( viewport ) {
+	 *                 return {
+	 *                     filters : new FiltersController( { view: viewport } ),
+	 *                     
+	 *                     mainDisplay : new MainDisplayController( {
+	 *                         view: viewport, 
+	 *                         usersCollection: this.usersCollection  // so the MainDisplayController can re-load this collection when a filter changes
+	 *                     } )
+	 *                 } );
+	 *             },
+	 *             
+	 *             
+	 *             init : function() {
+	 *                 this._super( arguments );
+	 *                 
+	 *                 this.getController( 'filters' ).on( 'filterselect', this.onFilterSelect, this );
+	 *             },
+	 *             
+	 *             
+	 *             // Implementation of a multiple-controller interaction
+	 *             onFilterSelect : function() {
+	 *                 var selectedFilters = this.getController( 'filters' ).getSelectedFilters();
+	 *                 this.getController( 'mainDisplay' ).update( selectedFilters );
+	 *             }
+	 *             
+	 *         } );
+	 *         
+	 *         return MyApplication;
+	 *         
+	 *     } );
+	 * 
+	 * 
+	 * Example usage from HTML page:
+	 * 
+	 *     <html>
+	 *         <head>
+	 *             <script src="path/to/require.js"></script>
+	 *             <script src="path/to/jQuery-GUI/dist/js/gui-all.js"></script>
+	 *             
+	 *             <script>
+	 *                 require( [
+	 *                     'my/app/Application'  // our subclass of gui.app.Application
+	 *                 ], function( MyApplication ) {
+	 *                     
+	 *                     // will instantiate Viewport/Controllers and render the Viewport when the document is ready
+	 *                     var app = new MyApplication();
+	 *                     
+	 *                 } );
+	 *             </script>
+	 *         </head>
+	 *     
+	 *         <body></body>
+	 *     </html>
+	 * 
+	 * 
+	 * ## Loading Dynamic Dependencies
+	 * 
+	 * Normally, all dependencies are loaded from the RequireJS wrapper module for an Application subclass (i.e. in its `define()` dependency
+	 * list). However, there is a case to be able to load certain dependencies dynamically, based on Application configuration. This can
+	 * be achieved by overriding the {@link #getDynamicDependencyList} method to return an array of the dynamic dependencies that are needed,
+	 * and then using {@link #getDynamicDependency} later to access these dependencies. The Application will wait until all dynamic dependencies
+	 * have been loaded before being initialized.
+	 * 
+	 * An example of this may be:
+	 * 
+	 *     define( [
+	 *         'gui/app/Application',
+	 *         
+	 *         'path/to/static/Dependency1',
+	 *         'path/to/static/Dependency2'
+	 *     ], function( Application, StaticDependency1, StaticDependency2 ) {
+	 *     
+	 *         var MyApplication = Application.extend( {
+	 *             
+	 *             getDynamicDependencyList : function() {
+	 *                 // assume `useSpecialController` was a boolean configuration option provided to the Application
+	 *                 if( this.useSpecialController ) {
+	 *                     this.dynamicControllerPath = 'path/to/special/Controller';
+	 *                 else
+	 *                     this.dynamicControllerPath = 'path/to/normal/Controller;
+	 *                 
+	 *                 return [ this.dynamicControllerPath, 'path/to/another/dynamic/Dependency' ];  // return list of dynamic dependencies
+	 *             },
+	 *             
+	 *             ...
+	 *             
+	 *             createControllers : function() {
+	 *                 var ControllerClass = this.getDynamicDependency( this.dynamicControllerPath );
+	 *                 
+	 *                 return {
+	 *                     appController: new ControllerClass();
+	 *                 };
+	 *             }
+	 *             
+	 *         } );
+	 *     
+	 *     } );
+	 * 
+	 * See the {@link loadDynamicDependencies} method for more information.
+	 */
+	var Application = Observable.extend( {
+		abstractClass: true,
+		
+		/**
+		 * @cfg {String/HTMLElement/jQuery} renderTo
+		 * 
+		 * A selector, HTMLElement, or jQuery wrapped set of where to render the {@link #viewport} when 
+		 * the document is ready.
+		 * 
+		 * By default, the {@link #viewport} is rendered to the document body, but it may be useful to render
+		 * an entire application into say, a {@link gui.window.Window}.
+		 */
+		renderTo : 'body',  // renders to the document body
+		
+		
+		/**
+		 * @private
+		 * @property {Object} dynamicDependencies
+		 * 
+		 * An Object (map) of the dynamic dependencies loaded from {@link #loadDynamicDependencies} (if any).
+		 * This will be an empty map if no dynamic dependencies were loaded.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {gui.Viewport} viewport
+		 * 
+		 * The viewport that was instantiated for the Application via {@link #createViewport}.
+		 */
+		
+		/**
+		 * @private
+		 * @property {Object} controllers
+		 * 
+		 * An Object (map) of the {@link gui.app.Controller Controllers} instantiated for the Application
+		 * from {@link #createControllers}. The keys are the controller names, and the values are the 
+		 * {@link gui.app.Controller} instances.
+		 * 
+		 * Individual controllers should be referenced by name via {@link #getController}.
+		 */
+		
+		/**
+		 * @private
+		 * @property {Boolean} destroyed
+		 * 
+		 * Flag which is set to `true` once the Application has been destroyed.
+		 */
+		
+		
+		/**
+		 * @constructor
+		 * @param {Object} [cfg] The configuration options for this class, specified in an Object (map).
+		 */
+		constructor : function( cfg ) {
+			_.assign( this, cfg );     // assign the configuration options onto this object
+			this._super( arguments );  // call the superclass constructor (Observable)
+
+			var me = this;  // for closure
+			
+			this.addEvents(
+				/**
+				 * Fires when the Application has been {@link #method-destroy destroyed}.
+				 * 
+				 * @event destroy
+				 * @param {gui.app.Application} application This Application instance.
+				 */
+				'destroy'
+			);
+			
+			this.beforeInit();  // call hook method for any pre-initialization logic
+			
+			// Load any dynamic dependencies (asynchronously), and when that is complete, call
+			// `onDependenciesLoaded()` to complete initialization. If there are no dynamic dependencies 
+			// to load, then `onDependenciesLoaded()` will be called immediately.
+			this.loadDynamicDependencies().then( function( dependencies ) {
+				me.dynamicDependencies = dependencies;  // for the `getDynamicDependency()` method to have access to them. This is an Object (map) of the dependencies, where the keys are the dependency names, and the values are the dependencies themselves. If there were no dynamic dependencies, this should be an empty Object.
+				
+				me.onDynamicDependenciesLoaded();
+			} );
+		},
+		
+		
+		// -----------------------------------
+		
+		// Dynamic Dependency Loading Functionality
+		
+		/**
+		 * Asynchronously loads any **dynamic** dependencies for the Application. The Application is only initialized after
+		 * all dynamic dependencies have loaded. 
+		 * 
+		 * Normally, all dependencies for an Application are loaded from the dependency list for a given Application subclass,
+		 * in the dependency list provided to `define()`. However, there is a case to be able to load certain dependencies 
+		 * dynamically, based on Application configuration. This method supports this use case, where the Application isn't 
+		 * initialized until all dynamic dependencies are loaded.
+		 * 
+		 * Note that in most production cases, all dynamic dependencies will be bundled into a single file and included as such
+		 * from an HTML page, which will make this method execute very quickly. However, during development, this bundle
+		 * file is usually not available, and hence dynamic dependencies are loaded individually through this method.
+		 * 
+		 * ## RequireJS and Creating Other Implementations
+		 * 
+		 * This method, by default, uses the RequireJS loader to pull in dependencies dynamically. If another loader needs to be 
+		 * used, this method may be overridden by a subclass in order to do so. A subclass implementation simply needs to return 
+		 * a jQuery promise that is resolved when the dependencies have been loaded successfully. The deferred must be resolved 
+		 * with one argument: an Object (map) where the keys are the dependency names, and the values are the dependencies 
+		 * themselves.
+		 * 
+		 * ## Specifying Dynamic Dependencies
+		 * 
+		 * To specify the dynamic dependencies for RequireJS to load, a subclass should override the 
+		 * {@link #getDynamicDependencyList} method. This method should return an array of strings, where each string is a 
+		 * RequireJS path for the dependency to load.
+		 * 
+		 * @protected
+		 * @return {jQuery.Promise} A Promise object which is resolved once the dynamic dependencies have been retrieved. The
+		 *   promise's Deferred must be resolved with a single argument: an Object (map) of the dependencies keyed by their
+		 *   dependency name, and whose values are the dependencies themselves.
+		 */
+		loadDynamicDependencies : function() {
+			var dependencyPaths = this.getDynamicDependencyList();  // array of strings for the RequireJS paths of the dependencies
+			
+			if( dependencyPaths.length === 0 ) {
+				return jQuery.when( {} );  // no dynamic dependencies, return a resolved promise. Note: must do this instead of using the require() function with an empty list, because require() executes asynchronously.
+				
+			} else {
+				var loader = this.createDependencyLoader();
+				return loader.load( dependencyPaths );
+			}
+		},
+		
+		
+		/**
+		 * Factory method to instantiate the dynamic dependency loader. May be overridden to provide a different
+		 * implementation.
+		 * 
+		 * @protected
+		 * @return {gui.loader.Loader}
+		 */
+		createDependencyLoader : function() {
+			return new RequireJsLoader();
+		},
+		
+		
+		/**
+		 * Hook method which should be overridden to provide any **dynamic** dependencies that the application may require.
+		 * This method should return an array of strings, where each string is a RequireJS path to a dependency.
+		 * 
+		 * Example:
+		 * 
+		 *     getDynamicDependencyList : function() {
+		 *         return [
+		 *             'path/to/dynamicDependency1',
+		 *             'path/to/dynamicDependency2'
+		 *         ];
+		 *     }
+		 * 
+		 * See {@link #loadDynamicDependencies} for more details.
+		 * 
+		 * @protected
+		 * @return {String[]} The array of dependencies to load dynamically before the Application is initialized.
+		 */
+		getDynamicDependencyList : function() {
+			return [];  // empty list by default
+		},
+		
+		
+		/**
+		 * Allows any **dynamic** dependencies (specified by the {@link #getDynamicDependencyList} method) to be retrieved
+		 * after they are loaded. The dynamic dependencies will be available to all Application hook methods when they are
+		 * called, including {@link #createDataContainers}, {@link #createViewport}, {@link #createControllers}, and 
+		 * {@link #init}.
+		 * 
+		 * @protected
+		 * @param {String} dependencyPath The path for the dynamic dependency.
+		 * @return {Mixed} The dependency that was loaded from the `dependencyPath`. If no dependency was loaded for the given
+		 *   `dependencyPath` an error is thrown.
+		 */
+		getDynamicDependency : function( dependencyPath ) {
+			var dependency = this.dynamicDependencies[ dependencyPath ];
+			
+			// <debug>
+			if( !dependency ) throw new Error( "Error: No dependency for the path '" + dependencyPath + "' was requested." );
+			// </debug>
+			
+			return dependency;
+		},
+		
+		
+		/**
+		 * Completes initialization of the Application after all dynamic dependencies have been loaded. Calls the rest of
+		 * the initialization hook methods.
+		 * 
+		 * @protected
+		 */
+		onDynamicDependenciesLoaded : function() {
+			// Create any Data Containers
+			this.createDataContainers();
+			
+			// Create the Viewport
+			var viewport = this.viewport = this.createViewport();
+			// <debug>
+			if( !viewport ) throw new Error( "Error: No viewport returned by createViewport() method" );
+			// </debug>
+			
+			// Create any Controllers
+			var controllers = this.controllers = this.createControllers( viewport );
+			// <debug>
+			if( !controllers ) throw new Error( "Error: No Object (map) returned by the createControllers() method" );
+			// </debug>
+			
+			// Initialize the Application
+			this.init();
+			
+			jQuery( document ).ready( _.bind( this.onDocumentReady, this ) );
+		},
+		
+		
+		// -----------------------------------
+		
+		// Initialization Hook Methods
+		
+		/**
+		 * Hook method which may be overridden in subclasses to provide any subclass-specific logic that should occur
+		 * before initialization. This method is called before any dynamic dependencies are loaded, and before any other 
+		 * hook method (i.e. before {@link #createDataContainers}, {@link #createViewport}, {@link #createControllers}, etc.)
+		 * is called. For maintainability purposes, this superclass method should be called first from any implementation.
+		 * 
+		 * This method may be used to check required configs, and set up any properties that are needed for the other initialization
+		 * methods.
+		 * 
+		 * ## Example
+		 * 
+		 *     beforeInit : function() {
+		 *         this._super( arguments );
+		 *         
+		 *         // Check required configs
+		 *         if( !this.env ) throw new Error( "`env` cfg required" );
+		 *         if( !this.userId ) throw new Error( "`userId` cfg required" );
+		 *         
+		 *         // Set up a performance timer
+		 *         this.performanceTimer = new PerformanceTimer();
+		 *     },
+		 *     
+		 *     ...
+		 *     
+		 *     init : function() {
+		 *         this._super( arguments );
+		 *         
+		 *         this.viewport.on( 'render', function() { this.performanceTimer.log(); }, this );
+		 *     }
+		 * 
+		 * 
+		 * @protected
+		 * @template
+		 * @method beforeInit
+		 */
+		beforeInit : _.noop,
+		
+		
+		/**
+		 * Hook method which may be overridden by subclasses to instantiate one or more {@link data.Model Models} and/or
+		 * {@link data.Collection Collections} that will be used by the application. References to these data containers 
+		 * may be saved to this Application object from this method. 
+		 * 
+		 * This method is just a tidy place to instantiate any data containers that will be needed application-wide, before
+		 * the viewport and controllers are instantiated.
+		 * 
+		 * ## Example
+		 * 
+		 *     createDataContainers : function() {
+		 *         this.usersCollection = new UsersCollection();
+		 *     }
+		 *     
+		 *     // ...
+		 *     
+		 *     createViewport : function() {
+		 *         return new AppViewport( {
+		 *             usersCollection : this.usersCollection  // so this collection can be bound to one or more view components
+		 *         } );
+		 *     }
+		 *     
+		 *     createControllers : function( viewport ) {
+		 *         return {
+		 *             users: new UsersController( {
+		 *                 view : viewport,
+		 *                 usersCollection : this.usersCollection  // so this collection can be managed by the UsersController
+		 *             } )
+		 *         };
+		 *     }
+		 * 
+		 * @protected
+		 * @template
+		 * @method createDataContainers
+		 */
+		createDataContainers : _.noop,
+		
+		
+		/**
+		 * Hook method which must be overridden by subclasses to instantiate and return a {@link gui.Viewport}.
+		 * 
+		 * @protected
+		 * @abstract
+		 * @template
+		 * @method createViewport
+		 * @return {gui.Viewport}
+		 */
+		createViewport : Class.abstractMethod,
+		
+		
+		/**
+		 * Hook method which may be overridden by subclasses to instantiate and return one or more 
+		 * {@link gui.app.Controller Controllers}. 
+		 * 
+		 * The return value from this method is an Object (map) where the keys are the names to reference the controller(s) by, 
+		 * and the values are the {@link gui.app.Controller} instances. Controllers are then later referenced via
+		 * {@link #getController}. 
+		 * 
+		 * The reason that controllers are returned from this method instead of simply creating direct references to them is 
+		 * so that the Application instance can manage them, and destroy them if the Application itself is 
+		 * {@link #method-destroy destroyed}.
+		 * 
+		 * ## Examples
+		 * 
+		 * A few examples for this method may look something like the following.
+		 * 
+		 * Single controller:
+		 * 
+		 *     createControllers : function( viewport ) {
+		 *         return {
+		 *             appController: new AppController( { view: viewport } )
+		 *         };
+		 *     }
+		 *     
+		 * Multiple controllers:
+		 * 
+		 *     createControllers : function( viewport ) {
+		 *         return {
+		 *             filters: new FiltersController( { view: viewport } ),
+		 *             display: new DisplayController( { view: viewport } )
+		 *         };
+		 *     }
+		 *     
+		 * You may also choose to implement factory methods for each controller, either for use with unit tests (where
+		 * mock controllers can be substituted), or for subclasses to return different Controller types. For example:
+		 * 
+		 *     createControllers : function( viewport ) {
+		 *         return {
+		 *             filters: this.createFiltersController( viewport ),
+		 *             display: this.createDisplayController( viewport )
+		 *         };
+		 *     },
+		 *     
+		 *     createFiltersController : function( viewport ) {
+		 *         return new FiltersController( { view: viewport } );
+		 *     },
+		 *     
+		 *     createDisplayController : function( viewport ) {
+		 *         return new DisplayController( { view: viewport } );
+		 *     }
+		 * 
+		 * And finally, when subclassing `createControllers`, one may add controllers to the return map in the following
+		 * fashion:
+		 * 
+		 *     // in superclass
+		 *     createControllers : function( viewport ) {
+		 *         return {
+		 *             filters: new FiltersController( { view: viewport } )
+		 *         };
+		 *     }
+		 * 
+		 * 
+		 *     // in subclass
+		 *     createControllers : function( viewport ) {
+		 *         var controllers = this._super( arguments );
+		 *         
+		 *         // Add controller(s) for this subclass
+		 *         controllers.display = new DisplayController( { view: viewport } );
+		 *         
+		 *         return controllers;
+		 *     }
+		 * 
+		 * @protected
+		 * @template
+		 * @param {gui.Viewport} viewport A reference to the Viewport created from {@link #createViewport}. This is
+		 *   usually passed to a Controller as the {@link gui.app.Controller#view view} config.
+		 * @return {Object} An Object (map) of the controllers, where the key names are the controller names, and the
+		 *   values are {@link gui.app.Controller} instances.
+		 */
+		createControllers : function() {
+			return {};  // empty map by default
+		},
+		
+		
+		/**
+		 * Hook method which may be overridden in subclasses to provide any subclass-specific initialization.
+		 * For maintainability purposes, this superclass method should be called first from any implementation.
+		 * 
+		 * This method is called after the {@link #viewport} has been instantiated by the {@link #createViewport}
+		 * method, and the {@link #controllers} have been instantiated by the {@link #createControllers} method.
+		 * 
+		 * ## Example
+		 * 
+		 *     init : function() {
+		 *         this._super( arguments );
+		 *         
+		 *         this.viewport.on( 'render', function() { ... } );  // assuming we want to listen for this event (probably don't need to)
+		 *         
+		 *         this.getController( 'myController').doSomething();  // `myController` would have been a controller set up in {@link #createControllers}
+		 *     }
+		 * 
+		 * @protected
+		 * @template
+		 * @method init
+		 */
+		init : _.noop,
+		
+		
+		/**
+		 * Handles when the page (document) is ready by rendering the Viewport. This method may be overridden (extended) to
+		 * add any post-rendering logic, although one might want to listen to the {@link #viewport viewport's} 
+		 * {@link gui.Viewport#event-render render} event from the {@link #init} method instead.
+		 * 
+		 * @protected
+		 */
+		onDocumentReady : function() {
+			this.viewport.render( this.renderTo );
+		},
+		
+		
+		// ------------------------------------
+		
+		
+		/**
+		 * Retrieves a controller by name. Controllers are set up from the {@link #createControllers} method.
+		 * 
+		 * Example:
+		 * 
+		 *     // set up a controller in this method
+		 *     createControllers : function() {
+		 *         return {
+		 *             mainDisplay: new MainDisplayController()
+		 *         };
+		 *     },
+		 *     
+		 *     ...
+		 *     
+		 *     // Retrieve the controller from another method
+		 *     init : function() {
+		 *         this._super( arguments );
+		 *         
+		 *         var mainDisplayController = this.getController( 'mainDisplay' );
+		 *         mainDisplayController.doSomething();
+		 *     }
+		 * 
+		 * @protected
+		 * @param {String} `name`
+		 * @return {gui.app.Controller} The controller for the given `name`, or `null` if there is no controller
+		 *   registered for that name.
+		 */
+		getController : function( name ) {
+			return this.controllers[ name ] || null;
+		},
+		
+		
+		// ------------------------------------
+		
+		// Destruction Functionality
+		
+		
+		/**
+		 * Destroys the Application.
+		 * 
+		 * Note: Subclasses should override the {@link #onDestroy} hook method instead of this method for their
+		 * own subclass-specific destruction logic.
+		 */
+		destroy : function() {
+			if( !this.isDestroyed() ) {
+				this.onDestroy();  // call hook method
+				
+				// Destroy controllers first
+				_.forOwn( this.controllers, function( controller ) { controller.destroy(); } );
+				
+				// Destroy the viewport second
+				this.viewport.destroy();
+				
+				this.destroyed = true;
+				this.fireEvent( 'destroy', this );  // note: fire 'destroy' event before purging listeners!
+				this.purgeListeners();
+			}
+		},
+		
+		
+		/**
+		 * Hook method for the destruction of the Application.
+		 * 
+		 * Subclasses should call their superclass method after any subclass-specific processing. For example:
+		 * 
+		 *     onDestroy : function() {
+		 *         this.popupWindow.destroy();  // destroy a {@link gui.window.Window} that was created by the subclass
+		 *         
+		 *         this._super( arguments );    // now call the superclass method
+		 *     }
+		 * 
+		 * @protected
+		 * @template
+		 */
+		onDestroy : _.noop,
+		
+		
+		/**
+		 * Determines if the Application has been destroyed.
+		 * 
+		 * @return {Boolean}
+		 */
+		isDestroyed : function() {
+			return !!this.destroyed;
+		}
+		
+	} );
+	
+	return Application;
+	
+} );
+/*global define */
 define('gui/app/EventBus', [
 	'lodash',
 	'Class',
@@ -8047,8 +9045,16 @@ define('gui/app/Controller', [
 		 * @protected
 		 * @property {Boolean} eventBusSubscribed
 		 * 
-		 * Flag which is set to true once this controller has subscribed to the {@link gui.app.EventBus}, to listen for all
-		 * {@link gui.Component} events.
+		 * Flag which is set to `true` once this controller has subscribed to the {@link gui.app.EventBus}, to listen for all
+		 * {@link gui.Component} events. This is done in the {@link #listen} method.
+		 */
+		
+		/**
+		 * @private
+		 * @property {Boolean} destroyed
+		 * 
+		 * Set to `true` if the Controller has been destroyed. Determine if the Controller has been destroyed via
+		 * the {@link #isDestroyed} method.
 		 */
 		
 		
@@ -8247,8 +9253,10 @@ define('gui/app/Controller', [
 		 *   which map event names to handler functions. See the description of this method for details.
 		 */
 		listen : function( selectors ) {
-			if( !this.eventBusSubscribed )
+			if( !this.eventBusSubscribed ) {
 				EventBus.subscribe( this.onComponentEvent, this );
+				this.eventBusSubscribed = true;
+			}
 			
 			var listeners = this.listeners;
 			
@@ -8314,13 +9322,17 @@ define('gui/app/Controller', [
 		 * should call the superclass method at the end of their subclass-specific processing.
 		 */
 		destroy : function() {
-			this.onDestroy();
-			
-			this.fireEvent( 'destroy', this );
-			this.purgeListeners();  // Note: purgeListeners() must be called after 'destroy' event has fired!
-			
-			if( this.eventBusSubscribed )
-				EventBus.unsubscribe( this.onComponentEvent, this );
+			if( !this.destroyed ) {
+				this.onDestroy();
+				
+				this.destroyed = true;
+				
+				this.fireEvent( 'destroy', this );
+				this.purgeListeners();  // Note: purgeListeners() must be called after 'destroy' event has fired!
+				
+				if( this.eventBusSubscribed )
+					EventBus.unsubscribe( this.onComponentEvent, this );
+			}
 		},
 		
 		
@@ -8331,7 +9343,17 @@ define('gui/app/Controller', [
 		 * @protected
 		 * @method onDestroy
 		 */
-		onDestroy : Gui.emptyFn
+		onDestroy : Gui.emptyFn,
+		
+		
+		/**
+		 * Determines if the Controller has been destroyed.
+		 * 
+		 * @return {Boolean} `true` if the Component has been {@link #method-destroy destroyed}, `false` otherwise.
+		 */
+		isDestroyed : function() {
+			return !!this.destroyed;
+		}
 		
 	} );
 	
@@ -12724,17 +13746,224 @@ define('gui/util/ModelBindable', [
 	
 } );
 /*global define */
+define('gui/view/DataBound', [
+	'jquery',
+	'lodash',
+	'Class',
+	
+	'gui/Component'
+], function( jQuery, _, Class, Component ) {
+	
+	/**
+	 * @abstract
+	 * @class gui.view.DataBound
+	 * @extends gui.Component
+	 * 
+	 * This class serves as the abstract base class of the {@link gui.view.Collection} and {@link gui.view.Model} classes,
+	 * which provides the common functionality for data-bound views. See subclasses for details.
+	 */
+	var DataBoundView = Component.extend( {
+		abstractClass : true,
+		
+		
+		/**
+		 * @cfg {String/String[]/Function/gui.template.Template} tpl (required)
+		 * @inheritdoc
+		 */
+		
+		/**
+		 * @cfg {Boolean} maskOnLoad
+		 * 
+		 * True to automatically mask the DataBoundView while its backing {@link data.DataComponent DataComponent} (a 
+		 * {@link data.Model} or {@link data.Collection}) is loading. The mask that is shown can be configured with the 
+		 * {@link #maskConfig} configuration option, or defaults to showing the message "Loading...".
+		 */
+		maskOnLoad : true,
+		
+		/**
+		 * @cfg {Number} loadingHeight
+		 * 
+		 * A minimum height to give the DataBoundView while its {@link data.DataComponent DataComponent} (a 
+		 * {@link data.Model} or {@link data.Collection}) is loading. This is useful to prevent the DataBoundView from collapsing 
+		 * to 0 height while the load mask is being shown, and there is no content in the view.
+		 * 
+		 * This is only used if the {@link #maskOnLoad} config is `true`. It is also only applied if the DataBoundView's height
+		 * is less than this number.
+		 */
+		
+		
+		/**
+		 * @private
+		 * @property {Boolean} hasLoadingHeight
+		 * 
+		 * Flag which is set to true when the {@link #loadingHeight} is applied, and set back to `false` after the
+		 * {@link #loadingHeight} has been removed.
+		 */
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		initComponent : function() {
+			this._super( arguments );
+			
+			// <debug>
+			if( !this.tpl ) throw new Error( "`tpl` config required" );
+			// </debug>
+			
+			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
+			// while the model is loading.
+			this.maskConfig = this.maskConfig || { spinner: true, msg: "Loading..." };
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onAfterRender : function() {
+			this._super( arguments );
+			
+			// Apply the loading height if the Data is currently loading when the view is rendered 
+			// (and the DataBoundView is supposed to be masked on load)
+			var dataComponent = this.getDataComponent();
+			if( dataComponent ) {
+				if( this.maskOnLoad && dataComponent.isLoading() ) {
+					this.applyLoadingHeight();
+				}
+			}
+		},
+		
+		
+		/**
+		 * Method which must be implemented in subclasses so that the DataBoundView can retrieve the {@link data.DataComponent}
+		 * which is currently bound.  
+		 * 
+		 * @protected
+		 * @abstract
+		 * @method getDataComponent
+		 * @return {data.DataComponent} The DataComponent which is currently bound, or `null`.
+		 */
+		getDataComponent : Class.abstractMethod,
+		
+		
+		/**
+		 * Method which must be implemented in subclasses so that the DataBoundView can unbind the {@link data.DataComponent}
+		 * which is currently bound.
+		 * 
+		 * @protected
+		 * @abstract
+		 * @method unbindDataComponent
+		 */
+		unbindDataComponent : Class.abstractMethod,
+		
+		
+		// -------------------------------------
+		
+		
+		/**
+		 * Handles the bound {@link data.DataComponent} starting to load, by displaying the "loading" mask over the DataBoundView
+		 * if the {@link #maskOnLoad} config is true.
+		 * 
+		 * @protected
+		 */
+		onLoadBegin : function() {
+			if( this.maskOnLoad ) {
+				this.mask();
+				this.applyLoadingHeight();
+			}
+		},
+		
+		
+		/**
+		 * Handles the bound {@link data.DataComponent} completing its load, by removing the "loading" mask from the DataBoundView,
+		 * which was shown by {@link #onLoadBegin} if the {@link #maskOnLoad} config was true.
+		 * 
+		 * Note: The view will be refreshed automatically due to the changes on the underlying {@link data.DataComponent}, and 
+		 * doesn't need to be refreshed from this method.
+		 * 
+		 * @protected
+		 */
+		onLoadComplete : function() {
+			if( this.maskOnLoad ) {
+				this.unMask();
+				this.removeLoadingHeight();
+			}
+		},
+		
+		
+		// -----------------------------------
+		
+		
+		/**
+		 * Applies the {@link #loadingHeight} to the DataBoundView's {@link #$el element}, if the current height of the
+		 * DataBoundView is less than the configured {@link #loadingHeight}. It also only applies the {@link #loadingHeight}
+		 * if the {@link #maskOnLoad} config is `true`.
+		 * 
+		 * This is called when the bound {@link data.DataComponent} is in its loading state.
+		 * 
+		 * @protected
+		 */
+		applyLoadingHeight : function() {
+			if( this.rendered ) {
+				var loadingHeight = this.loadingHeight,
+				    $el = this.$el;
+				
+				if( loadingHeight > this.getHeight() ) {
+					this.hasLoadingHeight = true;
+					$el.css( 'min-height', loadingHeight + 'px' );
+				}
+			}
+		},
+		
+		
+		/**
+		 * Removes the {@link #loadingHeight} from the DataBoundView's {@link #$el element}, restoring any {@link #minHeight} that
+		 * the DataBoundView has configured. This is only done if the {@link #loadingHeight} was applied in {@link #applyLoadingHeight}.
+		 * 
+		 * This is called when the {@link #collection} has finished loading.
+		 * 
+		 * @protected
+		 */
+		removeLoadingHeight : function() {
+			if( this.hasLoadingHeight ) {
+				var minHeight = ( this.minHeight ) ? this.minHeight + 'px' : '';
+				this.$el.css( 'min-height', minHeight );  // re-apply any configured `minHeight` to the component's element
+				
+				this.hasLoadingHeight = false;
+			}
+		},
+		
+		
+		// -----------------------------------
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onDestroy : function() {
+			this.unbindDataComponent();  // unbind any bound DataComponent
+			
+			this._super( arguments );
+		}
+		
+	} );
+	
+	return DataBoundView;
+	
+} );
+		
+/*global define */
 define('gui/view/Collection', [
 	'jquery',
 	'lodash',
 	'gui/ComponentManager',
-	'gui/Component',
+	'gui/view/DataBound',
 	'gui/util/CollectionBindable'
-], function( jQuery, _, ComponentManager, Component, CollectionBindable ) {
+], function( jQuery, _, ComponentManager, DataBoundView, CollectionBindable ) {
 	
 	/**
 	 * @class gui.view.Collection
-	 * @extends gui.Component
+	 * @extends gui.view.DataBound
 	 * @mixins gui.util.CollectionBindable
 	 * @alias type.collectionview
 	 * 
@@ -12746,7 +13975,7 @@ define('gui/view/Collection', [
 	 * This view is similar to the {@link gui.view.Model Model View}, but instead of showing a single {@link data.Model Model},
 	 * it shows a {@link data.Collection Collection} of them.
 	 */
-	var CollectionView = Component.extend( {
+	var CollectionView = DataBoundView.extend( {
 		mixins : [ CollectionBindable ],
 		
 		
@@ -12915,7 +14144,6 @@ define('gui/view/Collection', [
 			this._super( arguments );
 			
 			// <debug>
-			if( !this.tpl ) throw new Error( "`tpl` config required" );
 			if( !this.modelSelector ) throw new Error( "`modelSelector` config required" );
 			// </debug>
 			
@@ -12925,10 +14153,6 @@ define('gui/view/Collection', [
 			} else {
 				this.refresh();  // do an initial refresh if no collection, which simply sets up the CollectionView to not show anything (and not run the template, since we don't have models to run it with)
 			}
-			
-			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
-			// while the collection is loading.
-			this.maskConfig = this.maskConfig || { spinner: true, msg: "Loading..." };
 		},
 		
 		
@@ -12938,16 +14162,30 @@ define('gui/view/Collection', [
 		onAfterRender : function() {
 			this._super( arguments );
 			
-			var collection = this.collection;
-			if( collection ) {
+			if( this.collection ) {
 				this.collectModelElements( this.collectModels() );  // need to determine the initial set of models that were rendered (if any)
-				
-				// Mask the view if the Collection is currently loading when the view is rendered
-				if( this.maskOnLoad && collection.isLoading() ) {
-					this.applyLoadingHeight();
-					this.mask();
-				}
 			}
+		},
+		
+		
+		/**
+		 * Implementation of abstract method from superclass. Returns the {@link #collection}, if one is bound.
+		 * 
+		 * @protected
+		 * @return {data.Collection} The bound {@link #collection}, or `null` if there is no collection bound.
+		 */
+		getDataComponent : function() {
+			return this.getCollection();
+		},
+		
+		
+		/**
+		 * Implementation of abstract method from superclass. Unbinds the {@link #collection} one is bound.
+		 * 
+		 * @protected
+		 */
+		unbindDataComponent : function() {
+			this.unbindCollection();
 		},
 		
 		
@@ -12966,8 +14204,8 @@ define('gui/view/Collection', [
 		 */
 		getCollectionListeners : function( collection ) {
 			return {
-				'loadbegin' : this.onLoadBegin,
-				'load'      : this.onLoadComplete,
+				'loadbegin' : this.onLoadBegin,    // method in superclass
+				'load'      : this.onLoadComplete, // method in superclass
 				'addset'    : this.refresh,
 				'removeset' : this.refresh,
 				'reorder'   : this.refresh,
@@ -12982,88 +14220,23 @@ define('gui/view/Collection', [
 		 * bound to the view.
 		 * 
 		 * @protected
-		 * @param {data.Collection} collection The newly bound collection. Will be `null` if the previous collection was
+		 * @param {data.Collection} newCollection The newly bound collection. Will be `null` if the previous collection was
 		 *   simply unbound (i.e. `null` was passed to {@link #bindCollection}, or {@link #unbindCollection} was called). 
 		 * @param {data.Collection} oldCollection The collection that was just unbound. Will be `null` if there was no
 		 *   previously-bound collection.
 		 */
-		onCollectionBind : function( collection ) {
+		onCollectionBind : function( newCollection, oldCollection ) {
+			// Handle `maskOnLoad` behavior for the new bind. If the "new" collection is loading, mask.
+			// Otherwise, make sure the CollectionView is unmasked.
+			if( this.maskOnLoad ) {
+				this[ newCollection && newCollection.isLoading() ? 'mask' : 'unMask' ]();
+			}
+			
 			this.refresh();
 		},
 		
 		
 		// -----------------------------------
-		
-		
-		/**
-		 * Handles the {@link #collection} starting to load, by displaying the "loading" mask over the Collection View
-		 * if the {@link #maskOnLoad} config is true.
-		 * 
-		 * @protected
-		 */
-		onLoadBegin : function() {
-			if( this.maskOnLoad && this.rendered ) {
-				this.applyLoadingHeight();
-				
-				this.mask();
-			}
-		},
-		
-		
-		/**
-		 * Handles the {@link #collection} completing its load, by removing the "loading" mask from the Collection View,
-		 * which was shown by {@link #onLoadBegin} if the {@link #maskOnLoad} config was true.
-		 * 
-		 * Note: The view will be refreshed due to the addition/removal of models, and doesn't need to be refreshed
-		 * from this method.
-		 * 
-		 * @protected
-		 */
-		onLoadComplete : function() {
-			if( this.maskOnLoad && this.rendered ) {
-				this.unMask();
-				
-				this.removeLoadingHeight();
-			}
-		},
-		
-		
-		/**
-		 * Applies the {@link #loadingHeight} to the CollectionView's {@link #$el element}, if the current height of the
-		 * CollectionView is less than the configured {@link #loadingHeight}. It also only applies the {@link #loadingHeight}
-		 * if the {@link #maskOnLoad} config is `true`.
-		 * 
-		 * This is called when the {@link #collection} is in its loading state.
-		 * 
-		 * @protected
-		 */
-		applyLoadingHeight : function() {
-			var loadingHeight = this.loadingHeight,
-			    $el = this.$el;
-			
-			if( loadingHeight > this.getHeight() ) {
-				this.hasLoadingHeight = true;
-				$el.css( 'min-height', loadingHeight + 'px' );
-			}
-		},
-		
-		
-		/**
-		 * Removes the {@link #loadingHeight} from the CollectionView's {@link #$el element}, restoring any {@link #minHeight} that
-		 * the CollectionView has configured. This is only done if the {@link #loadingHeight} was applied in {@link #applyLoadingHeight}.
-		 * 
-		 * This is called when the {@link #collection} has finished loading.
-		 * 
-		 * @protected
-		 */
-		removeLoadingHeight : function() {
-			if( this.hasLoadingHeight ) {
-				var minHeight = ( this.minHeight ) ? this.minHeight + 'px' : '';
-				this.$el.css( 'min-height', minHeight );  // re-apply any configured `minHeight` to the component's element
-				
-				this.hasLoadingHeight = false;
-			}
-		},
 		
 		
 		/**
@@ -13192,19 +14365,6 @@ define('gui/view/Collection', [
 		 */
 		getElementFromModel : function( model ) {
 			return ( !this.rendered ) ? null : this.modelElCache[ model.getClientId() ] || null;
-		},
-		
-		
-		// ---------------------------------------
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		onDestroy : function() {
-			this.unbindCollection();  // unbind any bound collection
-			
-			this._super( arguments );
 		}
 		
 	} );
@@ -13220,13 +14380,13 @@ define('gui/view/Model', [
 	'jquery',
 	'lodash',
 	'gui/ComponentManager',
-	'gui/Component',
+	'gui/view/DataBound',
 	'gui/util/ModelBindable'
-], function( jQuery, _, ComponentManager, Component, ModelBindable ) {
+], function( jQuery, _, ComponentManager, DataBoundView, ModelBindable ) {
 	
 	/**
 	 * @class gui.view.Model
-	 * @extends gui.Component
+	 * @extends gui.view.DataBound
 	 * @mixins gui.util.ModelBindable
 	 * @alias type.modelview
 	 * 
@@ -13237,7 +14397,7 @@ define('gui/view/Model', [
 	 * This view is similar to the {@link gui.view.Collection Collection View}, which shows a {@link data.Collection Collection}
 	 * of {@link data.Model Models} instead of a single one.  
 	 */
-	var ModelView = Component.extend( {
+	var ModelView = DataBoundView.extend( {
 		mixins : [ ModelBindable ],
 		
 		/**
@@ -13303,17 +14463,6 @@ define('gui/view/Model', [
 		 */
 		modelVar : 'model',
 		
-		/**
-		 * @cfg {Boolean} maskOnLoad
-		 * 
-		 * True to automatically mask the Model View while the backing {@link #model} is loading. The mask that is shown
-		 * can be configured with the {@link #maskConfig} configuration option, or defaults to showing the message "Loading..."
-		 * 
-		 * This really only applies to a {@link data.Model Model} that is being {@link data.Model#method-load reloaded} from 
-		 * its backing data source (ex: a web server).
-		 */
-		maskOnLoad : true,
-		
 		
 		/**
 		 * @inheritdoc
@@ -13324,33 +14473,32 @@ define('gui/view/Model', [
 			
 			this._super( arguments );
 			
-			// <debug>
-			if( !this.tpl ) throw new Error( "`tpl` config required" );
-			// </debug>
-			
 			if( this.model ) {
 				this.bindModel( this.model );
 			} else {
 				this.refresh();  // do an initial refresh if no model, which simply sets up the ModelView to not show anything (and not run the template, since we don't have a model to run it with)
 			}
-			
-			// Set up the maskConfig if there is not a user-defined one. This is for masking the component
-			// while the model is loading.
-			this.maskConfig = this.maskConfig || { spinner: true, msg: "Loading..." };
 		},
 		
 		
 		/**
-		 * @inheritdoc
+		 * Implementation of abstract method from superclass. Returns the {@link #model}, if one is bound.
+		 * 
+		 * @protected
+		 * @return {data.Model} The bound {@link #model}, or `null` if there is no model bound.
 		 */
-		onAfterRender : function() {
-			this._super( arguments );
-			
-			// Mask the view if the Model is currently loading when the view is rendered
-			/*var model = this.model;
-			if( model && this.maskOnLoad && model.isLoading() ) {
-				this.mask();
-			}*/
+		getDataComponent : function() {
+			return this.getModel();
+		},
+		
+		
+		/**
+		 * Implementation of abstract method from superclass. Unbinds the {@link #model}, if one is bound.
+		 * 
+		 * @protected
+		 */
+		unbindDataComponent : function() {
+			this.unbindModel();
 		},
 		
 		
@@ -13370,8 +14518,8 @@ define('gui/view/Model', [
 		 */
 		getModelListeners : function( model ) {
 			return {
-				'loadbegin' : this.onLoadBegin,
-				'load'      : this.onLoadComplete,
+				'loadbegin' : this.onLoadBegin,    // method in superclass
+				'load'      : this.onLoadComplete, // method in superclass
 				'changeset' : this.refresh,
 				'rollback'  : this.refresh,
 				scope : this
@@ -13384,46 +14532,23 @@ define('gui/view/Model', [
 		 * bound to the view.
 		 * 
 		 * @protected
-		 * @param {data.Model} model The newly bound model. Will be `null` if the previous model was
+		 * @param {data.Model} newModel The newly bound model. Will be `null` if the previous model was
 		 *   simply unbound (i.e. `null` was passed to {@link #bindModel}, or {@link #unbindModel} was called). 
 		 * @param {data.Model} oldModel The model that was just unbound. Will be `null` if there was no
 		 *   previously-bound model.
 		 */
-		onModelBind : function( model ) {
+		onModelBind : function( newModel ) {
+			// Handle `maskOnLoad` behavior for the new bind. If the "new" model is loading, mask.
+			// Otherwise, make sure the ModelView is unmasked.
+			if( this.maskOnLoad ) {
+				this[ newModel && newModel.isLoading() ? 'mask' : 'unMask' ]();
+			}
+			
 			this.refresh();
 		},
 		
 		
 		// -----------------------------------
-		
-		
-		/**
-		 * Handles the {@link #model} starting to load, by displaying the "loading" mask over the Model View
-		 * if the {@link #maskOnLoad} config is true.
-		 * 
-		 * @protected
-		 */
-		onLoadBegin : function() {
-			if( this.maskOnLoad ) {
-				this.mask();
-			}
-		},
-		
-		
-		/**
-		 * Handles the {@link #model} completing its load, by removing the "loading" mask from the Model View,
-		 * which was shown by {@link #onLoadBegin} if the {@link #maskOnLoad} config was true.
-		 * 
-		 * Note: The view will be refreshed due to the addition/removal of models, and doesn't need to be refreshed
-		 * from this method.
-		 * 
-		 * @protected
-		 */
-		onLoadComplete : function() {
-			if( this.maskOnLoad ) {
-				this.unMask();
-			}
-		},
 		
 		
 		/**
@@ -13458,19 +14583,6 @@ define('gui/view/Model', [
 			data[ this.modelVar ] = model;
 			
 			return data;
-		},
-		
-		
-		// ---------------------------------------
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		onDestroy : function() {
-			this.unbindModel();
-			
-			this._super( arguments );
 		}
 		
 	} );
@@ -13726,4 +14838,4 @@ define('gui/window/Window', [
 	return Window;
 	
 } );
-require(["gui/Anchor", "gui/Component", "gui/ComponentManager", "gui/ComponentQuery", "gui/Container", "gui/Gui", "gui/Image", "gui/Label", "gui/Mask", "gui/Overlay", "gui/Viewport", "gui/anim/Animation", "gui/app/Controller", "gui/app/EventBus", "gui/button/Button", "gui/form/field/Checkbox", "gui/form/field/Dropdown", "gui/form/field/Field", "gui/form/field/Hidden", "gui/form/field/Radio", "gui/form/field/Text", "gui/form/field/TextArea", "gui/layout/Auto", "gui/layout/Card.SwitchTransition", "gui/layout/Card.Transition", "gui/layout/Card", "gui/layout/Column", "gui/layout/Fit", "gui/layout/HBox", "gui/layout/Layout", "gui/layout/VBox", "gui/panel/Header", "gui/panel/Panel", "gui/panel/ToolButton", "gui/plugin/Plugin", "gui/tab/Bar", "gui/tab/Panel", "gui/tab/Tab", "gui/template/LoDash", "gui/template/Template", "gui/util/CallbackList", "gui/util/CollectionBindable", "gui/util/Css", "gui/util/Html", "gui/util/ModelBindable", "gui/util/OptionsStore", "gui/view/Collection", "gui/view/Model", "gui/window/Window"]);
+require(["gui/Anchor", "gui/Component", "gui/ComponentManager", "gui/ComponentQuery", "gui/Container", "gui/Gui", "gui/Image", "gui/Label", "gui/Mask", "gui/Overlay", "gui/Viewport", "gui/anim/Animation", "gui/app/Application", "gui/app/Controller", "gui/app/EventBus", "gui/button/Button", "gui/form/field/Checkbox", "gui/form/field/Dropdown", "gui/form/field/Field", "gui/form/field/Hidden", "gui/form/field/Radio", "gui/form/field/Text", "gui/form/field/TextArea", "gui/layout/Auto", "gui/layout/Card.SwitchTransition", "gui/layout/Card.Transition", "gui/layout/Card", "gui/layout/Column", "gui/layout/Fit", "gui/layout/HBox", "gui/layout/Layout", "gui/layout/VBox", "gui/loader/Loader", "gui/loader/RequireJs", "gui/panel/Header", "gui/panel/Panel", "gui/panel/ToolButton", "gui/plugin/Plugin", "gui/tab/Bar", "gui/tab/Panel", "gui/tab/Tab", "gui/template/LoDash", "gui/template/Template", "gui/util/CallbackList", "gui/util/CollectionBindable", "gui/util/Css", "gui/util/Html", "gui/util/ModelBindable", "gui/util/OptionsStore", "gui/view/Collection", "gui/view/DataBound", "gui/view/Model", "gui/window/Window"]);
