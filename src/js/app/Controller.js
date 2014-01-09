@@ -257,10 +257,11 @@ define( [
 		 */
 		
 		/**
-		 * @protected
+		 * @private
 		 * @property {Boolean} destroyed
 		 * 
-		 * Set to `true` if the Controller has been destroyed.
+		 * Set to `true` if the Controller has been destroyed. Determine if the Controller has been destroyed via
+		 * the {@link #isDestroyed} method.
 		 */
 		
 		
@@ -549,7 +550,17 @@ define( [
 		 * @protected
 		 * @method onDestroy
 		 */
-		onDestroy : Gui.emptyFn
+		onDestroy : Gui.emptyFn,
+		
+		
+		/**
+		 * Determines if the Controller has been destroyed.
+		 * 
+		 * @return {Boolean} `true` if the Component has been {@link #method-destroy destroyed}, `false` otherwise.
+		 */
+		isDestroyed : function() {
+			return !!this.destroyed;
+		}
 		
 	} );
 	

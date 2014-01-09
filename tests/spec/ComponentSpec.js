@@ -2602,6 +2602,24 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 			
 		} );  // eo destroy() tests
+		
+		
+		describe( 'isDestroyed()', function() {
+			
+			it( "should return `false` before the Component has been destroyed", function() {
+				var component = new Component();
+				expect( component.isDestroyed() ).toBe( false );
+			} );
+			
+			
+			it( "should return `true` after the Component has been destroyed", function() {
+				var component = new Component();
+				component.destroy();
+				
+				expect( component.isDestroyed() ).toBe( true );
+			} );
+			
+		} );
 	
 	} );
 	
