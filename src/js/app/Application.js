@@ -394,7 +394,10 @@ define( [
 			this.initialized = true;
 			this.fireEvent( 'initialize', this );
 			
-			jQuery( document ).ready( _.bind( this.onDocumentReady, this ) );
+			var me = this;  // for closure
+			jQuery( document ).ready( function() {
+				if( !me.isDestroyed() ) me.onDocumentReady();  // only call the method if the Application hasn't been destroyed before the document is ready
+			} );
 		},
 		
 		
