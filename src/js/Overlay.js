@@ -11,7 +11,6 @@ define( [
 ], function( jQuery, _, Class, Gui, Animation, Component, Panel ) {
 	
 	/**
-	 * @abstract
 	 * @class gui.Overlay
 	 * @extends gui.panel.Panel
 	 *
@@ -20,8 +19,6 @@ define( [
 	 * {@link #anchor} config.
 	 */
 	var Overlay = Panel.extend( {
-		abstractClass : true,
-		
 		
 		/**
 		 * @cfg {Boolean} autoShow
@@ -58,7 +55,13 @@ define( [
 		 * {@link gui.window.Window Window} subclass, as the call to the {@link #method-hide} method is made behind the scenes 
 		 * in this case.
 		 */
-	
+		 
+		/**
+		 * @cfg {String/HTMLElement/jQuery} renderTo 
+		 * 
+		 * Override of superclass config which in the case of Overlay is stored until the {@link #show} method is called.
+		 * This allows for lazy rendering of Overlays. Defaults to the document body when the {@link #show} method is called.
+		 */
 	
 	
 		// Positioning Configs
@@ -93,14 +96,14 @@ define( [
 		 *   Adds these left-top values to the calculated position. Ex: "50 50" (left top). A single value
 		 *   given in the string will apply to both left and top values.
 		 *
-		 * @cfg {String} [anchor.collision]
-		 *   When the positioned element overflows the window in some direction, move it to an alternative position. Similar to `my` and `at`,
-		 *   this accepts a single value or a pair for horizontal/vertical, eg. "flip", "fit", "fit flip", "fit none". Defaults to 'flip'.
+		 * @cfg {String} [anchor.collision=flip]
+		 *   When the positioned element overflows the window in some direction, move it to an alternative position. Similar to `my`
+		 *   and `at`, this accepts a single value or a pair for horizontal/vertical, eg. "flip", "fit", "fit flip", "fit none".
 		 *
-		 *   - __flip__: (the default) to the opposite side and the collision detection is run again to see if it will fit. If it won't fit in either position, the center option should be used as a fall back.
-		 *   - __fit__: so the element keeps in the desired direction, but is re-positioned so it fits.
-		 *   - __flipfit__: first flips, then tries to fit as much as possible on the screen.
-		 *   - __none__: do not do collision detection.
+		 *   - **flip**: (the default) to the opposite side and the collision detection is run again to see if it will fit. If it won't fit in either position, the center option should be used as a fall back.
+		 *   - **fit**: so the element keeps in the desired direction, but is re-positioned so it fits.
+		 *   - **flipfit**: first flips, then tries to fit as much as possible on the screen.
+		 *   - **none**: do not do collision detection.
 		 */
 	
 		/**
@@ -130,6 +133,8 @@ define( [
 		 * 
 		 * When using {@link #x}/{@link #y} positioning, this config makes sure that the Overlay is constrained to be in the 
 		 * viewable area of the browser's viewport (at least as much as possible).
+		 * 
+		 * When using the {@link #anchor} config, the `collision` option must be set appropriately.
 		 */
 		constrainToViewport : true,
 		
@@ -139,14 +144,14 @@ define( [
 		 */
 		baseCls : 'gui-overlay',
 		
-		/**
-		 * @hide
-		 * @cfg {jQuery/HTMLElement} renderTo
-		 * 
-		 * This config should not be specified for this subclass. The Overlay will
-		 * automatically be rendered into the document body when it is opened.
-		 */
 		
+		/**
+		 * @protected
+		 * @property {String/HTMLElement/jQuery} deferredRenderTo
+		 * 
+		 * This property will hold the value of the {@link #renderTo} config, if one was provided. It is then used
+		 * to render the Overlay lazily in the {@link #show} method.
+		 */
 		
 		/**
 		 * @protected
@@ -169,6 +174,11 @@ define( [
 		 * @inheritdoc
 		 */
 		initComponent : function() {
+			// First, store any `renderTo` config that was provided to the Overlay, and remove it. We don't want the superclass
+			// (gui.Container) to automatically render the Overlay, since we want to lazily render it in the `show()` method.
+			this.deferredRenderTo = this.renderTo || 'body';
+			this.renderTo = undefined;  // note: not deleting the property, to make sure we don't unshadow a prototype property
+			
 			// Call superclass initComponent
 			this._super( arguments );
 			
@@ -234,9 +244,10 @@ define( [
 				options.anim = this.showAnim;
 			}
 			
-			// If the overlay has not been rendered yet, render it now to the document body
+			// If the overlay has not been rendered yet, render it now to the value of the `deferredRenderTo` property
+			// (which defaults to the document body)
 			if( !this.rendered ) {
-				this.render( document.body );
+				this.render( this.deferredRenderTo );
 			}
 			
 			this._super( [ options ] );
