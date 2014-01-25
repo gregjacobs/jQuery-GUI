@@ -323,7 +323,7 @@ define( [
 				this.fireEvent( 'tabchange', this, container.getItemAt( newTabIndex ), container.getItemAt( oldTabIndex ) );
 				
 			} else {
-				container.getContentTarget().tabs( 'option', 'selected', newTabIndex );
+				container.getLayoutTarget().tabs( 'option', 'selected', newTabIndex );
 			}
 		},
 		
@@ -362,7 +362,7 @@ define( [
 		onTabChange : function() {
 			var container = this.container,
 			    oldTab = this.container.getItemAt( this.activeTab ),  // retrieve the old tab for the event. It is still set to this.activeTab
-			    newTabIndex = this.activeTab = container.getContentTarget().tabs( 'option', 'selected' ),
+			    newTabIndex = this.activeTab = container.getLayoutTarget().tabs( 'option', 'selected' ),
 			    newTab = container.getItemAt( newTabIndex );
 			
 			// Do the layout in the newly shown tab (if it is a ui.Container)
@@ -380,7 +380,7 @@ define( [
 		// protected
 		onDestroy : function() {
 			if( this.tabsLayoutInitialized ) {
-				this.container.getContentTarget().tabs( 'destroy' );
+				this.container.getLayoutTarget().tabs( 'destroy' );
 				
 				this.$tabHeadersContainerEl.remove();
 				this.$contentDivEls.remove();   // Note: The $contentDivEls hold the $contentDivInnerEls, so removing them removes the $contentDivInnerEls as well

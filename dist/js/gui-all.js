@@ -4043,7 +4043,7 @@ define('gui/layout/Layout', [
 	 * 
 	 * The default layout that is used for a {@link gui.Container Container} is the {@link gui.layout.Auto}, 
 	 * which simply renders each child component directly into the {@link gui.Container gui.Container's} 
-	 * {@link gui.Component#getContentTarget content target element}, and does no further sizing or formatting.
+	 * {@link gui.Component#getLayoutTarget layout target element}, and does no further sizing or formatting.
 	 * 
 	 * 
 	 * ## Building a Layout
@@ -4202,7 +4202,7 @@ define('gui/layout/Layout', [
 			var container = this.container,
 			    childComponents = container.getItems(),
 			    numChildComponents = childComponents.length,
-			    $targetEl = container.getContentTarget(),
+			    $targetEl = container.getLayoutTarget(),
 			    childComponent,
 			    i;
 			
@@ -4421,7 +4421,7 @@ define('gui/layout/Auto', [
 		
 		/**
 		 * Layout implementation for AutoLayout, which simply renders each child component directly into the 
-		 * Container's content target (see {@link gui.Component#getContentTarget}). 
+		 * Container's layout target (see {@link gui.Component#getLayoutTarget}). 
 		 * 
 		 * @protected
 		 * @method onLayout
@@ -5213,13 +5213,26 @@ define('gui/Container', [
 				this.onBeforeLayout();
 				
 				// Run the layout strategy, which will lay the child components out into this Container,
-				// using the layout target returned by the getContentTarget() method.
+				// using the layout target returned by the getLayoutTarget() method.
 				this.getLayout().doLayout();
 	
 				// Run the template method after layout has been executed, and fire the afterlayout event
 				this.onLayout();
 				this.fireEvent( 'afterlayout', this );
 			}
+		},
+
+		
+		/**
+		 * Retrieves the element that should be the target for the Container's child components. For Container, this defaults to
+		 * the element retrieved by {@link #getContentTarget}, but may be overridden to provide a different element (other than
+		 * the content target) for child {@link #items}.
+		 * 
+		 * @protected
+		 * @return {jQuery} The element (jQuery wrapped set) where the Container's child {@link #items} should be placed.
+		 */
+		getLayoutTarget : function() {
+			return this.getContentTarget();
 		},
 		
 		
@@ -7091,7 +7104,6 @@ define('gui/Overlay', [
 ], function( jQuery, _, Class, Gui, Animation, Component, Panel ) {
 	
 	/**
-	 * @abstract
 	 * @class gui.Overlay
 	 * @extends gui.panel.Panel
 	 *
@@ -7100,8 +7112,6 @@ define('gui/Overlay', [
 	 * {@link #anchor} config.
 	 */
 	var Overlay = Panel.extend( {
-		abstractClass : true,
-		
 		
 		/**
 		 * @cfg {Boolean} autoShow
@@ -7138,7 +7148,13 @@ define('gui/Overlay', [
 		 * {@link gui.window.Window Window} subclass, as the call to the {@link #method-hide} method is made behind the scenes 
 		 * in this case.
 		 */
-	
+		 
+		/**
+		 * @cfg {String/HTMLElement/jQuery} renderTo 
+		 * 
+		 * Override of superclass config which in the case of Overlay is stored until the {@link #show} method is called.
+		 * This allows for lazy rendering of Overlays. Defaults to the document body when the {@link #show} method is called.
+		 */
 	
 	
 		// Positioning Configs
@@ -7173,14 +7189,14 @@ define('gui/Overlay', [
 		 *   Adds these left-top values to the calculated position. Ex: "50 50" (left top). A single value
 		 *   given in the string will apply to both left and top values.
 		 *
-		 * @cfg {String} [anchor.collision]
-		 *   When the positioned element overflows the window in some direction, move it to an alternative position. Similar to `my` and `at`,
-		 *   this accepts a single value or a pair for horizontal/vertical, eg. "flip", "fit", "fit flip", "fit none". Defaults to 'flip'.
+		 * @cfg {String} [anchor.collision=flip]
+		 *   When the positioned element overflows the window in some direction, move it to an alternative position. Similar to `my`
+		 *   and `at`, this accepts a single value or a pair for horizontal/vertical, eg. "flip", "fit", "fit flip", "fit none".
 		 *
-		 *   - __flip__: (the default) to the opposite side and the collision detection is run again to see if it will fit. If it won't fit in either position, the center option should be used as a fall back.
-		 *   - __fit__: so the element keeps in the desired direction, but is re-positioned so it fits.
-		 *   - __flipfit__: first flips, then tries to fit as much as possible on the screen.
-		 *   - __none__: do not do collision detection.
+		 *   - **flip**: (the default) to the opposite side and the collision detection is run again to see if it will fit. If it won't fit in either position, the center option should be used as a fall back.
+		 *   - **fit**: so the element keeps in the desired direction, but is re-positioned so it fits.
+		 *   - **flipfit**: first flips, then tries to fit as much as possible on the screen.
+		 *   - **none**: do not do collision detection.
 		 */
 	
 		/**
@@ -7210,6 +7226,8 @@ define('gui/Overlay', [
 		 * 
 		 * When using {@link #x}/{@link #y} positioning, this config makes sure that the Overlay is constrained to be in the 
 		 * viewable area of the browser's viewport (at least as much as possible).
+		 * 
+		 * When using the {@link #anchor} config, the `collision` option must be set appropriately.
 		 */
 		constrainToViewport : true,
 		
@@ -7219,14 +7237,14 @@ define('gui/Overlay', [
 		 */
 		baseCls : 'gui-overlay',
 		
-		/**
-		 * @hide
-		 * @cfg {jQuery/HTMLElement} renderTo
-		 * 
-		 * This config should not be specified for this subclass. The Overlay will
-		 * automatically be rendered into the document body when it is opened.
-		 */
 		
+		/**
+		 * @protected
+		 * @property {String/HTMLElement/jQuery} deferredRenderTo
+		 * 
+		 * This property will hold the value of the {@link #renderTo} config, if one was provided. It is then used
+		 * to render the Overlay lazily in the {@link #show} method.
+		 */
 		
 		/**
 		 * @protected
@@ -7249,6 +7267,11 @@ define('gui/Overlay', [
 		 * @inheritdoc
 		 */
 		initComponent : function() {
+			// First, store any `renderTo` config that was provided to the Overlay, and remove it. We don't want the superclass
+			// (gui.Container) to automatically render the Overlay, since we want to lazily render it in the `show()` method.
+			this.deferredRenderTo = this.renderTo || 'body';
+			this.renderTo = undefined;  // note: not deleting the property, to make sure we don't unshadow a prototype property
+			
 			// Call superclass initComponent
 			this._super( arguments );
 			
@@ -7314,9 +7337,10 @@ define('gui/Overlay', [
 				options.anim = this.showAnim;
 			}
 			
-			// If the overlay has not been rendered yet, render it now to the document body
+			// If the overlay has not been rendered yet, render it now to the value of the `deferredRenderTo` property
+			// (which defaults to the document body)
 			if( !this.rendered ) {
-				this.render( document.body );
+				this.render( this.deferredRenderTo );
 			}
 			
 			this._super( [ options ] );
@@ -8314,7 +8338,10 @@ define('gui/app/Application', [
 			this.initialized = true;
 			this.fireEvent( 'initialize', this );
 			
-			jQuery( document ).ready( _.bind( this.onDocumentReady, this ) );
+			var me = this;  // for closure
+			jQuery( document ).ready( function() {
+				if( !me.isDestroyed() ) me.onDocumentReady();  // only call the method if the Application hasn't been destroyed before the document is ready
+			} );
 		},
 		
 		
@@ -12112,8 +12139,8 @@ define('gui/layout/Card', [
 		
 		
 		/**
-		 * Layout implementation for CardLayout, which renders each child component into the Container's content target 
-		 * (see {@link gui.Component#getContentTarget}), and then hides them.  The one given by the {@link #activeItem}
+		 * Layout implementation for CardLayout, which renders each child component into the Container's layout target 
+		 * (see {@link gui.Component#getLayoutTarget}), and then hides them.  The one given by the {@link #activeItem}
 		 * config is then shown.
 		 * 
 		 * @protected
@@ -12140,7 +12167,7 @@ define('gui/layout/Card', [
 			} else {
 				// We're not doing deferred rendering, so render all child Components, and just hide them if they are not the activeItem.
 				for( var i = 0, len = childComponents.length; i < len; i++ ) {
-					// render the child Component into the Container's content target element, and size it
+					// render the child Component into the Container's layout target element, and size it
 					this.renderAndSizeCard( childComponents[ i ], $targetEl, targetWidth, targetHeight );
 					
 					// Hide the child Component if it is not the activeItem.
@@ -12235,7 +12262,7 @@ define('gui/layout/Card', [
 					
 					// Render the card (Component) if it is not yet rendered (and of course, exists)
 					if( item !== null ) {
-						var $targetEl = this.container.getContentTarget();
+						var $targetEl = this.container.getLayoutTarget();
 						this.renderAndSizeCard( item, $targetEl, $targetEl.width(), $targetEl.height() );
 					}
 					
@@ -12348,7 +12375,7 @@ define('gui/layout/Column', [
 		
 		/**
 		 * Layout implementation for ColumnsLayout, which renders each child component as columns into the 
-		 * Container's content target (see {@link gui.Component#getContentTarget).  Each child component in the
+		 * Container's layout target (see {@link gui.Component#getLayoutTarget).  Each child component in the
 		 * Container should have a special property named `columnWidth`, that determines how wide the column
 		 * should be.  This property can either be a number, or any css width value.
 		 * 

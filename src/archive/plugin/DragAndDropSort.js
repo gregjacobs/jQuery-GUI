@@ -75,7 +75,7 @@ ui.plugin.DragAndDropSort = Class.extend( ui.plugin.Plugin, {
 	 */
 	onRender : function() {
 		var container = this.container,
-		    $contentEl = container.getContentTarget();  // only make the Container's "content area" have draggable items
+		    $contentEl = container.getLayoutTarget();  // only make the Container's "content area" have draggable items
 		
 		$contentEl.addClass( 'juxUI-draggable' );
 		$contentEl.sortable( {

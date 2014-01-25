@@ -36,7 +36,7 @@ define( [
 		
 		/**
 		 * Layout implementation for ColumnsLayout, which renders each child component as columns into the 
-		 * Container's content target (see {@link gui.Component#getContentTarget).  Each child component in the
+		 * Container's layout target (see {@link gui.Component#getLayoutTarget).  Each child component in the
 		 * Container should have a special property named `columnWidth`, that determines how wide the column
 		 * should be.  This property can either be a number, or any css width value.
 		 * 

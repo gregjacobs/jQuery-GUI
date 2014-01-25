@@ -122,7 +122,7 @@ ui.layout.AccordionLayout = Class.extend( ui.layout.Layout, {
 	 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 	 */
 	initAccordionLayout : function( childComponents, $targetEl ) {
-		// Make sure the content target element is empty, to clear out any elements that may be in there 
+		// Make sure the layout target element is empty, to clear out any elements that may be in there 
 		// (such as from previous layouts, or any direct HTML injected in there).
 		$targetEl.addClass( 'ui-accordion ui-widget' );  // adding the css classes immediately (before jQuery UI processes these elements) to prevent a flash of unstyled
 		                                                 // content, and also so that things in child components are sized appropriately from the beginning when they are rendered
@@ -271,7 +271,7 @@ ui.layout.AccordionLayout = Class.extend( ui.layout.Layout, {
 			if( !this.container.rendered ) {
 				this.activeItem = item;	// Not rendered yet, set for when it is rendered
 			} else {
-				this.container.getContentTarget().accordion( "activate", item );
+				this.container.getLayoutTarget().accordion( "activate", item );
 			}
 		}
 	},
@@ -287,7 +287,7 @@ ui.layout.AccordionLayout = Class.extend( ui.layout.Layout, {
 		if( !this.container.rendered ) {
 			return this.container.getItemAt( this.activeItem );
 		} else {
-			return this.container.getItemAt( this.container.getContentTarget().accordion( "option", "active" ) );
+			return this.container.getItemAt( this.container.getLayoutTarget().accordion( "option", "active" ) );
 		}
 	},
 	
@@ -302,7 +302,7 @@ ui.layout.AccordionLayout = Class.extend( ui.layout.Layout, {
 		if( !this.container.rendered ) {
 			return this.activeItem;
 		} else {
-			return this.container.getContentTarget().accordion( "option", "active" );
+			return this.container.getLayoutTarget().accordion( "option", "active" );
 		}
 	},
 	
@@ -357,7 +357,7 @@ ui.layout.AccordionLayout = Class.extend( ui.layout.Layout, {
 	// protected
 	onDestroy : function() {
 		if( this.accordionLayoutInitialized ) {
-			this.container.getContentTarget().accordion( "destroy" );
+			this.container.getLayoutTarget().accordion( "destroy" );
 		}
 		
 		this._super( arguments );

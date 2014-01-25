@@ -764,13 +764,26 @@ define( [
 				this.onBeforeLayout();
 				
 				// Run the layout strategy, which will lay the child components out into this Container,
-				// using the layout target returned by the getContentTarget() method.
+				// using the layout target returned by the getLayoutTarget() method.
 				this.getLayout().doLayout();
 	
 				// Run the template method after layout has been executed, and fire the afterlayout event
 				this.onLayout();
 				this.fireEvent( 'afterlayout', this );
 			}
+		},
+
+		
+		/**
+		 * Retrieves the element that should be the target for the Container's child components. For Container, this defaults to
+		 * the element retrieved by {@link #getContentTarget}, but may be overridden to provide a different element (other than
+		 * the content target) for child {@link #items}.
+		 * 
+		 * @protected
+		 * @return {jQuery} The element (jQuery wrapped set) where the Container's child {@link #items} should be placed.
+		 */
+		getLayoutTarget : function() {
+			return this.getContentTarget();
 		},
 		
 		

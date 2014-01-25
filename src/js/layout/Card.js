@@ -94,8 +94,8 @@ define( [
 		
 		
 		/**
-		 * Layout implementation for CardLayout, which renders each child component into the Container's content target 
-		 * (see {@link gui.Component#getContentTarget}), and then hides them.  The one given by the {@link #activeItem}
+		 * Layout implementation for CardLayout, which renders each child component into the Container's layout target 
+		 * (see {@link gui.Component#getLayoutTarget}), and then hides them.  The one given by the {@link #activeItem}
 		 * config is then shown.
 		 * 
 		 * @protected
@@ -122,7 +122,7 @@ define( [
 			} else {
 				// We're not doing deferred rendering, so render all child Components, and just hide them if they are not the activeItem.
 				for( var i = 0, len = childComponents.length; i < len; i++ ) {
-					// render the child Component into the Container's content target element, and size it
+					// render the child Component into the Container's layout target element, and size it
 					this.renderAndSizeCard( childComponents[ i ], $targetEl, targetWidth, targetHeight );
 					
 					// Hide the child Component if it is not the activeItem.
@@ -217,7 +217,7 @@ define( [
 					
 					// Render the card (Component) if it is not yet rendered (and of course, exists)
 					if( item !== null ) {
-						var $targetEl = this.container.getContentTarget();
+						var $targetEl = this.container.getLayoutTarget();
 						this.renderAndSizeCard( item, $targetEl, $targetEl.width(), $targetEl.height() );
 					}
 					

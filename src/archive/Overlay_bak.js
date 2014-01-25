@@ -231,10 +231,10 @@ define( [
 		 * Retrieves the element that should be the target for the Component's content (html) or child components.  For this subclass,
 		 * this is the {@link #$contentContainer}.
 		 *
-		 * @method getContentTarget
+		 * @method getLayoutTarget
 		 * @return {jQuery} The element (jQuery wrapped set) where HTML content or child components should be placed.
 		 */
-		//getContentTarget : function() {
+		//getLayoutTarget : function() {
 			//return this.$contentContainer;
 		//},
 	

@@ -63,13 +63,13 @@ ui.containers.SectionContainer = Class.extend( ui.Container, {
 	
 	
 	/**
-	 * Override of {@link ui.Component#getContentTarget} to specify where html content and child components should
+	 * Override of {@link ui.Component#getLayoutTarget} to specify where html content and child components should
 	 * be rendered into.  This should be the {@link #$contentEl} for this subclass.
 	 * 
-	 * @method getContentTarget
+	 * @method getLayoutTarget
 	 * @return {jQuery}
 	 */
-	getContentTarget : function() {
+	getLayoutTarget : function() {
 		return this.$contentEl;
 	},
 	

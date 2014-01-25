@@ -68,12 +68,12 @@ define( [
 		constructor : function( cfg ) {
 			_.assign( this, cfg );
 			
-			// A mock Content target element
+			// A mock layout target element
 			this.$targetEl = jQuery( '<div style="width: ' + this.targetWidth + 'px; height: ' + this.targetHeight + 'px;" />' );
 			
-			// A mock Container, which uses the $targetEl as its content target
+			// A mock Container, which uses the $targetEl as its layout target
 			this.container = new Container();
-			spyOn( this.container, 'getContentTarget' ).andReturn( this.$targetEl );
+			spyOn( this.container, 'getLayoutTarget' ).andReturn( this.$targetEl );
 			spyOn( this.container, 'getCount' ).andReturn( 0 );      // initially 0. Override in tests.
 			spyOn( this.container, 'getItems' ).andReturn( [] );     // initially empty. Override in tests.
 			spyOn( this.container, 'getItemAt' ).andReturn( null );  // all calls to getItemAt() (with any argument) should return null by default. 

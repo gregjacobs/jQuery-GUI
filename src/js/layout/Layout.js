@@ -16,7 +16,7 @@ define( [
 	 * 
 	 * The default layout that is used for a {@link gui.Container Container} is the {@link gui.layout.Auto}, 
 	 * which simply renders each child component directly into the {@link gui.Container gui.Container's} 
-	 * {@link gui.Component#getContentTarget content target element}, and does no further sizing or formatting.
+	 * {@link gui.Component#getLayoutTarget layout target element}, and does no further sizing or formatting.
 	 * 
 	 * 
 	 * ## Building a Layout
@@ -175,7 +175,7 @@ define( [
 			var container = this.container,
 			    childComponents = container.getItems(),
 			    numChildComponents = childComponents.length,
-			    $targetEl = container.getContentTarget(),
+			    $targetEl = container.getLayoutTarget(),
 			    childComponent,
 			    i;
 			
