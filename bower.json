@@ -37,7 +37,7 @@
     "lodash": "~2.4.1",
     "Observable-js": "~0.1.2",
     "requirejs": "~2.1.8",
-    "Data-js": "~0.2.1",
+    "Data-js": "~0.5.0",
     "jquery-ui-amd": "~0.0.3"
   },
   "devDependencies": {
