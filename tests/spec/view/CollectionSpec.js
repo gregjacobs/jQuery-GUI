@@ -342,6 +342,8 @@ define( [
 					collection.fireEvent( 'loadbegin', collection );
 					
 					expect( collectionView.getHeight() ).toBe( 0 );  // still 0 - no loading height applied
+					
+					collectionView.destroy();  // clean up the local collectionView
 				} );
 				
 				
@@ -406,6 +408,8 @@ define( [
 				var collectionView = new ConfiguredCollectionView();
 				
 				expect( collectionView.getCollection() ).toBe( null );
+				
+				collectionView.destroy();  // clean up
 			} );
 			
 			
@@ -414,6 +418,8 @@ define( [
 				    collectionView = new ConfiguredCollectionView( { collection: collection } );
 				
 				expect( collectionView.getCollection() ).toBe( collection );
+				
+				collectionView.destroy();  // clean up
 			} );
 			
 			
@@ -424,6 +430,8 @@ define( [
 				collectionView.bindCollection( collection );
 				
 				expect( collectionView.getCollection() ).toBe( collection );
+				
+				collectionView.destroy();  // clean up
 			} );
 			
 		} );
@@ -456,6 +464,8 @@ define( [
 				
 				collectionView.bindCollection( collection1 );
 				expect( collection1.on.calls.length ).toBe( 1 );
+				
+				collectionView.destroy();  // clean up
 			} );
 			
 			
@@ -469,6 +479,8 @@ define( [
 				collectionView.bindCollection( null );
 				expect( collection1.on.calls.length ).toBe( 1 );  // not called again since initial bind
 				expect( collection1.un.calls.length ).toBe( 1 );  // should now be unbound
+				
+				collectionView.destroy();  // clean up
 			} );
 			
 			
@@ -484,6 +496,8 @@ define( [
 				expect( collection1.un.calls.length ).toBe( 1 );  // should now be unbound
 				expect( collection2.on.calls.length ).toBe( 1 );  // collection2 now bound
 				expect( collection2.un.calls.length ).toBe( 0 );  // not unbound yet
+				
+				collectionView.destroy();  // clean up
 			} );
 			
 			
@@ -498,6 +512,8 @@ define( [
 				collectionView.bindCollection( collection1 );
 				expect( collection1.on.calls.length ).toBe( 1 );  // not called again since initial bind
 				expect( collection1.un.calls.length ).toBe( 0 );  // should not have been unbound
+				
+				collectionView.destroy();  // clean up
 			} );
 			
 		} );
@@ -640,7 +656,7 @@ define( [
 			
 			afterEach( function() {
 				collectionView.destroy();
-				collectionView = null;
+				collectionView = null;  // reset before next test
 			} );
 			
 			
@@ -762,7 +778,8 @@ define( [
 			} );
 			
 			afterEach( function() { 
-				collectionView.destroy(); 
+				collectionView.destroy();
+				collectionView = null;  // reset before next test
 			} );
 			
 				

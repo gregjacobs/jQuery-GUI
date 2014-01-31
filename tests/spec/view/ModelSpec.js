@@ -105,6 +105,7 @@ define( [
 				
 				afterEach( function() {
 					modelView.destroy();  // note: modelView is instantiated in each test
+					modelView = null;     // remove before next test
 				} );
 				
 				
@@ -312,6 +313,8 @@ define( [
 					model.fireEvent( 'loadbegin', model );
 					
 					expect( modelView.getHeight() ).toBe( 0 );  // still 0 - no loading height applied
+					
+					modelView.destroy();  // clean up the local modelView
 				} );
 				
 				
@@ -375,6 +378,8 @@ define( [
 				var modelView = new ConfiguredModelView();
 				
 				expect( modelView.getModel() ).toBe( null );
+				
+				modelView.destroy();  // clean up
 			} );
 			
 			
@@ -383,6 +388,8 @@ define( [
 				    modelView = new ConfiguredModelView( { model: model } );
 				
 				expect( modelView.getModel() ).toBe( model );
+				
+				modelView.destroy();  // clean up
 			} );
 			
 			
@@ -393,6 +400,8 @@ define( [
 				modelView.bindModel( model );
 				
 				expect( modelView.getModel() ).toBe( model );
+				
+				modelView.destroy();  // clean up
 			} );
 			
 		} );
@@ -404,7 +413,8 @@ define( [
 			} );
 			
 			var model1,
-			    model2;
+			    model2,
+			    modelView;  // note: instantiated in tests
 			
 			beforeEach( function() {
 				model1 = new UserModel();
@@ -417,8 +427,14 @@ define( [
 			} );
 			
 			
+			afterEach( function() {
+				modelView.destroy();  // clean up
+				modelView = null;     // remove reference before next test
+			} );
+			
+			
 			it( "should bind a model to be listened to", function() {
-				var modelView = new SimpleModelView();
+				modelView = new SimpleModelView();
 				
 				modelView.bindModel( model1 );
 				expect( model1.on.calls.length ).toBe( 1 );
@@ -426,7 +442,7 @@ define( [
 			
 			
 			it( "should unbind the previously-bound model", function() {
-				var modelView = new SimpleModelView();
+				modelView = new SimpleModelView();
 				
 				modelView.bindModel( model1 );
 				expect( model1.on.calls.length ).toBe( 1 );
@@ -439,7 +455,7 @@ define( [
 			
 			
 			it( "should unbind the previously-bound model when binding a new model", function() {
-				var modelView = new SimpleModelView();
+				modelView = new SimpleModelView();
 				
 				modelView.bindModel( model1 );
 				expect( model1.on.calls.length ).toBe( 1 );
@@ -454,7 +470,7 @@ define( [
 			
 			
 			it( "should not re-bind the already-bound model", function() {
-				var modelView = new SimpleModelView();
+				modelView = new SimpleModelView();
 				
 				modelView.bindModel( model1 );
 				expect( model1.on.calls.length ).toBe( 1 );

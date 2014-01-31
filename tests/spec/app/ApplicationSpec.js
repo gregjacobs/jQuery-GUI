@@ -45,6 +45,11 @@ define( [
 		} );
 		
 		
+		afterEach( function() {
+			viewport.destroy();
+		} );
+		
+		
 		describe( 'constructor', function() {
 			
 			describe( "`listeners` config", function() {
@@ -62,6 +67,8 @@ define( [
 					
 					app.fireEvent( 'testEvent' );  // manually firing an event just for testing
 					expect( testEventCallCount ).toBe( 1 );
+					
+					app.destroy();  // clean up
 				} );
 				
 			} );
@@ -76,6 +83,8 @@ define( [
 					
 					var application = new TestApplication();
 					expect( application.isInitialized() ).toBe( true );
+					
+					application.destroy();  // clean up
 				} );
 				
 				
@@ -98,6 +107,8 @@ define( [
 					expect( application.isInitialized() ).toBe( true );
 					expect( pulledDep1 ).toBe( dep1 );
 					expect( pulledDep2 ).toBe( dep2 );
+					
+					application.destroy();  // clean up
 				} );
 				
 			} );
@@ -121,6 +132,8 @@ define( [
 					expect( ordering ).toEqual( [ 
 						"beforeInit", "loadDynamicDependencies", "createDataContainers", "createViewport", "createControllers", "init", "onDocumentReady"
 					] );
+					
+					app.destroy();  // clean up
 				} );
 				
 			} );
@@ -147,6 +160,8 @@ define( [
 					
 					var app = new MyApplication();
 					expect( app.viewport ).toBe( viewport );
+					
+					app.destroy();  // clean up
 				} );
 				
 			} );
@@ -169,6 +184,8 @@ define( [
 					
 					var application = new MyApplication();
 					expect( argProvidedViewport ).toBe( viewport );
+					
+					application.destroy();  // clean up
 				} );
 				
 
@@ -197,6 +214,8 @@ define( [
 					} ).not.toThrow();
 					
 					expect( application.getController( 'nonExistent' ) ).toBe( null );
+					
+					application.destroy();  // clean up
 				} );
 				
 				
@@ -218,6 +237,8 @@ define( [
 					expect( application.getController( 'controller1' ) ).toBe( controller1 );
 					expect( application.getController( 'controller2' ) ).toBe( controller2 );
 					expect( application.getController( 'controller3' ) ).toBe( null );
+					
+					application.destroy();  // clean up
 				} );
 				
 			} );
@@ -236,6 +257,8 @@ define( [
 						listeners : { 'initialize': function() { initializeEventCount++; } }
 					} );
 					expect( initializeEventCount ).toBe( 1 );
+					
+					application.destroy();  // clean up
 				} );
 
 				
@@ -262,6 +285,8 @@ define( [
 					application.resolveDynamicDependencies( {} );
 					expect( ordering ).toEqual( [ "init method", "init event" ] );
 					expect( initializeEventCount ).toBe( 1 );
+					
+					application.destroy();  // clean up
 				} );
 				
 			} );
@@ -277,19 +302,19 @@ define( [
 				
 				application.resolveDynamicDependencies( { 'path/to/Dep1': "a", 'path/to/Dep2': "b" } );
 				expect( application.isInitialized() ).toBe( true );
+				
+				application.destroy();  // clean up
 			} );
 			
 		} );
 		
 		
 		describe( 'destroy', function() {
-			var viewport,
-			    controller1,
+			var controller1,
 			    controller2,
 			    application;
 			
 			beforeEach( function() {
-				viewport = new Viewport();
 				controller1 = new Controller( { view: viewport } );
 				controller2 = new Controller( { view: viewport } );
 				
@@ -306,6 +331,10 @@ define( [
 					}
 				} );
 				application = new MyApplication();
+			} );
+			
+			afterEach( function() {
+				application.destroy();  // destroys controllers and the viewport
 			} );
 			
 			
