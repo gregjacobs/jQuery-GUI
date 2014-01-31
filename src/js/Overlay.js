@@ -395,13 +395,14 @@ define( [
 					}
 	
 				} else {
-					// no 'anchor' config provided, use x/y relative to the window
+					// no 'anchor' config provided, use x/y relative to the parent container where the Overlay has been rendered (most often the document body)
 					var x = this.x,
 					    y = this.y,
 					    xSide = x,  // default these to the values of the 'x' and 'y' configs, in the case that
 					    ySide = y,  // they are strings. They will be overwritten with side+offset if numbers
 					    atXSide = 'center',
-					    atYSide = 'center';
+					    atYSide = 'center',
+					    $overlayParent = $el.parent();
 					
 					if( typeof x === 'number' ) {
 					    xSide = ( x > 0 ? 'left' : 'right' ) + '+' + x;  // Position from right if this.x < 0. Forms a string like: "left+100"
@@ -414,7 +415,7 @@ define( [
 					
 					my = xSide + ' ' + ySide;      // forms a string like: "left+200 top+100" or "center center"
 					at = atXSide + ' ' + atYSide;  // forms a string like: "center center" or "left top"
-					of = window;
+					of = ( $overlayParent.is( 'body' ) ) ? window : $overlayParent;  // use `window` if rendered to the doc body, so as not to be affected by body margin/padding
 					
 					if( this.constrainToViewport ) {
 						collision = 'fit';
