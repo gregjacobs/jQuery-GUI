@@ -1,6 +1,6 @@
 {
   "name": "jQuery-GUI",
-  "version": "0.4.0",
+  "version": "0.7.1",
   "homepage": "https://github.com/gregjacobs/jQuery-GUI",
   "authors": [
     "Gregory Jacobs <greg@greg-jacobs.com>"
@@ -37,7 +37,7 @@
     "lodash": "~2.4.1",
     "Observable-js": "~0.1.2",
     "requirejs": "~2.1.8",
-    "Data-js": "~0.5.0",
+    "Data-js": "~0.5.2",
     "jquery-ui-amd": "~0.0.3"
   },
   "devDependencies": {

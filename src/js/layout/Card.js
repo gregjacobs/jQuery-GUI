@@ -95,7 +95,7 @@ define( [
 		
 		/**
 		 * Layout implementation for CardLayout, which renders each child component into the Container's layout target 
-		 * (see {@link gui.Component#getLayoutTarget}), and then hides them.  The one given by the {@link #activeItem}
+		 * (see {@link gui.Container#getLayoutTarget}), and then hides them.  The one given by the {@link #activeItem}
 		 * config is then shown.
 		 * 
 		 * @protected

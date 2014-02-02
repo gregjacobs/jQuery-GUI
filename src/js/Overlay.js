@@ -59,8 +59,8 @@ define( [
 		/**
 		 * @cfg {String/HTMLElement/jQuery} renderTo 
 		 * 
-		 * Override of superclass config which in the case of Overlay is stored until the {@link #show} method is called.
-		 * This allows for lazy rendering of Overlays. Defaults to the document body when the {@link #show} method is called.
+		 * Override of superclass config which in the case of Overlay is stored until the {@link #method-show} method is called.
+		 * This allows for lazy rendering of Overlays. Defaults to the document body when the {@link #method-show} method is called.
 		 */
 	
 	
@@ -150,7 +150,7 @@ define( [
 		 * @property {String/HTMLElement/jQuery} deferredRenderTo
 		 * 
 		 * This property will hold the value of the {@link #renderTo} config, if one was provided. It is then used
-		 * to render the Overlay lazily in the {@link #show} method.
+		 * to render the Overlay lazily in the {@link #method-show} method.
 		 */
 		
 		/**

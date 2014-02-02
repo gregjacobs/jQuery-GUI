@@ -16,7 +16,7 @@ define( [
 	 * 
 	 * The default layout that is used for a {@link gui.Container Container} is the {@link gui.layout.Auto}, 
 	 * which simply renders each child component directly into the {@link gui.Container gui.Container's} 
-	 * {@link gui.Component#getLayoutTarget layout target element}, and does no further sizing or formatting.
+	 * {@link gui.Container#getLayoutTarget layout target element}, and does no further sizing or formatting.
 	 * 
 	 * 
 	 * ## Building a Layout

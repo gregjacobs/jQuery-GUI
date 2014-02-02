@@ -4043,7 +4043,7 @@ define('gui/layout/Layout', [
 	 * 
 	 * The default layout that is used for a {@link gui.Container Container} is the {@link gui.layout.Auto}, 
 	 * which simply renders each child component directly into the {@link gui.Container gui.Container's} 
-	 * {@link gui.Component#getLayoutTarget layout target element}, and does no further sizing or formatting.
+	 * {@link gui.Container#getLayoutTarget layout target element}, and does no further sizing or formatting.
 	 * 
 	 * 
 	 * ## Building a Layout
@@ -4421,7 +4421,7 @@ define('gui/layout/Auto', [
 		
 		/**
 		 * Layout implementation for AutoLayout, which simply renders each child component directly into the 
-		 * Container's layout target (see {@link gui.Component#getLayoutTarget}). 
+		 * Container's layout target (see {@link gui.Container#getLayoutTarget}). 
 		 * 
 		 * @protected
 		 * @method onLayout
@@ -7152,8 +7152,8 @@ define('gui/Overlay', [
 		/**
 		 * @cfg {String/HTMLElement/jQuery} renderTo 
 		 * 
-		 * Override of superclass config which in the case of Overlay is stored until the {@link #show} method is called.
-		 * This allows for lazy rendering of Overlays. Defaults to the document body when the {@link #show} method is called.
+		 * Override of superclass config which in the case of Overlay is stored until the {@link #method-show} method is called.
+		 * This allows for lazy rendering of Overlays. Defaults to the document body when the {@link #method-show} method is called.
 		 */
 	
 	
@@ -7243,7 +7243,7 @@ define('gui/Overlay', [
 		 * @property {String/HTMLElement/jQuery} deferredRenderTo
 		 * 
 		 * This property will hold the value of the {@link #renderTo} config, if one was provided. It is then used
-		 * to render the Overlay lazily in the {@link #show} method.
+		 * to render the Overlay lazily in the {@link #method-show} method.
 		 */
 		
 		/**
@@ -7488,13 +7488,14 @@ define('gui/Overlay', [
 					}
 	
 				} else {
-					// no 'anchor' config provided, use x/y relative to the window
+					// no 'anchor' config provided, use x/y relative to the parent container where the Overlay has been rendered (most often the document body)
 					var x = this.x,
 					    y = this.y,
 					    xSide = x,  // default these to the values of the 'x' and 'y' configs, in the case that
 					    ySide = y,  // they are strings. They will be overwritten with side+offset if numbers
 					    atXSide = 'center',
-					    atYSide = 'center';
+					    atYSide = 'center',
+					    $overlayParent = $el.parent();
 					
 					if( typeof x === 'number' ) {
 					    xSide = ( x > 0 ? 'left' : 'right' ) + '+' + x;  // Position from right if this.x < 0. Forms a string like: "left+100"
@@ -7507,7 +7508,7 @@ define('gui/Overlay', [
 					
 					my = xSide + ' ' + ySide;      // forms a string like: "left+200 top+100" or "center center"
 					at = atXSide + ' ' + atYSide;  // forms a string like: "center center" or "left top"
-					of = window;
+					of = ( $overlayParent.is( 'body' ) ) ? window : $overlayParent;  // use `window` if rendered to the doc body, so as not to be affected by body margin/padding
 					
 					if( this.constrainToViewport ) {
 						collision = 'fit';
@@ -8120,7 +8121,7 @@ define('gui/app/Application', [
 	 *     
 	 *     } );
 	 * 
-	 * See the {@link loadDynamicDependencies} method for more information.
+	 * See the {@link #loadDynamicDependencies} method for more information.
 	 */
 	var Application = Observable.extend( {
 		abstractClass: true,
@@ -8670,9 +8671,9 @@ define('gui/app/Application', [
 		 *     }
 		 * 
 		 * 
-		 * Important: If your subclass loads dynamic dependencies, it is possible that {@link #destroy} is called before those
+		 * Important: If your subclass loads dynamic dependencies, it is possible that {@link #method-destroy} is called before those
 		 * dependencies have loaded (and therefore before your class has finished initializing). If this is the case where 
-		 * {@link #destroy} is called during this time, the Application class will not continue initializing. Check the state of 
+		 * {@link #method-destroy} is called during this time, the Application class will not continue initializing. Check the state of 
 		 * the {@link #isInitialized initialized} flag to know whether or not you need to destroy any objects that would have been 
 		 * created during the initialization process.
 		 * 
@@ -12140,7 +12141,7 @@ define('gui/layout/Card', [
 		
 		/**
 		 * Layout implementation for CardLayout, which renders each child component into the Container's layout target 
-		 * (see {@link gui.Component#getLayoutTarget}), and then hides them.  The one given by the {@link #activeItem}
+		 * (see {@link gui.Container#getLayoutTarget}), and then hides them.  The one given by the {@link #activeItem}
 		 * config is then shown.
 		 * 
 		 * @protected
@@ -14015,7 +14016,7 @@ define('gui/view/DataBound', [
 		 * Removes the {@link #loadingHeight} from the DataBoundView's {@link #$el element}, restoring any {@link #minHeight} that
 		 * the DataBoundView has configured. This is only done if the {@link #loadingHeight} was applied in {@link #applyLoadingHeight}.
 		 * 
-		 * This is called when the {@link #collection} has finished loading.
+		 * This is called when the bound data container (model or collection) has finished loading.
 		 * 
 		 * @protected
 		 */

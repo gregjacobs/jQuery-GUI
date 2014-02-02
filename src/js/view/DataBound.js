@@ -173,7 +173,7 @@ define( [
 		 * Removes the {@link #loadingHeight} from the DataBoundView's {@link #$el element}, restoring any {@link #minHeight} that
 		 * the DataBoundView has configured. This is only done if the {@link #loadingHeight} was applied in {@link #applyLoadingHeight}.
 		 * 
-		 * This is called when the {@link #collection} has finished loading.
+		 * This is called when the bound data container (model or collection) has finished loading.
 		 * 
 		 * @protected
 		 */

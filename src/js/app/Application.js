@@ -176,7 +176,7 @@ define( [
 	 *     
 	 *     } );
 	 * 
-	 * See the {@link loadDynamicDependencies} method for more information.
+	 * See the {@link #loadDynamicDependencies} method for more information.
 	 */
 	var Application = Observable.extend( {
 		abstractClass: true,
@@ -726,9 +726,9 @@ define( [
 		 *     }
 		 * 
 		 * 
-		 * Important: If your subclass loads dynamic dependencies, it is possible that {@link #destroy} is called before those
+		 * Important: If your subclass loads dynamic dependencies, it is possible that {@link #method-destroy} is called before those
 		 * dependencies have loaded (and therefore before your class has finished initializing). If this is the case where 
-		 * {@link #destroy} is called during this time, the Application class will not continue initializing. Check the state of 
+		 * {@link #method-destroy} is called during this time, the Application class will not continue initializing. Check the state of 
 		 * the {@link #isInitialized initialized} flag to know whether or not you need to destroy any objects that would have been 
 		 * created during the initialization process.
 		 * 

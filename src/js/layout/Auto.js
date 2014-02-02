@@ -20,7 +20,7 @@ define( [
 		
 		/**
 		 * Layout implementation for AutoLayout, which simply renders each child component directly into the 
-		 * Container's layout target (see {@link gui.Component#getLayoutTarget}). 
+		 * Container's layout target (see {@link gui.Container#getLayoutTarget}). 
 		 * 
 		 * @protected
 		 * @method onLayout
