@@ -1,5 +1,28 @@
 @import 'compass/css3';
 
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	font-size: 100%;
+}
+
+body {
+	background-color: #FFF;
+	font-family: sans-serif;
+	margin: 0; 
+	padding: 0;
+	color: #555566;
+}
+
+a:link, a:visited { color: #2a9dd7; text-decoration: none; outline: none; }
+a:hover, a:active { color: #cc0000; }
+
+input, textarea {
+	font-family: sans-serif;
+}
+
+
 @import '../../lib/_icons';
 
 @import '_icons';

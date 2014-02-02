@@ -1,12 +1,20 @@
 .gui-form-field-textarea {
-	
+
+	.gui-form-field-inputCell { padding: 0; }
+	.gui-form-field-inputContainer {
+		border: 1px solid #2A9DD7;
+		padding: 3px 5px;
+	}
 	
 }
 
 .gui-form-field-textarea-input {
-	resize: none;  // don't allow resizing for Chrome. Layout system can't update when resized by user.
+	@extend .gui-form-field-text-input;
+	
+	resize: none;  // Prevent Chrome from displaying resize handle for textareas. The resize handle usually won't work in a layout. 
 }
 
 .gui-form-field-textarea-emptyText {
 	@extend .gui-form-field-text-emptyText;
+	white-space: normal;
 }

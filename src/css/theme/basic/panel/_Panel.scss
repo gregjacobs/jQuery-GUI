@@ -1,2 +1,6 @@
-.gui-panel { border: 1px solid #000; }
-.gui-panel-body {}
+.gui-panel { border: 1px solid #DDD; border-width: 0 1px 1px 1px; }
+.gui-panel-body { border: 1px solid #DDD; border-width: 1px 0 0 0; padding: 2px; }
+
+// For when a Panel is a direct child of a TabPanel, hide the border
+.gui-tabPanel-childPanel { border-bottom: none; }
+.gui-tabPanel-childPanel-body {}

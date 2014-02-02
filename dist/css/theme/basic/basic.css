@@ -1,3 +1,37 @@
+/* line 3, ../../../../src/css/theme/basic/basic.scss */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-size: 100%;
+}
+
+/* line 10, ../../../../src/css/theme/basic/basic.scss */
+body {
+  background-color: #FFF;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #555566;
+}
+
+/* line 18, ../../../../src/css/theme/basic/basic.scss */
+a:link, a:visited {
+  color: #2a9dd7;
+  text-decoration: none;
+  outline: none;
+}
+
+/* line 19, ../../../../src/css/theme/basic/basic.scss */
+a:hover, a:active {
+  color: #cc0000;
+}
+
+/* line 21, ../../../../src/css/theme/basic/basic.scss */
+input, textarea {
+  font-family: sans-serif;
+}
+
 /* UI Icons from jQuery UI. http://jqueryui.com */
 /*
  * These icon CSS classes are to be used with the background images found in resources/img/icons/. 
@@ -6,918 +40,53 @@
  *    url( '../../resources/img/icons/ui-icons_222222_256x240.png' )
  */
 /* line 9, ../../../../src/css/lib/_icons.scss */
-.gui-icon-blank, .gui-icon-carat-1-n, .gui-icon-carat-1-ne, .gui-icon-carat-1-e, .gui-icon-carat-1-se, .gui-icon-carat-1-s, .gui-icon-carat-1-sw, .gui-icon-carat-1-w, .gui-icon-carat-1-nw, .gui-icon-carat-2-n-s, .gui-icon-carat-2-e-w, .gui-icon-triangle-1-n, .gui-icon-triangle-1-ne, .gui-icon-triangle-1-e, .gui-icon-triangle-1-se, .gui-icon-triangle-1-s, .gui-icon-triangle-1-sw, .gui-icon-triangle-1-w, .gui-icon-triangle-1-nw, .gui-icon-triangle-2-n-s, .gui-icon-triangle-2-e-w, .gui-icon-arrow-1-n, .gui-icon-arrow-1-ne, .gui-icon-arrow-1-e, .gui-icon-arrow-1-se, .gui-icon-arrow-1-s, .gui-icon-arrow-1-sw, .gui-icon-arrow-1-w, .gui-icon-arrow-1-nw, .gui-icon-arrow-2-n-s, .gui-icon-arrow-2-ne-sw, .gui-icon-arrow-2-e-w, .gui-icon-arrow-2-se-nw, .gui-icon-arrowstop-1-n, .gui-icon-arrowstop-1-e, .gui-icon-arrowstop-1-s, .gui-icon-arrowstop-1-w, .gui-icon-arrowthick-1-n, .gui-icon-arrowthick-1-ne, .gui-icon-arrowthick-1-e, .gui-icon-arrowthick-1-se, .gui-icon-arrowthick-1-s, .gui-icon-arrowthick-1-sw, .gui-icon-arrowthick-1-w, .gui-icon-arrowthick-1-nw, .gui-icon-arrowthick-2-n-s, .gui-icon-arrowthick-2-ne-sw, .gui-icon-arrowthick-2-e-w, .gui-icon-arrowthick-2-se-nw, .gui-icon-arrowthickstop-1-n, .gui-icon-arrowthickstop-1-e, .gui-icon-arrowthickstop-1-s, .gui-icon-arrowthickstop-1-w, .gui-icon-arrowreturnthick-1-w, .gui-icon-arrowreturnthick-1-n, .gui-icon-arrowreturnthick-1-e, .gui-icon-arrowreturnthick-1-s, .gui-icon-arrowreturn-1-w, .gui-icon-arrowreturn-1-n, .gui-icon-arrowreturn-1-e, .gui-icon-arrowreturn-1-s, .gui-icon-arrowrefresh-1-w, .gui-icon-arrowrefresh-1-n, .gui-icon-arrowrefresh-1-e, .gui-icon-arrowrefresh-1-s, .gui-icon-arrow-4, .gui-icon-arrow-4-diag, .gui-icon-extlink, .gui-icon-newwin, .gui-icon-refresh, .gui-icon-shuffle, .gui-icon-transfer-e-w, .gui-icon-transferthick-e-w, .gui-icon-folder-collapsed, .gui-icon-folder-open, .gui-icon-document, .gui-icon-document-b, .gui-icon-note, .gui-icon-mail-closed, .gui-icon-mail-open, .gui-icon-suitcase, .gui-icon-comment, .gui-icon-person, .gui-icon-print, .gui-icon-trash, .gui-icon-locked, .gui-icon-unlocked, .gui-icon-bookmark, .gui-icon-tag, .gui-icon-home, .gui-icon-flag, .gui-icon-calendar, .gui-icon-cart, .gui-icon-pencil, .gui-icon-clock, .gui-icon-disk, .gui-icon-calculator, .gui-icon-zoomin, .gui-icon-zoomout, .gui-icon-search, .gui-icon-wrench, .gui-icon-gear, .gui-icon-heart, .gui-icon-star, .gui-icon-link, .gui-icon-cancel, .gui-icon-plus, .gui-icon-plusthick, .gui-icon-minus, .gui-icon-minusthick, .gui-icon-close, .gui-icon-closethick, .gui-icon-key, .gui-icon-lightbulb, .gui-icon-scissors, .gui-icon-clipboard, .gui-icon-copy, .gui-icon-contact, .gui-icon-image, .gui-icon-video, .gui-icon-script, .gui-icon-alert, .gui-icon-info, .gui-icon-notice, .gui-icon-help, .gui-icon-check, .gui-icon-bullet, .gui-icon-radio-on, .gui-icon-radio-off, .gui-icon-pin-w, .gui-icon-pin-s, .gui-icon-play, .gui-icon-pause, .gui-icon-seek-next, .gui-icon-seek-prev, .gui-icon-seek-end, .gui-icon-seek-start, .gui-icon-seek-first, .gui-icon-stop, .gui-icon-eject, .gui-icon-volume-off, .gui-icon-volume-on, .gui-icon-power, .gui-icon-signal-diag, .gui-icon-signal, .gui-icon-battery-0, .gui-icon-battery-1, .gui-icon-battery-2, .gui-icon-battery-3, .gui-icon-circle-plus, .gui-icon-circle-minus, .gui-icon-circle-close, .gui-icon-circle-triangle-e, .gui-icon-circle-triangle-s, .gui-icon-circle-triangle-w, .gui-icon-circle-triangle-n, .gui-icon-circle-arrow-e, .gui-icon-circle-arrow-s, .gui-icon-circle-arrow-w, .gui-icon-circle-arrow-n, .gui-icon-circle-zoomin, .gui-icon-circle-zoomout, .gui-icon-circle-check, .gui-icon-circlesmall-plus, .gui-icon-circlesmall-minus, .gui-icon-circlesmall-close, .gui-icon-squaresmall-plus, .gui-icon-squaresmall-minus, .gui-icon-squaresmall-close, .gui-icon-grip-dotted-vertical, .gui-icon-grip-dotted-horizontal, .gui-icon-grip-solid-vertical, .gui-icon-grip-solid-horizontal, .gui-icon-gripsmall-diagonal-se, .gui-icon-grip-diagonal-se {
+.gui-panel-toolbutton-icon-close {
   width: 16px;
   height: 16px;
   background-repeat: no-repeat;
 }
 
-/* line 14, ../../../../src/css/lib/_icons.scss */
-.gui-icon-blank {
-  background-position: 16px 16px;
-}
-
-/* line 15, ../../../../src/css/lib/_icons.scss */
-.gui-icon-carat-1-n {
-  background-position: 0 0;
-}
-
-/* line 16, ../../../../src/css/lib/_icons.scss */
-.gui-icon-carat-1-ne {
-  background-position: -16px 0;
-}
-
-/* line 17, ../../../../src/css/lib/_icons.scss */
-.gui-icon-carat-1-e {
-  background-position: -32px 0;
-}
-
-/* line 18, ../../../../src/css/lib/_icons.scss */
-.gui-icon-carat-1-se {
-  background-position: -48px 0;
-}
-
-/* line 19, ../../../../src/css/lib/_icons.scss */
-.gui-icon-carat-1-s {
-  background-position: -64px 0;
-}
-
-/* line 20, ../../../../src/css/lib/_icons.scss */
-.gui-icon-carat-1-sw {
-  background-position: -80px 0;
-}
-
-/* line 21, ../../../../src/css/lib/_icons.scss */
-.gui-icon-carat-1-w {
-  background-position: -96px 0;
-}
-
-/* line 22, ../../../../src/css/lib/_icons.scss */
-.gui-icon-carat-1-nw {
-  background-position: -112px 0;
-}
-
-/* line 23, ../../../../src/css/lib/_icons.scss */
-.gui-icon-carat-2-n-s {
-  background-position: -128px 0;
-}
-
-/* line 24, ../../../../src/css/lib/_icons.scss */
-.gui-icon-carat-2-e-w {
-  background-position: -144px 0;
-}
-
-/* line 25, ../../../../src/css/lib/_icons.scss */
-.gui-icon-triangle-1-n {
-  background-position: 0 -16px;
-}
-
-/* line 26, ../../../../src/css/lib/_icons.scss */
-.gui-icon-triangle-1-ne {
-  background-position: -16px -16px;
-}
-
-/* line 27, ../../../../src/css/lib/_icons.scss */
-.gui-icon-triangle-1-e {
-  background-position: -32px -16px;
-}
-
-/* line 28, ../../../../src/css/lib/_icons.scss */
-.gui-icon-triangle-1-se {
-  background-position: -48px -16px;
-}
-
-/* line 29, ../../../../src/css/lib/_icons.scss */
-.gui-icon-triangle-1-s {
-  background-position: -64px -16px;
-}
-
-/* line 30, ../../../../src/css/lib/_icons.scss */
-.gui-icon-triangle-1-sw {
-  background-position: -80px -16px;
-}
-
-/* line 31, ../../../../src/css/lib/_icons.scss */
-.gui-icon-triangle-1-w {
-  background-position: -96px -16px;
-}
-
-/* line 32, ../../../../src/css/lib/_icons.scss */
-.gui-icon-triangle-1-nw {
-  background-position: -112px -16px;
-}
-
-/* line 33, ../../../../src/css/lib/_icons.scss */
-.gui-icon-triangle-2-n-s {
-  background-position: -128px -16px;
-}
-
-/* line 34, ../../../../src/css/lib/_icons.scss */
-.gui-icon-triangle-2-e-w {
-  background-position: -144px -16px;
-}
-
-/* line 35, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-1-n {
-  background-position: 0 -32px;
-}
-
-/* line 36, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-1-ne {
-  background-position: -16px -32px;
-}
-
-/* line 37, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-1-e {
-  background-position: -32px -32px;
-}
-
-/* line 38, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-1-se {
-  background-position: -48px -32px;
-}
-
-/* line 39, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-1-s {
-  background-position: -64px -32px;
-}
-
-/* line 40, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-1-sw {
-  background-position: -80px -32px;
-}
-
-/* line 41, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-1-w {
-  background-position: -96px -32px;
-}
-
-/* line 42, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-1-nw {
-  background-position: -112px -32px;
-}
-
-/* line 43, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-2-n-s {
-  background-position: -128px -32px;
-}
-
-/* line 44, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-2-ne-sw {
-  background-position: -144px -32px;
-}
-
-/* line 45, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-2-e-w {
-  background-position: -160px -32px;
-}
-
-/* line 46, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-2-se-nw {
-  background-position: -176px -32px;
-}
-
-/* line 47, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowstop-1-n {
-  background-position: -192px -32px;
-}
-
-/* line 48, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowstop-1-e {
-  background-position: -208px -32px;
-}
-
-/* line 49, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowstop-1-s {
-  background-position: -224px -32px;
-}
-
-/* line 50, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowstop-1-w {
-  background-position: -240px -32px;
-}
-
-/* line 51, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthick-1-n {
-  background-position: 0 -48px;
-}
-
-/* line 52, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthick-1-ne {
-  background-position: -16px -48px;
-}
-
-/* line 53, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthick-1-e {
-  background-position: -32px -48px;
-}
-
-/* line 54, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthick-1-se {
-  background-position: -48px -48px;
-}
-
-/* line 55, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthick-1-s {
-  background-position: -64px -48px;
-}
-
-/* line 56, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthick-1-sw {
-  background-position: -80px -48px;
-}
-
-/* line 57, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthick-1-w {
-  background-position: -96px -48px;
-}
-
-/* line 58, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthick-1-nw {
-  background-position: -112px -48px;
-}
-
-/* line 59, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthick-2-n-s {
-  background-position: -128px -48px;
-}
-
-/* line 60, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthick-2-ne-sw {
-  background-position: -144px -48px;
-}
-
-/* line 61, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthick-2-e-w {
-  background-position: -160px -48px;
-}
-
-/* line 62, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthick-2-se-nw {
-  background-position: -176px -48px;
-}
-
-/* line 63, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthickstop-1-n {
-  background-position: -192px -48px;
-}
-
-/* line 64, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthickstop-1-e {
-  background-position: -208px -48px;
-}
-
-/* line 65, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthickstop-1-s {
-  background-position: -224px -48px;
-}
-
-/* line 66, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowthickstop-1-w {
-  background-position: -240px -48px;
-}
-
-/* line 67, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowreturnthick-1-w {
-  background-position: 0 -64px;
-}
-
-/* line 68, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowreturnthick-1-n {
-  background-position: -16px -64px;
-}
-
-/* line 69, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowreturnthick-1-e {
-  background-position: -32px -64px;
-}
-
-/* line 70, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowreturnthick-1-s {
-  background-position: -48px -64px;
-}
-
-/* line 71, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowreturn-1-w {
-  background-position: -64px -64px;
-}
-
-/* line 72, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowreturn-1-n {
-  background-position: -80px -64px;
-}
-
-/* line 73, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowreturn-1-e {
-  background-position: -96px -64px;
-}
-
-/* line 74, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowreturn-1-s {
-  background-position: -112px -64px;
-}
-
-/* line 75, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowrefresh-1-w {
-  background-position: -128px -64px;
-}
-
-/* line 76, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowrefresh-1-n {
-  background-position: -144px -64px;
-}
-
-/* line 77, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowrefresh-1-e {
-  background-position: -160px -64px;
-}
-
-/* line 78, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrowrefresh-1-s {
-  background-position: -176px -64px;
-}
-
-/* line 79, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-4 {
-  background-position: 0 -80px;
-}
-
-/* line 80, ../../../../src/css/lib/_icons.scss */
-.gui-icon-arrow-4-diag {
-  background-position: -16px -80px;
-}
-
-/* line 81, ../../../../src/css/lib/_icons.scss */
-.gui-icon-extlink {
-  background-position: -32px -80px;
-}
-
-/* line 82, ../../../../src/css/lib/_icons.scss */
-.gui-icon-newwin {
-  background-position: -48px -80px;
-}
-
-/* line 83, ../../../../src/css/lib/_icons.scss */
-.gui-icon-refresh {
-  background-position: -64px -80px;
-}
-
-/* line 84, ../../../../src/css/lib/_icons.scss */
-.gui-icon-shuffle {
-  background-position: -80px -80px;
-}
-
-/* line 85, ../../../../src/css/lib/_icons.scss */
-.gui-icon-transfer-e-w {
-  background-position: -96px -80px;
-}
-
-/* line 86, ../../../../src/css/lib/_icons.scss */
-.gui-icon-transferthick-e-w {
-  background-position: -112px -80px;
-}
-
-/* line 87, ../../../../src/css/lib/_icons.scss */
-.gui-icon-folder-collapsed {
-  background-position: 0 -96px;
-}
-
-/* line 88, ../../../../src/css/lib/_icons.scss */
-.gui-icon-folder-open {
-  background-position: -16px -96px;
-}
-
-/* line 89, ../../../../src/css/lib/_icons.scss */
-.gui-icon-document {
-  background-position: -32px -96px;
-}
-
-/* line 90, ../../../../src/css/lib/_icons.scss */
-.gui-icon-document-b {
-  background-position: -48px -96px;
-}
-
-/* line 91, ../../../../src/css/lib/_icons.scss */
-.gui-icon-note {
-  background-position: -64px -96px;
-}
-
-/* line 92, ../../../../src/css/lib/_icons.scss */
-.gui-icon-mail-closed {
-  background-position: -80px -96px;
-}
-
-/* line 93, ../../../../src/css/lib/_icons.scss */
-.gui-icon-mail-open {
-  background-position: -96px -96px;
-}
-
-/* line 94, ../../../../src/css/lib/_icons.scss */
-.gui-icon-suitcase {
-  background-position: -112px -96px;
-}
-
-/* line 95, ../../../../src/css/lib/_icons.scss */
-.gui-icon-comment {
-  background-position: -128px -96px;
-}
-
-/* line 96, ../../../../src/css/lib/_icons.scss */
-.gui-icon-person {
-  background-position: -144px -96px;
-}
-
-/* line 97, ../../../../src/css/lib/_icons.scss */
-.gui-icon-print {
-  background-position: -160px -96px;
-}
-
-/* line 98, ../../../../src/css/lib/_icons.scss */
-.gui-icon-trash {
-  background-position: -176px -96px;
-}
-
-/* line 99, ../../../../src/css/lib/_icons.scss */
-.gui-icon-locked {
-  background-position: -192px -96px;
-}
-
-/* line 100, ../../../../src/css/lib/_icons.scss */
-.gui-icon-unlocked {
-  background-position: -208px -96px;
-}
-
-/* line 101, ../../../../src/css/lib/_icons.scss */
-.gui-icon-bookmark {
-  background-position: -224px -96px;
-}
-
-/* line 102, ../../../../src/css/lib/_icons.scss */
-.gui-icon-tag {
-  background-position: -240px -96px;
-}
-
-/* line 103, ../../../../src/css/lib/_icons.scss */
-.gui-icon-home {
-  background-position: 0 -112px;
-}
-
-/* line 104, ../../../../src/css/lib/_icons.scss */
-.gui-icon-flag {
-  background-position: -16px -112px;
-}
-
-/* line 105, ../../../../src/css/lib/_icons.scss */
-.gui-icon-calendar {
-  background-position: -32px -112px;
-}
-
-/* line 106, ../../../../src/css/lib/_icons.scss */
-.gui-icon-cart {
-  background-position: -48px -112px;
-}
-
-/* line 107, ../../../../src/css/lib/_icons.scss */
-.gui-icon-pencil {
-  background-position: -64px -112px;
-}
-
-/* line 108, ../../../../src/css/lib/_icons.scss */
-.gui-icon-clock {
-  background-position: -80px -112px;
-}
-
-/* line 109, ../../../../src/css/lib/_icons.scss */
-.gui-icon-disk {
-  background-position: -96px -112px;
-}
-
-/* line 110, ../../../../src/css/lib/_icons.scss */
-.gui-icon-calculator {
-  background-position: -112px -112px;
-}
-
-/* line 111, ../../../../src/css/lib/_icons.scss */
-.gui-icon-zoomin {
-  background-position: -128px -112px;
-}
-
-/* line 112, ../../../../src/css/lib/_icons.scss */
-.gui-icon-zoomout {
-  background-position: -144px -112px;
-}
-
-/* line 113, ../../../../src/css/lib/_icons.scss */
-.gui-icon-search {
-  background-position: -160px -112px;
-}
-
-/* line 114, ../../../../src/css/lib/_icons.scss */
-.gui-icon-wrench {
-  background-position: -176px -112px;
-}
-
-/* line 115, ../../../../src/css/lib/_icons.scss */
-.gui-icon-gear {
-  background-position: -192px -112px;
-}
-
-/* line 116, ../../../../src/css/lib/_icons.scss */
-.gui-icon-heart {
-  background-position: -208px -112px;
-}
-
-/* line 117, ../../../../src/css/lib/_icons.scss */
-.gui-icon-star {
-  background-position: -224px -112px;
-}
-
-/* line 118, ../../../../src/css/lib/_icons.scss */
-.gui-icon-link {
-  background-position: -240px -112px;
-}
-
-/* line 119, ../../../../src/css/lib/_icons.scss */
-.gui-icon-cancel {
-  background-position: 0 -128px;
-}
-
-/* line 120, ../../../../src/css/lib/_icons.scss */
-.gui-icon-plus {
-  background-position: -16px -128px;
-}
-
-/* line 121, ../../../../src/css/lib/_icons.scss */
-.gui-icon-plusthick {
-  background-position: -32px -128px;
-}
-
-/* line 122, ../../../../src/css/lib/_icons.scss */
-.gui-icon-minus {
-  background-position: -48px -128px;
-}
-
-/* line 123, ../../../../src/css/lib/_icons.scss */
-.gui-icon-minusthick {
-  background-position: -64px -128px;
-}
-
 /* line 124, ../../../../src/css/lib/_icons.scss */
-.gui-icon-close {
+.gui-panel-toolbutton-icon-close {
   background-position: -80px -128px;
 }
 
-/* line 125, ../../../../src/css/lib/_icons.scss */
-.gui-icon-closethick {
-  background-position: -96px -128px;
-}
-
-/* line 126, ../../../../src/css/lib/_icons.scss */
-.gui-icon-key {
-  background-position: -112px -128px;
-}
-
-/* line 127, ../../../../src/css/lib/_icons.scss */
-.gui-icon-lightbulb {
-  background-position: -128px -128px;
-}
-
-/* line 128, ../../../../src/css/lib/_icons.scss */
-.gui-icon-scissors {
-  background-position: -144px -128px;
-}
-
-/* line 129, ../../../../src/css/lib/_icons.scss */
-.gui-icon-clipboard {
-  background-position: -160px -128px;
-}
-
-/* line 130, ../../../../src/css/lib/_icons.scss */
-.gui-icon-copy {
-  background-position: -176px -128px;
-}
-
-/* line 131, ../../../../src/css/lib/_icons.scss */
-.gui-icon-contact {
-  background-position: -192px -128px;
-}
-
-/* line 132, ../../../../src/css/lib/_icons.scss */
-.gui-icon-image {
-  background-position: -208px -128px;
-}
-
-/* line 133, ../../../../src/css/lib/_icons.scss */
-.gui-icon-video {
-  background-position: -224px -128px;
-}
-
-/* line 134, ../../../../src/css/lib/_icons.scss */
-.gui-icon-script {
-  background-position: -240px -128px;
-}
-
-/* line 135, ../../../../src/css/lib/_icons.scss */
-.gui-icon-alert {
-  background-position: 0 -144px;
-}
-
-/* line 136, ../../../../src/css/lib/_icons.scss */
-.gui-icon-info {
-  background-position: -16px -144px;
-}
-
-/* line 137, ../../../../src/css/lib/_icons.scss */
-.gui-icon-notice {
-  background-position: -32px -144px;
-}
-
-/* line 138, ../../../../src/css/lib/_icons.scss */
-.gui-icon-help {
-  background-position: -48px -144px;
-}
-
-/* line 139, ../../../../src/css/lib/_icons.scss */
-.gui-icon-check {
-  background-position: -64px -144px;
-}
-
-/* line 140, ../../../../src/css/lib/_icons.scss */
-.gui-icon-bullet {
-  background-position: -80px -144px;
-}
-
-/* line 141, ../../../../src/css/lib/_icons.scss */
-.gui-icon-radio-on {
-  background-position: -96px -144px;
-}
-
-/* line 142, ../../../../src/css/lib/_icons.scss */
-.gui-icon-radio-off {
-  background-position: -112px -144px;
-}
-
-/* line 143, ../../../../src/css/lib/_icons.scss */
-.gui-icon-pin-w {
-  background-position: -128px -144px;
-}
-
-/* line 144, ../../../../src/css/lib/_icons.scss */
-.gui-icon-pin-s {
-  background-position: -144px -144px;
-}
-
-/* line 145, ../../../../src/css/lib/_icons.scss */
-.gui-icon-play {
-  background-position: 0 -160px;
-}
-
-/* line 146, ../../../../src/css/lib/_icons.scss */
-.gui-icon-pause {
-  background-position: -16px -160px;
-}
-
-/* line 147, ../../../../src/css/lib/_icons.scss */
-.gui-icon-seek-next {
-  background-position: -32px -160px;
-}
-
-/* line 148, ../../../../src/css/lib/_icons.scss */
-.gui-icon-seek-prev {
-  background-position: -48px -160px;
-}
-
-/* line 149, ../../../../src/css/lib/_icons.scss */
-.gui-icon-seek-end {
-  background-position: -64px -160px;
-}
-
-/* line 150, ../../../../src/css/lib/_icons.scss */
-.gui-icon-seek-start {
-  background-position: -80px -160px;
-}
-
 /* gui-icon-seek-first is deprecated, use gui-icon-seek-start instead */
-/* line 152, ../../../../src/css/lib/_icons.scss */
-.gui-icon-seek-first {
-  background-position: -80px -160px;
-}
-
-/* line 153, ../../../../src/css/lib/_icons.scss */
-.gui-icon-stop {
-  background-position: -96px -160px;
-}
-
-/* line 154, ../../../../src/css/lib/_icons.scss */
-.gui-icon-eject {
-  background-position: -112px -160px;
-}
-
-/* line 155, ../../../../src/css/lib/_icons.scss */
-.gui-icon-volume-off {
-  background-position: -128px -160px;
-}
-
-/* line 156, ../../../../src/css/lib/_icons.scss */
-.gui-icon-volume-on {
-  background-position: -144px -160px;
-}
-
-/* line 157, ../../../../src/css/lib/_icons.scss */
-.gui-icon-power {
-  background-position: 0 -176px;
-}
-
-/* line 158, ../../../../src/css/lib/_icons.scss */
-.gui-icon-signal-diag {
-  background-position: -16px -176px;
-}
-
-/* line 159, ../../../../src/css/lib/_icons.scss */
-.gui-icon-signal {
-  background-position: -32px -176px;
-}
-
-/* line 160, ../../../../src/css/lib/_icons.scss */
-.gui-icon-battery-0 {
-  background-position: -48px -176px;
-}
-
-/* line 161, ../../../../src/css/lib/_icons.scss */
-.gui-icon-battery-1 {
-  background-position: -64px -176px;
-}
-
-/* line 162, ../../../../src/css/lib/_icons.scss */
-.gui-icon-battery-2 {
-  background-position: -80px -176px;
-}
-
-/* line 163, ../../../../src/css/lib/_icons.scss */
-.gui-icon-battery-3 {
-  background-position: -96px -176px;
-}
-
-/* line 164, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-plus {
-  background-position: 0 -192px;
-}
-
-/* line 165, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-minus {
-  background-position: -16px -192px;
-}
-
-/* line 166, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-close {
-  background-position: -32px -192px;
-}
-
-/* line 167, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-triangle-e {
-  background-position: -48px -192px;
-}
-
-/* line 168, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-triangle-s {
-  background-position: -64px -192px;
-}
-
-/* line 169, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-triangle-w {
-  background-position: -80px -192px;
-}
-
-/* line 170, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-triangle-n {
-  background-position: -96px -192px;
-}
-
-/* line 171, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-arrow-e {
-  background-position: -112px -192px;
-}
-
-/* line 172, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-arrow-s {
-  background-position: -128px -192px;
-}
-
-/* line 173, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-arrow-w {
-  background-position: -144px -192px;
-}
-
-/* line 174, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-arrow-n {
-  background-position: -160px -192px;
-}
-
-/* line 175, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-zoomin {
-  background-position: -176px -192px;
-}
-
-/* line 176, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-zoomout {
-  background-position: -192px -192px;
-}
-
-/* line 177, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circle-check {
-  background-position: -208px -192px;
-}
-
-/* line 178, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circlesmall-plus {
-  background-position: 0 -208px;
-}
-
-/* line 179, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circlesmall-minus {
-  background-position: -16px -208px;
-}
-
-/* line 180, ../../../../src/css/lib/_icons.scss */
-.gui-icon-circlesmall-close {
-  background-position: -32px -208px;
-}
-
-/* line 181, ../../../../src/css/lib/_icons.scss */
-.gui-icon-squaresmall-plus {
-  background-position: -48px -208px;
-}
-
-/* line 182, ../../../../src/css/lib/_icons.scss */
-.gui-icon-squaresmall-minus {
-  background-position: -64px -208px;
-}
-
-/* line 183, ../../../../src/css/lib/_icons.scss */
-.gui-icon-squaresmall-close {
-  background-position: -80px -208px;
-}
-
-/* line 184, ../../../../src/css/lib/_icons.scss */
-.gui-icon-grip-dotted-vertical {
-  background-position: 0 -224px;
-}
-
-/* line 185, ../../../../src/css/lib/_icons.scss */
-.gui-icon-grip-dotted-horizontal {
-  background-position: -16px -224px;
-}
-
-/* line 186, ../../../../src/css/lib/_icons.scss */
-.gui-icon-grip-solid-vertical {
-  background-position: -32px -224px;
-}
-
-/* line 187, ../../../../src/css/lib/_icons.scss */
-.gui-icon-grip-solid-horizontal {
-  background-position: -48px -224px;
-}
-
-/* line 188, ../../../../src/css/lib/_icons.scss */
-.gui-icon-gripsmall-diagonal-se {
-  background-position: -64px -224px;
-}
-
-/* line 189, ../../../../src/css/lib/_icons.scss */
-.gui-icon-grip-diagonal-se {
-  background-position: -80px -224px;
-}
-
 /* UI Icons from jQuery UI. http://jqueryui.com */
 /*
- * These icon CSS classes are to be used with the background images found in resources/img/icons/.
+ * These icon CSS classes are to be used with the background images found in resources/images/icons/.
  */
 /* line 6, ../../../../src/css/theme/basic/_icons.scss */
-.gui-icon-blank, .gui-icon-carat-1-n, .gui-icon-carat-1-ne, .gui-icon-carat-1-e, .gui-icon-carat-1-se, .gui-icon-carat-1-s, .gui-icon-carat-1-sw, .gui-icon-carat-1-w, .gui-icon-carat-1-nw, .gui-icon-carat-2-n-s, .gui-icon-carat-2-e-w, .gui-icon-triangle-1-n, .gui-icon-triangle-1-ne, .gui-icon-triangle-1-e, .gui-icon-triangle-1-se, .gui-icon-triangle-1-s, .gui-icon-triangle-1-sw, .gui-icon-triangle-1-w, .gui-icon-triangle-1-nw, .gui-icon-triangle-2-n-s, .gui-icon-triangle-2-e-w, .gui-icon-arrow-1-n, .gui-icon-arrow-1-ne, .gui-icon-arrow-1-e, .gui-icon-arrow-1-se, .gui-icon-arrow-1-s, .gui-icon-arrow-1-sw, .gui-icon-arrow-1-w, .gui-icon-arrow-1-nw, .gui-icon-arrow-2-n-s, .gui-icon-arrow-2-ne-sw, .gui-icon-arrow-2-e-w, .gui-icon-arrow-2-se-nw, .gui-icon-arrowstop-1-n, .gui-icon-arrowstop-1-e, .gui-icon-arrowstop-1-s, .gui-icon-arrowstop-1-w, .gui-icon-arrowthick-1-n, .gui-icon-arrowthick-1-ne, .gui-icon-arrowthick-1-e, .gui-icon-arrowthick-1-se, .gui-icon-arrowthick-1-s, .gui-icon-arrowthick-1-sw, .gui-icon-arrowthick-1-w, .gui-icon-arrowthick-1-nw, .gui-icon-arrowthick-2-n-s, .gui-icon-arrowthick-2-ne-sw, .gui-icon-arrowthick-2-e-w, .gui-icon-arrowthick-2-se-nw, .gui-icon-arrowthickstop-1-n, .gui-icon-arrowthickstop-1-e, .gui-icon-arrowthickstop-1-s, .gui-icon-arrowthickstop-1-w, .gui-icon-arrowreturnthick-1-w, .gui-icon-arrowreturnthick-1-n, .gui-icon-arrowreturnthick-1-e, .gui-icon-arrowreturnthick-1-s, .gui-icon-arrowreturn-1-w, .gui-icon-arrowreturn-1-n, .gui-icon-arrowreturn-1-e, .gui-icon-arrowreturn-1-s, .gui-icon-arrowrefresh-1-w, .gui-icon-arrowrefresh-1-n, .gui-icon-arrowrefresh-1-e, .gui-icon-arrowrefresh-1-s, .gui-icon-arrow-4, .gui-icon-arrow-4-diag, .gui-icon-extlink, .gui-icon-newwin, .gui-icon-refresh, .gui-icon-shuffle, .gui-icon-transfer-e-w, .gui-icon-transferthick-e-w, .gui-icon-folder-collapsed, .gui-icon-folder-open, .gui-icon-document, .gui-icon-document-b, .gui-icon-note, .gui-icon-mail-closed, .gui-icon-mail-open, .gui-icon-suitcase, .gui-icon-comment, .gui-icon-person, .gui-icon-print, .gui-icon-trash, .gui-icon-locked, .gui-icon-unlocked, .gui-icon-bookmark, .gui-icon-tag, .gui-icon-home, .gui-icon-flag, .gui-icon-calendar, .gui-icon-cart, .gui-icon-pencil, .gui-icon-clock, .gui-icon-disk, .gui-icon-calculator, .gui-icon-zoomin, .gui-icon-zoomout, .gui-icon-search, .gui-icon-wrench, .gui-icon-gear, .gui-icon-heart, .gui-icon-star, .gui-icon-link, .gui-icon-cancel, .gui-icon-plus, .gui-icon-plusthick, .gui-icon-minus, .gui-icon-minusthick, .gui-icon-close, .gui-icon-closethick, .gui-icon-key, .gui-icon-lightbulb, .gui-icon-scissors, .gui-icon-clipboard, .gui-icon-copy, .gui-icon-contact, .gui-icon-image, .gui-icon-video, .gui-icon-script, .gui-icon-alert, .gui-icon-info, .gui-icon-notice, .gui-icon-help, .gui-icon-check, .gui-icon-bullet, .gui-icon-radio-on, .gui-icon-radio-off, .gui-icon-pin-w, .gui-icon-pin-s, .gui-icon-play, .gui-icon-pause, .gui-icon-seek-next, .gui-icon-seek-prev, .gui-icon-seek-end, .gui-icon-seek-start, .gui-icon-seek-first, .gui-icon-stop, .gui-icon-eject, .gui-icon-volume-off, .gui-icon-volume-on, .gui-icon-power, .gui-icon-signal-diag, .gui-icon-signal, .gui-icon-battery-0, .gui-icon-battery-1, .gui-icon-battery-2, .gui-icon-battery-3, .gui-icon-circle-plus, .gui-icon-circle-minus, .gui-icon-circle-close, .gui-icon-circle-triangle-e, .gui-icon-circle-triangle-s, .gui-icon-circle-triangle-w, .gui-icon-circle-triangle-n, .gui-icon-circle-arrow-e, .gui-icon-circle-arrow-s, .gui-icon-circle-arrow-w, .gui-icon-circle-arrow-n, .gui-icon-circle-zoomin, .gui-icon-circle-zoomout, .gui-icon-circle-check, .gui-icon-circlesmall-plus, .gui-icon-circlesmall-minus, .gui-icon-circlesmall-close, .gui-icon-squaresmall-plus, .gui-icon-squaresmall-minus, .gui-icon-squaresmall-close, .gui-icon-grip-dotted-vertical, .gui-icon-grip-dotted-horizontal, .gui-icon-grip-solid-vertical, .gui-icon-grip-solid-horizontal, .gui-icon-gripsmall-diagonal-se, .gui-icon-grip-diagonal-se {
-  background-image: url('../../../../resources/img/icons/ui-icons_222222_256x240.png?1364663068');
+.gui-panel-toolbutton-icon-close {
+  background-image: url('../../../../resources/images/icons/ui-icons_222222_256x240.png?1365518842');
 }
 
-/* gui-icon-seek-first is deprecated, use gui-icon-seek-start instead */
 /* line 1, ../../../../src/css/theme/basic/_Mask.scss */
 .gui-mask-overlay {
   background-color: #000;
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
-  opacity: 0.4;
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=5);
+  opacity: 0.05;
 }
 
 /* line 6, ../../../../src/css/theme/basic/_Mask.scss */
 .gui-mask-content {
-  background-color: #BBBBBB;
+  background-color: #FFF;
   padding: 8px;
   border: 1px solid black;
+  white-space: nowrap;
 }
 
-/* line 12, ../../../../src/css/theme/basic/_Mask.scss */
+/* line 13, ../../../../src/css/theme/basic/_Mask.scss */
 .gui-mask-spinner {
   margin: 5px;
   height: 16px;
   width: 16px;
-  background-image: url('../../../../resources/img/icons/spinner.gif?1368749361');
+  background-image: url('../../../../resources/images/theme/basic/spinner.gif?1368642649');
+}
+
+/* line 20, ../../../../src/css/theme/basic/_Mask.scss */
+.gui-mask-msg {
+  margin-right: 3px;
 }
 
 /* line 1, ../../../../src/css/theme/basic/button/_Button.scss */
@@ -950,27 +119,133 @@
 }
 
 /* line 1, ../../../../src/css/theme/basic/form/field/_Field.scss */
-.gui-form-field-inputContainer {
-  border: 1px solid #3baae3;
+.gui-form-field {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  border-collapse: collapse;
+}
+/* line 7, ../../../../src/css/theme/basic/form/field/_Field.scss */
+.gui-form-field tbody, .gui-form-field tr, .gui-form-field th {
+  margin: 0;
+  padding: 0;
 }
 
+/* line 14, ../../../../src/css/theme/basic/form/field/_Field.scss */
+.gui-form-field-leftLabelCell {
+  padding-top: 3px;
+}
+
+/* line 18, ../../../../src/css/theme/basic/form/field/_Field.scss */
+.gui-form-field-inputCell {
+  vertical-align: top;
+}
+
+/* line 3, ../../../../src/css/theme/basic/form/field/_Dropdown.scss */
+.gui-form-field-dropdown .gui-form-field-inputCell {
+  padding: 0;
+}
+/* line 5, ../../../../src/css/theme/basic/form/field/_Dropdown.scss */
+.gui-form-field-dropdown .gui-form-field-inputContainer {
+  border: 1px solid #2A9DD7;
+  padding: 3px 5px;
+}
+
+/* The box that shows the selected option's text */
+/* line 17, ../../../../src/css/theme/basic/form/field/_Dropdown.scss */
+.gui-form-field-dropdown-expandButton {
+  display: inline-block;
+  height: 14px;
+  width: 9px;
+  background-image: url('../../../../resources/images/theme/basic/downMenuPointer.png?1366119124');
+  background-position: 0px 0px;
+  right: 6px;
+  top: 50%;
+  margin-top: -9px;
+}
+
+/* line 30, ../../../../src/css/theme/basic/form/field/_Dropdown.scss */
+.gui-form-field-dropdown-expandButton:hover {
+  background-position: -9px 0px;
+}
+
+/* line 35, ../../../../src/css/theme/basic/form/field/_Dropdown.scss */
+.gui-form-field-dropdown-menu {
+  border-bottom: 1px solid #2A9DD7;
+  border-right: 1px solid #2A9DD7;
+  border-left: 1px solid #2A9DD7;
+  overflow-y: auto;
+}
+
+/* line 42, ../../../../src/css/theme/basic/form/field/_Dropdown.scss */
+.gui-form-field-dropdown-menu-item {
+  padding: 3px 5px 3px 4px;
+  background: #fff;
+}
+
+/* line 46, ../../../../src/css/theme/basic/form/field/_Dropdown.scss */
+.gui-form-field-dropdown-menu-item:hover {
+  background: #48BBF5;
+  color: #fff;
+  position: relative;
+}
+
+/* line 52, ../../../../src/css/theme/basic/form/field/_Dropdown.scss */
+.gui-form-field-dropdown-menu-item-selected {
+  background: #2a9dd7;
+  color: white;
+}
+
+/* line 3, ../../../../src/css/theme/basic/form/field/_Text.scss */
+.gui-form-field-text .gui-form-field-inputCell {
+  padding: 0;
+}
 /* line 5, ../../../../src/css/theme/basic/form/field/_Text.scss */
-.gui-form-field-text-emptyText, .gui-form-field-textarea-emptyText {
-  font-size: 14px;
-  color: #AAA;
+.gui-form-field-text .gui-form-field-inputContainer {
+  border: 1px solid #2A9DD7;
+  padding: 3px 5px;
 }
 
-/* line 6, ../../../../src/css/theme/basic/form/field/_TextArea.scss */
+/* line 12, ../../../../src/css/theme/basic/form/field/_Text.scss */
+.gui-form-field-text-input, .gui-form-field-textarea-input {
+  font-size: 16px;
+}
+
+/* line 16, ../../../../src/css/theme/basic/form/field/_Text.scss */
+.gui-form-field-text-emptyText, .gui-form-field-textarea-emptyText {
+  font-size: 16px;
+  color: #AAB;
+  white-space: nowrap;
+  top: 3px;
+  left: 5px;
+}
+
+/* line 3, ../../../../src/css/theme/basic/form/field/_TextArea.scss */
+.gui-form-field-textarea .gui-form-field-inputCell {
+  padding: 0;
+}
+/* line 4, ../../../../src/css/theme/basic/form/field/_TextArea.scss */
+.gui-form-field-textarea .gui-form-field-inputContainer {
+  border: 1px solid #2A9DD7;
+  padding: 3px 5px;
+}
+
+/* line 11, ../../../../src/css/theme/basic/form/field/_TextArea.scss */
 .gui-form-field-textarea-input {
   resize: none;
 }
 
+/* line 17, ../../../../src/css/theme/basic/form/field/_TextArea.scss */
+.gui-form-field-textarea-emptyText {
+  white-space: normal;
+}
+
 /* line 1, ../../../../src/css/theme/basic/panel/_Header.scss */
 .gui-panel-header {
-  border: 1px solid #000;
-  border-width: 0 0 1px 0;
+  border: 1px solid #DDD;
+  border-width: 1px 0 0 0;
   background-color: #2383B3;
-  padding: 2px;
+  padding: 1px 2px;
 }
 
 /* line 2, ../../../../src/css/theme/basic/panel/_Header.scss */
@@ -987,63 +262,91 @@
 
 /* line 1, ../../../../src/css/theme/basic/panel/_Panel.scss */
 .gui-panel, .gui-tabPanel {
-  border: 1px solid #000;
+  border: 1px solid #DDD;
+  border-width: 0 1px 1px 1px;
+}
+
+/* line 2, ../../../../src/css/theme/basic/panel/_Panel.scss */
+.gui-panel-body {
+  border: 1px solid #DDD;
+  border-width: 1px 0 0 0;
+  padding: 2px;
+}
+
+/* line 5, ../../../../src/css/theme/basic/panel/_Panel.scss */
+.gui-tabPanel-childPanel {
+  border-bottom: none;
 }
 
 /* line 1, ../../../../src/css/theme/basic/panel/_ToolButton.scss */
 .gui-panel-toolbutton {
   width: 15px;
   height: 15px;
+  border: none;
 }
 
-/* line 6, ../../../../src/css/theme/basic/panel/_ToolButton.scss */
+/* line 7, ../../../../src/css/theme/basic/panel/_ToolButton.scss */
 .gui-panel-toolbutton .gui-button-icon {
   top: -1px;
   left: -2px;
 }
 
-/* line 11, ../../../../src/css/theme/basic/panel/_ToolButton.scss */
+/* line 12, ../../../../src/css/theme/basic/panel/_ToolButton.scss */
 .gui-panel-toolbutton-icon {
-  background-image: url("../../../../resources/img/icons/ui-icons_222222_256x240.png");
+  background-image: url('../../../../resources/images/theme/basic/ui-icons_2694e8_256x240.png?1366070829');
 }
 
-/* line 2, ../../../../src/css/theme/basic/tab/_Tab.scss */
+/* line 1, ../../../../src/css/theme/basic/tab/_Tab.scss */
+.gui-tabPanel-tab {
+  margin-right: -1px;
+  border: 1px solid #DDD;
+  border-width: 1px 1px 0 1px;
+  padding: 3px 10px 5px 10px;
+  font-size: 13px;
+  background-color: #FBFBFB;
+}
+
+/* line 10, ../../../../src/css/theme/basic/tab/_Tab.scss */
 .gui-tabPanel-tab-active {
-  background-color: #DDD;
+  border-bottom: 3px solid #2A9DD7;
+  padding-bottom: 3px;
 }
 
 /* line 1, ../../../../src/css/theme/basic/window/_Window.scss */
 .gui-window {
-  border-color: #000;
-  border-style: solid;
-  border-width: 0 1px 1px 1px;
+  border-top: 5px solid #2A9DD7;
+  border-right: 1px solid #CCC;
+  border-bottom: 1px solid #CCC;
+  border-left: 1px solid #CCC;
 }
 
 /* line 3, ../../../../src/css/theme/basic/window/_Window.scss */
 .gui-window-header {
-  border-color: #000;
-  border-style: solid;
-  border-width: 1px 0 0 0;
-  background-color: #2383B3;
+  background-color: #FFF;
 }
 
 /* line 4, ../../../../src/css/theme/basic/window/_Window.scss */
 .gui-window-header-title {
+  padding: 3px 5px;
+  font-size: 14px;
   font-weight: bold;
-  color: #FFF;
+  color: #2A9DD7;
 }
 
-/* line 9, ../../../../src/css/theme/basic/window/_Window.scss */
+/* line 5, ../../../../src/css/theme/basic/window/_Window.scss */
+.gui-window-header-toolButtons {
+  padding-top: 1px;
+}
+
+/* line 10, ../../../../src/css/theme/basic/window/_Window.scss */
 .gui-window-body {
-  border-color: #000;
-  border-style: solid;
-  border-width: 1px 0 0 0;
+  border-top: 1px solid #CCC;
   background-color: #FFF;
 }
 
 /* line 12, ../../../../src/css/theme/basic/window/_Window.scss */
 .gui-window-modalMask {
   background-color: #CCC;
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
-  opacity: 0.5;
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
+  opacity: 0.2;
 }

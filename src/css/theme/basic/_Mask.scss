@@ -1,17 +1,22 @@
 .gui-mask-overlay {
 	background-color: #000;
-	@include opacity( .40 );
+	@include opacity( .05 );
 }
 
 .gui-mask-content {
-	background-color: #BBBBBB;
+	background-color: #FFF;
 	padding: 8px;
 	border: 1px solid black;
+	white-space: nowrap;
 }
 
 .gui-mask-spinner {
 	margin: 5px;
 	height: 16px;
 	width: 16px;
-	background-image: image-url( 'icons/spinner.gif' );
+	background-image: image-url( 'theme/basic/spinner.gif' );
+}
+
+.gui-mask-msg {
+	margin-right: 3px;
 }

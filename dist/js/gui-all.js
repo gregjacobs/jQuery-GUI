@@ -1,6 +1,6 @@
 /*!
  * jQuery-GUI
- * Version 0.4.0
+ * Version 0.7.1
  *
  * Copyright(c) 2013 Gregory Jacobs.
  * MIT Licensed. http://www.opensource.org/licenses/mit-license.php
@@ -14690,6 +14690,33 @@ define('gui/view/Model', [
 	
 } );
 /*global define */
+define('gui/window/Header', [
+	'gui/ComponentManager',
+	'gui/panel/Header'
+], function( ComponentManager, PanelHeader ) {
+	
+	/**
+	 * @class gui.window.Header
+	 * @extends gui.panel.Header
+	 * 
+	 * Specialized Container subclass which is used as a {@link gui.window.Window Window's} header.
+	 */
+	var WindowHeader = PanelHeader.extend( {
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'gui-window-header'
+		
+	} );
+	
+	ComponentManager.registerType( 'windowheader', WindowHeader );
+	
+	return WindowHeader;
+	
+} );
+/*global define */
 define('gui/window/Window', [
 	'jquery',
 	'lodash',
@@ -14934,4 +14961,4 @@ define('gui/window/Window', [
 	return Window;
 	
 } );
-require(["gui/Anchor", "gui/Component", "gui/ComponentManager", "gui/ComponentQuery", "gui/Container", "gui/Gui", "gui/Image", "gui/Label", "gui/Mask", "gui/Overlay", "gui/Viewport", "gui/anim/Animation", "gui/app/Application", "gui/app/Controller", "gui/app/EventBus", "gui/button/Button", "gui/form/field/Checkbox", "gui/form/field/Dropdown", "gui/form/field/Field", "gui/form/field/Hidden", "gui/form/field/Radio", "gui/form/field/Text", "gui/form/field/TextArea", "gui/layout/Auto", "gui/layout/Card.SwitchTransition", "gui/layout/Card.Transition", "gui/layout/Card", "gui/layout/Column", "gui/layout/Fit", "gui/layout/HBox", "gui/layout/Layout", "gui/layout/VBox", "gui/loader/Loader", "gui/loader/RequireJs", "gui/panel/Header", "gui/panel/Panel", "gui/panel/ToolButton", "gui/plugin/Plugin", "gui/tab/Bar", "gui/tab/Panel", "gui/tab/Tab", "gui/template/LoDash", "gui/template/Template", "gui/util/CallbackList", "gui/util/CollectionBindable", "gui/util/Css", "gui/util/Html", "gui/util/ModelBindable", "gui/util/OptionsStore", "gui/view/Collection", "gui/view/DataBound", "gui/view/Model", "gui/window/Window"]);
+require(["gui/Anchor", "gui/Component", "gui/ComponentManager", "gui/ComponentQuery", "gui/Container", "gui/Gui", "gui/Image", "gui/Label", "gui/Mask", "gui/Overlay", "gui/Viewport", "gui/anim/Animation", "gui/app/Application", "gui/app/Controller", "gui/app/EventBus", "gui/button/Button", "gui/form/field/Checkbox", "gui/form/field/Dropdown", "gui/form/field/Field", "gui/form/field/Hidden", "gui/form/field/Radio", "gui/form/field/Text", "gui/form/field/TextArea", "gui/layout/Auto", "gui/layout/Card.SwitchTransition", "gui/layout/Card.Transition", "gui/layout/Card", "gui/layout/Column", "gui/layout/Fit", "gui/layout/HBox", "gui/layout/Layout", "gui/layout/VBox", "gui/loader/Loader", "gui/loader/RequireJs", "gui/panel/Header", "gui/panel/Panel", "gui/panel/ToolButton", "gui/plugin/Plugin", "gui/tab/Bar", "gui/tab/Panel", "gui/tab/Tab", "gui/template/LoDash", "gui/template/Template", "gui/util/CallbackList", "gui/util/CollectionBindable", "gui/util/Css", "gui/util/Html", "gui/util/ModelBindable", "gui/util/OptionsStore", "gui/view/Collection", "gui/view/DataBound", "gui/view/Model", "gui/window/Header", "gui/window/Window"]);

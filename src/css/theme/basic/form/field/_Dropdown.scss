@@ -1,0 +1,55 @@
+.gui-form-field-dropdown {
+
+	.gui-form-field-inputCell { padding: 0; }
+
+	.gui-form-field-inputContainer {
+		border: 1px solid #2A9DD7;
+		padding: 3px 5px;
+	}
+	
+}
+
+.gui-form-field-dropdown-dropdownContainer {}
+
+/* The box that shows the selected option's text */
+.gui-form-field-dropdown-selectText {}
+
+.gui-form-field-dropdown-expandButton {
+	display: inline-block;
+	height: 14px;
+	width: 9px;
+	background-image: image-url('theme/basic/downMenuPointer.png');
+	background-position: 0px 0px;
+	right: 6px;
+	
+	// Center vertically
+	top: 50%;
+	margin-top: -9px;
+}
+
+.gui-form-field-dropdown-expandButton:hover{
+	background-position: -9px 0px;
+}
+
+// The dropdown menu itself. This is appended to the document body
+.gui-form-field-dropdown-menu {
+	border-bottom: 1px solid #2A9DD7;
+	border-right: 1px solid #2A9DD7;
+	border-left: 1px solid #2A9DD7; 
+	overflow-y:auto;
+}
+
+.gui-form-field-dropdown-menu-item {
+	padding: 3px 5px 3px 4px; 
+	background: #fff;; 
+}
+.gui-form-field-dropdown-menu-item:hover {
+	background: #48BBF5; 
+	color: #fff;
+ 	position: relative;
+}
+
+.gui-form-field-dropdown-menu-item-selected {
+	background: #2a9dd7; 
+	color:#fff
+}

@@ -1,2 +1,13 @@
-.gui-tabPanel-tab {}
-.gui-tabPanel-tab-active { background-color: #DDD; }
+.gui-tabPanel-tab {
+	margin-right: -1px;
+	border: 1px solid #DDD;
+	border-width: 1px 1px 0 1px;
+	padding: 3px 10px 5px 10px;
+	font-size: 13px;
+	background-color: #FBFBFB;
+}
+
+.gui-tabPanel-tab-active {
+	border-bottom: 3px solid #2A9DD7;
+	padding-bottom: 3px;  // reduce bottom padding to make up for increased bottom border
+}

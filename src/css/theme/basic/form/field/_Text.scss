@@ -1,8 +1,23 @@
 .gui-form-field-text {
+
+	.gui-form-field-inputCell { padding: 0; }
+
+	.gui-form-field-inputContainer {
+		border: 1px solid #2A9DD7;
+		padding: 3px 5px;
+	}
 	
 }
 
+.gui-form-field-text-input {
+	font-size: 16px;
+}
+
 .gui-form-field-text-emptyText {
-	font-size: 14px;
-	color: #AAA;
+	font-size: 16px;
+	color: #AAB;
+	white-space: nowrap;
+	
+	top: 3px;   // to match inputContainer padding
+	left: 5px;  // to match inputContainer padding
 }
