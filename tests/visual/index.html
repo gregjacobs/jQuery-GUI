@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Visual Tests - jQuery-GUI</title>
+
+	<link rel="stylesheet" href="../../dist/css/base/base.css" />
+	<link rel="stylesheet" href="../../dist/css/theme/basic/basic.css" />
+
+	<script type="text/javascript" src="../../bower_components/requirejs/require.js"></script>
+	<script type="text/javascript">
+		require.config( {
+			baseUrl : '../../',
+			
+			paths : {
+				// General dependencies
+				'jquery'     : 'bower_components/jquery/jquery',
+				'jquery-ui'  : 'bower_components/jquery-ui-amd/jquery-ui-1.10.0/jqueryui',
+				'lodash'     : 'bower_components/lodash/dist/lodash.compat',
+				'Class'      : 'bower_components/Class-js/dist/Class',
+				'Observable' : 'bower_components/Observable-js/dist/Observable',
+				'data'       : 'bower_components/Data-js/src',
+				
+				// jQuery-GUI Library
+				'gui' : 'src/js'
+			}
+		} );
+	</script>
+	
+	<script src="index.js"></script>
+	
+	<style>
+		#linksHeader { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #CCC; }
+		#linksContainer { display: none; }
+		.link { display: block; }
+		
+		
+		.relative { position: relative; }
+		
+		.marginComponent { margin: 5px }
+	</style>
+
+</head>
+
+<body>
+
+<div id="linksHeader">
+	This is a visual test file for all components. Individual component visual tests may be accessed from the following links:
+	<a href="javascript:;" onclick="$( '#linksContainer' ).show(); $( this ).hide();">(Show)</a>
+	
+	<div id="linksContainer">
+		<a class="link" href="Mask.html">gui.Mask</a>
+		<a class="link" href="button/Button.html">gui.button.Button</a>
+		<a class="link" href="form/field/Dropdown.html">gui.form.field.Dropdown</a>
+		<a class="link" href="form/field/Text.html">gui.form.field.Text</a>
+		<a class="link" href="form/field/TextArea.html">gui.form.field.TextArea</a>
+		<a class="link" href="panel/Panel.html">gui.panel.Panel</a>
+		<a class="link" href="tab/Panel.html">gui.tab.Panel</a>
+		<a class="link" href="window/Window.html">gui.window.Window</a>
+	</div>
+</div>
+
+<div id="contentArea"></div>
+
+</body>
+</html>
