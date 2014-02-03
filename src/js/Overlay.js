@@ -2,23 +2,22 @@
 define( [
 	'jquery',
 	'lodash',
-	'Class',
-	'gui/Gui',
-	'gui/anim/Animation',
+	
 	'gui/Component',
-	'gui/panel/Panel',
-	'jquery-ui/position'  // jQuery UI's `position` plugin
-], function( jQuery, _, Class, Gui, Animation, Component, Panel ) {
+	'gui/Container',
+	
+	'jquery-ui/position'  // jQuery UI's `position` plugin. Makes positioning functionality available from jQuery.prototype.position()
+], function( jQuery, _, Component, Container ) {
 	
 	/**
 	 * @class gui.Overlay
-	 * @extends gui.panel.Panel
+	 * @extends gui.panel.Container
 	 *
 	 * Base class for UI elements that "float" on top of the document (most notably: {@link gui.window.Window}).
 	 * This can be positioned by {@link #x} and {@link #y} values, or positioned relative to other elements using the 
 	 * {@link #anchor} config.
 	 */
-	var Overlay = Panel.extend( {
+	var Overlay = Container.extend( {
 		
 		/**
 		 * @cfg {Boolean} autoShow
