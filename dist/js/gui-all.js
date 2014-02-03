@@ -5917,1201 +5917,25 @@ define('gui/Label', [
 	
 } );
 /*global define */
-define('gui/layout/HBox', [
-	'jquery',
-	'gui/Component',
-	'gui/Container',
-	'gui/layout/Layout'
-], function( jQuery, Component, Container, Layout ) {
-
-	/**
-	 * @class gui.layout.HBox
-	 * @extends gui.layout.Layout
-	 * @alias layout.hbox
-	 * 
-	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
-	 * in the Container that should have a flexible width that proportionally should take up the remaining area of its parent
-	 * element should have a special property named {@link #flex}, that determines how wide the box should be in relation to the
-	 * available area.  This property is a number, relative to other children. If a {@link #flex} not provided, the layout uses 
-	 * the component's width instead.
-	 */
-	var HBoxLayout = Layout.extend( {
-		
-		/**
-		 * @cfg {Number} flex
-		 * This config is to be placed on **child components** of the {@link #container}. The number is a ratio
-		 * of how much space the child component should take up in relation to the remaining space in the target
-		 * element, and based on other child components' flex values.
-		 * 
-		 * For example, the following configuration would make component #1 have ~33% width, and component #2 have
-		 * ~67% width.
-		 * 
-		 *     layout : 'hbox',
-		 *     items : [
-		 *         {
-		 *             flex : 1,
-		 *             html : "I'm at 33% width"
-		 *         },
-		 *         {
-		 *             flex : 2,
-		 *             html : "I'm at 67% width"
-		 *         }
-		 *     ]
-		 * 
-		 * Other components may also exist in the {@link #container} that do not have a {@link #flex} value. These will be sized,
-		 * and components *with* a {@link #flex} value will be flexed into the *remaining* space that is not taken up by the other
-		 * components. Example:
-		 * 
-		 *     width : 100,    // not necessary, but just for example purposes
-		 *     layout : 'hbox',
-		 *     
-		 *     items : [
-		 *         {
-		 *             html : "I will be sized based on my content. Let's say my width is 20px though, for argument's sake"
-		 *         },
-		 *         {
-		 *             flex : 1,
-		 *             html : "Since the previous component is 20px wide, I will take up the remaining 80px of space"
-		 *         }
-		 *     ]
-		 */
-		
-		/**
-		 * @protected
-		 * @property {jQuery} $clearEl
-		 * 
-		 * The element used to clear the floats created by the layout routine.
-		 */
-		
-		
-		/**
-		 * Hook method for subclasses to override to implement their layout strategy. Implements the HBoxLayout algorithm.
-		 * 
-		 * @protected
-		 * @template
-		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
-		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
-		 */
-		onLayout : function( childComponents, $targetEl ) {
-			this._super( arguments );
-			
-			
-			var flexedComponents = [],
-			    totalFlex = 0,
-			    totalUnflexedWidth = 0,
-			    i, len, childComponent, numChildComponents = childComponents.length;
-			
-			// First, render and lay out each of the child components that don't have a 'flex' value.
-			// While we're at it, we'll add up the total flex that components which *do* have a flex value have.
-			for( i = 0; i < numChildComponents; i++ ) {
-				childComponent = childComponents[ i ];
-				
-				// Add the CSS class to components to be able to place them in an HBox layout. This adds `float:left;`,
-				// and a few other fixing styles.
-				childComponent.addCls( 'gui-layout-hbox-component' );
-				
-				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
-				this.renderComponent( childComponent, $targetEl, { position: i } );
-				
-				// Only process the child component if it is not hidden
-				if( !childComponent.isHidden() ) {
-					if( !childComponent.flex ) {
-						// Not a flexed component, do its layout
-						childComponent.doLayout();
-						
-						// Sadly, the element being measured may have a sub-pixel width, but jQuery returns the floor value of 
-						// it. And in this case, we would get float wrapping because the sum of the actual widths would be greater 
-						// than the container width after flex values are computed. So simply adding one pixel as a workaround
-						// at this point. May have to do something different in the future, with a table layout.
-						totalUnflexedWidth += Math.floor( 1 + childComponent.getOuterWidth( /* includeMargin */ true ) );
-						
-					} else {
-						// Flexed component: push it onto the flexed components processing array for the next step
-						flexedComponents.push( childComponent );
-						totalFlex += childComponent.flex;
-					}
-				}
-			}
-			
-			// Now go through and size the other child components based on their flex values and the remaining space.
-			if( totalFlex > 0 ) {
-				var targetWidth = $targetEl.width(),
-				    targetHeight = $targetEl.height(),
-				    remainingTargetWidth = targetWidth - totalUnflexedWidth,
-				    trimmedPixels = 0;  // Stores the decimal values resulting in the division of the remainingTargetWidth divided by the flex value. 
-				                        // The pixels that are trimmed off of each of the child components is added to the last item to fill the extra space.
-				
-				for( i = 0, len = flexedComponents.length; i < len; i++ ) {
-					childComponent = flexedComponents[ i ];
-					
-					// Now size the flexed component based on the flex value
-					var newChildWidth = ( childComponent.flex / totalFlex ) * remainingTargetWidth;
-					trimmedPixels += newChildWidth % 1;            // take the decimal value from the child height. Ex: 3.25 % 1 == 0.25  (We'll use this later).
-					newChildWidth = Math.floor( newChildWidth );  // and do the actual trimming off of the decimal for the new child height
-					
-					// If sizing the last component, add in (the smallest whole number of) the decimal value pixels that were trimmed from previous components
-					if( i === len - 1 ) {
-						newChildWidth += Math.floor( trimmedPixels );
-						newChildWidth--;  // and take off a pixel to attempt to fix the accidental browser wrapping issue with sub-pixel widths...
-					}
-					
-					this.sizeComponent( childComponent, newChildWidth, undefined );
-				}
-			}
-			
-			if( !this.$clearEl ) {
-				this.$clearEl = jQuery( '<div class="gui-layout-hbox-clear" />' );  // to clear the floats
-			}
-			$targetEl.append( this.$clearEl );
-		},
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		onDestroy : function() {
-			if( this.$clearEl ) {
-				this.$clearEl.remove();
-			}
-			
-			this._super( arguments );
-		}
-		
-	} );
-	
-	
-	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'hbox', HBoxLayout );
-	
-	return HBoxLayout;
-	
-} );
-
-/*global define */
-define('gui/panel/Header', [
-	'lodash',
-	'gui/ComponentManager',
-	'gui/Container',
-	'gui/Label',
-	'gui/layout/HBox'
-], function( _, ComponentManager, Container, Label ) {
-	
-	/**
-	 * @class gui.panel.Header
-	 * @extends gui.Container
-	 * 
-	 * Specialized Container subclass which is used as a {@link gui.panel.Panel Panel's} header.
-	 */
-	var PanelHeader = Container.extend( {
-		
-		/**
-		 * @cfg {String} title
-		 * 
-		 * The title of the Panel, which is placed in the {@link #titleLabel}.
-		 */
-		
-		/**
-		 * @cfg {Number} titlePosition
-		 * 
-		 * The index in the Header's {@link #items} array where the {@link #title} component should be
-		 * placed. This is most useful when providing the {@link #items} config to place other components
-		 * in the Header.
-		 * 
-		 * Defaults to 0, making the {@link #title} component the first component.
-		 */
-		titlePosition : 0,
-		
-		/**
-		 * @cfg {Object/Object[]} items
-		 * 
-		 * Any component(s) to place into the Header. The {@link #title} component is automatically
-		 * added to this array at the index specified by the {@link #titlePosition}, and any {@link #toolButtons}
-		 * are automatically appended as well.
-		 * 
-		 * See this config in the superclass for more details.
-		 */
-		
-		/**
-		 * @cfg {Object/Object[]/gui.panel.ToolButton/gui.panel.ToolButton[]} toolButtons
-		 * 
-		 * One or more {@link gui.panel.ToolButton ToolButtons} or ToolButton config objects. These will
-		 * be placed on the right side of the header.
-		 */
-		
-		/**
-		 * @cfg
-		 * @inheritdoc
-		 */
-		layout : 'hbox',
-		
-		/**
-		 * @cfg
-		 * @inheritdoc
-		 */
-		componentCls : 'gui-panel-header',
-		
-		
-		/**
-		 * @protected
-		 * @property {gui.Label} titleLabel
-		 * 
-		 * The label component for the title.
-		 */
-		
-		/**
-		 * @protected
-		 * @property {gui.Container} toolButtonsCt
-		 * 
-		 * The Container that holds the {@link #toolButtons}.
-		 */
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		initComponent : function() {
-			this.titleLabel = this.createTitleLabel();
-			this.toolButtonsCt = this.createToolButtonsCt();
-			
-			this.items = this.buildItems();  // note: if an `items` config was passed to the Header, it will be handled in buildItems()
-			
-			this._super( arguments );
-		},
-		
-		
-		/**
-		 * Builds the array of the header's child items.
-		 * 
-		 * @protected
-		 * @return {Object/Object[]} The child item(s).
-		 */
-		buildItems : function() {
-			var items = this.items || [];  // start with any custom items, or an empty array
-			if( !_.isArray( items ) )  // the `items` config may have been a single object, in which case, wrap in an array
-				items = [ items ];
-			
-			// Add the title component at the appropriate position
-			var titlePosition = Math.min( this.titlePosition, items.length );  // append if at a position greater than the number of items
-			items.splice( titlePosition, 0, this.titleLabel );
-			
-			// Add the toolbuttons, right aligned
-			items.push( 
-				{ type: 'component', flex: 1 },  // take up the middle space, to effectively right-align the tool buttons
-				this.toolButtonsCt
-			);
-			
-			return items;
-		},
-		
-		
-		/**
-		 * Creates the title component. This is the component that the {@link #title}
-		 * config will be applied to, by default.
-		 * 
-		 * @protected
-		 * @return {gui.Label}
-		 */
-		createTitleLabel : function() {
-			return new Label( {
-				cls  : this.componentCls + '-title',
-				text : this.title
-			} );
-		},
-		
-		
-		/**
-		 * Creates the tool buttons container.
-		 * 
-		 * @protected
-		 * @return {gui.Container}
-		 */
-		createToolButtonsCt : function() {
-			return new Container( {
-				cls         : this.componentCls + '-toolButtons',
-				defaultType : 'toolbutton',   // gui.panel.ToolButton
-				items       : this.toolButtons
-			} );
-		},
-		
-		
-		// ------------------------------------
-		
-		
-		/**
-		 * Sets the text in the {@link #titleLabel}.
-		 * 
-		 * @param {String} title
-		 */
-		setTitle : function( title ) {
-			this.titleLabel.setText( title );
-			this.doLayout();  // Update the Header's layout for the new text size
-		}
-		
-	} );
-	
-	ComponentManager.registerType( 'panelheader', PanelHeader );
-	
-	return PanelHeader;
-	
-} );
-/*global define */
-define('gui/button/Button', [
-	'jquery',
-	'lodash',
-	'gui/Component',
-	'gui/ComponentManager',
-	'gui/template/LoDash'
-], function( jQuery, _, Component, ComponentManager, LoDashTpl ) {
-
-	/**
-	 * @class gui.button.Button
-	 * @extends gui.Component
-	 * @alias type.button
-	 * 
-	 * A generic button that calls its {@link #handler} when clicked.
-	 */
-	var Button = Component.extend( {
-		
-		/**
-		 * @cfg {String} iconCls
-		 * 
-		 * A CSS class to use for the icon.
-		 */
-		
-		/**
-		 * @cfg {String} iconAlign
-		 * 
-		 * Which side to put the icon on. Accepts 'left' or 'right'.
-		 */
-		iconAlign : 'left',
-		
-		/**
-		 * @cfg {String} text
-		 *  
-		 * The text for the button.
-		 */
-		text : "",
-	
-		/**
-		 * @cfg {String} tooltip
-		 * 
-		 * The text to use as the button's tooltip for when the mouse is hovered over the button. Currently just sets the title 
-		 * attribute of the button element.
-		 */
-		tooltip: "",
-		
-		/**
-		 * @cfg {Function} handler
-		 * 
-		 * A function to run when the button is clicked. Alternatively, one can listen to the {@link #click} event. 
-		 */
-		
-		/**
-		 * @cfg {Object} scope
-		 * 
-		 * The scope to run the {@link #handler} function in. Defaults to the Button object.
-		 */
-		
-		/**
-		 * @cfg {Boolean} disabled
-		 * 
-		 * Set to `true` to have the button be initially disabled.
-		 */
-		disabled : false,
-		
-		/**
-		 * @cfg
-		 * @inheritdoc
-		 */
-		baseCls : 'gui-button',
-		
-		/**
-		 * @cfg
-		 * @inheritdoc
-		 */
-		renderTpl : new LoDashTpl( [
-			'<span class="<%= baseCls %>-icon <%= baseCls %>-icon-left <%= leftIconElCls %>"></span>',
-			'<a id="<%= elId %>-text" class="<%= baseCls %>-text <%= textElCls %>" href="javascript:;" title="<%= tooltip %>">',
-				'<%= text %>',
-			'</a>',
-			'<span class="<%= baseCls %>-icon <%= baseCls %>-icon-right <%= rightIconElCls %>"></span>'
-		] ),
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		initComponent : function() {
-			this.addEvents(
-				/**
-				 * Fires when the button has been clicked.
-				 * 
-				 * @event click
-				 * @param {gui.button.Button} button This gui.Button instance.
-				 */
-				'click',
-				
-				/**
-				 * Fires when the mouse has entered (hovered over) the button. Equivalent to the jQuery mouseenter event.
-				 * 
-				 * @event mouseenter
-				 * @param {gui.button.Button} button This gui.Button instance.
-				 */
-				'mouseenter',
-				
-				/**
-				 * Fires when the mouse has left (no longer hovered over) the button. Equivalent to the jQuery mouseleave event.
-				 * 
-				 * @event mouseleave
-				 * @param {gui.button.Button} button This gui.Button instance.
-				 */
-				'mouseleave'
-			);
-			
-			this._super( arguments );
-		},
-		
-		
-		/**
-		 * Override of superclass method used to add the {@link #tooltip} config as the "title" attribute.
-		 * 
-		 * @protected
-		 * @return {Object}
-		 */
-		getRenderAttributes : function() {
-			var attributes = this._super( arguments );
-			
-			if( this.tooltip ) {
-				attributes.title = this.tooltip;
-			}
-			return attributes;
-		},
-		
-		
-		/**
-		 * Override of superclass method used to build the {@link #renderTplData} object.
-		 * 
-		 * @protected
-		 * @return {Object}
-		 */
-		getRenderTplData : function() {
-			var leftIconElCls = "",
-			    rightIconElCls = "",
-			    textElCls = "",
-			    iconCls = this.iconCls,
-			    hiddenCls = this.baseCls + '-hiddenEl';
-			
-			if( !iconCls ) {
-				leftIconElCls = rightIconElCls = hiddenCls;
-			} else if( this.iconAlign === 'left' ) {
-				leftIconElCls = iconCls;
-				rightIconElCls = hiddenCls;
-			} else {
-				leftIconElCls = hiddenCls;
-				rightIconElCls = iconCls;
-			}
-			
-			return _.defaults( this._super( arguments ), {
-				text     : this.text,
-				tooltip  : this.tooltip,
-				
-				leftIconElCls  : leftIconElCls,
-				rightIconElCls : rightIconElCls,
-				textElCls      : textElCls
-			} );
-		},
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		onRender : function() {
-			this._super( arguments );
-			
-			if( this.disabled ) {
-				this.disable();
-			}
-			
-			// Store a reference to the text element
-			this.$textEl = jQuery( '#' + this.elId + '-text' );
-			
-			// Add Event Handlers
-			this.$el.on( {
-				'mouseenter' : _.bind( this.onMouseEnter, this ),
-				'mouseleave' : _.bind( this.onMouseLeave, this ),
-				'mousedown'  : _.bind( this.onMouseDown, this ),
-				'mouseup'    : _.bind( this.onMouseUp, this ),
-				'click'      : _.bind( this.onClick, this )
-			} );
-		},
-		
-		
-		/**
-		 * Sets the text on the button. Accepts HTML as well.
-		 * 
-		 * @param {String} text
-		 */
-		setText : function( text ) {
-			this.text = text;
-			
-			if( this.rendered ) {
-				this.$textEl.html( text );
-			}
-		},
-		
-		
-		/**
-		 * Disables the button.
-		 * 
-		 * @method disable
-		 */
-		disable : function() {
-			this.disabled = true;
-			
-			if( this.rendered ) {
-				this.$el.prop( 'disabled', true );
-			}
-		},
-		
-		
-		/**
-		 * Enables the button (if it was previously {@link #disable disabled}).
-		 * 
-		 * @method enable
-		 */
-		enable : function() {
-			this.disabled = false;
-			
-			if( this.rendered ) {
-				this.$el.prop( 'disabled', false );
-			}
-		},
-		
-		
-		/**
-		 * Sets the disabled/enabled state of the Button based on the provided `disabled` flag.
-		 * 
-		 * @param {Boolean} disabled True to disable the Button, false to enable the Button.
-		 */
-		setDisabled : function( disabled ) {
-			this[ disabled ? 'disable' : 'enable' ]();
-		},
-		
-		
-		/**
-		 * Handles a click to the Button.
-		 * 
-		 * @protected
-		 * @param {jQuery.Event} evt
-		 */
-		onClick : function( evt ) {
-			if( this.handler ) {
-				this.handler.call( this.scope || this, this );  // run the handler in the scope of this Button if no scope config was provided, and provide this button instasnce as the first arg
-			}
-			
-			this.fireEvent( 'click', this );
-		},
-		
-		
-		/**
-		 * Method that is run when mouse hovers over the Button.
-		 * 
-		 * @protected
-		 * @param {jQuery.Event} evt
-		 */
-		onMouseEnter : function() {
-			this.addCls( this.baseCls + '-hover' );
-			
-			this.fireEvent( 'mouseenter', this );
-		},
-		
-		
-		/**
-		 * Method that is run when mouse un-hovers the Button.
-		 * 
-		 * @protected
-		 * @param {jQuery.Event} evt
-		 */
-		onMouseLeave : function() {
-			this.removeCls( this.baseCls + '-hover' );
-			
-			this.fireEvent( 'mouseleave', this );
-		},
-		
-		
-		/**
-		 * Method that is run when mouse is pressed down on the Button.
-		 * 
-		 * @protected
-		 * @param {jQuery.Event} evt
-		 */
-		onMouseDown : function() {
-			this.addCls( this.baseCls + '-active' );
-		},
-		
-		
-		/**
-		 * Method that is run when mouse is release on the Button.
-		 * 
-		 * @protected
-		 * @param {jQuery.Event} evt
-		 */
-		onMouseUp : function() {
-			this.removeCls( this.baseCls + '-active' );
-		}
-		
-	} );
-	
-	
-	ComponentManager.registerType( 'button', Button );
-	
-	return Button;
-	
-} );
-
-/*global define */
-define('gui/panel/ToolButton', [
-	'gui/button/Button',
-	'gui/ComponentManager'
-], function( Button, ComponentManager ) {
-	
-	/**
-	 * @class gui.panel.ToolButton
-	 * @extends gui.button.Button
-	 * @alias type.toolbutton
-	 * 
-	 * Small utility class for a button that can be used in a {@link gui.panel.Panel Panel's} header.
-	 */
-	var ToolButton = Button.extend( {
-		
-		/**
-		 * @cfg {String} toolType (required)
-		 * 
-		 * The tool button type. Currently accepts the strings:
-		 * 
-		 * - close
-		 * - closethick
-		 */
-		
-		/**
-		 * @cfg
-		 * @inheritdoc
-		 */
-		componentCls : 'gui-panel-toolbutton',
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		initComponent : function() {
-			// <debug>
-			if( !this.toolType ) throw new Error( "'toolType' cfg required" );
-			// </debug>
-			
-			var componentCls = this.componentCls,
-			    toolType = this.toolType;
-			
-			this.iconCls = [
-				'gui-icon-' + toolType,
-				componentCls + '-icon',
-				componentCls + '-icon-' + toolType
-			].join( " " );
-			
-			this._super( arguments );
-		}
-		
-	} );
-	
-	
-	ComponentManager.registerType( 'toolbutton', ToolButton );
-	
-	return ToolButton;
-	
-} );
-/*global define */
-define('gui/panel/Panel', [
-	'jquery',
-	'lodash',
-	'gui/util/Css',
-	'gui/ComponentManager',
-	'gui/Container',
-	'gui/panel/Header',
-	'gui/template/LoDash',
-	'gui/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
-], function( jQuery, _, Css, ComponentManager, Container, PanelHeader, LoDashTpl ) {
-
-	/**
-	 * @class gui.panel.Panel
-	 * @extends gui.Container
-	 * @alias type.panel
-	 *
-	 * An application-oriented {@link gui.Container} subclass which supports adding a {@link #title} bar and 
-	 * {@link #toolButtons}.
-	 */
-	var Panel = Container.extend( {
-
-		/**
-		 * @cfg {String} bodyCls
-		 * 
-		 * Any additional CSS class(es) to add to the Panel's {@link #$bodyEl body} element. If multiple CSS classes
-		 * are added, they should each be separated by a space. Ex:
-		 * 
-		 *     bodyCls : 'bodyClass1 bodyClass2'
-		 */
-		bodyCls: '',
-		
-		/**
-		 * @cfg {Object} bodyStyle
-		 * 
-		 * Any additional CSS style(s) to apply to the Panel's {@link #$bodyEl body} element. Should be an object where the 
-		 * keys are the CSS property names, and the values are the CSS values. Ex:
-		 * 
-		 *     bodyStyle : {
-		 *         'padding'    : '5px',
-		 *         'border-top' : '1px solid #000'
-		 *     }
-		 */
-		
-		/**
-		 * @cfg {String} title
-		 * 
-		 * The title of the Panel.
-		 */
-		title : "",
-		
-		/**
-		 * @cfg {Object/Object[]/gui.panel.ToolButton/gui.panel.ToolButton[]} toolButtons
-		 * 
-		 * One or more {@link gui.panel.ToolButton ToolButtons} or ToolButton config objects. These will
-		 * be placed on the right side of the Panel's header (i.e. top right of the Panel).
-		 */
-		
-		/**
-		 * @cfg {Object} header
-		 * 
-		 * Any configuration options to pass to the {@link #property-header} component. This may include
-		 * a `type` property to specify a different Header subclass than the default {@link gui.panel.Header}.
-		 */
-		
-		/**
-		 * @cfg {Object/Object[]/gui.button.Button/gui.button.Button[]} buttons
-		 * 
-		 * One or more {@link gui.button.Button Buttons} or Button config objects for buttons to place
-		 * in the footer of the Panel. These will be placed on the right side of the Panel's footer 
-		 * (i.e. bottom right of the Panel).
-		 */
-		
-		/**
-		 * @cfg {Boolean} headerHidden
-		 * 
-		 * `true` to initially hide the Panel's {@link #property-header}. Can be shown using {@link #showHeader}. 
-		 */
-		
-		
-		/**
-		 * @cfg
-		 * @inheritdoc
-		 */
-		baseCls : 'gui-panel',
-		
-		/**
-		 * @cfg
-		 * @inheritdoc
-		 */
-		renderTpl : new LoDashTpl( [
-			'<div',
-				' id="<%= elId %>-body"',
-				' class="<%= baseCls %>-body<% if( bodyCls ) { %> <%= bodyCls %><% } %>"',
-				'<% if( bodyStyle ) { %> style="<%= bodyStyle %>"<% } %>>',
-			'</div>'
-		] ),
-		
-		
-		/**
-		 * @protected
-		 * @property {jQuery} $bodyEl
-		 * 
-		 * A reference to the Panel's body element. This will be available after the Panel is rendered.
-		 */
-		
-		/**
-		 * @protected
-		 * @property {gui.Container} header
-		 * 
-		 * The Container which acts as the Panel's header. The header holds the {@link #title}, and any {@link #toolButtons} 
-		 * specified. 
-		 * 
-		 * Note that this Container is only created if a {@link #title} or {@link #toolButtons} have been specified.
-		 */
-		
-		/**
-		 * @protected
-		 * @property {gui.Container} footer
-		 * 
-		 * The Container which acts as the Panel's footer. The footer holds the any {@link #buttons} specified. 
-		 * 
-		 * Note that this Container is only created if a {@link #buttons} config has been specified.
-		 */
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		initComponent : function() {
-			this._super( arguments );
-			
-			// Move the `header` config to `headerCfg`, as to not be confusing when an actual gui.panel.Header is created in the `header` property
-			this.headerCfg = this.header;
-			delete this.header;
-			
-			if( this.title || this.toolButtons || this.headerCfg ) {
-				this.doCreateHeader();
-			}
-			if( this.buttons ) {
-				this.doCreateFooter();
-			}
-		},
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		onRender : function() {
-			this._super( arguments );
-			
-			this.$bodyEl = jQuery( '#' + this.elId + '-body' );
-			
-			if( this.header ) {
-				this.header.render( this.$el, 0 );  // prepend before the body
-			}
-			if( this.footer ) {
-				this.footer.render( this.$el );  // append after the body
-			}
-		},
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		getRenderTplData : function() {
-			var bodyStyle = Css.mapToString( this.bodyStyle || {} );
-			
-			return _.assign( this._super( arguments ), {
-				bodyCls   : this.bodyCls,
-				bodyStyle : bodyStyle
-			} );
-		},
-		
-		
-		/**
-		 * Returns the body element for the Panel, wrapped in a jQuery object.  This element will only be available after the 
-		 * Panel has been rendered by the {@link #method-render} method.  
-		 * 
-		 * @return {jQuery}
-		 */
-		getBodyEl : function() {
-			return this.$bodyEl;  // created when rendered
-		},
-		
-		
-		/**
-		 * Override of superclass method, used to specify the {@link #$bodyEl} as the target for Panel content.
-		 * 
-		 * @protected
-		 * @return {jQuery}
-		 */
-		getContentTarget : function() {
-			return this.getBodyEl();
-		},
-		
-		
-		// ------------------------------------------
-		
-		
-		/**
-		 * Performs the creation of the {@link #property-header}, by calling {@link #createHeader}, and then applying 
-		 * any post-processing required (which includes rendering it as the first element in the Panel
-		 * itself if it is already rendered).
-		 * 
-		 * To create a different {@link #property-header} in a subclass, override {@link #createHeader} instead of this 
-		 * method.
-		 * 
-		 * @protected
-		 */
-		doCreateHeader : function() {
-			this.header = this.createHeader( _.defaults( {}, this.headerCfg, {
-				type         : 'panelheader',
-				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'gui-panel-header'. For Window, 'gui-window-header'
-				title        : this.title,
-				toolButtons  : this.toolButtons
-			} ) );
-			this.header.setVisible( !this.headerHidden );
-			delete this.headerHidden;
-			
-			if( this.rendered ) {
-				this.header.render( this.$el, /* prepend */ 0 );  // prepend to make it the first element (i.e. before the body)
-			}
-		},
-		
-		
-		/**
-		 * Creates the {@link #property-header}, which contains the {@link #title} and any {@link #toolButtons} configured.
-		 * 
-		 * @protected
-		 * @param {Object} headerConfig The configuration for the header, with defaults applied from the Panel.
-		 * @return {gui.panel.Header}
-		 */
-		createHeader : function( headerConfig ) {
-			return ComponentManager.create( headerConfig );
-		},
-		
-		
-		/**
-		 * Performs the creation of the {@link #footer}, by calling {@link #createFooter}, and then applying 
-		 * any post-processing required (which includes rendering it as the last element in the Panel
-		 * itself if it is already rendered).
-		 * 
-		 * To create a different {@link #property-header} in a subclass, override {@link #createHeader} instead of this 
-		 * method.
-		 * 
-		 * @protected
-		 */
-		doCreateFooter : function() {
-			this.footer = this.createFooter();
-			
-			if( this.rendered ) {
-				this.footer.render( this.$el );  // append to make it the last element (i.e. after the body)
-			}
-		},
-		
-		
-		/**
-		 * Creates the {@link #footer} Container, which contains any {@link #buttons} that were configured.
-		 * 
-		 * @protected
-		 * @return {gui.Container}
-		 */
-		createFooter : function() {
-			return new Container( {
-				cls    : this.baseCls + '-footer',
-				layout : 'hbox',
-				
-				items  : [
-					{ type: 'component', flex: 1 },  // to push the buttons to the right
-					{
-						type : 'container',
-						cls  : this.baseCls + '-footer-buttons',
-						
-						defaultType : 'button',   // gui.button.Button
-						items       : this.buttons
-					}
-				]
-			} );
-		},
-		
-		
-		// -----------------------------------
-		
-		
-		/**
-		 * Gets the {@link #property-header} of the Panel. If the {@link #property-header} has not been created yet,
-		 * it will be instantiated before it is returned.
-		 * 
-		 * In most cases, you will not need to directly access the Panel's {@link #property-header} component. Most of 
-		 * the time, you will set the {@link #cfg-header} config options, and if the Panel's title needs to be changed,
-		 * you will use the {@link #setTitle} method.
-		 * 
-		 * However, this method is provided for more advanced operations, such as if components need to be injected into
-		 * the header. In this case, be aware that the header is created with components of its own, and you will need
-		 * to inject yours at the correct indexes.
-		 * 
-		 * @return {gui.panel.Header}
-		 */
-		getHeader : function() {
-			if( !this.header ) {
-				this.doCreateHeader();
-			}
-			return this.header;
-		},
-		
-		
-		/**
-		 * Sets the title of the Panel.
-		 * 
-		 * @param {String} title The title to set.
-		 * @chainable
-		 */
-		setTitle : function( title ) {
-			if( !this.header ) {
-				this.doCreateHeader();
-			}
-			
-			this.title = title;
-			this.header.setTitle( title );
-			
-			return this;
-		},
-		
-		
-		/**
-		 * Retrieves the {@link #title} of the Panel.
-		 * 
-		 * @return {String} The title of the Panel.
-		 */
-		getTitle : function() {
-			return this.title;
-		},
-		
-		
-		/**
-		 * Shows the Panel's {@link #property-header}, if it is currently hidden.
-		 * 
-		 * @chainable
-		 */
-		showHeader : function() {
-			if( this.header ) {
-				this.header.show();
-			} else {
-				this.headerHidden = false;  // in case the header hasn't been created yet, we'll use this for when it is
-			}
-			
-			return this;
-		},
-		
-		
-		/**
-		 * Hides the Panel's {@link #property-header}, if it is currently visible.
-		 * 
-		 * @chainable
-		 */
-		hideHeader : function() {
-			if( this.header ) {
-				this.header.hide();
-			} else {
-				this.headerHidden = true;  // in case the header hasn't been created yet, we'll use this for when it is
-			}
-			
-			return this;
-		},
-		
-		
-		// ---------------------------------
-		
-		// Panel's Body Styling Functionality
-		
-		/**
-		 * Adds one or more CSS classes to the Panel's {@link #$bodyEl body} element.
-		 * 
-		 * @param {String} cssClass One or more CSS classes to add to the Panel's {@link #$bodyEl body} element. If specifying 
-		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
-		 * @return {gui.panel.Panel} This Panel, to allow method chaining.
-		 */
-		addBodyCls : function( cssClass ) {
-			if( !this.rendered ) {
-				this.bodyCls = Css.addCls( this.bodyCls, cssClass );  // update the `bodyCls` config in the unrendered state
-			} else {
-				this.$bodyEl.addClass( cssClass ); // delegate to jQuery in this case
-			}
-			return this;
-		},
-		
-		
-		/**
-		 * Removes one or more CSS classes from the Panel's {@link #$bodyEl body} element.
-		 * 
-		 * @param {String} cssClass One or more CSS classes to remove from the Panel's {@link #$bodyEl body} element. If specifying 
-		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
-		 * @return {gui.panel.Panel} This Panel, to allow method chaining.
-		 */
-		removeBodyCls : function( cssClass ) {
-			if( !this.rendered ) {
-				this.bodyCls = Css.removeCls( this.bodyCls, cssClass );  // update the `bodyCls` config in the unrendered state
-			} else {
-				this.$bodyEl.removeClass( cssClass ); // delegate to jQuery in this case
-			}
-			return this;
-		},
-		
-		
-		/**
-		 * Determines if the Panel's {@link #$bodyEl body} element has the given `cssClass`.
-		 * 
-		 * @param {String} cssClass The CSS class to test for.
-		 * @return {Boolean} True if the Panel's {@link #$bodyEl body} element has the given `cssClass`, false otherwise.
-		 */
-		hasBodyCls : function( cssClass ) {
-			// Check the `bodyCls` config in the unrendered state, or the body element itself in the rendered state
-			return ( !this.rendered ) ? Css.hasCls( this.bodyCls, cssClass ) : this.$bodyEl.hasClass( cssClass );
-		},
-		
-		
-		/**
-		 * Sets a CSS style property on the Panel's {@link #$bodyEl body} element.
-		 * 
-		 * @param {String/Object} name The CSS property name. This first argument may also be provided as an Object of key/value
-		 *   pairs for CSS property names/values to apply to the Panel's {@link #$bodyEl body} element.
-		 * @param {String} value The value for the CSS property. Optional if the first argument is an Object.
-		 * @return {gui.panel.Panel} This Panel, to allow method chaining.
-		 */
-		setBodyStyle : function( name, value ) {
-			if( !this.rendered ) {
-				this.bodyStyle = this.bodyStyle || {};
-				
-				if( typeof name === 'object' ) {
-					_.assign( this.bodyStyle, name );  // apply each of the properties on the provided 'styles' object onto the Panel's bodyStyle
-				} else {
-					this.bodyStyle[ name ] = value;
-				}
-				
-			} else {
-				this.$bodyEl.css( name, value );  // will work for both method signatures (i.e. when `name` is an object, and when provided both name / value)
-			}
-			return this;
-		},
-
-		
-		// ---------------------------------
-		
-		
-		/**
-		 * @inheritdoc
-		 */
-		onDestroy : function() {
-			if( this.header ) this.header.destroy();
-			if( this.footer ) this.footer.destroy();
-			
-			this._super( arguments );
-		}
-		
-	} );
-	
-	
-	ComponentManager.registerType( 'panel', Panel );
-	
-	return Panel;
-	
-} );
-/*global define */
 define('gui/Overlay', [
 	'jquery',
 	'lodash',
-	'Class',
-	'gui/Gui',
-	'gui/anim/Animation',
+	
 	'gui/Component',
-	'gui/panel/Panel',
-	'jquery-ui/position'  // jQuery UI's `position` plugin
-], function( jQuery, _, Class, Gui, Animation, Component, Panel ) {
+	'gui/Container',
+	
+	'jquery-ui/position'  // jQuery UI's `position` plugin. Makes positioning functionality available from jQuery.prototype.position()
+], function( jQuery, _, Component, Container ) {
 	
 	/**
 	 * @class gui.Overlay
-	 * @extends gui.panel.Panel
+	 * @extends gui.panel.Container
 	 *
 	 * Base class for UI elements that "float" on top of the document (most notably: {@link gui.window.Window}).
 	 * This can be positioned by {@link #x} and {@link #y} values, or positioned relative to other elements using the 
 	 * {@link #anchor} config.
 	 */
-	var Overlay = Panel.extend( {
+	var Overlay = Container.extend( {
 		
 		/**
 		 * @cfg {Boolean} autoShow
@@ -9457,6 +8281,321 @@ define('gui/app/Controller', [
 	return Controller;
 	
 } );
+/*global define */
+define('gui/button/Button', [
+	'jquery',
+	'lodash',
+	'gui/Component',
+	'gui/ComponentManager',
+	'gui/template/LoDash'
+], function( jQuery, _, Component, ComponentManager, LoDashTpl ) {
+
+	/**
+	 * @class gui.button.Button
+	 * @extends gui.Component
+	 * @alias type.button
+	 * 
+	 * A generic button that calls its {@link #handler} when clicked.
+	 */
+	var Button = Component.extend( {
+		
+		/**
+		 * @cfg {String} iconCls
+		 * 
+		 * A CSS class to use for the icon.
+		 */
+		
+		/**
+		 * @cfg {String} iconAlign
+		 * 
+		 * Which side to put the icon on. Accepts 'left' or 'right'.
+		 */
+		iconAlign : 'left',
+		
+		/**
+		 * @cfg {String} text
+		 *  
+		 * The text for the button.
+		 */
+		text : "",
+	
+		/**
+		 * @cfg {String} tooltip
+		 * 
+		 * The text to use as the button's tooltip for when the mouse is hovered over the button. Currently just sets the title 
+		 * attribute of the button element.
+		 */
+		tooltip: "",
+		
+		/**
+		 * @cfg {Function} handler
+		 * 
+		 * A function to run when the button is clicked. Alternatively, one can listen to the {@link #click} event. 
+		 */
+		
+		/**
+		 * @cfg {Object} scope
+		 * 
+		 * The scope to run the {@link #handler} function in. Defaults to the Button object.
+		 */
+		
+		/**
+		 * @cfg {Boolean} disabled
+		 * 
+		 * Set to `true` to have the button be initially disabled.
+		 */
+		disabled : false,
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		baseCls : 'gui-button',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		renderTpl : new LoDashTpl( [
+			'<span class="<%= baseCls %>-icon <%= baseCls %>-icon-left <%= leftIconElCls %>"></span>',
+			'<a id="<%= elId %>-text" class="<%= baseCls %>-text <%= textElCls %>" href="javascript:;" title="<%= tooltip %>">',
+				'<%= text %>',
+			'</a>',
+			'<span class="<%= baseCls %>-icon <%= baseCls %>-icon-right <%= rightIconElCls %>"></span>'
+		] ),
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		initComponent : function() {
+			this.addEvents(
+				/**
+				 * Fires when the button has been clicked.
+				 * 
+				 * @event click
+				 * @param {gui.button.Button} button This gui.Button instance.
+				 */
+				'click',
+				
+				/**
+				 * Fires when the mouse has entered (hovered over) the button. Equivalent to the jQuery mouseenter event.
+				 * 
+				 * @event mouseenter
+				 * @param {gui.button.Button} button This gui.Button instance.
+				 */
+				'mouseenter',
+				
+				/**
+				 * Fires when the mouse has left (no longer hovered over) the button. Equivalent to the jQuery mouseleave event.
+				 * 
+				 * @event mouseleave
+				 * @param {gui.button.Button} button This gui.Button instance.
+				 */
+				'mouseleave'
+			);
+			
+			this._super( arguments );
+		},
+		
+		
+		/**
+		 * Override of superclass method used to add the {@link #tooltip} config as the "title" attribute.
+		 * 
+		 * @protected
+		 * @return {Object}
+		 */
+		getRenderAttributes : function() {
+			var attributes = this._super( arguments );
+			
+			if( this.tooltip ) {
+				attributes.title = this.tooltip;
+			}
+			return attributes;
+		},
+		
+		
+		/**
+		 * Override of superclass method used to build the {@link #renderTplData} object.
+		 * 
+		 * @protected
+		 * @return {Object}
+		 */
+		getRenderTplData : function() {
+			var leftIconElCls = "",
+			    rightIconElCls = "",
+			    textElCls = "",
+			    iconCls = this.iconCls,
+			    hiddenCls = this.baseCls + '-hiddenEl';
+			
+			if( !iconCls ) {
+				leftIconElCls = rightIconElCls = hiddenCls;
+			} else if( this.iconAlign === 'left' ) {
+				leftIconElCls = iconCls;
+				rightIconElCls = hiddenCls;
+			} else {
+				leftIconElCls = hiddenCls;
+				rightIconElCls = iconCls;
+			}
+			
+			return _.defaults( this._super( arguments ), {
+				text     : this.text,
+				tooltip  : this.tooltip,
+				
+				leftIconElCls  : leftIconElCls,
+				rightIconElCls : rightIconElCls,
+				textElCls      : textElCls
+			} );
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onRender : function() {
+			this._super( arguments );
+			
+			if( this.disabled ) {
+				this.disable();
+			}
+			
+			// Store a reference to the text element
+			this.$textEl = jQuery( '#' + this.elId + '-text' );
+			
+			// Add Event Handlers
+			this.$el.on( {
+				'mouseenter' : _.bind( this.onMouseEnter, this ),
+				'mouseleave' : _.bind( this.onMouseLeave, this ),
+				'mousedown'  : _.bind( this.onMouseDown, this ),
+				'mouseup'    : _.bind( this.onMouseUp, this ),
+				'click'      : _.bind( this.onClick, this )
+			} );
+		},
+		
+		
+		/**
+		 * Sets the text on the button. Accepts HTML as well.
+		 * 
+		 * @param {String} text
+		 */
+		setText : function( text ) {
+			this.text = text;
+			
+			if( this.rendered ) {
+				this.$textEl.html( text );
+			}
+		},
+		
+		
+		/**
+		 * Disables the button.
+		 * 
+		 * @method disable
+		 */
+		disable : function() {
+			this.disabled = true;
+			
+			if( this.rendered ) {
+				this.$el.prop( 'disabled', true );
+			}
+		},
+		
+		
+		/**
+		 * Enables the button (if it was previously {@link #disable disabled}).
+		 * 
+		 * @method enable
+		 */
+		enable : function() {
+			this.disabled = false;
+			
+			if( this.rendered ) {
+				this.$el.prop( 'disabled', false );
+			}
+		},
+		
+		
+		/**
+		 * Sets the disabled/enabled state of the Button based on the provided `disabled` flag.
+		 * 
+		 * @param {Boolean} disabled True to disable the Button, false to enable the Button.
+		 */
+		setDisabled : function( disabled ) {
+			this[ disabled ? 'disable' : 'enable' ]();
+		},
+		
+		
+		/**
+		 * Handles a click to the Button.
+		 * 
+		 * @protected
+		 * @param {jQuery.Event} evt
+		 */
+		onClick : function( evt ) {
+			if( this.handler ) {
+				this.handler.call( this.scope || this, this );  // run the handler in the scope of this Button if no scope config was provided, and provide this button instasnce as the first arg
+			}
+			
+			this.fireEvent( 'click', this );
+		},
+		
+		
+		/**
+		 * Method that is run when mouse hovers over the Button.
+		 * 
+		 * @protected
+		 * @param {jQuery.Event} evt
+		 */
+		onMouseEnter : function() {
+			this.addCls( this.baseCls + '-hover' );
+			
+			this.fireEvent( 'mouseenter', this );
+		},
+		
+		
+		/**
+		 * Method that is run when mouse un-hovers the Button.
+		 * 
+		 * @protected
+		 * @param {jQuery.Event} evt
+		 */
+		onMouseLeave : function() {
+			this.removeCls( this.baseCls + '-hover' );
+			
+			this.fireEvent( 'mouseleave', this );
+		},
+		
+		
+		/**
+		 * Method that is run when mouse is pressed down on the Button.
+		 * 
+		 * @protected
+		 * @param {jQuery.Event} evt
+		 */
+		onMouseDown : function() {
+			this.addCls( this.baseCls + '-active' );
+		},
+		
+		
+		/**
+		 * Method that is run when mouse is release on the Button.
+		 * 
+		 * @protected
+		 * @param {jQuery.Event} evt
+		 */
+		onMouseUp : function() {
+			this.removeCls( this.baseCls + '-active' );
+		}
+		
+	} );
+	
+	
+	ComponentManager.registerType( 'button', Button );
+	
+	return Button;
+	
+} );
+
 /*global define */
 define('gui/form/field/Field', [
 	'jquery',
@@ -12477,6 +11616,177 @@ define('gui/layout/Column', [
 	
 } );
 /*global define */
+define('gui/layout/HBox', [
+	'jquery',
+	'gui/Component',
+	'gui/Container',
+	'gui/layout/Layout'
+], function( jQuery, Component, Container, Layout ) {
+
+	/**
+	 * @class gui.layout.HBox
+	 * @extends gui.layout.Layout
+	 * @alias layout.hbox
+	 * 
+	 * A layout that renders its {@link #container container's} child components using a "flexbox" scheme. Each child component
+	 * in the Container that should have a flexible width that proportionally should take up the remaining area of its parent
+	 * element should have a special property named {@link #flex}, that determines how wide the box should be in relation to the
+	 * available area.  This property is a number, relative to other children. If a {@link #flex} not provided, the layout uses 
+	 * the component's width instead.
+	 */
+	var HBoxLayout = Layout.extend( {
+		
+		/**
+		 * @cfg {Number} flex
+		 * This config is to be placed on **child components** of the {@link #container}. The number is a ratio
+		 * of how much space the child component should take up in relation to the remaining space in the target
+		 * element, and based on other child components' flex values.
+		 * 
+		 * For example, the following configuration would make component #1 have ~33% width, and component #2 have
+		 * ~67% width.
+		 * 
+		 *     layout : 'hbox',
+		 *     items : [
+		 *         {
+		 *             flex : 1,
+		 *             html : "I'm at 33% width"
+		 *         },
+		 *         {
+		 *             flex : 2,
+		 *             html : "I'm at 67% width"
+		 *         }
+		 *     ]
+		 * 
+		 * Other components may also exist in the {@link #container} that do not have a {@link #flex} value. These will be sized,
+		 * and components *with* a {@link #flex} value will be flexed into the *remaining* space that is not taken up by the other
+		 * components. Example:
+		 * 
+		 *     width : 100,    // not necessary, but just for example purposes
+		 *     layout : 'hbox',
+		 *     
+		 *     items : [
+		 *         {
+		 *             html : "I will be sized based on my content. Let's say my width is 20px though, for argument's sake"
+		 *         },
+		 *         {
+		 *             flex : 1,
+		 *             html : "Since the previous component is 20px wide, I will take up the remaining 80px of space"
+		 *         }
+		 *     ]
+		 */
+		
+		/**
+		 * @protected
+		 * @property {jQuery} $clearEl
+		 * 
+		 * The element used to clear the floats created by the layout routine.
+		 */
+		
+		
+		/**
+		 * Hook method for subclasses to override to implement their layout strategy. Implements the HBoxLayout algorithm.
+		 * 
+		 * @protected
+		 * @template
+		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
+		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
+		 */
+		onLayout : function( childComponents, $targetEl ) {
+			this._super( arguments );
+			
+			
+			var flexedComponents = [],
+			    totalFlex = 0,
+			    totalUnflexedWidth = 0,
+			    i, len, childComponent, numChildComponents = childComponents.length;
+			
+			// First, render and lay out each of the child components that don't have a 'flex' value.
+			// While we're at it, we'll add up the total flex that components which *do* have a flex value have.
+			for( i = 0; i < numChildComponents; i++ ) {
+				childComponent = childComponents[ i ];
+				
+				// Add the CSS class to components to be able to place them in an HBox layout. This adds `float:left;`,
+				// and a few other fixing styles.
+				childComponent.addCls( 'gui-layout-hbox-component' );
+				
+				// Render the component (note: it is only rendered if it is not yet rendered already, or in the wrong position in the DOM)
+				this.renderComponent( childComponent, $targetEl, { position: i } );
+				
+				// Only process the child component if it is not hidden
+				if( !childComponent.isHidden() ) {
+					if( !childComponent.flex ) {
+						// Not a flexed component, do its layout
+						childComponent.doLayout();
+						
+						// Sadly, the element being measured may have a sub-pixel width, but jQuery returns the floor value of 
+						// it. And in this case, we would get float wrapping because the sum of the actual widths would be greater 
+						// than the container width after flex values are computed. So simply adding one pixel as a workaround
+						// at this point. May have to do something different in the future, with a table layout.
+						totalUnflexedWidth += Math.floor( 1 + childComponent.getOuterWidth( /* includeMargin */ true ) );
+						
+					} else {
+						// Flexed component: push it onto the flexed components processing array for the next step
+						flexedComponents.push( childComponent );
+						totalFlex += childComponent.flex;
+					}
+				}
+			}
+			
+			// Now go through and size the other child components based on their flex values and the remaining space.
+			if( totalFlex > 0 ) {
+				var targetWidth = $targetEl.width(),
+				    targetHeight = $targetEl.height(),
+				    remainingTargetWidth = targetWidth - totalUnflexedWidth,
+				    trimmedPixels = 0;  // Stores the decimal values resulting in the division of the remainingTargetWidth divided by the flex value. 
+				                        // The pixels that are trimmed off of each of the child components is added to the last item to fill the extra space.
+				
+				for( i = 0, len = flexedComponents.length; i < len; i++ ) {
+					childComponent = flexedComponents[ i ];
+					
+					// Now size the flexed component based on the flex value
+					var newChildWidth = ( childComponent.flex / totalFlex ) * remainingTargetWidth;
+					trimmedPixels += newChildWidth % 1;            // take the decimal value from the child height. Ex: 3.25 % 1 == 0.25  (We'll use this later).
+					newChildWidth = Math.floor( newChildWidth );  // and do the actual trimming off of the decimal for the new child height
+					
+					// If sizing the last component, add in (the smallest whole number of) the decimal value pixels that were trimmed from previous components
+					if( i === len - 1 ) {
+						newChildWidth += Math.floor( trimmedPixels );
+						newChildWidth--;  // and take off a pixel to attempt to fix the accidental browser wrapping issue with sub-pixel widths...
+					}
+					
+					this.sizeComponent( childComponent, newChildWidth, undefined );
+				}
+			}
+			
+			if( !this.$clearEl ) {
+				this.$clearEl = jQuery( '<div class="gui-layout-hbox-clear" />' );  // to clear the floats
+			}
+			$targetEl.append( this.$clearEl );
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onDestroy : function() {
+			if( this.$clearEl ) {
+				this.$clearEl.remove();
+			}
+			
+			this._super( arguments );
+		}
+		
+	} );
+	
+	
+	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
+	Container.registerLayout( 'hbox', HBoxLayout );
+	
+	return HBoxLayout;
+	
+} );
+
+/*global define */
 define('gui/layout/VBox', [
 	'gui/Container',
 	'gui/layout/Layout'
@@ -12612,6 +11922,695 @@ define('gui/layout/VBox', [
 	
 } );
 
+/*global define */
+define('gui/panel/Header', [
+	'lodash',
+	'gui/ComponentManager',
+	'gui/Container',
+	'gui/Label',
+	'gui/layout/HBox'
+], function( _, ComponentManager, Container, Label ) {
+	
+	/**
+	 * @class gui.panel.Header
+	 * @extends gui.Container
+	 * 
+	 * Specialized Container subclass which is used as a {@link gui.panel.Panel Panel's} header.
+	 */
+	var PanelHeader = Container.extend( {
+		
+		/**
+		 * @cfg {String} title
+		 * 
+		 * The title of the Panel, which is placed in the {@link #titleLabel}.
+		 */
+		
+		/**
+		 * @cfg {Number} titlePosition
+		 * 
+		 * The index in the Header's {@link #items} array where the {@link #title} component should be
+		 * placed. This is most useful when providing the {@link #items} config to place other components
+		 * in the Header.
+		 * 
+		 * Defaults to 0, making the {@link #title} component the first component.
+		 */
+		titlePosition : 0,
+		
+		/**
+		 * @cfg {Object/Object[]} items
+		 * 
+		 * Any component(s) to place into the Header. The {@link #title} component is automatically
+		 * added to this array at the index specified by the {@link #titlePosition}, and any {@link #toolButtons}
+		 * are automatically appended as well.
+		 * 
+		 * See this config in the superclass for more details.
+		 */
+		
+		/**
+		 * @cfg {Object/Object[]/gui.panel.ToolButton/gui.panel.ToolButton[]} toolButtons
+		 * 
+		 * One or more {@link gui.panel.ToolButton ToolButtons} or ToolButton config objects. These will
+		 * be placed on the right side of the header.
+		 */
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		layout : 'hbox',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'gui-panel-header',
+		
+		
+		/**
+		 * @protected
+		 * @property {gui.Label} titleLabel
+		 * 
+		 * The label component for the title.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {gui.Container} toolButtonsCt
+		 * 
+		 * The Container that holds the {@link #toolButtons}.
+		 */
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		initComponent : function() {
+			this.titleLabel = this.createTitleLabel();
+			this.toolButtonsCt = this.createToolButtonsCt();
+			
+			this.items = this.buildItems();  // note: if an `items` config was passed to the Header, it will be handled in buildItems()
+			
+			this._super( arguments );
+		},
+		
+		
+		/**
+		 * Builds the array of the header's child items.
+		 * 
+		 * @protected
+		 * @return {Object/Object[]} The child item(s).
+		 */
+		buildItems : function() {
+			var items = this.items || [];  // start with any custom items, or an empty array
+			if( !_.isArray( items ) )  // the `items` config may have been a single object, in which case, wrap in an array
+				items = [ items ];
+			
+			// Add the title component at the appropriate position
+			var titlePosition = Math.min( this.titlePosition, items.length );  // append if at a position greater than the number of items
+			items.splice( titlePosition, 0, this.titleLabel );
+			
+			// Add the toolbuttons, right aligned
+			items.push( 
+				{ type: 'component', flex: 1 },  // take up the middle space, to effectively right-align the tool buttons
+				this.toolButtonsCt
+			);
+			
+			return items;
+		},
+		
+		
+		/**
+		 * Creates the title component. This is the component that the {@link #title}
+		 * config will be applied to, by default.
+		 * 
+		 * @protected
+		 * @return {gui.Label}
+		 */
+		createTitleLabel : function() {
+			return new Label( {
+				cls  : this.componentCls + '-title',
+				text : this.title
+			} );
+		},
+		
+		
+		/**
+		 * Creates the tool buttons container.
+		 * 
+		 * @protected
+		 * @return {gui.Container}
+		 */
+		createToolButtonsCt : function() {
+			return new Container( {
+				cls         : this.componentCls + '-toolButtons',
+				defaultType : 'toolbutton',   // gui.panel.ToolButton
+				items       : this.toolButtons
+			} );
+		},
+		
+		
+		// ------------------------------------
+		
+		
+		/**
+		 * Sets the text in the {@link #titleLabel}.
+		 * 
+		 * @param {String} title
+		 */
+		setTitle : function( title ) {
+			this.titleLabel.setText( title );
+			this.doLayout();  // Update the Header's layout for the new text size
+		}
+		
+	} );
+	
+	ComponentManager.registerType( 'panelheader', PanelHeader );
+	
+	return PanelHeader;
+	
+} );
+/*global define */
+define('gui/panel/ToolButton', [
+	'gui/button/Button',
+	'gui/ComponentManager'
+], function( Button, ComponentManager ) {
+	
+	/**
+	 * @class gui.panel.ToolButton
+	 * @extends gui.button.Button
+	 * @alias type.toolbutton
+	 * 
+	 * Small utility class for a button that can be used in a {@link gui.panel.Panel Panel's} header.
+	 */
+	var ToolButton = Button.extend( {
+		
+		/**
+		 * @cfg {String} toolType (required)
+		 * 
+		 * The tool button type. Currently accepts the strings:
+		 * 
+		 * - close
+		 * - closethick
+		 */
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		componentCls : 'gui-panel-toolbutton',
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		initComponent : function() {
+			// <debug>
+			if( !this.toolType ) throw new Error( "'toolType' cfg required" );
+			// </debug>
+			
+			var componentCls = this.componentCls,
+			    toolType = this.toolType;
+			
+			this.iconCls = [
+				'gui-icon-' + toolType,
+				componentCls + '-icon',
+				componentCls + '-icon-' + toolType
+			].join( " " );
+			
+			this._super( arguments );
+		}
+		
+	} );
+	
+	
+	ComponentManager.registerType( 'toolbutton', ToolButton );
+	
+	return ToolButton;
+	
+} );
+/*global define */
+define('gui/panel/Panel', [
+	'jquery',
+	'lodash',
+	'gui/util/Css',
+	'gui/ComponentManager',
+	'gui/Container',
+	'gui/panel/Header',
+	'gui/template/LoDash',
+	'gui/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
+], function( jQuery, _, Css, ComponentManager, Container, PanelHeader, LoDashTpl ) {
+
+	/**
+	 * @class gui.panel.Panel
+	 * @extends gui.Container
+	 * @alias type.panel
+	 *
+	 * An application-oriented {@link gui.Container} subclass which supports adding a {@link #title} bar and 
+	 * {@link #toolButtons}.
+	 */
+	var Panel = Container.extend( {
+
+		/**
+		 * @cfg {String} bodyCls
+		 * 
+		 * Any additional CSS class(es) to add to the Panel's {@link #$bodyEl body} element. If multiple CSS classes
+		 * are added, they should each be separated by a space. Ex:
+		 * 
+		 *     bodyCls : 'bodyClass1 bodyClass2'
+		 */
+		bodyCls: '',
+		
+		/**
+		 * @cfg {Object} bodyStyle
+		 * 
+		 * Any additional CSS style(s) to apply to the Panel's {@link #$bodyEl body} element. Should be an object where the 
+		 * keys are the CSS property names, and the values are the CSS values. Ex:
+		 * 
+		 *     bodyStyle : {
+		 *         'padding'    : '5px',
+		 *         'border-top' : '1px solid #000'
+		 *     }
+		 */
+		
+		/**
+		 * @cfg {String} title
+		 * 
+		 * The title of the Panel.
+		 */
+		title : "",
+		
+		/**
+		 * @cfg {Object/Object[]/gui.panel.ToolButton/gui.panel.ToolButton[]} toolButtons
+		 * 
+		 * One or more {@link gui.panel.ToolButton ToolButtons} or ToolButton config objects. These will
+		 * be placed on the right side of the Panel's header (i.e. top right of the Panel).
+		 */
+		
+		/**
+		 * @cfg {Object} header
+		 * 
+		 * Any configuration options to pass to the {@link #property-header} component. This may include
+		 * a `type` property to specify a different Header subclass than the default {@link gui.panel.Header}.
+		 */
+		
+		/**
+		 * @cfg {Object/Object[]/gui.button.Button/gui.button.Button[]} buttons
+		 * 
+		 * One or more {@link gui.button.Button Buttons} or Button config objects for buttons to place
+		 * in the footer of the Panel. These will be placed on the right side of the Panel's footer 
+		 * (i.e. bottom right of the Panel).
+		 */
+		
+		/**
+		 * @cfg {Boolean} headerHidden
+		 * 
+		 * `true` to initially hide the Panel's {@link #property-header}. Can be shown using {@link #showHeader}. 
+		 */
+		
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		baseCls : 'gui-panel',
+		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		renderTpl : new LoDashTpl( [
+			'<div',
+				' id="<%= elId %>-body"',
+				' class="<%= baseCls %>-body<% if( bodyCls ) { %> <%= bodyCls %><% } %>"',
+				'<% if( bodyStyle ) { %> style="<%= bodyStyle %>"<% } %>>',
+			'</div>'
+		] ),
+		
+		
+		/**
+		 * @protected
+		 * @property {jQuery} $bodyEl
+		 * 
+		 * A reference to the Panel's body element. This will be available after the Panel is rendered.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {gui.Container} header
+		 * 
+		 * The Container which acts as the Panel's header. The header holds the {@link #title}, and any {@link #toolButtons} 
+		 * specified. 
+		 * 
+		 * Note that this Container is only created if a {@link #title} or {@link #toolButtons} have been specified.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {gui.Container} footer
+		 * 
+		 * The Container which acts as the Panel's footer. The footer holds the any {@link #buttons} specified. 
+		 * 
+		 * Note that this Container is only created if a {@link #buttons} config has been specified.
+		 */
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		initComponent : function() {
+			this._super( arguments );
+			
+			// Move the `header` config to `headerCfg`, as to not be confusing when an actual gui.panel.Header is created in the `header` property
+			this.headerCfg = this.header;
+			delete this.header;
+			
+			if( this.title || this.toolButtons || this.headerCfg ) {
+				this.doCreateHeader();
+			}
+			if( this.buttons ) {
+				this.doCreateFooter();
+			}
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onRender : function() {
+			this._super( arguments );
+			
+			this.$bodyEl = jQuery( '#' + this.elId + '-body' );
+			
+			if( this.header ) {
+				this.header.render( this.$el, 0 );  // prepend before the body
+			}
+			if( this.footer ) {
+				this.footer.render( this.$el );  // append after the body
+			}
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		getRenderTplData : function() {
+			var bodyStyle = Css.mapToString( this.bodyStyle || {} );
+			
+			return _.assign( this._super( arguments ), {
+				bodyCls   : this.bodyCls,
+				bodyStyle : bodyStyle
+			} );
+		},
+		
+		
+		/**
+		 * Returns the body element for the Panel, wrapped in a jQuery object.  This element will only be available after the 
+		 * Panel has been rendered by the {@link #method-render} method.  
+		 * 
+		 * @return {jQuery}
+		 */
+		getBodyEl : function() {
+			return this.$bodyEl;  // created when rendered
+		},
+		
+		
+		/**
+		 * Override of superclass method, used to specify the {@link #$bodyEl} as the target for Panel content.
+		 * 
+		 * @protected
+		 * @return {jQuery}
+		 */
+		getContentTarget : function() {
+			return this.getBodyEl();
+		},
+		
+		
+		// ------------------------------------------
+		
+		
+		/**
+		 * Performs the creation of the {@link #property-header}, by calling {@link #createHeader}, and then applying 
+		 * any post-processing required (which includes rendering it as the first element in the Panel
+		 * itself if it is already rendered).
+		 * 
+		 * To create a different {@link #property-header} in a subclass, override {@link #createHeader} instead of this 
+		 * method.
+		 * 
+		 * @protected
+		 */
+		doCreateHeader : function() {
+			this.header = this.createHeader( _.defaults( {}, this.headerCfg, {
+				type         : 'panelheader',
+				componentCls : this.baseCls + '-header',  // Ex: For Panel itself, 'gui-panel-header'. For Window, 'gui-window-header'
+				title        : this.title,
+				toolButtons  : this.toolButtons
+			} ) );
+			this.header.setVisible( !this.headerHidden );
+			delete this.headerHidden;
+			
+			if( this.rendered ) {
+				this.header.render( this.$el, /* prepend */ 0 );  // prepend to make it the first element (i.e. before the body)
+			}
+		},
+		
+		
+		/**
+		 * Creates the {@link #property-header}, which contains the {@link #title} and any {@link #toolButtons} configured.
+		 * 
+		 * @protected
+		 * @param {Object} headerConfig The configuration for the header, with defaults applied from the Panel.
+		 * @return {gui.panel.Header}
+		 */
+		createHeader : function( headerConfig ) {
+			return ComponentManager.create( headerConfig );
+		},
+		
+		
+		/**
+		 * Performs the creation of the {@link #footer}, by calling {@link #createFooter}, and then applying 
+		 * any post-processing required (which includes rendering it as the last element in the Panel
+		 * itself if it is already rendered).
+		 * 
+		 * To create a different {@link #property-header} in a subclass, override {@link #createHeader} instead of this 
+		 * method.
+		 * 
+		 * @protected
+		 */
+		doCreateFooter : function() {
+			this.footer = this.createFooter();
+			
+			if( this.rendered ) {
+				this.footer.render( this.$el );  // append to make it the last element (i.e. after the body)
+			}
+		},
+		
+		
+		/**
+		 * Creates the {@link #footer} Container, which contains any {@link #buttons} that were configured.
+		 * 
+		 * @protected
+		 * @return {gui.Container}
+		 */
+		createFooter : function() {
+			return new Container( {
+				cls    : this.baseCls + '-footer',
+				layout : 'hbox',
+				
+				items  : [
+					{ type: 'component', flex: 1 },  // to push the buttons to the right
+					{
+						type : 'container',
+						cls  : this.baseCls + '-footer-buttons',
+						
+						defaultType : 'button',   // gui.button.Button
+						items       : this.buttons
+					}
+				]
+			} );
+		},
+		
+		
+		// -----------------------------------
+		
+		
+		/**
+		 * Gets the {@link #property-header} of the Panel. If the {@link #property-header} has not been created yet,
+		 * it will be instantiated before it is returned.
+		 * 
+		 * In most cases, you will not need to directly access the Panel's {@link #property-header} component. Most of 
+		 * the time, you will set the {@link #cfg-header} config options, and if the Panel's title needs to be changed,
+		 * you will use the {@link #setTitle} method.
+		 * 
+		 * However, this method is provided for more advanced operations, such as if components need to be injected into
+		 * the header. In this case, be aware that the header is created with components of its own, and you will need
+		 * to inject yours at the correct indexes.
+		 * 
+		 * @return {gui.panel.Header}
+		 */
+		getHeader : function() {
+			if( !this.header ) {
+				this.doCreateHeader();
+			}
+			return this.header;
+		},
+		
+		
+		/**
+		 * Sets the title of the Panel.
+		 * 
+		 * @param {String} title The title to set.
+		 * @chainable
+		 */
+		setTitle : function( title ) {
+			if( !this.header ) {
+				this.doCreateHeader();
+			}
+			
+			this.title = title;
+			this.header.setTitle( title );
+			
+			return this;
+		},
+		
+		
+		/**
+		 * Retrieves the {@link #title} of the Panel.
+		 * 
+		 * @return {String} The title of the Panel.
+		 */
+		getTitle : function() {
+			return this.title;
+		},
+		
+		
+		/**
+		 * Shows the Panel's {@link #property-header}, if it is currently hidden.
+		 * 
+		 * @chainable
+		 */
+		showHeader : function() {
+			if( this.header ) {
+				this.header.show();
+			} else {
+				this.headerHidden = false;  // in case the header hasn't been created yet, we'll use this for when it is
+			}
+			
+			return this;
+		},
+		
+		
+		/**
+		 * Hides the Panel's {@link #property-header}, if it is currently visible.
+		 * 
+		 * @chainable
+		 */
+		hideHeader : function() {
+			if( this.header ) {
+				this.header.hide();
+			} else {
+				this.headerHidden = true;  // in case the header hasn't been created yet, we'll use this for when it is
+			}
+			
+			return this;
+		},
+		
+		
+		// ---------------------------------
+		
+		// Panel's Body Styling Functionality
+		
+		/**
+		 * Adds one or more CSS classes to the Panel's {@link #$bodyEl body} element.
+		 * 
+		 * @param {String} cssClass One or more CSS classes to add to the Panel's {@link #$bodyEl body} element. If specifying 
+		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
+		 * @return {gui.panel.Panel} This Panel, to allow method chaining.
+		 */
+		addBodyCls : function( cssClass ) {
+			if( !this.rendered ) {
+				this.bodyCls = Css.addCls( this.bodyCls, cssClass );  // update the `bodyCls` config in the unrendered state
+			} else {
+				this.$bodyEl.addClass( cssClass ); // delegate to jQuery in this case
+			}
+			return this;
+		},
+		
+		
+		/**
+		 * Removes one or more CSS classes from the Panel's {@link #$bodyEl body} element.
+		 * 
+		 * @param {String} cssClass One or more CSS classes to remove from the Panel's {@link #$bodyEl body} element. If specifying 
+		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
+		 * @return {gui.panel.Panel} This Panel, to allow method chaining.
+		 */
+		removeBodyCls : function( cssClass ) {
+			if( !this.rendered ) {
+				this.bodyCls = Css.removeCls( this.bodyCls, cssClass );  // update the `bodyCls` config in the unrendered state
+			} else {
+				this.$bodyEl.removeClass( cssClass ); // delegate to jQuery in this case
+			}
+			return this;
+		},
+		
+		
+		/**
+		 * Determines if the Panel's {@link #$bodyEl body} element has the given `cssClass`.
+		 * 
+		 * @param {String} cssClass The CSS class to test for.
+		 * @return {Boolean} True if the Panel's {@link #$bodyEl body} element has the given `cssClass`, false otherwise.
+		 */
+		hasBodyCls : function( cssClass ) {
+			// Check the `bodyCls` config in the unrendered state, or the body element itself in the rendered state
+			return ( !this.rendered ) ? Css.hasCls( this.bodyCls, cssClass ) : this.$bodyEl.hasClass( cssClass );
+		},
+		
+		
+		/**
+		 * Sets a CSS style property on the Panel's {@link #$bodyEl body} element.
+		 * 
+		 * @param {String/Object} name The CSS property name. This first argument may also be provided as an Object of key/value
+		 *   pairs for CSS property names/values to apply to the Panel's {@link #$bodyEl body} element.
+		 * @param {String} value The value for the CSS property. Optional if the first argument is an Object.
+		 * @return {gui.panel.Panel} This Panel, to allow method chaining.
+		 */
+		setBodyStyle : function( name, value ) {
+			if( !this.rendered ) {
+				this.bodyStyle = this.bodyStyle || {};
+				
+				if( typeof name === 'object' ) {
+					_.assign( this.bodyStyle, name );  // apply each of the properties on the provided 'styles' object onto the Panel's bodyStyle
+				} else {
+					this.bodyStyle[ name ] = value;
+				}
+				
+			} else {
+				this.$bodyEl.css( name, value );  // will work for both method signatures (i.e. when `name` is an object, and when provided both name / value)
+			}
+			return this;
+		},
+
+		
+		// ---------------------------------
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		onDestroy : function() {
+			if( this.header ) this.header.destroy();
+			if( this.footer ) this.footer.destroy();
+			
+			this._super( arguments );
+		}
+		
+	} );
+	
+	
+	ComponentManager.registerType( 'panel', Panel );
+	
+	return Panel;
+	
+} );
 /*global define */
 define('gui/tab/Tab', [
 	'jquery',
@@ -14720,19 +14719,75 @@ define('gui/window/Header', [
 define('gui/window/Window', [
 	'jquery',
 	'lodash',
+	
 	'gui/ComponentManager',
-	'gui/Overlay'
-], function( jQuery, _, ComponentManager, Overlay ) {
+	'gui/Overlay',
+	'gui/template/LoDash',
+	'gui/util/Css',
+	
+	'gui/window/Header',
+	'gui/panel/ToolButton'   // for instantiating ToolButtons based on the toolButtons config
+], function( jQuery, _, ComponentManager, Overlay, LoDashTpl, Css ) {
 	
 	/**
 	 * @class gui.window.Window
 	 * @extends gui.Overlay
 	 * @alias type.window
 	 * 
-	 * Basic class for creating a window (also known as a dialog). As a subclass of {@link gui.panel.Panel Panel}, the Window
-	 * may accept a {@link #title}, and it also adds a {@link #closeButton close button} to the top right  
+	 * Basic class for creating a window (also known as a dialog). Window is a subclass of {@link gui.Container}, and accepts
+	 * child components as such. The Window may also accept a {@link #title} config, and it adds a {@link #closeButton close button} 
+	 * to the top right  
 	 */
 	var Window = Overlay.extend( {
+		
+		/**
+		 * @cfg {String} title
+		 * 
+		 * The title of the Window.
+		 */
+		title : "",
+		
+		/**
+		 * @cfg {Object/Object[]/gui.panel.ToolButton/gui.panel.ToolButton[]} toolButtons
+		 * 
+		 * One or more {@link gui.panel.ToolButton ToolButtons} or ToolButton config objects. These will
+		 * be placed on the right side of the Window's header (i.e. top right of the Window).
+		 */
+		
+		/**
+		 * @cfg {Object} header
+		 * 
+		 * Any configuration options to pass to the {@link #property-header} component. This may include
+		 * a `type` property to specify a different Header subclass than the default {@link gui.window.Header}.
+		 */
+		
+		/**
+		 * @cfg {Boolean} headerHidden
+		 * 
+		 * `true` to initially hide the Window's {@link #property-header}. Can be shown using {@link #showHeader}. 
+		 */
+
+		/**
+		 * @cfg {String} bodyCls
+		 * 
+		 * Any additional CSS class(es) to add to the Window's {@link #$bodyEl body} element. If multiple CSS classes
+		 * are added, they should each be separated by a space. Ex:
+		 * 
+		 *     bodyCls : 'bodyClass1 bodyClass2'
+		 */
+		bodyCls: '',
+		
+		/**
+		 * @cfg {Object} bodyStyle
+		 * 
+		 * Any additional CSS style(s) to apply to the Window's {@link #$bodyEl body} element. Should be an object where the 
+		 * keys are the CSS property names, and the values are the CSS values. Ex:
+		 * 
+		 *     bodyStyle : {
+		 *         'padding'    : '5px',
+		 *         'border-top' : '1px solid #000'
+		 *     }
+		 */
 		
 		/**
 		 * @cfg {Boolean} closeButton
@@ -14790,6 +14845,18 @@ define('gui/window/Window', [
 		 */
 		y : 'center',
 		
+		/**
+		 * @cfg
+		 * @inheritdoc
+		 */
+		renderTpl : new LoDashTpl( [
+			'<div',
+				' id="<%= elId %>-body"',
+				' class="<%= baseCls %>-body<% if( bodyCls ) { %> <%= bodyCls %><% } %>"',
+				'<% if( bodyStyle ) { %> style="<%= bodyStyle %>"<% } %>>',
+			'</div>'
+		] ),
+		
 		
 		/**
 		 * @protected
@@ -14801,17 +14868,39 @@ define('gui/window/Window', [
 		
 		/**
 		 * @private
-		 * @property {Function} maskResizeHandler
+		 * @property {Function} modalMaskResizeHandler
 		 * 
 		 * The bound handler function that is a handler of the window resize event, which resizes the {@link #$modalMaskEl}
 		 * when the browser window is resized.
 		 */
+		
+		/**
+		 * @protected
+		 * @property {jQuery} $bodyEl
+		 * 
+		 * A reference to the Window's body element. This will be available after the Window is rendered.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {gui.window.Header} header
+		 * 
+		 * The Container which acts as the Window's header. The header holds the {@link #title}, and any {@link #toolButtons} 
+		 * specified. 
+		 * 
+		 * Note that this Container is only created if a {@link #title} or {@link #toolButtons} have been specified.
+		 */
+
 		
 		
 		/**
 		 * @inheritdoc
 		 */
 		initComponent : function() {
+			// Move the `header` config to `headerCfg`, as to not be confusing when an actual gui.window.Header is created in the `header` property
+			this.headerCfg = this.header;
+			delete this.header;
+			
 			// Add the close button if the config is true
 			if( this.closeButton ) {
 				this.toolButtons = ( this.toolButtons || [] ).concat( {
@@ -14823,6 +14912,23 @@ define('gui/window/Window', [
 			}
 			
 			this._super( arguments );
+			
+			if( this.title || this.toolButtons || this.headerCfg ) {
+				this.doCreateHeader();
+			}
+		},
+		
+		
+		/**
+		 * @inheritdoc
+		 */
+		getRenderTplData : function() {
+			var bodyStyle = Css.mapToString( this.bodyStyle || {} );
+			
+			return _.assign( this._super( arguments ), {
+				bodyCls   : this.bodyCls,
+				bodyStyle : bodyStyle
+			} );
 		},
 		
 		
@@ -14832,22 +14938,68 @@ define('gui/window/Window', [
 		onRender : function() {
 			this._super( arguments );
 			
-			// If the closeOnEscape config is true, set up a keydown event for it to close the overlay.
-			if( this.closeOnEscape ) {
-				var me = this;  // for closure
-				this.$el.keyup( function( evt ) {
-					if( evt.keyCode === 27 && me.closeOnEscape ) {  // 27 == 'esc' char
-						me.doClose();
-					}
-				} );
+			this.$bodyEl = jQuery( '#' + this.elId + '-body' );
+			
+			if( this.header ) {
+				this.header.render( this.$el, 0 );  // prepend before the body
 			}
 			
-			// Set up a handler to resize the modal mask, if enabled
-			if( this.modal ) {
-				this.maskResizeHandler = _.debounce( _.bind( this.resizeModalMask, this ), 100, { maxWait: 300 } );
-				jQuery( window ).on( 'resize', this.maskResizeHandler );
-			}
+			if( this.closeOnEscape ) this.initCloseOnEscape();
+			if( this.modal ) this.initModalResizeHandler();
 		},
+		
+		
+		/**
+		 * Called from {@link #onRender}. If the {@link #closeOnEscape} config is true, sets up a keydown event for the key 
+		 * to close the Window when pressed.
+		 * 
+		 * @private
+		 */
+		initCloseOnEscape : function() {
+			var me = this;  // for closure
+			this.$el.keyup( function( evt ) {
+				if( evt.keyCode === 27 && me.closeOnEscape ) {  // 27 == 'esc' char
+					me.doClose();
+				}
+			} );
+		},
+		
+
+		/**
+		 * Called from {@link #onRender}. If the {@link #modal} config is true, this method sets up a handler to resize the 
+		 * modal mask when the browser window resizes.
+		 * 
+		 * @private
+		 */
+		initModalResizeHandler : function() {
+			this.modalMaskResizeHandler = _.debounce( _.bind( this.resizeModalMask, this ), 100, { maxWait: 300 } );
+			jQuery( window ).on( 'resize', this.modalMaskResizeHandler );
+		},
+		
+		
+		/**
+		 * Returns the body element for the Window, wrapped in a jQuery object.  This element will only be available after the 
+		 * Window has been rendered by the {@link #method-render} method.  
+		 * 
+		 * @return {jQuery}
+		 */
+		getBodyEl : function() {
+			return this.$bodyEl;  // created when rendered
+		},
+		
+		
+		/**
+		 * Override of superclass method, used to specify the {@link #$bodyEl} as the target for Window content.
+		 * 
+		 * @protected
+		 * @return {jQuery}
+		 */
+		getContentTarget : function() {
+			return this.getBodyEl();
+		},
+
+		
+		// -----------------------------------
 		
 		
 		/**
@@ -14937,17 +15089,218 @@ define('gui/window/Window', [
 		
 		// -----------------------------------
 		
+		// Header Functionality
+		
+		/**
+		 * Performs the creation of the {@link #property-header}, by calling {@link #createHeader}, and then applying 
+		 * any post-processing required (which includes rendering it as the first element in the Window
+		 * itself if it is already rendered).
+		 * 
+		 * To create a different {@link #property-header} in a subclass, override {@link #createHeader} instead of this 
+		 * method.
+		 * 
+		 * @protected
+		 */
+		doCreateHeader : function() {
+			this.header = this.createHeader( _.defaults( {}, this.headerCfg, {
+				type         : 'windowheader',
+				componentCls : this.baseCls + '-header',  // Ex: For Window itself, 'gui-window-header'
+				title        : this.title,
+				toolButtons  : this.toolButtons
+			} ) );
+			this.header.setVisible( !this.headerHidden );
+			delete this.headerHidden;
+			
+			if( this.rendered ) {
+				this.header.render( this.$el, /* prepend */ 0 );  // prepend to make it the first element (i.e. before the body)
+			}
+		},
+		
+		
+		/**
+		 * Creates the {@link #property-header}, which contains the {@link #title} and any {@link #toolButtons} configured.
+		 * 
+		 * @protected
+		 * @param {Object} headerConfig The configuration for the header, with defaults applied from the Window.
+		 * @return {gui.window.Header}
+		 */
+		createHeader : function( headerConfig ) {
+			return ComponentManager.create( headerConfig );
+		},
+		
+		
+		/**
+		 * Gets the {@link #property-header} of the Window. If the {@link #property-header} has not been created yet,
+		 * it will be instantiated before it is returned.
+		 * 
+		 * In most cases, you will not need to directly access the Window's {@link #property-header} component. Most of 
+		 * the time, you will set the {@link #cfg-header} config options, and if the Window's title needs to be changed,
+		 * you will use the {@link #setTitle} method.
+		 * 
+		 * However, this method is provided for more advanced operations, such as if components need to be injected into
+		 * the header. In this case, be aware that the header is created with components of its own, and you will need
+		 * to inject yours at the correct indexes.
+		 * 
+		 * @return {gui.window.Header}
+		 */
+		getHeader : function() {
+			if( !this.header ) {
+				this.doCreateHeader();
+			}
+			return this.header;
+		},
+		
+		
+		/**
+		 * Sets the title of the Window.
+		 * 
+		 * @param {String} title The title to set.
+		 * @chainable
+		 */
+		setTitle : function( title ) {
+			if( !this.header ) {
+				this.doCreateHeader();
+			}
+			
+			this.title = title;
+			this.header.setTitle( title );
+			
+			return this;
+		},
+		
+		
+		/**
+		 * Retrieves the {@link #title} of the Window.
+		 * 
+		 * @return {String} The title of the Window.
+		 */
+		getTitle : function() {
+			return this.title;
+		},
+		
+		
+		/**
+		 * Shows the Window's {@link #property-header}, if it is currently hidden.
+		 * 
+		 * @chainable
+		 */
+		showHeader : function() {
+			if( this.header ) {
+				this.header.show();
+			} else {
+				this.headerHidden = false;  // in case the header hasn't been created yet, we'll use this for when it is
+			}
+			
+			return this;
+		},
+		
+		
+		/**
+		 * Hides the Window's {@link #property-header}, if it is currently visible.
+		 * 
+		 * @chainable
+		 */
+		hideHeader : function() {
+			if( this.header ) {
+				this.header.hide();
+			} else {
+				this.headerHidden = true;  // in case the header hasn't been created yet, we'll use this for when it is
+			}
+			
+			return this;
+		},
+		
+		
+		// ---------------------------------
+		
+		// Window's Body Styling Functionality
+		
+		/**
+		 * Adds one or more CSS classes to the Window's {@link #$bodyEl body} element.
+		 * 
+		 * @param {String} cssClass One or more CSS classes to add to the Window's {@link #$bodyEl body} element. If specifying 
+		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
+		 * @return {gui.window.Window} This Window, to allow method chaining.
+		 */
+		addBodyCls : function( cssClass ) {
+			if( !this.rendered ) {
+				this.bodyCls = Css.addCls( this.bodyCls, cssClass );  // update the `bodyCls` config in the unrendered state
+			} else {
+				this.$bodyEl.addClass( cssClass ); // delegate to jQuery in this case
+			}
+			return this;
+		},
+		
+		
+		/**
+		 * Removes one or more CSS classes from the Window's {@link #$bodyEl body} element.
+		 * 
+		 * @param {String} cssClass One or more CSS classes to remove from the Window's {@link #$bodyEl body} element. If specifying 
+		 *   multiple CSS classes, they should be separated with a space. Ex: "class1 class2"
+		 * @return {gui.window.Window} This Window, to allow method chaining.
+		 */
+		removeBodyCls : function( cssClass ) {
+			if( !this.rendered ) {
+				this.bodyCls = Css.removeCls( this.bodyCls, cssClass );  // update the `bodyCls` config in the unrendered state
+			} else {
+				this.$bodyEl.removeClass( cssClass ); // delegate to jQuery in this case
+			}
+			return this;
+		},
+		
+		
+		/**
+		 * Determines if the Window's {@link #$bodyEl body} element has the given `cssClass`.
+		 * 
+		 * @param {String} cssClass The CSS class to test for.
+		 * @return {Boolean} True if the Window's {@link #$bodyEl body} element has the given `cssClass`, false otherwise.
+		 */
+		hasBodyCls : function( cssClass ) {
+			// Check the `bodyCls` config in the unrendered state, or the body element itself in the rendered state
+			return ( !this.rendered ) ? Css.hasCls( this.bodyCls, cssClass ) : this.$bodyEl.hasClass( cssClass );
+		},
+		
+		
+		/**
+		 * Sets a CSS style property on the Window's {@link #$bodyEl body} element.
+		 * 
+		 * @param {String/Object} name The CSS property name. This first argument may also be provided as an Object of key/value
+		 *   pairs for CSS property names/values to apply to the Window's {@link #$bodyEl body} element.
+		 * @param {String} value The value for the CSS property. Optional if the first argument is an Object.
+		 * @return {gui.window.Window} This Window, to allow method chaining.
+		 */
+		setBodyStyle : function( name, value ) {
+			if( !this.rendered ) {
+				this.bodyStyle = this.bodyStyle || {};
+				
+				if( typeof name === 'object' ) {
+					_.assign( this.bodyStyle, name );  // apply each of the properties on the provided 'styles' object onto the Window's bodyStyle
+				} else {
+					this.bodyStyle[ name ] = value;
+				}
+				
+			} else {
+				this.$bodyEl.css( name, value );  // will work for both method signatures (i.e. when `name` is an object, and when provided both name / value)
+			}
+			return this;
+		},
+		
+		
+		// -----------------------------------
+		
 		
 		/**
 		 * @inheritdoc
 		 */
 		onDestroy : function() {
+			if( this.header ) this.header.destroy();
+			
 			if( this.$modalMaskEl ) {
 				this.$modalMaskEl.remove();
 			}
 			
-			if( this.maskResizeHandler ) {
-				jQuery( window ).off( 'resize', this.maskResizeHandler );
+			if( this.modalMaskResizeHandler ) {
+				jQuery( window ).off( 'resize', this.modalMaskResizeHandler );
 			}
 			
 			this._super( arguments );
@@ -14961,4 +15314,5 @@ define('gui/window/Window', [
 	return Window;
 	
 } );
+
 require(["gui/Anchor", "gui/Component", "gui/ComponentManager", "gui/ComponentQuery", "gui/Container", "gui/Gui", "gui/Image", "gui/Label", "gui/Mask", "gui/Overlay", "gui/Viewport", "gui/anim/Animation", "gui/app/Application", "gui/app/Controller", "gui/app/EventBus", "gui/button/Button", "gui/form/field/Checkbox", "gui/form/field/Dropdown", "gui/form/field/Field", "gui/form/field/Hidden", "gui/form/field/Radio", "gui/form/field/Text", "gui/form/field/TextArea", "gui/layout/Auto", "gui/layout/Card.SwitchTransition", "gui/layout/Card.Transition", "gui/layout/Card", "gui/layout/Column", "gui/layout/Fit", "gui/layout/HBox", "gui/layout/Layout", "gui/layout/VBox", "gui/loader/Loader", "gui/loader/RequireJs", "gui/panel/Header", "gui/panel/Panel", "gui/panel/ToolButton", "gui/plugin/Plugin", "gui/tab/Bar", "gui/tab/Panel", "gui/tab/Tab", "gui/template/LoDash", "gui/template/Template", "gui/util/CallbackList", "gui/util/CollectionBindable", "gui/util/Css", "gui/util/Html", "gui/util/ModelBindable", "gui/util/OptionsStore", "gui/view/Collection", "gui/view/DataBound", "gui/view/Model", "gui/window/Header", "gui/window/Window"]);
