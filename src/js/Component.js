@@ -127,7 +127,7 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 	 *   makes them available as properties, and allows them to be referenced in subclasses as `this.configName`.  However, unless the
 	 *   configuration options are also listed as public properties, they should not be used externally.
 	 * - Components directly support masking and un-masking their viewable area.  See the {@link #maskConfig} configuration option, and the {@link #mask} and
-	 *   {@link #unMask} methods.
+	 *   {@link #unmask} methods.
 	 * - When a Component is {@link #method-destroy} destroyed, a number of automatic cleanup mechanisms are executed. See {@link #method-destroy} for details.
 	 */
 	var Component = Class.extend( Observable, { 
@@ -410,7 +410,7 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		 * argument is omitted), or if the {@link #cfg-masked} configuration option is true (in which a mask will be shown over the Component, using this maskConfig, 
 		 * when it is first rendered).  This default maskConfig can be overrided when calling {@link #mask} by passing a configuration object for its argument.
 		 * 
-		 * Masks are shown and hidden using the {@link #mask} and {@link #unMask} methods. If this configuration option is not provided, the configuration
+		 * Masks are shown and hidden using the {@link #mask} and {@link #unmask} methods. If this configuration option is not provided, the configuration
 		 * options default to the default values of the configuration options for {@link gui.Mask}.
 		 */
 		
@@ -2002,7 +2002,7 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		/**
 		 * Hides the mask (shown with the {@link #mask} method) from the Component's element.
 		 */
-		unMask : function() {
+		unmask : function() {
 			this.masked = false;
 			
 			// in case there was a show request while hidden: set deferMaskShow back to false, and remove the deferredMaskConfig (as we're now hiding the mask)
@@ -2012,6 +2012,16 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 			if( this.rendered && this._mask ) {
 				this._mask.hide();
 			}
+		},
+		
+		
+		/**
+		 * Hides the mask (shown with the {@link #mask} method) from the Component's element.
+		 * 
+		 * @deprecated 0.7.3 Use {@link #unmask} instead.
+		 */
+		unMask : function() {
+			this.unmask();
 		},
 		
 		
