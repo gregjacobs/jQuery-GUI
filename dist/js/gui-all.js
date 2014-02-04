@@ -768,8 +768,44 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 */
 		msg : "",
 		
-
+		/**
+		 * @cfg {String} overlayCls
+		 * 
+		 * Any additional space-delimited CSS class(es) to add to the Mask's {@Link #$overlayEl overlay element}.
+		 */
 		
+		/**
+		 * @cfg {String} contentCls
+		 * 
+		 * Any additional space-delimited CSS class(es) to add to the Mask's {@Link #$contentEl content element}.
+		 */
+		
+		/**
+		 * @cfg {Object} contentPosition
+		 * 
+		 * Defines where the {@link #$contentEl content element} will be placed within the Mask. 
+		 * 
+		 * This config is an Object (map) which has two properties: `my` and `at`. These properties relate to the 'my' and 'at' configs
+		 * that are accepted by the jQuery UI Position utility (see: http://jqueryui.com/position/), and may take any Position utility
+		 * values.
+		 * 
+		 * For example:
+		 * 
+		 *     {
+		 *         my: 'right-20 bottom-20',
+		 *         at: 'right bottom'
+		 *     }
+		 * 
+		 * 
+		 * Defaults to:
+		 * 
+		 *     {
+		 *         my: 'center center',
+		 *         at: 'center center'
+		 *     }
+		 */
+		
+
 		/**
 		 * @protected
 		 * @property {String/gui.template.Template} maskTpl
@@ -888,9 +924,18 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 * @param {Object} config The new configuration options for the Mask. See the "config options" section of the docs for details. 
 		 */
 		updateConfig : function( config ) {
+			// First, remove any previous CSS classes from the elements (if they are rendered)
+			if( this.rendered ) {
+				if( this.overlayCls ) this.$overlayEl.removeClass( this.overlayCls );
+				if( this.contentCls ) this.$contentEl.removeClass( this.contentCls );
+			}
+			
 			// Remove any previously set configuration options (unshadows defaults on prototype)
 			delete this.spinner;
 			delete this.msg;
+			delete this.overlayCls;
+			delete this.contentCls;
+			delete this.contentPosition;
 			
 			// Apply the new config
 			_.assign( this, config );
@@ -935,11 +980,17 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 */
 		updateMaskElements : function() {
 			if( this.rendered ) {
+				// Update CSS classes if any were provided
+				if( this.overlayCls ) this.$overlayEl.addClass( this.overlayCls );
+				if( this.contentCls ) this.$contentEl.addClass( this.contentCls );
+				
 				// Update the spinner's visibility based on the `spinner` config
 				this.$contentEl.toggleClass( this.spinnerVisibleCls, this.spinner );
 				
 				// Update the message
 				this.setMsg( this.msg );
+				
+				this.repositionContentEl();
 			}
 		},
 		
@@ -1038,9 +1089,11 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		repositionContentEl : function() {
 			// using jQuery UI positioning utility to center the content element
 			if( this.isContentElVisible() ) {
+				var contentPosition = this.contentPosition || {};
+				
 				this.$contentEl.position( {
-					my: 'center center',
-					at: 'center center',
+					my: contentPosition.my || 'center center',
+					at: contentPosition.at || 'center center',
 					of: this.$targetEl
 				} );
 			}
