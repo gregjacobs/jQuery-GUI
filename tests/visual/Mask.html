@@ -62,7 +62,44 @@
 				showHideShowMask.show();
 				showHideShowMask.hide();
 				showHideShowMask.show();
+
 				
+				var topLeftContentMask = new Mask( $( '#contentArea7' ), {
+					spinner : false,
+					msg : "Top Left",
+					contentPosition: { my: 'left+20 top+20', at: 'left top' }
+				} );
+				topLeftContentMask.show();
+
+				var topRightContentMask = new Mask( $( '#contentArea8' ), {
+					spinner : false,
+					msg : "Top Right",
+					contentPosition: { my: 'right-20 top+20', at: 'right top' }
+				} );
+				topRightContentMask.show();
+
+				var bottomLeftContentMask = new Mask( $( '#contentArea9' ), {
+					spinner : false,
+					msg : "Bottom Left",
+					contentPosition: { my: 'left+20 bottom-20', at: 'left bottom' }
+				} );
+				bottomLeftContentMask.show();
+
+				var bottomRightContentMask = new Mask( $( '#contentArea10' ), {
+					spinner : false,
+					msg : "Bottom Right",
+					contentPosition: { my: 'right-20 bottom-20', at: 'right bottom' }
+				} );
+				bottomRightContentMask.show();
+				
+				
+				var styledMask = new Mask( $( '#contentArea11' ), {
+					spinner : false,
+					msg : "Styled Msg",
+					overlayCls : 'blueOverlay',
+					contentCls : 'greenContent noContentBorder noContentBackground'
+				} );
+				styledMask.show();
 			} );
 		} );
 	</script>
@@ -76,6 +113,11 @@
 			width: 300px;
 			border: 1px solid black;
 		}
+		
+		.blueOverlay { background-color: blue; }
+		.greenContent { color: green; font-style: italic; }
+		.noContentBorder { border: none; }
+		.noContentBackground { background: none; }
 	</style>
 
 </head>
@@ -88,6 +130,11 @@
 <div id="contentArea4" class="contentArea">Message-only Mask</div>
 <div id="contentArea5" class="contentArea">Spinner and Message Mask</div>
 <div id="contentArea6" class="contentArea">Mask which has been shown, hidden, and then shown again.</div>
+<div id="contentArea7" class="contentArea">Mask with content in top left.</div>
+<div id="contentArea8" class="contentArea">Mask with content in top right.</div>
+<div id="contentArea9" class="contentArea">Mask with content in bottom left.</div>
+<div id="contentArea10" class="contentArea">Mask with content in bottom right.</div>
+<div id="contentArea11" class="contentArea">Styled Mask</div>
 
 </body>
 </html>

@@ -96,12 +96,29 @@ define( [
 				
 			} );
 			
+			
+			describe( 'contentPosition', function() {
+				
+				it( "should allow the content element to be positioned within the mask", function() {
+					mask = new Mask( $el, { msg: "Test Msg", contentPosition: { my: 'left+20 top+30', at: 'left top' } } );
+					mask.show();
+					
+					expect( mask.$contentEl.css( 'display' ) ).toBe( 'block' );  // just checking
+					
+					var position = mask.$contentEl.position();
+					expect( position.left ).toBe( 20 );
+					expect( position.top ).toBe( 30 );
+				} );
+				
+				
+			} );
+			
 		} );
 		
 		
 		describe( 'updateConfig()', function() {
 			
-			it( "should remove any old overlayCls, and apply a new one provided in the config", function() {
+			it( "should remove any old `overlayCls` cfg, and apply a new one provided in the config", function() {
 				mask = new Mask( $el, { overlayCls: 'oldCls' } );
 				mask.show();
 
@@ -113,7 +130,7 @@ define( [
 			} );
 
 			
-			it( "should remove any old contentCls, and apply a new one provided in the config", function() {
+			it( "should remove any old `contentCls` cfg, and apply a new one provided in the config", function() {
 				mask = new Mask( $el, { contentCls: 'oldCls' } );
 				mask.show();
 
@@ -122,6 +139,22 @@ define( [
 				mask.updateConfig( { contentCls: 'newCls' } );
 				expect( mask.$contentEl.hasClass( 'oldCls' ) ).toBe( false );
 				expect( mask.$contentEl.hasClass( 'newCls' ) ).toBe( true );
+			} );
+			
+			
+			it( "should remove any old `contentPosition` cfg, and apply a new one provided in the config", function() {
+				mask = new Mask( $el, { msg: "Test Msg", contentPosition: { my: 'left+20 top+30', at: 'left top' } } );
+				mask.show();
+				
+				// Check initial condition
+				var position = mask.$contentEl.position();
+				expect( position.left ).toBe( 20 );
+				expect( position.top ).toBe( 30 );
+
+				mask.updateConfig( { msg: "Test Msg", contentPosition: { my: 'left+10 top+15', at: 'left top' } } );
+				var position2 = mask.$contentEl.position();
+				expect( position2.left ).toBe( 10 );
+				expect( position2.top ).toBe( 15 );
 			} );
 			
 		} );
