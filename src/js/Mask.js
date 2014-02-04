@@ -33,8 +33,19 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 */
 		msg : "",
 		
-
+		/**
+		 * @cfg {String} overlayCls
+		 * 
+		 * Any additional space-delimited CSS class(es) to add to the Mask's {@Link #$overlayEl overlay} element.
+		 */
 		
+		/**
+		 * @cfg {String} contentCls
+		 * 
+		 * Any additional space-delimited CSS class(es) to add to the Mask's {@Link #$contentEl content} element.
+		 */
+		
+
 		/**
 		 * @protected
 		 * @property {String/gui.template.Template} maskTpl
@@ -153,9 +164,17 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 * @param {Object} config The new configuration options for the Mask. See the "config options" section of the docs for details. 
 		 */
 		updateConfig : function( config ) {
+			// First, remove any previous CSS classes from the elements (if they are rendered)
+			if( this.rendered ) {
+				if( this.overlayCls ) this.$overlayEl.removeClass( this.overlayCls );
+				if( this.contentCls ) this.$contentEl.removeClass( this.contentCls );
+			}
+			
 			// Remove any previously set configuration options (unshadows defaults on prototype)
 			delete this.spinner;
 			delete this.msg;
+			delete this.overlayCls;
+			delete this.contentCls;
 			
 			// Apply the new config
 			_.assign( this, config );
@@ -200,6 +219,10 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 */
 		updateMaskElements : function() {
 			if( this.rendered ) {
+				// Update CSS classes if any were provided
+				if( this.overlayCls ) this.$overlayEl.addClass( this.overlayCls );
+				if( this.contentCls ) this.$contentEl.addClass( this.contentCls );
+				
 				// Update the spinner's visibility based on the `spinner` config
 				this.$contentEl.toggleClass( this.spinnerVisibleCls, this.spinner );
 				
