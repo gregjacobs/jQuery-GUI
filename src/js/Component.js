@@ -14,8 +14,7 @@ define( [
 	'gui/template/Template',
 	'gui/template/LoDash',
 	'gui/ComponentManager'   // circular dependency. used via require() call in code below
-],
-function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
+], function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
 
 	/**
 	 * @class gui.Component
@@ -123,14 +122,15 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 	 * 
 	 * Some other things to note about Component and its subclasses are:
 	 * 
-	 * - Any configuration options that are provided to its constructor are automatically applied (copied) onto the new Component object. This
-	 *   makes them available as properties, and allows them to be referenced in subclasses as `this.configName`.  However, unless the
-	 *   configuration options are also listed as public properties, they should not be used externally.
-	 * - Components directly support masking and un-masking their viewable area.  See the {@link #maskConfig} configuration option, and the {@link #mask} and
-	 *   {@link #unmask} methods.
-	 * - When a Component is {@link #method-destroy} destroyed, a number of automatic cleanup mechanisms are executed. See {@link #method-destroy} for details.
+	 * - Any configuration options that are provided to its constructor are automatically applied (copied) onto the new Component 
+	 *   object. This makes them available as properties, and allows them to be referenced in subclasses as `this.configName`.  
+	 *   However, unless the configuration options are also listed as public properties, they should not be used externally.
+	 * - Components directly support masking and un-masking their viewable area.  See the {@link #masked}/{@link #maskConfig} 
+	 *   configuration options, and the {@link #mask} and {@link #unmask} methods.
+	 * - When a Component is {@link #method-destroy destroyed}, a number of automatic cleanup mechanisms are executed. 
+	 *   See {@link #method-destroy} for details.
 	 */
-	var Component = Class.extend( Observable, { 
+	var Component = Observable.extend( { 
 		
 		/**
 		 * @cfg {String} id
@@ -376,49 +376,59 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		
 		/**
 		 * @cfg {Number/String} height
+		 * 
 		 * A height to give the Component. Accepts a number (for the number of pixels) or any valid CSS string. Defaults to automatic sizing. 
 		 */
 		
 		/**
 		 * @cfg {Number/String} width
+		 * 
 		 * A width to give the Component. Accepts a number (for the number of pixels) or any valid CSS string. Defaults to automatic sizing. 
 		 */
 		
 		/**
 		 * @cfg {Number/String} minHeight
+		 * 
 		 * A minimum height to give the Component. Accepts a number (for the number of pixels) or any valid CSS string. Defaults to automatic sizing. 
 		 */
 		
 		/**
 		 * @cfg {Number/String} minWidth
+		 * 
 		 * A minimum width to give the Component. Accepts a number (for the number of pixels) or any valid CSS string. Defaults to automatic sizing. 
 		 */
 		
 		/**
 		 * @cfg {Number/String} maxHeight
+		 * 
 		 * A maximum height to give the Component. Accepts a number (for the number of pixels) or any valid CSS string. Defaults to automatic sizing. 
 		 */
 		
 		/**
 		 * @cfg {Number/String} maxWidth
+		 * 
 		 * A maximum width to give the Component. Accepts a number (for the number of pixels) or any valid CSS string. Defaults to automatic sizing. 
 		 */
 		
 		
 		/**
-		 * @cfg {Object} maskConfig A configuration object for the default mask that will be shown when the {@link #mask} method is called (if {@link #mask mask's}
-		 * argument is omitted), or if the {@link #cfg-masked} configuration option is true (in which a mask will be shown over the Component, using this maskConfig, 
-		 * when it is first rendered).  This default maskConfig can be overrided when calling {@link #mask} by passing a configuration object for its argument.
+		 * @cfg {Object} maskConfig 
 		 * 
-		 * Masks are shown and hidden using the {@link #mask} and {@link #unmask} methods. If this configuration option is not provided, the configuration
-		 * options default to the default values of the configuration options for {@link gui.Mask}.
+		 * A configuration object for the default mask that will be shown when the {@link #mask} method is called (if 
+		 * {@link #mask mask's} argument is omitted), or if the {@link #masked} configuration option is `true` (in which case a mask 
+		 * will be shown over the Component, using this `maskConfig` when it is first rendered). This default maskConfig can be 
+		 * overriden when calling {@link #mask} by passing a configuration object to its argument.
+		 * 
+		 * Masks are shown and hidden using the {@link #mask} and {@link #unmask} methods. If this configuration option is not 
+		 * provided, the configuration options default to the default values of the configuration options for {@link gui.Mask}.
 		 */
 		
 		/**
-		 * @cfg {Boolean} masked True to instantiate the Component with its mask shown (the {@link #mask} method is automatically run when the Component
-		 * is rendered).
+		 * @cfg {Boolean} masked 
+		 * 
+		 * `true` to instantiate the Component with its mask shown (the {@link #mask} method is called 
+		 * automatically when the Component is instantiated), using the configuration specified by {@link #maskConfig}.
 		 */
-		masked : false,
 		
 		
 		/**
@@ -442,6 +452,15 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		 */
 		parentContainer: null,
 		
+		
+		/**
+		 * @property {Boolean} isGuiComponent
+		 * 
+		 * A flag (which is always set to `true`) that signifies that this object is a Component or Component subclass. This 
+		 * is used mainly to avoid an `instanceof` check with some of the collaborator classes of Component (like {@link gui.Mask}),
+		 * such as to not introduce a circular dependency when not necessary.
+		 */
+		isGuiComponent : true,
 		
 		/**
 		 * @private
@@ -523,41 +542,14 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		currentAnimation : null,
 		
 		
-		/**
-		 * @protected
-		 * @property {Boolean} masked
-		 * 
-		 * Flag to store the current state of if the Component is masked or not. This is also a config option.
-		 */
 		
 		/**
 		 * @private
-		 * @property {Boolean} deferMaskShow
+		 * @property {gui.Mask} componentMask
 		 * 
-		 * Flag that is set to true if the {@link #mask} method is run, but the Component is currently hidden.
-		 * The Component must be in a visible state to show the mask, as the gui.Mask class makes a calculation of 
-		 * the height of the mask target element.  When the Component's {@link #method-show} method runs, this flag will be
-		 * tested to see if it is true, and if so, will run the {@link #mask} method at that time.
+		 * The gui.Mask instance that the Component is using to mask the Component. This will be `undefined` if no Mask has 
+		 * been created (i.e. the {@link #masked} config was not set to `true`, and the {@link #mask} method was never called). 
 		 */
-		deferMaskShow : false,
-		
-		/**
-		 * @private
-		 * @property {gui.Mask} _mask
-		 * 
-		 * The gui.Mask instance that the Component is currently using to mask over the Component. This will be null
-		 * if no gui.Mask has been created (i.e. the {@link #mask} method has never been called). 
-		 */
-		
-		/**
-		 * @private
-		 * @property {Object} deferredMaskConfig
-		 * 
-		 * If the masking of the Component needs to be deferred (either because the Component is not yet rendered, or because
-		 * the Component is currently hidden), then the configuration options to show the mask with are stored in this property,
-		 * for when the mask does in fact get shown.
-		 */
-		
 		
 		/**
 		 * @protected
@@ -757,7 +749,12 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 			
 			// Call template method for the initialization of subclasses of this Component
 			this.initComponent();
-			
+
+			// If the Component was configured to be masked, call mask() to set it up.
+			if( this.masked ) {
+				this.mask();
+				delete this.masked;  // no longer needed
+			}
 			
 			// Initialize any plugins provided to the Component
 			if( this.plugins.length > 0 ) {
@@ -767,7 +764,7 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 			// Render the component immediately if a 'renderTo' element is specified
 			if( this.renderTo ) {
 				this.render( this.renderTo );
-				delete this.renderTo;   // no longer needed
+				delete this.renderTo;  // no longer needed
 			}
 		},
 		
@@ -948,11 +945,6 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 					this.$el.hide();
 				}
 				
-				// If the Component was configured with masked = true, show the mask now.
-				if( this.masked ) {
-					this.mask( this.deferredMaskConfig );  // deferredMaskConfig will be defined if a call to mask() has been made before the Component has been rendered. Otherwise, it will be undefined.
-				}
-				
 				// Call the onAfterRender hook method, and fire the 'render' event
 				this.onAfterRender( $containerEl, options );
 				this.fireEvent( 'render', this );
@@ -1069,7 +1061,7 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		 * when the {@link #onRender} hook method has been called, and after the {@link #html}, {@link #contentEl}, and 
 		 * {@link #tpl} configs have been processed and their content has been added to the Component's {@link #$el element}.
 		 * It is also called after the initial {@link #cfg-hidden} state has been processed, and any initial 
-		 * {@link #cfg-masked mask} has been applied.
+		 * {@link #masked mask} has been applied.
 		 * 
 		 * @protected
 		 * @method onAfterRender
@@ -1648,11 +1640,6 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 				this.fireEvent( 'showbegin', this );
 				this.fireEvent( 'show', this );
 				
-				// If a mask show request has been made while the Component was hidden, show the mask now, with the configuration requested when the call to mask() was made (if any).
-				if( this.deferMaskShow ) {
-					this.mask( this.deferredMaskConfig );
-				}
-				
 				// If a show animation was specified, run that now. Otherwise, simply show the element
 				var animConfig = options.anim;  // Note: setting this after the onBeforeShow() hook method has executed, to give it a chance to modify the `anim` option
 				if( animConfig ) {
@@ -1956,46 +1943,34 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		
 		
 		/**
-		 * Masks the component with a {@link gui.Mask}. Uses the default mask configuration provided by the {@link #maskConfig} configuration object,
-		 * or optionally, the provided `maskConfig` argument.
+		 * Masks the component with a {@link gui.Mask}. Uses the default mask configuration provided by the {@link #maskConfig} 
+		 * configuration object, or optionally, the provided `maskConfig` argument.
 		 * 
-		 * @param {Object} maskConfig (optional) The explicit configuration options to set the {@link gui.Mask} that will mask over the Component.
-		 *   If not provided, will use the default options provided by the {@link #maskConfig} configuration option.
+		 * @param {Object} maskConfig (optional) The explicit configuration options to set the {@link gui.Mask} that will mask 
+		 *   over the Component. If not provided, will use the default options provided by the {@link #maskConfig} configuration 
+		 *   option.
 		 */
 		mask : function( maskConfig ) {
 			maskConfig = maskConfig || this.maskConfig;  // use the provided argument if it exists, or the defaults provided by the config option otherwise
 			
-			// Set the flag for the isMasked method. Also, if the Component is not rendered, this is updated so that the mask will show on render time.
-			this.masked = true;
-			
-			if( !this.rendered ) {
-				this.deferredMaskConfig = maskConfig;  // set the maskConfig to use when the Component is rendered
-				
+			if( !this.componentMask ) {
+				this.componentMask = this.createMask( _.assign( { target: this }, maskConfig ) );
 			} else {
-				// If the Component is currently hidden when the mask() request is made, we need to defer
-				// it to when the Component's show() method is run. This is because gui.Mask has to make a calculation
-				// of the mask target's height. 
-				if( this.isHidden() ) {
-					this.deferMaskShow = true;
-					this.deferredMaskConfig = maskConfig;  // set the maskConfig to use when the Component is shown
-					
-				} else {
-					// Component is rendered and is shown (i.e. not hidden), then we can show the mask
-					
-					// If there is not yet a mask instance for this Component, create one now.
-					// Otherwise, just update its config.
-					if( !this._mask ) {
-						this._mask = new Mask( this.getMaskTarget(), maskConfig );
-					} else {
-						this._mask.updateConfig( maskConfig );
-					}
-					this._mask.show();
-					
-					// mask has been shown, make sure deferMaskShow flag is set back to false
-					this.deferMaskShow = false;
-					delete this.deferredMaskConfig;  // in case this exists from a previous deferred mask, remove it now
-				}
+				this.componentMask.resetConfig( maskConfig );
 			}
+			this.componentMask.show();  // if the Component has not yet been rendered, the Mask will wait for it
+		},
+		
+		
+		/**
+		 * Factory method used to create the {@link #componentMask} for the Component.
+		 * 
+		 * @protected
+		 * @param {Object} maskCfg The configuration options for the Mask.
+		 * @return {gui.Mask}
+		 */
+		createMask : function( maskCfg ) {
+			return new Mask( maskCfg );
 		},
 		
 		
@@ -2003,15 +1978,7 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		 * Hides the mask (shown with the {@link #mask} method) from the Component's element.
 		 */
 		unmask : function() {
-			this.masked = false;
-			
-			// in case there was a show request while hidden: set deferMaskShow back to false, and remove the deferredMaskConfig (as we're now hiding the mask)
-			this.deferMaskShow = false;  
-			delete this.deferredMaskConfig;
-			
-			if( this.rendered && this._mask ) {
-				this._mask.hide();
-			}
+			if( this.componentMask ) this.componentMask.hide();  // note: if there is no `componentMask`, then `mask()` has never been called, and we don't need to do anything.
 		},
 		
 		
@@ -2026,12 +1993,12 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		
 		
 		/**
-		 * Determines if the Component is currently masked.  See the {@link #mask} method for details on showing the Component's mask.
+		 * Determines if the Component is currently masked. See the {@link #mask} method for details on showing the Component's mask.
 		 * 
-		 * @return {Boolean}
+		 * @return {Boolean} `true` if the Component is currently masked, `false` otherwise.
 		 */
 		isMasked : function() {
-			return this.masked;
+			return !!this.componentMask && this.componentMask.isVisible();
 		},
 		
 		
@@ -2039,7 +2006,9 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		 * Method that defines which element the Component's mask should be shown over. For gui.Component,
 		 * this is the Component's base {@link #$el element}, but this may be redefined by subclasses.
 		 * 
-		 * @protected
+		 * This method is called by {@link gui.Mask} when masking a Component, to determine where the Mask's
+		 * elements should be placed.
+		 * 
 		 * @return {jQuery}
 		 */
 		getMaskTarget : function() {
@@ -2162,9 +2131,9 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 		
 		/**
 		 * Destroys the Component. Frees (i.e. deletes) all references that the Component held to HTMLElements or jQuery wrapped sets
-		 * (so as to prevent memory leaks) and removes them from the DOM, removes the Component's {@link #mask} if it has one, purges 
-		 * all event {@link #listeners} from the object, and removes the Component's element ({@link #$el}) from the DOM, if the Component 
-		 * is rendered.
+		 * (so as to prevent memory leaks) and removes them from the DOM, removes the Component's {@link #componentMask mask} if it 
+		 * has one, purges all event {@link #listeners} from the object, and removes the Component's element ({@link #$el}) from the 
+		 * DOM, if the Component is rendered.
 		 *
 		 * Fires the {@link #beforedestroy} event, which a handler can return false from to cancel the destruction process,
 		 * and the {@link #event-destroy} event.
@@ -2182,9 +2151,9 @@ function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation
 					this.currentAnimation.end();
 				}
 				
-				// Destroy the mask, if it is an instantiated gui.Mask object (it may not be if the mask was never used)
-				if( this._mask instanceof Mask ) {
-					this._mask.destroy();
+				// Destroy the mask, if one was instantiated by a call to mask()
+				if( this.componentMask ) {
+					this.componentMask.destroy();
 				}
 				
 				// Remove any HTMLElement or jQuery wrapped sets used by the Component from the DOM, and free 

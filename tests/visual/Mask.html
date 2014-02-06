@@ -32,30 +32,34 @@
 		], function( $, Mask ) {
 			$( document ).ready( function() {
 				
-				var hiddenMask = new Mask( $( '#contentArea1' ) );
+				var hiddenMask = new Mask( { target: $( '#contentArea1' ) } );
 				hiddenMask.show();
 				hiddenMask.hide();
 				
-				var basicMask = new Mask( $( '#contentArea2' ) );
+				var basicMask = new Mask( { target: $( '#contentArea2' ) } );
 				basicMask.show();
 				
-				var spinnerMask = new Mask( $( '#contentArea3' ), {
+				var spinnerMask = new Mask( { 
+					target: $( '#contentArea3' ),
 					spinner : true
 				} );
 				spinnerMask.show();
 				
-				var messageMask = new Mask( $( '#contentArea4' ), {
+				var messageMask = new Mask( { 
+					target: $( '#contentArea4' ),
 					msg : "Loading..."
 				} );
 				messageMask.show();
 				
-				var spinnerAndMessageMask = new Mask( $( '#contentArea5' ), {
+				var spinnerAndMessageMask = new Mask( {
+					target: $( '#contentArea5' ),
 					spinner : true,
 					msg : "Loading..."
 				} );
 				spinnerAndMessageMask.show();
 				
-				var showHideShowMask = new Mask( $( '#contentArea6' ), {
+				var showHideShowMask = new Mask( {
+					target: $( '#contentArea6' ),
 					spinner : true,
 					msg : "Loading..."
 				} );
@@ -63,40 +67,45 @@
 				showHideShowMask.hide();
 				showHideShowMask.show();
 
+
+				var topRightContentMask = new Mask( {
+					target: $( '#contentArea7' ),
+					spinner : false,
+					msg : "Top Right",
+					contentPosition: { my: 'right-20 top+20', at: 'right top' }
+				} );
+				topRightContentMask.show();
 				
-				var topLeftContentMask = new Mask( $( '#contentArea7' ), {
+				var topLeftContentMask = new Mask( {
+					target: $( '#contentArea8' ),
 					spinner : false,
 					msg : "Top Left",
 					contentPosition: { my: 'left+20 top+20', at: 'left top' }
 				} );
 				topLeftContentMask.show();
 
-				var topRightContentMask = new Mask( $( '#contentArea8' ), {
-					spinner : false,
-					msg : "Top Right",
-					contentPosition: { my: 'right-20 top+20', at: 'right top' }
-				} );
-				topRightContentMask.show();
-
-				var bottomLeftContentMask = new Mask( $( '#contentArea9' ), {
-					spinner : false,
-					msg : "Bottom Left",
-					contentPosition: { my: 'left+20 bottom-20', at: 'left bottom' }
-				} );
-				bottomLeftContentMask.show();
-
-				var bottomRightContentMask = new Mask( $( '#contentArea10' ), {
+				var bottomRightContentMask = new Mask( { 
+					target: $( '#contentArea9' ),
 					spinner : false,
 					msg : "Bottom Right",
 					contentPosition: { my: 'right-20 bottom-20', at: 'right bottom' }
 				} );
 				bottomRightContentMask.show();
+
+				var bottomLeftContentMask = new Mask( { 
+					target: $( '#contentArea10' ),
+					spinner : false,
+					msg : "Bottom Left",
+					contentPosition: { my: 'left+20 bottom-20', at: 'left bottom' }
+				} );
+				bottomLeftContentMask.show();
 				
 				
-				var styledMask = new Mask( $( '#contentArea11' ), {
+				var styledMask = new Mask( { 
+					target: $( '#contentArea11' ),
 					spinner : false,
 					msg : "Styled Msg",
-					overlayCls : 'blueOverlay',
+					overlayCls : 'redOverlay',
 					contentCls : 'greenContent noContentBorder noContentBackground'
 				} );
 				styledMask.show();
@@ -114,7 +123,7 @@
 			border: 1px solid black;
 		}
 		
-		.blueOverlay { background-color: blue; }
+		.redOverlay { background-color: red; }
 		.greenContent { color: green; font-style: italic; }
 		.noContentBorder { border: none; }
 		.noContentBackground { background: none; }

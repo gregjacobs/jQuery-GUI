@@ -6,43 +6,87 @@ define( [
 	'gui/template/Template',
 	'gui/template/LoDash',
 	'jquery-ui/position'  // jQuery UI's `position` plugin
-], 
-function( jQuery, _, Class, Template, LoDashTpl ) {
+], function( jQuery, _, Class, Template, LoDashTpl ) {
 	
 	/**
 	 * @class gui.Mask
-	 * @extends Object
 	 * 
-	 * Generalized class that can create a mask over any given element, and provides a simple interface
-	 * to show, hide, and add content to it.
+	 * Generalized Mask class that can create an overlay over any given element, effectively disabling it. It may also be
+	 * shown with a {@link #spinner} image, and an optional {@link #msg}.
+	 * 
+	 * The class provides an easy way to mask any HTMLElement or {@link gui.Component}, and provides a simple interface
+	 * to {@link #show}, {@link #hide}, and add content to it.
+	 * 
+	 * The only required configuration option is the {@link #target} configuration option. It is not required at instantiation
+	 * time, but must be at least provided using {@link #setTarget} before {@link #show} is called.
+	 * 
+	 * Example:
+	 * 
+	 *     @example
+	 *     require( [
+	 *         'jquery',
+	 *         'gui/Mask'
+	 *     ], function( jQuery, Mask ) {
+	 *         
+	 *         var $contentDiv = jQuery( '<div style="width: 200px; height: 200px; border: 1px solid #000;">Some Content</div>' )
+	 *             .appendTo( 'body' );
+	 *         
+	 *         var mask = new Mask( { target: $contentDiv, spinner: true, msg: "Loading..." } );
+	 *         
+	 *         // Links to show/hide the mask
+	 *         jQuery( '<a href="javascript:;">Show Mask</a>' ).click( function() { mask.show(); } ).appendTo( 'body' );
+	 *         jQuery( '<br />' ).appendTo( 'body' );
+	 *         jQuery( '<a href="javascript:;">Hide Mask</a>' ).click( function() { mask.hide(); } ).appendTo( 'body' );
+	 *         
+	 *     } );
 	 */
-	var Mask = Class.extend( Object, {
+	var Mask = Class.create( {
+
+		/**
+		 * @cfg {HTMLElement/jQuery/gui.Component} target (required)
+		 * 
+		 * The target of the Mask. This may be an HTMLElement, a jQuery wrapped set, of a {@link gui.Component}.
+		 * 
+		 * - In the case of a jQuery wrapped set, the set must only contain one element.
+		 * - In the case of a {@link gui.Component}, the Mask will mask over the Component's 
+		 *   {@link gui.Component#getMaskTarget mask target} element. It will also wait for the Component to be rendered
+		 *   if it has not been rendered yet.
+		 * 
+		 * Note: It is not required that this config be set at instantiation time, but it must be set before calling
+		 * {@link #show}. The {@link #setTarget) method may be used to set the Mask's target after instantiation time. 
+		 */
 		
 		/**
 		 * @cfg {Boolean} spinner
 		 * 
 		 * `true` to display a spinner image in the {@link #$contentEl} element when the mask is shown.
 		 */
-		spinner : false,
 		
 		/**
 		 * @cfg {String/HTMLElement/jQuery} msg
 		 * 
-		 * A message (or any content) to display in the center of the mask. If this is specified, the {@link #$contentEl} will be
-		 * made to look like an opaque box, so that text inside of it is easily readable. Defaults to an empty string, for no message.
+		 * A message (or any HTML content) to display in the content area of the mask. If this is specified, the {@link #$contentEl} 
+		 * will be made to look like an opaque box, so that text inside of it is easily readable. Defaults to an empty string, for 
+		 * no message.
 		 */
 		msg : "",
 		
 		/**
 		 * @cfg {String} overlayCls
 		 * 
-		 * Any additional space-delimited CSS class(es) to add to the Mask's {@Link #$overlayEl overlay element}.
+		 * Any additional space-delimited CSS class(es) to add to the Mask's {@Link #$overlayEl overlay element}. This is the element
+		 * that forms the mask itself. 
+		 * 
+		 * To style the Mask's {@link #spinner} or {@link #msg}, use {@link #contentCls}.
 		 */
 		
 		/**
 		 * @cfg {String} contentCls
 		 * 
-		 * Any additional space-delimited CSS class(es) to add to the Mask's {@Link #$contentEl content element}.
+		 * Any additional space-delimited CSS class(es) to add to the Mask's {@Link #$contentEl content element}. This is the element
+		 * that holds the {@link #spinner} and {@link #msg}.
+		 * 
+		 * To style the Mask's overlay, use {@link #overlayCls}.
 		 */
 		
 		/**
@@ -50,9 +94,9 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 * 
 		 * Defines where the {@link #$contentEl content element} will be placed within the Mask. 
 		 * 
-		 * This config is an Object (map) which has two properties: `my` and `at`. These properties relate to the 'my' and 'at' configs
-		 * that are accepted by the jQuery UI Position utility (see: http://jqueryui.com/position/), and may take any Position utility
-		 * values.
+		 * This config is an Object (map) which must have two properties: `my` and `at`. These properties relate to the 'my' 
+		 * and 'at' configs that are accepted by the jQuery UI Position utility (see: http://jqueryui.com/position/), and may take 
+		 * any Position utility values.
 		 * 
 		 * For example:
 		 * 
@@ -62,7 +106,7 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 *     }
 		 * 
 		 * 
-		 * Defaults to:
+		 * Defaults to centering the content element within the mask, using the following config:
 		 * 
 		 *     {
 		 *         my: 'center center',
@@ -78,33 +122,25 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 * The template to use to create the Mask's elements.
 		 */
 		maskTpl : new LoDashTpl( [
-			'<div data-elem="gui-mask-overlay" class="gui-mask-overlay" />',
-			'<div data-elem="gui-mask-content" class="gui-mask-content">',
+			'<div data-elem="gui-mask-overlay" class="gui-mask-overlay<%= ( overlayCls ? " " + overlayCls : "" ) %>" />',
+			'<div data-elem="gui-mask-content" class="gui-mask-content<%= ( spinner ? " " + spinnerVisibleCls : "" ) %><%= ( msg ? " " + msgVisibleCls : "" ) %><%= ( contentCls ? " " + contentCls : "" ) %>">',
 				'<span class="gui-mask-spinner" />',
-				'<div data-elem="gui-mask-msg" class="gui-mask-msg" />',
+				'<div data-elem="gui-mask-msg" class="gui-mask-msg"><%= msg %></div>',
 			'</div>'
 		] ),
 		
 		/**
 		 * @protected
-		 * @property {jQuery} $targetEl
-		 * 
-		 * The element to mask, wrapped in a jQuery wrapped set.
-		 */
-		
-		/**
-		 * @protected
 		 * @property {Boolean} rendered
 		 * 
-		 * Will be true once the Mask's elements have been rendered ({@link #initMaskElements} has been run). Initially false.
+		 * Will be true once the Mask's elements have been rendered ({@link #renderMaskElements} has been run). Initially false.
 		 */
-		rendered : false,
 		
 		/**
 		 * @protected
 		 * @property {jQuery} $overlayEl
 		 * 
-		 * The masking element itself. This is lazily created in the {@link #initMaskElements} method when the mask is to
+		 * The masking element itself. This is lazily created in the {@link #renderMaskElements} method when the mask is to
 		 * be shown.
 		 */
 		
@@ -113,7 +149,7 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 * @property {jQuery} $contentEl
 		 * 
 		 * The content element that sits on top of the Mask to display the {@link #msg} and/or {@link #spinner}. This is lazily 
-		 * created in the {@link #initMaskElements} method when the mask is to be shown.
+		 * created in the {@link #renderMaskElements} method when the mask is to be shown.
 		 */
 		
 		/**
@@ -145,117 +181,166 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		 * 
 		 * Stores if the mask is currently being shown or not (visible). Retrieve with {@link #isVisible}.
 		 */
-		visible : false,
+		
+		/**
+		 * @protected
+		 * @property {Boolean} elementsAttached
+		 * 
+		 * Flag which is set `true` while the elements of the Mask ({@link #$overlayEl} and {@link #$contentEl}) are attached
+		 * to the {@link #target} element.
+		 */
+		
+		/**
+		 * @protected
+		 * @property {Number} repositionIntervalId
+		 * 
+		 * The ID of the interval which constantly repositions the mask and its content element over the {@link #target}.
+		 * This is done in case the {@link #target} changes size at any point.
+		 */
 		
 		
 		/**
 		 * @constructor
-		 * @param {HTMLElement/jQuery} targetEl The element or jQuery wrapped set that the mask is to mask over. This
-		 *   may only be one element in the case of a jQuery wrapped set. 
-		 * @param {Object} config Any additional configuration options for the Mask, specified in an object (hash).
+		 * @param {Object} [cfg] The configuration options for the Mask, specified in an Object (map).
 		 */
-		constructor : function( targetEl, config ) {
-			if( _.isElement( targetEl ) ) {
-				this.$targetEl = jQuery( targetEl );
+		constructor : function( cfg ) {
+			_.assign( this, cfg );
+			
+			if( this.target ) {
+				var target = this.target;
+				delete this.target;  // so setTarget() won't think there's a "previous" target
 				
-			} else if( targetEl instanceof jQuery ) {
-				// <debug>
-				if( targetEl.length !== 1 ) {
-					throw new Error( "If the 'targetEl' argument to the gui.Mask constructor is a jQuery wrapped set, it must contain exactly one element." );
-				}
-				// </debug>
-				this.$targetEl = targetEl;
+				this.setTarget( target );
+			}
+		},
+		
+		
+		/**
+		 * Resets the configuration of the mask with a brand new configuration object. All configuration options (with the exception
+		 * of {@link #target}) will be either replaced with the new configuration options, or restored to their defaults. 
+		 * 
+		 * A new {@link #target} may still be provided to this method, which will in turn change the target for the Mask. This 
+		 * configuration option is simply left as-is if not provided.
+		 * 
+		 * @param {Object} cfg An Object (map) of the new configuration options for the Mask. See the "config options" section of 
+		 *   the docs for accepted properties. 
+		 */
+		resetConfig : function( cfg ) {
+			// First, remove any previous CSS classes from the elements (if they are rendered), and add the new ones (if any)
+			if( this.rendered ) {
+				this.$overlayEl.removeClass( this.overlayCls ).addClass( cfg.overlayCls );
+				this.$contentEl.removeClass( this.contentCls ).addClass( cfg.contentCls );
+			}
+			this.overlayCls = cfg.overlayCls;
+			this.contentCls = cfg.contentCls;
+			
+			this.setSpinner( cfg.spinner || false );
+			this.setMsg( cfg.msg || "" );
+			if( cfg.target ) 
+				this.setTarget( cfg.target );
+			
+			this.contentPosition = cfg.contentPosition;
+			this.positionContentEl();
+		},
+		
+		
+		/**
+		 * Sets (or moves) the {@link #target} for the Mask.
+		 * 
+		 * @param {HTMLElement/jQuery/gui.Component} target The new target of the Mask. See {@link #target} for details.
+		 */
+		setTarget : function( target ) {
+			var currentlyVisible = this.isVisible();
+			if( currentlyVisible ) this.hide();  // hide, to restore the old Mask target element's state
+			
+			var prevTarget = this.target;
+			if( prevTarget && prevTarget.isGuiComponent ) {
+				this.unsubscribeToRender( prevTarget );
+			}
+			
+			this.target = this.normalizeTarget( target );
+			
+			if( target.isGuiComponent ) {
+				this.subscribeToRender( target );
+			}
+			
+			if( currentlyVisible ) this.show();  // now show again using the new `this.target` reference
+		},
+		
+		
+		/**
+		 * Normalizes the provided `target` (for the {@link #target} config) to a jQuery wrapped set if it was an HTML element.
+		 * 
+		 * @protected
+		 * @param {HTMLElement/jQuery/gui.Component} target
+		 * @return {jQuery/gui.Component}
+		 */
+		normalizeTarget : function( target ) {
+			if( _.isElement( target ) ) {
+				return jQuery( target );
 			
 			// <debug>
-			} else {
-				throw new Error( "gui.Mask requires the first argument to its constructor to be an HTMLElement, or a jQuery wrapped set" );
+			} else if( target instanceof jQuery && target.length !== 1 ) {
+				throw new Error( "`target` jQuery object must hold exactly one element" );
 			// </debug>
 			}
 			
-			if( !( this.maskTpl instanceof Template ) )
-				this.maskTpl = new LoDashTpl( this.maskTpl );
-			
-			// Apply any additional configuration properties onto this object
-			this.updateConfig( config );
+			return target;
 		},
 		
 		
-		
 		/**
-		 * Updates the configuration of the mask. Accepts an object with the configuration options for this class,
-		 * and updates the Mask accordingly.  Note that all configuration options that are not provided in the
-		 * `config` argument will be reset to their defaults. 
+		 * Subscribes to the {@link gui.Component#event-render render} event of the given `component`. 
 		 * 
-		 * @param {Object} config The new configuration options for the Mask. See the "config options" section of the docs for details. 
+		 * This is used when an unrendered {@link gui.Component} is used as the Mask's {@link #target}.
+		 * 
+		 * @private
+		 * @param {gui.Component} component
 		 */
-		updateConfig : function( config ) {
-			// First, remove any previous CSS classes from the elements (if they are rendered)
-			if( this.rendered ) {
-				if( this.overlayCls ) this.$overlayEl.removeClass( this.overlayCls );
-				if( this.contentCls ) this.$contentEl.removeClass( this.contentCls );
-			}
-			
-			// Remove any previously set configuration options (unshadows defaults on prototype)
-			delete this.spinner;
-			delete this.msg;
-			delete this.overlayCls;
-			delete this.contentCls;
-			delete this.contentPosition;
-			
-			// Apply the new config
-			_.assign( this, config );
-			
-			// If the mask is already rendered, update the elements accordingly
-			if( this.rendered ) {
-				this.updateMaskElements();
-			}
+		subscribeToRender : function( component ) {
+			component.on( 'render', this.onTargetComponentRender, this );
 		},
 		
 		
 		/**
-		 * Creates the masking elements (the {@link #$overlayEl} and {@link #$contentEl}) if they have not yet been created. When creating
-		 * the elements, they are appended to the target element (note that they are absolutely positioned so they do not affect document flow).
+		 * Unsubscribes from the {@link gui.Component#event-render render} event of the given `component`. 
+		 * 
+		 * This is used when an unrendered {@link gui.Component} is used as the Mask's {@link #target}.
+		 * 
+		 * @private
+		 * @param {gui.Component} component
+		 */
+		unsubscribeToRender : function( component ) {
+			component.un( 'render', this.onTargetComponentRender, this );
+		},
+		
+		
+		/**
+		 * Handles a {@link #target} of a {@link gui.Component} becoming rendered. The Mask is not actually rendered 
+		 * and shown until the Component has become rendered (i.e. created its elements).
 		 * 
 		 * @protected
+		 * @param {gui.Component} component
 		 */
-		initMaskElements : function() {
-			// Create the mask elements if they do not yet exist, and append it to the target element
-			if( !this.rendered ) {
-				var $targetEl = this.$targetEl;
-				$targetEl.append( this.maskTpl.apply( {} ) );  // no data for the template (at this point in time)
+		onTargetComponentRender : function( component ) {
+			if( this.isVisible() ) {
+				this.unsubscribeToRender( component );  // remove event listener since no longer needed
 				
-				var onMaskClick = _.bind( this.onMaskClick, this );
-				this.$overlayEl = $targetEl.find( '[data-elem="gui-mask-overlay"]' )
-					.on( 'click', onMaskClick );
-				this.$contentEl = $targetEl.find( '[data-elem="gui-mask-content"]' )
-					.on( 'click', onMaskClick );
-				this.$msgEl = $targetEl.find( '[data-elem="gui-mask-msg"]' );
-				
-				this.rendered = true;
-				this.updateMaskElements();
+				this.show();  // calling this now will show the Mask due to the `deferredShow` property being set to true
 			}
 		},
 		
 		
 		/**
-		 * Updates the mask elements with the current values of the configuration options (which may be set after instantiation time
-		 * with the {@link #updateConfig} method.
+		 * Sets the {@link #spinner spinner's} visibility.
 		 * 
-		 * @protected
+		 * @param {Boolean} visible `true` to make the spinner visible, `false` to hide it.
 		 */
-		updateMaskElements : function() {
+		setSpinner : function( visible ) {
+			this.spinner = visible;
+			
 			if( this.rendered ) {
-				// Update CSS classes if any were provided
-				if( this.overlayCls ) this.$overlayEl.addClass( this.overlayCls );
-				if( this.contentCls ) this.$contentEl.addClass( this.contentCls );
-				
-				// Update the spinner's visibility based on the `spinner` config
-				this.$contentEl.toggleClass( this.spinnerVisibleCls, this.spinner );
-				
-				// Update the message
-				this.setMsg( this.msg );
-				
-				this.repositionContentEl();
+				this.$contentEl.toggleClass( this.spinnerVisibleCls, visible );
 			}
 		},
 		
@@ -275,6 +360,309 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		},
 		
 		
+		// -----------------------------------
+		
+		
+		/**
+		 * Initializes (creates) the masking elements (the {@link #$overlayEl} and {@link #$contentEl}), and appends them to the
+		 * {@link #target} element.
+		 * 
+		 * Note that these elements are absolutely positioned so they do not affect document flow.
+		 * 
+		 * @protected
+		 */
+		renderMaskElements : function() {
+			if( !this.rendered ) {
+				this.attachElementsToTargetEl();
+				
+				var $targetEl = this.getTargetEl(),
+				    onMaskClick = _.bind( this.onMaskClick, this );
+				
+				this.$overlayEl = $targetEl.find( '[data-elem="gui-mask-overlay"]' ).on( 'click', onMaskClick );
+				this.$contentEl = $targetEl.find( '[data-elem="gui-mask-content"]' ).on( 'click', onMaskClick );
+				this.$msgEl = $targetEl.find( '[data-elem="gui-mask-msg"]' );
+				
+				this.rendered = true;
+			}
+		},
+		
+		
+		/**
+		 * Determines if Mask has been rendered.
+		 * 
+		 * The Mask will only be rendered once {@link #show shown}. If {@link #target} is a {@link gui.Component}, the
+		 * Component must also be {@link gui.Component#isRendered rendered}.
+		 */
+		isRendered : function() {
+			return !!this.rendered;
+		},
+		
+		
+		/**
+		 * Retrieves the target element for the Mask.
+		 * 
+		 * @protected
+		 * @return {jQuery}
+		 */
+		getTargetEl : function() {
+			var target = this.target;
+			
+			return ( target.isGuiComponent ) ? target.getMaskTarget() : target;
+		},
+		
+		
+		// -------------------------------------
+		
+		
+		/**
+		 * Shows the mask over the target element.
+		 * 
+		 * Note that if the mask is already visible, and its height needs to be recalculated because the underlying element's 
+		 * size has changed, this method may be called again to redraw the mask.
+		 */
+		show : function() {
+			// Only show the Mask if it is not already shown (or if it's show routine was deferred because of an unrendered target gui.Component)
+			if( !this.isVisible() || this.deferredShow ) {
+				// <debug>
+				if( !this.target ) throw new Error( "Cannot show Mask, no `target` specified" );
+				// </debug>
+				
+				this.visible = true;
+				
+				// If the Mask can't be shown because the `target` is a gui.Component that is not yet rendered, then defer until
+				// the Component is rendered.
+				if( !this.canShow() ) {
+					this.deferredShow = true;
+					return;
+				} else {
+					delete this.deferredShow;  // we're showing the mask, no longer deferred
+				}
+				
+				if( !this.rendered ) this.renderMaskElements();  // Lazily render the Mask's elements if not yet rendered
+				
+				this.prepareTargetElForMask();
+				this.attachElementsToTargetEl();  // effectively "shows" the Mask's elements, since they are detached when the Mask is hidden
+				this.positionAndSizeElements();
+				
+				// Set up an interval to continually make sure that the Mask's elements are always sized and positioned to be in
+				// sync with the `target` element.
+				this.repositionIntervalId = setInterval( _.bind( this.positionAndSizeElements, this ), 100 );
+			}
+		},
+		
+		
+		/**
+		 * Determines if the Mask can be shown. 
+		 * 
+		 * The Mask can be shown if:
+		 * 
+		 * 1. The {@link #target} is an element (normalized to a jQuery wrapped set), or 
+		 * 2. The {@link #target} is a {@link gui.Component} that is {@link gui.Component#isRendered *rendered*}.
+		 * 
+		 * This method will return `false` if the {@link #target} is a {@link gui.Component} that is not yet rendered.
+		 * 
+		 * @protected
+		 * @return {Boolean} `true` if the Mask can be shown, `false` otherwise.
+		 */
+		canShow : function() {
+			var target = this.target;
+			return ( target instanceof jQuery ) || ( target && target.isGuiComponent && target.isRendered() ); 
+		},
+		
+		
+		/**
+		 * Appends the Mask's elements (the {@link #$overlayEl and the {@link #$contentEl}) to the {@link #target target's} 
+		 * element.
+		 * 
+		 * If the Mask's elements have not yet been created, they will be created lazily by executing the {@link #maskTpl}
+		 * the first time this method is run.
+		 * 
+		 * @protected
+		 */
+		attachElementsToTargetEl : function() {
+			var $targetEl = this.getTargetEl();
+			
+			if( !this.rendered ) {  // Not yet rendered, run the template to append the elements for the first time
+				var tplData = this.getMaskTplData();
+				$targetEl.append( this.maskTpl.apply( tplData ) );
+				
+			} else {
+				this.$overlayEl.appendTo( $targetEl );
+				this.$contentEl.appendTo( $targetEl );
+			}
+			this.elementsAttached = true;
+		},
+		
+		
+		/**
+		 * Retrieves the data that will be used by the {@link #maskTpl} when the template is executed.
+		 * 
+		 * @protected
+		 */
+		getMaskTplData : function() {
+			return {
+				spinner : this.spinner,
+				spinnerVisibleCls : this.spinnerVisibleCls,
+				
+				msg : this.msg,
+				msgVisibleCls : this.msgVisibleCls,
+				
+				overlayCls : this.overlayCls,
+				contentCls : this.contentCls
+			};
+		},
+		
+		
+		/**
+		 * Prepares the {@link #target} for showing the Mask by giving it a positioning context if it doesn't yet have one,
+		 * and removing its scrollbars.
+		 * 
+		 * @protected
+		 */
+		prepareTargetElForMask : function() {
+			var $targetEl = this.getTargetEl();
+			
+			// First, add the gui-masked css class to the target element, which removes the target element's scroll bars
+			$targetEl.addClass( 'gui-masked' );
+			
+			// Next, give the target element a relative positioning context if it currently does not have one (i.e. it's static), 
+			// and the target element is not the document body (which already has a positioning context)
+			if( $targetEl.css( 'position' ) === 'static' && !$targetEl.is( 'body' ) ) {
+				$targetEl.addClass( 'gui-masked-relative' );
+			}
+		},
+		
+		
+		/**
+		 * Positions and sizes the Mask's elements. This method is called continually while the Mask is {@link #show shown} in order
+		 * to always account for the possibility of the {@link #target} element changing size.
+		 * 
+		 * @protected
+		 */
+		positionAndSizeElements : function() {
+			this.sizeOverlayEl();
+			this.positionContentEl();
+		},
+		
+		
+		/**
+		 * Sizes the {@link #$overlayEl} to be the height of the {@link #target} element.
+		 * 
+		 * Note: Old IE will not always expand full height automatically if it has a CSS-driven 100% height. Just doing this 
+		 * calculation for all browsers for simplicity for now, instead of a hybrid solution.
+		 * 
+		 * @protected
+		 */
+		sizeOverlayEl : function() {
+			this.$overlayEl.height( this.getTargetEl().outerHeight() );
+		},
+		
+		
+		/**
+		 * Repositions the {@link #$contentEl} to be at the {@link #contentPosition}.
+		 * 
+		 * @protected
+		 */
+		positionContentEl : function() {
+			if( this.isContentElVisible() ) {
+				var contentPosition = this.contentPosition || {},
+				    $targetEl = this.getTargetEl();
+				
+				this.$contentEl.position( {  // use jQuery UI positioning utility to position the content element
+					my: contentPosition.my || 'center center',
+					at: contentPosition.at || 'center center',
+					of: $targetEl,
+					collision: 'none'  // if clients want to move their content element outside of the Mask area, they are welcome to do so
+				} );
+			}
+		},
+		
+		
+		/**
+		 * Used internally by the Mask, determines if the {@link #$contentEl} is visible.
+		 * 
+		 * @protected
+		 * @return {Boolean} `true` if the {@link #$contentEl} is visible, `false` otherwise.
+		 */
+		isContentElVisible : function() {
+			return ( !!this.spinner || !!this.msg );  // it's visible if the Mask has either a spinner, or a message
+		},
+		
+		
+		/**
+		 * Hides the mask.
+		 */
+		hide : function() {
+			if( this.isVisible() ) {  // Should only hide if the mask is currently visible.
+				
+				// If the Mask was being deferred from showing, then we do not need to perform these actions since show() never fully executed
+				if( !this.deferredShow ) {
+					clearInterval( this.repositionIntervalId );
+					
+					this.detachElementsFromTargetEl();  // effectively hides the Mask's elements
+					this.restoreTargetEl();             // restore scrollbars (if any) and remove the Mask-given positioning context
+				}
+					
+				this.visible = false;
+			}
+		},
+		
+		
+		/**
+		 * Detaches the Mask's elements (the {@link #$overlayEl and the {@link #$contentEl}) from the {@link #target target's}
+		 * element. This effectively hides the Mask's elements.
+		 * 
+		 * @protected
+		 */
+		detachElementsFromTargetEl : function() {
+			this.$overlayEl.detach();
+			this.$contentEl.detach();
+			
+			this.elementsAttached = false;
+		},
+		
+		
+		/**
+		 * Restores the {@link #target} for hiding the Mask by removing its Mask-given positioning context (if it was given one),
+		 * and restoring its scrollbars.
+		 * 
+		 * @protected
+		 */
+		restoreTargetEl : function() {
+			this.getTargetEl().removeClass( 'gui-masked gui-masked-relative' );
+		},
+		
+		
+		/**
+		 * Determines if the Mask is currently shown (visible).
+		 * 
+		 * @return {Boolean} `true` if the Mask is currently shown (visible), `false` otherwise.
+		 */
+		isVisible : function() {
+			return !!this.visible;
+		},
+		
+		
+		/**
+		 * Determines if the Mask's elements are attached to the {@link #target} element. 
+		 * 
+		 * It is possible that the Mask is considered {@link #isVisible visible}, but its elements have not yet been attached because the 
+		 * {@link #target} is an unrendered {@link gui.Component}. It is still considered visible in this case because as soon as the
+		 * Component is {@link gui.Component#event-render rendered}, the Mask will be shown.
+		 * 
+		 * @return {Boolean} `true` if the Mask is currently visible, and the Mask's elements are attached to the {@link #target} element. 
+		 *   Returns `false` otherwise.
+		 */
+		isAttached : function() {
+			return this.elementsAttached;
+		},
+		
+		
+		// -------------------------------------
+		
+		// Event Handlers
+		
+		
 		/**
 		 * Handles a click to the Mask's elements by simply stopping event propagation. The mask should swallow any click events 
 		 * to it, to prevent any behavior from the bubbling of the event.
@@ -291,127 +679,17 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 		
 		
 		/**
-		 * Shows the mask over the target element.
-		 * 
-		 * Note that if the mask is already visible, and its height needs to be recalculated because the underlying element's 
-		 * size has changed, this method may be called again to redraw the mask.
-		 */
-		show : function() {
-			if( !this.isVisible() ) {
-				// First, make sure the masking elements have been created (lazily created upon showing the mask, not in the constructor)
-				this.initMaskElements();
-				
-				
-				var $targetEl = this.$targetEl,
-				    $overlayEl = this.$overlayEl,
-				    $contentEl = this.$contentEl;
-				
-				// First, add the gui-masked css class to the target element, which removes the target element's scroll bars
-				$targetEl.addClass( 'gui-masked' );
-				
-				// Next, give the target element a relative positioning context if it currently does not have one (i.e. it 
-				// has "position: static"), and the target element not the document body (the document body already has a positioning context)
-				if( $targetEl.css( 'position' ) === 'static' && !$targetEl.is( 'body' ) ) {
-					$targetEl.addClass( 'gui-masked-relative' );
-				}
-				
-				
-				// Now show the masking element. Make sure it is appended if it has been detached.
-				$overlayEl.appendTo( $targetEl );
-				
-				// IE will not expand full height automatically if it has auto height. Just doing this calc for all browsers for now,
-				// instead of worrying about browser detection (determining which versions of IE are affected) or attempting 
-				// a feature detection for this.
-				$overlayEl.height( $targetEl.outerHeight() );
-				
-				
-				// Position the content element ($contentEl) in the center of the $targetEl, and set it to continually reposition it on an interval.
-				// The interval is for when elements on the page may resize themselves, we need to adjust the content element's position. The interval
-				// will be cleared once the mask is hidden.
-				this.$contentEl.appendTo( $targetEl );  // Make sure it is appended if it has been detached.
-				this.repositionContentEl();
-				
-				var me = this;  // for closure
-				var repositionIntervalId = setInterval( function() {
-					if( me.isVisible() ) {
-						$overlayEl.height( $targetEl.outerHeight() );  // continually make sure that the mask's overlay height is correct, in case the content changes
-						me.repositionContentEl();
-					} else {
-						clearInterval( repositionIntervalId );  // When no longer shown, clear the interval
-					}
-				}, 100 );
-				
-				this.visible = true;
-			}
-		},
-		
-		
-		/**
-		 * Repositions the {@link #$contentEl} to be in the center of the {@link #$targetEl}.
-		 * 
-		 * @protected
-		 */
-		repositionContentEl : function() {
-			// using jQuery UI positioning utility to center the content element
-			if( this.isContentElVisible() ) {
-				var contentPosition = this.contentPosition || {};
-				
-				this.$contentEl.position( {
-					my: contentPosition.my || 'center center',
-					at: contentPosition.at || 'center center',
-					of: this.$targetEl
-				} );
-			}
-		},
-		
-		
-		/**
-		 * Hides the mask.
-		 */
-		hide : function() {
-			// Should only hide if the mask is currently visible.
-			if( this.isVisible() ) {
-				// Hide the mask and the content element (if it exists), and restore the target element 
-				// to its original state (i.e. scrollbars allowed, and no positioning context if it didn't have one)
-				this.$overlayEl.detach();
-				this.$contentEl.detach();
-				this.$targetEl.removeClass( 'gui-masked' ).removeClass( 'gui-masked-relative' );
-				
-				this.visible = false;
-			}
-		},
-		
-		
-		/**
-		 * Determines if the Mask is currently shown (visible).
-		 * 
-		 * @return {Boolean} `true` if the mask is currently shown (visible), `false` otherwise.
-		 */
-		isVisible : function() {
-			return this.visible;
-		},
-		
-		
-		/**
-		 * Determines if the {@link #$contentEl} is visible. This is used internally.
-		 * 
-		 * @protected
-		 * @return {Boolean} `true` if the {@link #$contentEl} is visible, `false` otherwise.
-		 */
-		isContentElVisible : function() {
-			return ( this.spinner || !!this.msg );
-		},
-		
-		
-		// -------------------------------------
-		
-		
-		/**
-		 * Destroys the mask by cleaning up its elements.
+		 * Destroys the Mask by cleaning up its elements.
 		 */
 		destroy : function() {
-			// Make sure the mask has been hidden, to restore the target element to its original state
+			// Make sure the mask has been hidden, to restore the target element to its original state, and clear
+			// the reposition interval
 			this.hide();
+			
+			// Make sure that if the `target` is a gui.Component, that we unsubscribe from any 'render' listener we added
+			if( this.target && this.target.isGuiComponent ) {
+				this.unsubscribeToRender( this.target );
+			}
 			
 			if( this.rendered ) {
 				this.$overlayEl.remove();
@@ -422,4 +700,5 @@ function( jQuery, _, Class, Template, LoDashTpl ) {
 	} );
 	
 	return Mask;
+	
 } );
