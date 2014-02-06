@@ -11,7 +11,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 9000;
+  z-index: 500;
   width: 100%;
   height: 100%;
   zoom: 1;
@@ -22,7 +22,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 9001;
+  z-index: 501;
   zoom: 1;
   display: none;
 }

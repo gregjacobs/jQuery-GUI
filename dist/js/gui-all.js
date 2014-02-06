@@ -1,6 +1,6 @@
 /*!
  * jQuery-GUI
- * Version 0.7.1
+ * Version 0.8.1
  *
  * Copyright(c) 2013 Gregory Jacobs.
  * MIT Licensed. http://www.opensource.org/licenses/mit-license.php
@@ -796,6 +796,7 @@ define('gui/Mask', [
 		 * 
 		 * `true` to display a spinner image in the {@link #$contentEl} element when the mask is shown.
 		 */
+		spinner : false,
 		
 		/**
 		 * @cfg {String/HTMLElement/jQuery} msg
@@ -964,10 +965,10 @@ define('gui/Mask', [
 		resetConfig : function( cfg ) {
 			cfg = cfg || {};
 			
-			// First, set the new content position. This will be used in subsequent calls, and 
-			this.contentPosition = cfg.contentPosition;  // NOTE: Set the contentPosition before 
+			// First, set the new content position. This will be used in calls to setSpinner() and setMsg() if changes are made
+			// to those configs, which may make it more performant to set first.
+			this.contentPosition = cfg.contentPosition; 
 			
-			// New Target, move the Mask
 			if( cfg.target ) this.setTarget( cfg.target );
 			
 			// Remove any previous CSS classes from the elements (if they are rendered), and add the new ones (if any)
@@ -981,7 +982,9 @@ define('gui/Mask', [
 			this.setSpinner( cfg.spinner || false );
 			this.setMsg( cfg.msg || "" );
 			
-			// if( this.isAttached() ) this.positionContentEl();  -- Note: no need for this here: handled by setSpinner() and setMsg()
+			// Note: must run positionContentEl() in case there was a change to only the `contentPosition` config.
+			// Otherwise, this would have been called by setSpinner() or setMsg() if changes were made to the spinner/msg state.
+			if( this.isAttached() ) this.positionContentEl();
 		},
 		
 		
@@ -1078,13 +1081,16 @@ define('gui/Mask', [
 		 * @param {Boolean} visible `true` to make the spinner visible, `false` to hide it.
 		 */
 		setSpinner : function( visible ) {
+			if( this.spinner === visible ) return;  // return out if already in the given `visible` state
+			
 			this.spinner = visible;
 			
 			if( this.rendered ) {
 				this.$contentEl.toggleClass( this.spinnerVisibleCls, visible );
 				
-				if( this.isAttached() ) 
-					this.positionContentEl();  // the Mask's elements are currently attached and shown, position
+				// Update the position of the content element to account for the change in spinner visibility
+				if( this.isAttached() )
+					this.positionContentEl();  
 			}
 		},
 		
@@ -1095,12 +1101,15 @@ define('gui/Mask', [
 		 * @param {String} msg The message. Accepts HTML. To remove the message, provide an empty string.
 		 */
 		setMsg : function( msg ) {
+			if( this.msg === msg ) return;  // return out if we already have the given `msg`
+			
 			this.msg = msg;
 			
 			if( this.rendered ) {
 				this.$contentEl.toggleClass( this.msgVisibleCls, !!msg );
 				this.$msgEl.html( msg );
 				
+				// Update the position of the content element to account for a possible change in message size
 				if( this.isAttached() )
 					this.positionContentEl();  // the Mask's elements are currently attached and shown, position
 			}
@@ -1332,7 +1341,7 @@ define('gui/Mask', [
 		 * @return {Boolean} `true` if the {@link #$contentEl} is visible, `false` otherwise.
 		 */
 		isContentElVisible : function() {
-			return ( !!this.spinner || !!this.msg );  // it's visible if the Mask has either a spinner, or a message
+			return ( this.spinner || !!this.msg );  // it's visible if the Mask has either a spinner, or a message
 		},
 		
 		
