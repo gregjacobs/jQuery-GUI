@@ -282,6 +282,103 @@ define( [
 		
 		describe( 'resetConfig()', function() {
 			
+			it( "should remove all configs (except `target`) from an unshown Mask when not providing any argument", function() {
+				mask = new Mask( {
+					target: $el1,
+					spinner: true,
+					msg: "Test Msg",
+					overlayCls: "overlayCls1 overlayCls2",
+					contentCls: "contentCls1 contentCls2",
+					contentPosition: { my: 'left+5 top+10', at: 'left top' }
+				} );
+				
+				mask.resetConfig();
+				
+				expect( mask.target ).toBe( $el1 );  // this is the only one which should not have been reset
+				expect( mask.spinner ).toBe( false );
+				expect( mask.msg ).toBe( "" );
+				expect( mask.overlayCls ).toBeUndefined();
+				expect( mask.overlayCls ).toBeUndefined();
+				expect( mask.contentPosition ).toBeUndefined();
+			} );
+			
+			
+			it( "should remove all configs (except `target`) from a shown Mask when not providing any argument", function() {
+				mask = new Mask( {
+					target: $el1,
+					spinner: true,
+					msg: "Test Msg",
+					overlayCls: "overlayCls1 overlayCls2",
+					contentCls: "contentCls1 contentCls2",
+					contentPosition: { my: 'left+5 top+10', at: 'left top' }
+				} );
+				mask.show();
+				
+				mask.resetConfig();
+				
+				expect( mask ).toBeAttachedTo( $el1 );
+				expect( mask ).not.toHaveSpinnerVisible();
+				expect( mask ).not.toHaveMsgVisible();
+				expect( jQuery.trim( mask.$overlayEl[ 0 ].className ) ).toBe( 'gui-mask-overlay' );  // the default CSS class
+				expect( jQuery.trim( mask.$contentEl[ 0 ].className ) ).toBe( 'gui-mask-content' );  // the default CSS class
+				
+				// TODO: check actual 'centered' position within the mask
+				expect( mask.contentPosition ).toBeUndefined();
+			} );
+			
+			
+			it( "should set all configs on an unshown Mask", function() {
+				mask = new Mask();
+				
+				mask.resetConfig( {
+					target: $el1,
+					spinner: true,
+					msg: "Test Msg",
+					overlayCls: "overlayCls1 overlayCls2",
+					contentCls: "contentCls1 contentCls2",
+					contentPosition: { my: 'left+5 top+10', at: 'left top' }
+				} );
+				
+				expect( mask.target ).toBe( $el1 );
+				expect( mask.spinner ).toBe( true );
+				expect( mask.msg ).toBe( "Test Msg" );
+				expect( mask.overlayCls ).toBe( "overlayCls1 overlayCls2" );
+				expect( mask.contentCls ).toBe( "contentCls1 contentCls2" );
+				expect( mask.contentPosition ).toEqual( { my: 'left+5 top+10', at: 'left top' } );
+			} );
+			
+			
+			it( "should set all configs on a shown Mask", function() {
+				mask = new Mask( { target: $el1 } );
+				mask.show();
+				
+				mask.resetConfig( {
+					target: $el2,
+					spinner: true,
+					msg: "Test Msg",
+					overlayCls: "overlayCls1 overlayCls2",
+					contentCls: "contentCls1 contentCls2",
+					contentPosition: { my: 'left+5 top+10', at: 'left top' }
+				} );
+				
+				expect( mask ).toBeAttachedTo( $el2 );
+				expect( mask ).toHaveSpinnerVisible();
+				expect( mask ).toHaveMsgVisible();
+				
+				expect( mask.$overlayEl.hasClass( 'gui-mask-overlay' ) ).toBe( true );  // the default CSS class
+				expect( mask.$overlayEl.hasClass( 'overlayCls1' ) ).toBe( true );
+				expect( mask.$overlayEl.hasClass( 'overlayCls2' ) ).toBe( true );
+				
+				expect( mask.$contentEl.hasClass( 'gui-mask-content' ) ).toBe( true );  // the default CSS class
+				expect( mask.$contentEl.hasClass( 'contentCls1' ) ).toBe( true );
+				expect( mask.$contentEl.hasClass( 'contentCls2' ) ).toBe( true );
+				
+				var position = mask.$contentEl.position();
+				expect( position.left ).toBe( 5 );
+				expect( position.top ).toBe( 10 );
+			} );
+			
+			
 			it( "should remove any old `overlayCls` cfg, and apply a new one provided in the config", function() {
 				mask = new Mask( { target: $el1, overlayCls: 'oldCls' } );
 				mask.show();

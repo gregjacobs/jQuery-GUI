@@ -61,6 +61,7 @@ define( [
 		 * 
 		 * `true` to display a spinner image in the {@link #$contentEl} element when the mask is shown.
 		 */
+		spinner : false,
 		
 		/**
 		 * @cfg {String/HTMLElement/jQuery} msg
@@ -216,17 +217,26 @@ define( [
 		
 		
 		/**
-		 * Resets the configuration of the mask with a brand new configuration object. All configuration options (with the exception
-		 * of {@link #target}) will be either replaced with the new configuration options, or restored to their defaults. 
+		 * Resets the configuration of the mask, optionally with a brand new configuration object. All configuration options 
+		 * (with the exception of {@link #target}) will be either replaced with the new configuration options, or restored to 
+		 * their defaults. 
 		 * 
-		 * A new {@link #target} may still be provided to this method, which will in turn change the target for the Mask. This 
-		 * configuration option is simply left as-is if not provided.
+		 * A new {@link #target} may be provided to this method in the `newCfg` object however, which will in turn change the 
+		 * target for the Mask. This configuration option is simply left as-is if not provided.
 		 * 
-		 * @param {Object} cfg An Object (map) of the new configuration options for the Mask. See the "config options" section of 
-		 *   the docs for accepted properties. 
+		 * @param {Object} [newCfg] An Object (map) of the new configuration options for the Mask, if any. See the "config options" 
+		 *   section of the docs for accepted properties. 
 		 */
 		resetConfig : function( cfg ) {
-			// First, remove any previous CSS classes from the elements (if they are rendered), and add the new ones (if any)
+			cfg = cfg || {};
+			
+			// First, set the new content position. This will be used in calls to setSpinner() and setMsg() if changes are made
+			// to those configs, which may make it more performant to set first.
+			this.contentPosition = cfg.contentPosition; 
+			
+			if( cfg.target ) this.setTarget( cfg.target );
+			
+			// Remove any previous CSS classes from the elements (if they are rendered), and add the new ones (if any)
 			if( this.rendered ) {
 				this.$overlayEl.removeClass( this.overlayCls ).addClass( cfg.overlayCls );
 				this.$contentEl.removeClass( this.contentCls ).addClass( cfg.contentCls );
@@ -236,11 +246,10 @@ define( [
 			
 			this.setSpinner( cfg.spinner || false );
 			this.setMsg( cfg.msg || "" );
-			if( cfg.target ) 
-				this.setTarget( cfg.target );
 			
-			this.contentPosition = cfg.contentPosition;
-			this.positionContentEl();
+			// Note: must run positionContentEl() in case there was a change to only the `contentPosition` config.
+			// Otherwise, this would have been called by setSpinner() or setMsg() if changes were made to the spinner/msg state.
+			if( this.isAttached() ) this.positionContentEl();
 		},
 		
 		
@@ -337,10 +346,16 @@ define( [
 		 * @param {Boolean} visible `true` to make the spinner visible, `false` to hide it.
 		 */
 		setSpinner : function( visible ) {
+			if( this.spinner === visible ) return;  // return out if already in the given `visible` state
+			
 			this.spinner = visible;
 			
 			if( this.rendered ) {
 				this.$contentEl.toggleClass( this.spinnerVisibleCls, visible );
+				
+				// Update the position of the content element to account for the change in spinner visibility
+				if( this.isAttached() )
+					this.positionContentEl();  
 			}
 		},
 		
@@ -351,11 +366,17 @@ define( [
 		 * @param {String} msg The message. Accepts HTML. To remove the message, provide an empty string.
 		 */
 		setMsg : function( msg ) {
+			if( this.msg === msg ) return;  // return out if we already have the given `msg`
+			
 			this.msg = msg;
 			
 			if( this.rendered ) {
 				this.$contentEl.toggleClass( this.msgVisibleCls, !!msg );
 				this.$msgEl.html( msg );
+				
+				// Update the position of the content element to account for a possible change in message size
+				if( this.isAttached() )
+					this.positionContentEl();  // the Mask's elements are currently attached and shown, position
 			}
 		},
 		
@@ -585,7 +606,7 @@ define( [
 		 * @return {Boolean} `true` if the {@link #$contentEl} is visible, `false` otherwise.
 		 */
 		isContentElVisible : function() {
-			return ( !!this.spinner || !!this.msg );  // it's visible if the Mask has either a spinner, or a message
+			return ( this.spinner || !!this.msg );  // it's visible if the Mask has either a spinner, or a message
 		},
 		
 		
