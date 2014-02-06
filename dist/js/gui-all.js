@@ -951,17 +951,26 @@ define('gui/Mask', [
 		
 		
 		/**
-		 * Resets the configuration of the mask with a brand new configuration object. All configuration options (with the exception
-		 * of {@link #target}) will be either replaced with the new configuration options, or restored to their defaults. 
+		 * Resets the configuration of the mask, optionally with a brand new configuration object. All configuration options 
+		 * (with the exception of {@link #target}) will be either replaced with the new configuration options, or restored to 
+		 * their defaults. 
 		 * 
-		 * A new {@link #target} may still be provided to this method, which will in turn change the target for the Mask. This 
-		 * configuration option is simply left as-is if not provided.
+		 * A new {@link #target} may be provided to this method in the `newCfg` object however, which will in turn change the 
+		 * target for the Mask. This configuration option is simply left as-is if not provided.
 		 * 
-		 * @param {Object} cfg An Object (map) of the new configuration options for the Mask. See the "config options" section of 
-		 *   the docs for accepted properties. 
+		 * @param {Object} [newCfg] An Object (map) of the new configuration options for the Mask, if any. See the "config options" 
+		 *   section of the docs for accepted properties. 
 		 */
 		resetConfig : function( cfg ) {
-			// First, remove any previous CSS classes from the elements (if they are rendered), and add the new ones (if any)
+			cfg = cfg || {};
+			
+			// First, set the new content position. This will be used in subsequent calls, and 
+			this.contentPosition = cfg.contentPosition;  // NOTE: Set the contentPosition before 
+			
+			// New Target, move the Mask
+			if( cfg.target ) this.setTarget( cfg.target );
+			
+			// Remove any previous CSS classes from the elements (if they are rendered), and add the new ones (if any)
 			if( this.rendered ) {
 				this.$overlayEl.removeClass( this.overlayCls ).addClass( cfg.overlayCls );
 				this.$contentEl.removeClass( this.contentCls ).addClass( cfg.contentCls );
@@ -971,11 +980,8 @@ define('gui/Mask', [
 			
 			this.setSpinner( cfg.spinner || false );
 			this.setMsg( cfg.msg || "" );
-			if( cfg.target ) 
-				this.setTarget( cfg.target );
 			
-			this.contentPosition = cfg.contentPosition;
-			this.positionContentEl();
+			// if( this.isAttached() ) this.positionContentEl();  -- Note: no need for this here: handled by setSpinner() and setMsg()
 		},
 		
 		
@@ -1076,6 +1082,9 @@ define('gui/Mask', [
 			
 			if( this.rendered ) {
 				this.$contentEl.toggleClass( this.spinnerVisibleCls, visible );
+				
+				if( this.isAttached() ) 
+					this.positionContentEl();  // the Mask's elements are currently attached and shown, position
 			}
 		},
 		
@@ -1091,6 +1100,9 @@ define('gui/Mask', [
 			if( this.rendered ) {
 				this.$contentEl.toggleClass( this.msgVisibleCls, !!msg );
 				this.$msgEl.html( msg );
+				
+				if( this.isAttached() )
+					this.positionContentEl();  // the Mask's elements are currently attached and shown, position
 			}
 		},
 		
