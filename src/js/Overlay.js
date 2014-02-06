@@ -11,7 +11,7 @@ define( [
 	
 	/**
 	 * @class gui.Overlay
-	 * @extends gui.panel.Container
+	 * @extends gui.Container
 	 *
 	 * Base class for UI elements that "float" on top of the document (most notably: {@link gui.window.Window}).
 	 * This can be positioned by {@link #x} and {@link #y} values, or positioned relative to other elements using the 
