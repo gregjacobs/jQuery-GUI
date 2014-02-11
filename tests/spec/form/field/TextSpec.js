@@ -327,7 +327,7 @@ define( [
 			// Normally this test of focusing the field would scroll the body of the test harness to where the field is appended,
 			// so resetting the scroll value after the test.
 			afterEach( function() {
-				jQuery( 'body' ).scrollTop( 0 );
+				jQuery( 'html, body' ).scrollTop( 0 );  // 'html' for IE
 			} );
 			
 			
