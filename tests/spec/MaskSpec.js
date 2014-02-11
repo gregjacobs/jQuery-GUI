@@ -299,7 +299,7 @@ define( [
 				expect( mask.msg ).toBe( "" );
 				expect( mask.overlayCls ).toBeUndefined();
 				expect( mask.overlayCls ).toBeUndefined();
-				expect( mask.contentPosition ).toBeUndefined();
+				expect( mask.contentPosition ).toBe( null );
 			} );
 			
 			
@@ -323,7 +323,7 @@ define( [
 				expect( jQuery.trim( mask.$contentEl[ 0 ].className ) ).toBe( 'gui-mask-content' );  // the default CSS class
 				
 				// TODO: check actual 'centered' position within the mask
-				expect( mask.contentPosition ).toBeUndefined();
+				expect( mask.contentPosition ).toBe( null );
 			} );
 			
 			
@@ -747,6 +747,45 @@ define( [
 		} );
 		
 		
+		describe( 'setContentPosition()', function() {
+			
+			it( "should set the content position of an unrendered Mask", function() {
+				mask = new Mask( { target: $el1, msg: "Message" } );
+				mask.setContentPosition( { my: 'left top', at: 'left top' } );
+				
+				mask.show();
+				expect( mask.$contentEl.css( 'top' ) ).toBe( '0px' );
+				expect( mask.$contentEl.css( 'left' ) ).toBe( '0px' );
+			} );
+			
+			
+			it( "should set the content position of a rendered Mask", function() {
+				mask = new Mask( { target: $el1, msg: "Message", contentPosition: { my: 'left+20 top+20', at: 'left top' } } );
+				mask.show();
+				expect( mask.$contentEl.css( 'top' ) ).toBe( '20px' );   // initial condition
+				expect( mask.$contentEl.css( 'left' ) ).toBe( '20px' );  // initial condition
+				
+				mask.setContentPosition( { my: 'left+10 top+10', at: 'left top' } );
+				expect( mask.$contentEl.css( 'top' ) ).toBe( '10px' );
+				expect( mask.$contentEl.css( 'left' ) ).toBe( '10px' );
+			} );
+			
+			
+			it( "should set the content position of a rendered Mask multiple times", function() {
+				mask = new Mask( { target: $el1, msg: "Message", contentPosition: { my: 'left+20 top+20', at: 'left top' } } );
+				mask.show();
+				
+				mask.setContentPosition( { my: 'left+10 top+10', at: 'left top' } );
+				mask.setContentPosition( { my: 'left+40 top+40', at: 'left top' } );
+				mask.setContentPosition( { my: 'left+30 top+30', at: 'left top' } );
+				
+				expect( mask.$contentEl.css( 'top' ) ).toBe( '30px' );
+				expect( mask.$contentEl.css( 'left' ) ).toBe( '30px' );
+			} );
+			
+		} );
+		
+		
 		describe( 'show()', function() {
 			
 			it( "should throw an error if there is no `target` when the method is called", function() {
@@ -839,6 +878,64 @@ define( [
 				jasmine.Clock.tick( 1 );
 				expect( $overlayEl.height() ).toBe( 300 );  // now fixed
 				expect( $contentEl.css( 'top' ) ).toBe( 300 - contentElHeight + "px" );  // now fixed
+			} );
+			
+			
+			it( "should resize the reposition the $contentEl every 100ms *only if* the target's element or content's element has changed size", function() {
+				jasmine.Clock.useMock();
+				
+				mask = new Mask( { 
+					target: $el1, 
+					msg: "Test Msg", 
+					contentPosition: { my: 'center center', at: 'center center' }
+				} );
+				mask.show();
+				
+				// Spy on the jQuery UI position() function for the $contentEl, so we can see how many times it's called
+				var $contentEl = mask.$contentEl;
+				spyOn( $contentEl, 'position' ).andCallThrough();
+				
+				
+				// Advance first 100ms, no position() should have taken place
+				jasmine.Clock.tick( 100 );
+				expect( $contentEl.position.calls.length ).toBe( 0 );
+				
+				jasmine.Clock.tick( 100 );  // test again
+				expect( $contentEl.position.calls.length ).toBe( 0 );
+				
+				
+				// Now resize the `target` element
+				$el1.css( 'width', '300px' );
+				jasmine.Clock.tick( 100 );
+				expect( $contentEl.position.calls.length ).toBe( 1 );  // first call to resize
+				
+				jasmine.Clock.tick( 100 );  // test again
+				expect( $contentEl.position.calls.length ).toBe( 1 );  // still 1
+				
+				$el1.css( 'height', '300px' );
+				jasmine.Clock.tick( 100 );
+				expect( $contentEl.position.calls.length ).toBe( 2 );  // second call to resize
+				
+				jasmine.Clock.tick( 100 );  // test again
+				expect( $contentEl.position.calls.length ).toBe( 2 );  // still 2
+				
+				
+				
+				// Now resize the `content` element
+				$contentEl.css( 'width', '100px' );
+				jasmine.Clock.tick( 100 );
+				expect( $contentEl.position.calls.length ).toBe( 3 );  // third call to resize
+				
+				jasmine.Clock.tick( 100 );  // test again
+				expect( $contentEl.position.calls.length ).toBe( 3 );  // still 3
+				
+				
+				$contentEl.css( 'height', '100px' );
+				jasmine.Clock.tick( 100 );
+				expect( $contentEl.position.calls.length ).toBe( 4 );  // fourth call to resize
+				
+				jasmine.Clock.tick( 100 );  // test again
+				expect( $contentEl.position.calls.length ).toBe( 4 );  // still 4
 			} );
 			
 		} );

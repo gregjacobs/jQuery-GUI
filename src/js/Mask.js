@@ -199,6 +199,14 @@ define( [
 		 * This is done in case the {@link #target} changes size at any point.
 		 */
 		
+		/**
+		 * @protected
+		 * @property {Object} lastPositionedSizes
+		 * 
+		 * A cache of the last {@link #target} and {@link #$contentEl} widths/heights that the {@link #positionContentEl} 
+		 * method executed with. These are used to prevent extra calls to the jQuery UI Position utility.
+		 */
+		
 		
 		/**
 		 * @constructor
@@ -232,7 +240,7 @@ define( [
 			
 			// First, set the new content position. This will be used in calls to setSpinner() and setMsg() if changes are made
 			// to those configs, which may make it more performant to set first.
-			this.contentPosition = cfg.contentPosition; 
+			this.setContentPosition( cfg.contentPosition || null );
 			
 			if( cfg.target ) this.setTarget( cfg.target );
 			
@@ -246,10 +254,6 @@ define( [
 			
 			this.setSpinner( cfg.spinner || false );
 			this.setMsg( cfg.msg || "" );
-			
-			// Note: must run positionContentEl() in case there was a change to only the `contentPosition` config.
-			// Otherwise, this would have been called by setSpinner() or setMsg() if changes were made to the spinner/msg state.
-			if( this.isAttached() ) this.positionContentEl();
 		},
 		
 		
@@ -378,6 +382,22 @@ define( [
 				if( this.isAttached() )
 					this.positionContentEl();  // the Mask's elements are currently attached and shown, position
 			}
+		},
+		
+		
+		/**
+		 * Sets the {@link #contentPosition content position} for the Mask.
+		 * 
+		 * @param {Object} contentPosition An Object (map) with two properties: `my` and `at` which specify the
+		 *   position of the {@link #$contentEl} within the Mask's {@link #target}. See {@link #contentPosition}
+		 *   for more details. May be set to `null` to remove a particular content position and restore the default.
+		 */
+		setContentPosition : function( contentPosition ) {
+			this.contentPosition = contentPosition;
+			
+			this.lastPositionedSizes = null;  // reset the `lastPositionedSizes` cache, so the next call to positionContentEl() will recalculate the content's position
+			if( this.isAttached() ) 
+				this.positionContentEl();
 		},
 		
 		
@@ -580,21 +600,55 @@ define( [
 		
 		
 		/**
-		 * Repositions the {@link #$contentEl} to be at the {@link #contentPosition}.
+		 * Repositions the {@link #$contentEl} to be at the {@link #contentPosition}. This is called when the Mask is first
+		 * put up, and on a timer while the Mask is up in order to always account for any changes that might occur to the 
+		 * {@link #target} element's width/height.
 		 * 
+		 * This method sets the position, and then caches the target/content widths and heights that the position operation
+		 * was just executed against. It does this for two reasons:
+		 * 
+		 * 1. To reduce the overhead of executing the relatively expensive position() function each time. We only need to 
+		 *    reposition the content element if the target/content widths and heights change, and these rarely change while 
+		 *    the mask is up.
+		 * 2. To solve an issue with IE8 where running the position() function over and over could actually set different
+		 *    left/top positions. This isn't a bug with the jQuery UI Position utility itself, but the underlying
+		 *    `jQuery.offset.setOffset()` function that it calls. For some reason, setOffset() looking up the current offset and
+		 *    CSS left/top gives different values, and these factor into its calculation. In the case of IE8, these may get rounded 
+		 *    up or down and thus for each call to setOffset(), a slightly different offset is set. This causes the Mask's 
+		 *    {@link #$contentEl} to "wiggle" while the Mask is up.
+		 *    
 		 * @protected
 		 */
 		positionContentEl : function() {
 			if( this.isContentElVisible() ) {
-				var contentPosition = this.contentPosition || {},
-				    $targetEl = this.getTargetEl();
+				var $targetEl = this.getTargetEl(),
+				    $contentEl = this.$contentEl,
+				    targetWidth = $targetEl.outerWidth(),
+				    targetHeight = $targetEl.outerHeight(),
+				    contentWidth = $contentEl.outerWidth(),
+				    contentHeight = $contentEl.outerHeight(),
+				    lastSizes = this.lastPositionedSizes || {};
 				
-				this.$contentEl.position( {  // use jQuery UI positioning utility to position the content element
-					my: contentPosition.my || 'center center',
-					at: contentPosition.at || 'center center',
-					of: $targetEl,
-					collision: 'none'  // if clients want to move their content element outside of the Mask area, they are welcome to do so
-				} );
+				// Only position the content element if one of the sizes has changed
+				if( 
+					lastSizes.targetWidth !== targetWidth || lastSizes.targetHeight !== targetHeight || 
+					lastSizes.contentWidth !== contentWidth || lastSizes.contentHeight !== contentHeight 
+				) {
+					var contentPosition = this.contentPosition || {};
+					$contentEl.position( {
+						my: contentPosition.my || 'center center',
+						at: contentPosition.at || 'center center',
+						of: $targetEl,
+						collision: 'none'  // if clients want to move their content element outside of the Mask area, they are welcome to do so
+					} );
+					
+					this.lastPositionedSizes = {
+						targetWidth: targetWidth,
+						targetHeight: targetHeight,
+						contentWidth: contentWidth,
+						contentHeight: contentHeight
+					};
+				}
 			}
 		},
 		
