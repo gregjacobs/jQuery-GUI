@@ -3,8 +3,7 @@ define( [
 	'jquery',
 	'lodash',
 	'gui/ComponentManager',
-	'gui/Container',
-	'gui/layout/Fit'  // default layout
+	'gui/Container'
 ], function( jQuery, _, ComponentManager, Container ) {
 
 	/**
@@ -23,13 +22,6 @@ define( [
 	 * their parent {@link gui.Container Container} should be configured with a {@link gui.layout.Fit FitLayout}.
 	 */
 	var Viewport = Container.extend( {
-		
-		/**
-		 * @cfg
-		 * @inheritdoc
-		 */
-		layout : 'fit',
-		
 		
 		/**
 		 * @private
