@@ -14905,6 +14905,29 @@ define('gui/view/Model', [
 	 * 
 	 * This view is similar to the {@link gui.view.Collection Collection View}, which shows a {@link data.Collection Collection}
 	 * of {@link data.Model Models} instead of a single one.  
+	 * 
+	 * ## Method of Interest to Override
+	 * 
+	 * A few methods of interest to override are the following:
+	 * 
+	 * 1. {@link #prepareTplData}
+	 * 
+	 *    This method is executed each time before the {@link #tpl} is rewritten, and may populate extra variables to provide to 
+	 *    the template. For instance:
+	 *    
+	 *     tpl : [
+	 *         '<div>Name: <%= model.get( "name" ) %></div>',
+	 *         '<div>Calculated Amount: <%= calculatedAmount %></div>'
+	 *     ],
+	 *    
+	 *     ...
+	 *     
+	 *     prepareTplData : function() {
+	 *         var data = this._super( arguments );
+	 *         data.calculatedAmount = this.formatCalculatedAmount();
+	 *         
+	 *         return data;
+	 *     }
 	 */
 	var ModelView = DataBoundView.extend( {
 		mixins : [ ModelBindable ],
