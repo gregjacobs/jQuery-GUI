@@ -32,7 +32,7 @@ input, textarea {
   font-family: sans-serif;
 }
 
-/* UI Icons from jQuery UI. http://jqueryui.com */
+/*! UI Icons from jQuery UI. http://jqueryui.com */
 /*
  * These icon CSS classes are to be used with the background images found in resources/img/icons/. 
  * 
@@ -52,13 +52,13 @@ input, textarea {
 }
 
 /* gui-icon-seek-first is deprecated, use gui-icon-seek-start instead */
-/* UI Icons from jQuery UI. http://jqueryui.com */
+/*! UI Icons from jQuery UI. http://jqueryui.com */
 /*
  * These icon CSS classes are to be used with the background images found in resources/images/icons/.
  */
 /* line 6, ../../../../src/css/theme/basic/_icons.scss */
 .gui-panel-toolbutton-icon-close {
-  background-image: url('../../../../resources/images/icons/ui-icons_222222_256x240.png?1391652193');
+  background-image: url('../../../../resources/images/icons/ui-icons_222222_256x240.png?1365518842');
 }
 
 /* line 1, ../../../../src/css/theme/basic/_Mask.scss */
@@ -81,7 +81,7 @@ input, textarea {
   margin: 5px;
   height: 16px;
   width: 16px;
-  background-image: url('../../../../resources/images/theme/basic/spinner.gif?1391652194');
+  background-image: url('../../../../resources/images/theme/basic/spinner.gif?1368642649');
 }
 
 /* line 20, ../../../../src/css/theme/basic/_Mask.scss */
@@ -157,7 +157,7 @@ input, textarea {
   display: inline-block;
   height: 14px;
   width: 9px;
-  background-image: url('../../../../resources/images/theme/basic/downMenuPointer.png?1391652194');
+  background-image: url('../../../../resources/images/theme/basic/downMenuPointer.png?1366119124');
   background-position: 0px 0px;
   right: 6px;
   top: 50%;
@@ -293,7 +293,7 @@ input, textarea {
 
 /* line 12, ../../../../src/css/theme/basic/panel/_ToolButton.scss */
 .gui-panel-toolbutton-icon {
-  background-image: url('../../../../resources/images/theme/basic/ui-icons_2694e8_256x240.png?1391652194');
+  background-image: url('../../../../resources/images/theme/basic/ui-icons_2694e8_256x240.png?1366070829');
 }
 
 /* line 1, ../../../../src/css/theme/basic/tab/_Tab.scss */

@@ -10,4 +10,4 @@
 .gui-window-body {}
 
 
-.gui-window-modalMask { position: absolute; top: 0; left: 0; }
+.gui-window-modalMask { position: absolute; top: 0; left: 0; z-index: 999; }
