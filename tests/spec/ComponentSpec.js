@@ -3,15 +3,23 @@
 define( [
 	'jquery',
 	'lodash',
-	'Class',
+	
+	'gui/ComponentManager',
 	'gui/anim/Animation',
 	'gui/plugin/Plugin',
 	'gui/Component',
 	'gui/Container'
 ],
-function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
+function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container ) {
 	
 	describe( 'gui.Component', function() {
+		
+		it( "should be able to be instantiated from the ComponentManager using the type name 'component'", function() {
+			var component = ComponentManager.create( { type: 'component' } );
+			
+			expect( component instanceof Component ).toBe( true );
+		} );
+		
 		
 		describe( 'constructor', function() {
 			
@@ -41,6 +49,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 					}
 				} );
 			} );
+			
 				
 			it( "The constructor should always set the 'plugins' property to an array before initComponent is run, with an empty array for the plugins config", function() {
 				var component = new Component( {
@@ -52,8 +61,9 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				} );
 			} );
 			
+			
 			it( "The constructor should always set the 'plugins' property to an array before initComponent is run, with a single object for the plugins config", function() {
-				var PluginSubclass = Class.extend( Plugin, { init: function() {} } );
+				var PluginSubclass = Plugin.extend( { init: function() {} } );
 				var plugin = new PluginSubclass();
 				
 				var component = new Component( {
@@ -66,7 +76,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			} );
 				
 			it( "The constructor should always set the 'plugins' property to an array before initComponent is run, with an array of objects for the plugins config", function() {
-				var PluginSubclass = Class.extend( Plugin, { init: function() {} } );
+				var PluginSubclass = Plugin.extend( { init: function() {} } );
 				var p1 = new PluginSubclass(),
 				    p2 = new PluginSubclass();
 				
@@ -92,7 +102,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 				pluginComponentRef = null;
 				
 				// Create a simple plugin for testing
-				MyPlugin = Class.extend( Plugin, {
+				MyPlugin = Plugin.extend( {
 					init : function( component ) {
 						pluginInitCalledCount++;
 						pluginComponentRef = component;
@@ -2553,7 +2563,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			
 			it( "should remove all HTMLElement and jQuery references held by a Component upon destruction", function() {
 				// Create a Component subclass that creates an HTML element and a jQuery wrapped set
-				var ComponentSubClass = Class.extend( Component, {
+				var ComponentSubClass = Component.extend( {
 					initComponent : function() {
 						this.$wrappedSet = jQuery( '<div />' );
 						this.divElement = document.createElement( 'DIV' );
@@ -2575,7 +2585,7 @@ function( jQuery, _, Class, Animation, Plugin, Component, Container ) {
 			
 			it( "should remove all HTMLElement and jQuery references held by a Component from the DOM upon destruction", function() {
 				// Create a Component subclass that creates an HTML element and a jQuery wrapped set
-				var ComponentSubClass = Class.extend( Component, {
+				var ComponentSubClass = Component.extend( {
 					initComponent : function() {
 						// NOTE: These two elements are intentionally not appended to the Component's element, so that the automatic recursive
 						// removal of $el does not effect them. It is possible that Components add elements in other places in the DOM, such as

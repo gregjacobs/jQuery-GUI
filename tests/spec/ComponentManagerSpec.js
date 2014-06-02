@@ -65,29 +65,18 @@ define( [
 			} );
 			
 			
-			it( "should retrieve the base 'component' type (added for workaround needed for RequireJS circular dependency, where Component can't register itself with the ComponentManager)", function() {
-				expect( ComponentManager.getType( 'component' ) ).toBe( Component );
-				expect( ComponentManager.hasType( 'CoMpoNeNt' ) ).toBe( true );  // test mixed case
-			} );
-			
-			
 			it( "should retrieve a Component subclass based on its type name", function() {
 				var someClass = function() { this.value = 1; };
 				ComponentManager.registerType( 'someClass', someClass );
-				expect( ComponentManager.hasType( 'someClass' ) ).toBe( true );  // ComponentManager should now have type 'someClass'.
+				expect( ComponentManager.hasType( 'someClass' ) ).toBe( true );       // ComponentManager should now have type 'someClass'.
 				expect( ComponentManager.getType( 'someClass' ) ).toBe( someClass );  // getType() not returning the constructor function for 'someClass'
+				expect( ComponentManager.getType( 'SoMeClaSS' ) ).toBe( someClass );  // test mixed case
 			} );
 			
 		} );
 		
 		
 		describe( 'hasType()', function() {
-			
-			it( "should always return true if queried for 'component' (due to workaround needed for RequireJS circular dependency, where Component can't register itself with the ComponentManager)", function() {
-				expect( ComponentManager.hasType( 'component' ) ).toBe( true );
-				expect( ComponentManager.hasType( 'CoMpoNeNt' ) ).toBe( true );  // test mixed case
-			} );
-			
 			
 			it( "should determine if a class with the given type name is registered or not", function() {
 				// Test initial state
@@ -105,15 +94,16 @@ define( [
 				
 				// Make sure the following falsy values return false, in the case of an undefined property and such
 				expect( ComponentManager.hasType( undefined ) ).toBe( false );  // hasType should have returned false for undefined type name.
-				expect( ComponentManager.hasType( null ) ).toBe( false );  // hasType should have returned false for null type name.
-				expect( ComponentManager.hasType( false ) ).toBe( false );  // hasType should have returned false for boolean false type name.
-				expect( ComponentManager.hasType( "" ) ).toBe( false );  // hasType should have returned false for an empty string type name.
+				expect( ComponentManager.hasType( null ) ).toBe( false );       // hasType should have returned false for null type name.
+				expect( ComponentManager.hasType( false ) ).toBe( false );      // hasType should have returned false for boolean false type name.
+				expect( ComponentManager.hasType( "" ) ).toBe( false );         // hasType should have returned false for an empty string type name.
 			} );
 			
 		} );
 			
 			
 		describe( 'create()', function() {
+			
 			it( "should simply return an already-instantiated component", function() { 
 				// Test that already-instantiated components are returned directly
 				var myComponent = new Component();
@@ -146,12 +136,14 @@ define( [
 				expect( cmp instanceof Component ).toBe( true );  // create() did not instantiate 'someClass' via config object.
 			} );
 			
+			
 			it( "should create the type `gui.Container` when no 'type' config is specified in the anonymous config object", function() { 
 				ComponentManager.registerType( 'container', Container );  // need to re-register the Container class for this test.
 				
 				var cmp = ComponentManager.create( {} );
 				expect( cmp instanceof Container ).toBe( true );  // create() did not instantiate a Container via config object with no type property.
 			} );
+			
 		
 			it( "should throw an error for an unknown type name", function() {
 				expect( function() {
@@ -161,6 +153,7 @@ define( [
 					
 				} ).toThrow( "ComponentManager.create(): Unknown type: 'non-existent-type'" );
 			} );
+			
 		} );
 	} );
 } );

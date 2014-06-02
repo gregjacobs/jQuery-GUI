@@ -1,20 +1,35 @@
 /*global define */
 define( [
-	'require',
 	'jquery',
 	'lodash',
 	'Class',
-	'gui/Gui',
 	'Observable',
+	
+	'gui/Gui',
+	'gui/ComponentManager',
 	'gui/util/Css',
 	'gui/util/Html',
 	'gui/Mask',
 	'gui/anim/Animation',
 	'gui/plugin/Plugin',
 	'gui/template/Template',
-	'gui/template/LoDash',
-	'gui/ComponentManager'   // circular dependency. used via require() call in code below
-], function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
+	'gui/template/LoDash'
+], function(
+	jQuery,
+	_,
+	Class,
+	Observable,
+	
+	Gui,
+	ComponentManager,
+	Css,
+	Html,
+	Mask,
+	Animation,
+	Plugin,
+	Template,
+	LoDashTpl
+) {
 
 	/**
 	 * @class gui.Component
@@ -2100,7 +2115,7 @@ define( [
 		 */
 		findParentByType : function( type ) {
 			if( typeof type === 'string' ) {
-				type = require( 'gui/ComponentManager' ).getType( type );
+				type = ComponentManager.getType( type );
 				
 				// No type found for the given type name, return null immediately
 				if( !type ) {
@@ -2204,10 +2219,7 @@ define( [
 	} );
 	
 	
-	// NOTE: Due to circular dependency issues with RequireJS, ComponentManager automatically registers this class with
-	// the type string 'component'. Leaving below line commented as a reminder. Even if we add an async require() call here,
-	// it is possible that the Component class is still not registered in time for use.
-	//ComponentManager.registerType( 'component', Component );   -- leave as reminder
+	ComponentManager.registerType( 'component', Component );
 
 	return Component;
 	

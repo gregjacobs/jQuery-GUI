@@ -1,8 +1,5 @@
 /*global define */
-define( [
-	'require',
-	'gui/Component'  // loaded via require() call in the code below, as it is a circular dependency
-], function( require ) {
+define( function() {
 	
 	/**
 	 * @class gui.ComponentManager
@@ -54,10 +51,7 @@ define( [
 		 */
 		getType : function( type ) {
 			type = type.toLowerCase();
-			
-			// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
-			// gui.Component can't register itself with the ComponentManager
-			var jsClass = ( type === 'component' ) ? require( 'gui/Component' ) : this.componentClasses[ type ];
+			var jsClass = this.componentClasses[ type ];
 			
 			// <debug>
 			if( !jsClass ) 
@@ -79,11 +73,7 @@ define( [
 			if( !type ) {  // any falsy type value given, return false
 				return false;
 			} else {
-				type = type.toLowerCase();
-				
-				// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
-				// Component can't register itself with the ComponentManager
-				return ( type === 'component' ) ? true : !!this.componentClasses[ type ];
+				return !!this.componentClasses[ type.toLowerCase() ];
 			}
 		},
 		
@@ -100,15 +90,11 @@ define( [
 		 * @return {gui.Component} The instantiated Component.
 		 */
 		create : function( config ) {
-			var type = config.type ? config.type.toLowerCase() : undefined,
-			    Component = require( 'gui/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (gui.Component depends on gui.ComponentManager)
+			var type = config.type ? config.type.toLowerCase() : undefined;
 			
-			if( config instanceof Component ) {
+			if( config.isGuiComponent ) {
 				// Already a Component instance, return it
 				return config;
-				
-			} else if( type === 'component' ) {  // special case, added to get around the RequireJS circular dependency issue where Component can't register itself with the ComponentManager
-				return new Component( config );
 				
 			} else if( this.hasType( type || "container" ) ) {
 				return new this.componentClasses[ type || "container" ]( config );
