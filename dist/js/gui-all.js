@@ -1,6 +1,6 @@
 /*!
  * jQuery-GUI
- * Version 0.8.3
+ * Version 0.8.6
  *
  * Copyright(c) 2013 Gregory Jacobs.
  * MIT Licensed. http://www.opensource.org/licenses/mit-license.php
@@ -8,6 +8,118 @@
  * https://github.com/gregjacobs/jQuery-GUI
  */
 
+/*global define */
+define('gui/ComponentManager',[], function() {
+	
+	/**
+	 * @class gui.ComponentManager
+	 * @singleton
+	 *
+	 * Object used to manage {@link gui.Component} "types", and handles instantiating them based on the string that is specified
+	 * for them in the manifest.
+	 */
+	var ComponentManager = {
+		
+		/**
+		 * @private
+		 * @property {Object} componentClasses
+		 * 
+		 * An Object (map) of the {@link gui.Component} classes which have been {@link #registerType registered}, 
+		 * keyed by their type name. 
+		 */
+		componentClasses : {},
+	   
+	   
+		/**
+		 * Registers a given class with a `type` name. This is used to map the type names specified in Bit manifests
+		 * to the class that should be instantiated.  Note that type names are case-insensitive.
+		 * 
+		 * This method will throw an error if a type name is already registered, to assist in making sure that we don't get
+		 * unexpected behavior from a type name being overwritten.
+		 * 
+		 * @param {String} type The type name of registered class.
+		 * @param {Function} jsClass The class (constructor function) to register.
+		 */
+		registerType : function( type, jsClass ) {
+			type = type.toLowerCase();
+			
+			if( !this.componentClasses[ type ] ) { 
+				this.componentClasses[ type ] = jsClass;
+			// <debug>
+			} else {
+				throw new Error( "Error: gui.ComponentManager already has a type '" + type + "'" );
+			// </debug>
+			}
+		},
+		
+		
+		/**
+		 * Retrieves the Component class (constructor function) that has been registered by the supplied `type` name. 
+		 * 
+		 * @param {String} type The type name of the registered class.
+		 * @return {Function} The class (constructor function) that has been registered under the given `type` name.
+		 */
+		getType : function( type ) {
+			type = type.toLowerCase();
+			var jsClass = this.componentClasses[ type ];
+			
+			// <debug>
+			if( !jsClass ) 
+				throw new Error( "The class with type name '" + type + "' has not been registered. Make sure that the component " +
+				                 "exists, and has been 'required' by a RequireJS require() or define() call" );
+			// </debug>
+			
+			return jsClass;
+		},
+		
+		
+		/**
+		 * Determines if the ComponentManager has (i.e. can instantiate) a given `type`.
+		 * 
+		 * @param {String} type The type name to check for.
+		 * @return {Boolean} `true` if the ComponentManager has the given type, `false` otherwise.
+		 */
+		hasType : function( type ) {
+			if( !type ) {  // any falsy type value given, return false
+				return false;
+			} else {
+				return !!this.componentClasses[ type.toLowerCase() ];
+			}
+		},
+		
+		
+		/**
+		 * Creates (instantiates) a {@link gui.Component Component} based on its type name, given
+		 * a configuration object that has a `type` property. If an already-instantiated 
+		 * {@link gui.Component Component} is provided, it will simply be returned unchanged.
+		 * 
+		 * @param {Object} config The configuration object for the Component. Config objects should have the property `type`, 
+		 *   which determines which type of {@link gui.Component Component} will be instantiated. If the object does not
+		 *   have a `type` property, it will default to "container", which makes it simple to create things like tab containers. 
+		 *   Note that already-instantiated {@link gui.Component Components} will simply be returned unchanged. 
+		 * @return {gui.Component} The instantiated Component.
+		 */
+		create : function( config ) {
+			var type = config.type ? config.type.toLowerCase() : undefined;
+			
+			if( config.isGuiComponent ) {
+				// Already a Component instance, return it
+				return config;
+				
+			} else if( this.hasType( type || "container" ) ) {
+				return new this.componentClasses[ type || "container" ]( config );
+				
+			} else {
+				// No registered type with the given type, throw an error
+				throw new Error( "ComponentManager.create(): Unknown type: '" + type + "'" );
+			}
+		}
+		
+	};
+	
+	return ComponentManager;
+	
+} );
 /*!
  * jQuery-GUI
  * Copyright(c) 2013 Gregory Jacobs.
@@ -1515,13 +1627,10 @@ define('gui/Mask', [
 
 /*global define */
 define('gui/anim/Animation', [
-	'require',
 	'jquery',
 	'lodash',
-	'Class',
-	'Observable',
-	'gui/Component'
-], function( require, jQuery, _, Class, Observable, Component ) {
+	'Observable'
+], function( jQuery, _, Observable ) {
 	
 	/**
 	 * @class gui.anim.Animation
@@ -1529,7 +1638,7 @@ define('gui/anim/Animation', [
 	 * 
 	 * A class that encapsulates a single animation of a given HTMLElement, jQuery wrapped set, or {@link gui.Component}.
 	 */
-	var Animation = Class.extend( Observable, {
+	var Animation = Observable.extend( {
 		
 		/**
 		 * @cfg {HTMLElement/jQuery/gui.Component} target (required)
@@ -1698,7 +1807,7 @@ define('gui/anim/Animation', [
 			// Make sure there is a 'target' config, and normalize it if need be
 			var target = this.target;
 			if( target ) {
-				if( target instanceof require( 'gui/Component' ) ) {   // need to require() gui.Component here, because it is a circular dependency
+				if( target.isGuiComponent ) {
 					$target = jQuery( target.getEl() );
 				} else {
 					$target = jQuery( target );
@@ -1886,21 +1995,36 @@ function( _, Class, Observable ) {
 
 /*global define */
 define('gui/Component', [
-	'require',
 	'jquery',
 	'lodash',
 	'Class',
-	'gui/Gui',
 	'Observable',
+	
+	'gui/Gui',
+	'gui/ComponentManager',
 	'gui/util/Css',
 	'gui/util/Html',
 	'gui/Mask',
 	'gui/anim/Animation',
 	'gui/plugin/Plugin',
 	'gui/template/Template',
-	'gui/template/LoDash',
-	'gui/ComponentManager'   // circular dependency. used via require() call in code below
-], function( require, jQuery, _, Class, Gui, Observable, Css, Html, Mask, Animation, Plugin, Template, LoDashTpl ) {
+	'gui/template/LoDash'
+], function(
+	jQuery,
+	_,
+	Class,
+	Observable,
+	
+	Gui,
+	ComponentManager,
+	Css,
+	Html,
+	Mask,
+	Animation,
+	Plugin,
+	Template,
+	LoDashTpl
+) {
 
 	/**
 	 * @class gui.Component
@@ -3986,7 +4110,7 @@ define('gui/Component', [
 		 */
 		findParentByType : function( type ) {
 			if( typeof type === 'string' ) {
-				type = require( 'gui/ComponentManager' ).getType( type );
+				type = ComponentManager.getType( type );
 				
 				// No type found for the given type name, return null immediately
 				if( !type ) {
@@ -4090,141 +4214,12 @@ define('gui/Component', [
 	} );
 	
 	
-	// NOTE: Due to circular dependency issues with RequireJS, ComponentManager automatically registers this class with
-	// the type string 'component'. Leaving below line commented as a reminder. Even if we add an async require() call here,
-	// it is possible that the Component class is still not registered in time for use.
-	//ComponentManager.registerType( 'component', Component );   -- leave as reminder
+	ComponentManager.registerType( 'component', Component );
 
 	return Component;
 	
 } );
 
-/*global define */
-define('gui/ComponentManager', [
-	'require',
-	'gui/Component'  // loaded via require() call in the code below, as it is a circular dependency
-], function( require ) {
-	
-	/**
-	 * @class gui.ComponentManager
-	 * @singleton
-	 *
-	 * Object used to manage {@link gui.Component} "types", and handles instantiating them based on the string that is specified
-	 * for them in the manifest.
-	 */
-	var ComponentManager = {
-		
-		/**
-		 * @private
-		 * @property {Object} componentClasses
-		 * 
-		 * An Object (map) of the {@link gui.Component} classes which have been {@link #registerType registered}, 
-		 * keyed by their type name. 
-		 */
-		componentClasses : {},
-	   
-	   
-		/**
-		 * Registers a given class with a `type` name. This is used to map the type names specified in Bit manifests
-		 * to the class that should be instantiated.  Note that type names are case-insensitive.
-		 * 
-		 * This method will throw an error if a type name is already registered, to assist in making sure that we don't get
-		 * unexpected behavior from a type name being overwritten.
-		 * 
-		 * @param {String} type The type name of registered class.
-		 * @param {Function} jsClass The class (constructor function) to register.
-		 */
-		registerType : function( type, jsClass ) {
-			type = type.toLowerCase();
-			
-			if( !this.componentClasses[ type ] ) { 
-				this.componentClasses[ type ] = jsClass;
-			// <debug>
-			} else {
-				throw new Error( "Error: gui.ComponentManager already has a type '" + type + "'" );
-			// </debug>
-			}
-		},
-		
-		
-		/**
-		 * Retrieves the Component class (constructor function) that has been registered by the supplied `type` name. 
-		 * 
-		 * @param {String} type The type name of the registered class.
-		 * @return {Function} The class (constructor function) that has been registered under the given `type` name.
-		 */
-		getType : function( type ) {
-			type = type.toLowerCase();
-			
-			// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
-			// gui.Component can't register itself with the ComponentManager
-			var jsClass = ( type === 'component' ) ? require( 'gui/Component' ) : this.componentClasses[ type ];
-			
-			// <debug>
-			if( !jsClass ) 
-				throw new Error( "The class with type name '" + type + "' has not been registered. Make sure that the component " +
-				                 "exists, and has been 'required' by a RequireJS require() or define() call" );
-			// </debug>
-			
-			return jsClass;
-		},
-		
-		
-		/**
-		 * Determines if the ComponentManager has (i.e. can instantiate) a given `type`.
-		 * 
-		 * @param {String} type The type name to check for.
-		 * @return {Boolean} `true` if the ComponentManager has the given type, `false` otherwise.
-		 */
-		hasType : function( type ) {
-			if( !type ) {  // any falsy type value given, return false
-				return false;
-			} else {
-				type = type.toLowerCase();
-				
-				// Note: special case for 'component', added to get around the RequireJS circular dependency issue where 
-				// Component can't register itself with the ComponentManager
-				return ( type === 'component' ) ? true : !!this.componentClasses[ type ];
-			}
-		},
-		
-		
-		/**
-		 * Creates (instantiates) a {@link gui.Component Component} based on its type name, given
-		 * a configuration object that has a `type` property. If an already-instantiated 
-		 * {@link gui.Component Component} is provided, it will simply be returned unchanged.
-		 * 
-		 * @param {Object} config The configuration object for the Component. Config objects should have the property `type`, 
-		 *   which determines which type of {@link gui.Component Component} will be instantiated. If the object does not
-		 *   have a `type` property, it will default to "container", which makes it simple to create things like tab containers. 
-		 *   Note that already-instantiated {@link gui.Component Components} will simply be returned unchanged. 
-		 * @return {gui.Component} The instantiated Component.
-		 */
-		create : function( config ) {
-			var type = config.type ? config.type.toLowerCase() : undefined,
-			    Component = require( 'gui/Component' );  // need to require here, as otherwise we'd have an unresolved circular dependency (gui.Component depends on gui.ComponentManager)
-			
-			if( config instanceof Component ) {
-				// Already a Component instance, return it
-				return config;
-				
-			} else if( type === 'component' ) {  // special case, added to get around the RequireJS circular dependency issue where Component can't register itself with the ComponentManager
-				return new Component( config );
-				
-			} else if( this.hasType( type || "container" ) ) {
-				return new this.componentClasses[ type || "container" ]( config );
-				
-			} else {
-				// No registered type with the given type, throw an error
-				throw new Error( "ComponentManager.create(): Unknown type: '" + type + "'" );
-			}
-		}
-		
-	};
-	
-	return ComponentManager;
-	
-} );
 /*global define */
 /*jshint scripturl:true */
 define('gui/Anchor', [
@@ -4412,11 +4407,137 @@ define('gui/Anchor', [
 	
 } );
 /*global define */
+define('gui/layout/Manager', [
+	'lodash'
+], function( _ ) {
+	
+	/**
+	 * @class gui.layout.Manager
+	 * @singleton
+	 *
+	 * Object used to manage {@link gui.layout.Layout} "types", and handles instantiating them based on the `type` string that 
+	 * is registered for them.
+	 */
+	var LayoutManager = {
+		
+		/**
+		 * @private
+		 * @property {Object} layoutClasses
+		 * 
+		 * An Object (map) of the {@link gui.layout.Layout} classes which have been {@link #registerType registered}, 
+		 * keyed by their type name.
+		 */
+		layoutClasses : {},
+		
+	   
+		/**
+		 * Registers a {@link gui.layout.Layout Layout}, allowing {@link #layout layouts} to be specified by their string `type` name.
+		 * 
+		 * This method will throw an error if a type name is already registered, to assist in making sure that we don't get
+		 * unexpected behavior from a type name being overwritten.
+		 *
+		 * @param {String} typeName The type name for the Layout.
+		 * @param {Function} layoutClass A {@link gui.layout.Layout} subclass.
+		 */
+		registerType : function( typeName, jsClass ) {
+			typeName = typeName.toLowerCase();
+			
+			if( !this.layoutClasses[ typeName ] ) { 
+				this.layoutClasses[ typeName ] = jsClass;
+			// <debug>
+			} else {
+				throw new Error( "Error: gui.layout.Manager already has a type '" + typeName + "'" );
+			// </debug>
+			}
+		},
+		
+		
+		/**
+		 * Retrieves the {@link gui.layout.Layout} class (constructor function) that has been registered by the supplied `type` name. 
+		 * 
+		 * @param {String} typeName The type name that the layout was registered with. This is case-insensitive.
+		 * @return {Function} The {@link gui.layout.Layout Layout} that was registered with the given `typeName`.
+		 */
+		getType : function( typeName ) {
+			typeName = typeName.toLowerCase();
+			var jsClass = this.layoutClasses[ typeName ];
+			
+			// <debug>
+			if( !jsClass ) 
+				throw new Error( "The layout class with type name '" + typeName + "' has not been registered. Make sure that the layout " +
+				                 "exists, and has been 'required' by a RequireJS require() or define() call" );
+			// </debug>
+			
+			return jsClass;
+		},
+		
+		
+		/**
+		 * Determines if the LayoutManager has (i.e. can instantiate) a given `type`.
+		 * 
+		 * @param {String} typeName The type name to check for.
+		 * @return {Boolean} `true` if the LayoutManager has the given type, `false` otherwise.
+		 */
+		hasType : function( typeName ) {
+			if( !typeName ) {  // any falsy type value given, return false
+				return false;
+			} else {
+				return !!this.layoutClasses[ typeName.toLowerCase() ];
+			}
+		},
+		
+		
+		/**
+		 * Creates (instantiates) a {@link gui.layout.Layout Layout} based on its type name, given a configuration object that 
+		 * has a `type` property. If an already-instantiated {@link gui.layout.Layout Layout} is provided, it will simply be 
+		 * returned unchanged.
+		 * 
+		 * @param {Object/gui.layout.Layout} config The configuration object for the Layout. Config objects should have the property `type`, 
+		 *   which determines which type of {@link gui.layout.Layout Layout} that will be instantiated. If the object does not
+		 *   have a `type` property, it will default to instantiating an {@link gui.layout.Auto AutoLayout}. 
+		 *   Note that already-instantiated {@link gui.layout.Layout Layouts} will simply be returned unchanged. 
+		 * @return {gui.layout.Layout} The instantiated Layout.
+		 */
+		create : function( layoutCfg ) {
+			if( layoutCfg && layoutCfg.isGuiLayout ) {
+				// The layout is already a gui.layout.Layout instance
+				return layoutCfg;
+	
+			} else {
+				// The `layoutCfg` is a string or layoutCfg object
+				var layoutTypeName;
+	
+				if( typeof layoutCfg === 'string' ) {
+					layoutTypeName = layoutCfg;
+	
+				} else if( typeof layoutCfg === 'object' ) {  // config object
+					layoutTypeName = ( layoutCfg.type || 'auto' ).toLowerCase();   // default to 'auto' layout
+					
+					layoutCfg = _.clone( layoutCfg );
+					delete layoutCfg.type;  // remove the 'type' property from the config object now, as to not shadow the Layout object's prototype 'type' property when applied
+	
+				} else {
+					// Not a gui.layout.Layout, String, or Object...
+					throw new Error( "Invalid layout argument provided to setLayout. See method description in docs." );
+				}
+
+				// Create the layout strategy object from its type name if all is well
+				var LayoutClass = this.getType( layoutTypeName );
+				return new LayoutClass( layoutCfg );
+			}
+		}
+		
+	};
+	
+	
+	return LayoutManager;
+	
+} );
+/*global define */
 define('gui/layout/Layout', [
 	'lodash',
-	'Observable',
-	'gui/Gui'
-], function( _, Observable, Gui ) {
+	'Observable'
+], function( _, Observable ) {
 	
 	/**
 	 * @abstract 
@@ -4472,6 +4593,18 @@ define('gui/layout/Layout', [
 		 * after instantiation with {@link #setContainer}. 
 		 */
 		container : null,
+		
+		
+		/**
+		 * @property {Boolean} isGuiLayout (readonly)
+		 * 
+		 * A property simply to identify Layout instances as such. This is so that we don't need circular dependencies in some of the
+		 * other jQuery-GUI files, which only bring in the Layout class for an `instanceof` check.
+		 * 
+		 * Although RequireJS supports circular dependencies, compiling in advanced mode with the Google Closure Compiler requires that
+		 * no circular dependencies exist.
+		 */
+		isGuiLayout : true,
 		
 		/**
 		 * @private
@@ -4535,7 +4668,7 @@ define('gui/layout/Layout', [
 		 * @template
 		 * @method initLayout
 		 */
-		initLayout : Gui.emptyFn,
+		initLayout : _.noop,
 		
 		
 		/**
@@ -4572,7 +4705,7 @@ define('gui/layout/Layout', [
 		 * @method onContainerSet
 		 * @param {gui.Container} container The Container that was set.
 		 */
-		onContainerSet : Gui.emptyFn,
+		onContainerSet : _.noop,
 		
 		
 		/**
@@ -4634,7 +4767,7 @@ define('gui/layout/Layout', [
 		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
-		onLayout : Gui.emptyFn,
+		onLayout : _.noop,
 		
 		
 		/**
@@ -4648,7 +4781,7 @@ define('gui/layout/Layout', [
 		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
-		afterLayout : Gui.emptyFn,
+		afterLayout : _.noop,
 		
 		
 		/**
@@ -4779,7 +4912,7 @@ define('gui/layout/Layout', [
 		 * @template
 		 * @method onDestroy
 		 */
-		onDestroy : Gui.emptyFn
+		onDestroy : _.noop
 		
 	} );
 
@@ -4787,10 +4920,9 @@ define('gui/layout/Layout', [
 } );
 /*global define */
 define('gui/layout/Auto', [
-	'require',
-	'gui/layout/Layout',
-	'gui/Container'
-], function( require, Layout ) {
+	'gui/layout/Manager',
+	'gui/layout/Layout'
+], function( LayoutManager, Layout ) {
 	
 	/**
 	 * @class gui.layout.Auto
@@ -4825,25 +4957,23 @@ define('gui/layout/Auto', [
 		
 	} );
 	
-	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
-	// NOTE: Due to circular dependency issues with RequireJS, gui.Container automatically considers this class as "registered" with
-	// the type string 'auto'. Leaving below line commented as a reminder. Even if we add an async require() call here,
-	// it is possible that the AutoLayout class is still not registered in time for use.
-	//Container.registerLayout( 'auto', AutoLayout );   -- leave as reminder
+	
+	LayoutManager.registerType( 'auto', AutoLayout );
 
 	return AutoLayout;
+	
 } );
 /*global define */
 define('gui/Container', [
-	'require',
 	'lodash',
 	'Class',
 	'gui/Gui',
 	'gui/ComponentManager',
 	'gui/Component',
-	'gui/layout/Layout',   // circular dependency, used with require() call
-	'gui/layout/Auto'      // circular dependency, used with require() call
-], function( require, _, Class, Gui, ComponentManager, Component ) {
+	'gui/layout/Manager',
+	'gui/layout/Layout',
+	'gui/layout/Auto'
+], function( _, Class, Gui, ComponentManager, Component, LayoutManager, Layout, AutoLayout ) {
 
 	/**
 	 * @class gui.Container
@@ -4853,60 +4983,7 @@ define('gui/Container', [
 	 * Base class for a component that holds other child components. Provides a default
 	 * container layout that just adds child components directly into it with no layout.
 	 */
-	var Container = Class.extend( Component, {
-	
-		statics : {
-			
-			/**
-			 * @private
-			 * @static
-			 * @property {Object} layouts
-			 * 
-			 * Map that stores "registered" layout types. The layouts are in the `gui.layout` package, and each
-			 * specifies a type name that is used to instantiate them.
-			 */
-			layouts : {},
-			
-			/**
-			 * Registers a {@link gui.layout.Layout Layout} with the Container class, allowing {@link #layout layouts}
-			 * to be specified by their string `typeName`.
-			 *
-			 * @static
-			 * @param {String} typeName The type name for the Layout.
-			 * @param {Function} layoutClass A {@link gui.layout.Layout} subclass.
-			 */
-			registerLayout : function( typeName, layoutClass ) {
-				Container.layouts[ typeName.toLowerCase() ] = layoutClass;
-			},
-			
-			/**
-			 * Retrieves a registered {@link gui.layout.Layout Layout} class by "type" name.
-			 * 
-			 * @static
-			 * @protected
-			 * @param {String} typeName The type name that the layout was registered with. This is case-insensitive.
-			 * @return {Function} The {@link gui.layout.Layout Layout} that was registered with the
-			 *   given `typeName`.
-			 * @throws {Error} If the `typeName` did not resolve to a registered {@link gui.layout.Layout Layout}.
-			 */
-			getLayoutType : function( typeName ) {
-				typeName = typeName.toLowerCase();
-				
-				// <debug>
-				// Check that the layout type given is a registered layout type (or 'auto', as the AutoLayout
-				// is assumed to be loaded as a workaround for the circular dependency of this class requiring it)
-				if( typeName !== 'auto' && !Container.layouts[ typeName ] ) {
-					throw new Error( "Layout type '" + typeName + "' is not a registered layout type." );
-				}
-				// </debug>
-				
-				// Return the AutoLayout explicitly if asked for, since that class is not registered due to issues 
-				// with RequireJS and the circular dependency of this class requiring it. Other Layout classes are 
-				// registered normally. 
-				return ( typeName === 'auto' ) ? require( 'gui/layout/Auto' ) : Container.layouts[ typeName ];
-			}
-			
-		},
+	var Container = Component.extend( {
 	
 		/**
 		 * @cfg {String} defaultType
@@ -5669,12 +5746,9 @@ define('gui/Container', [
 		 * Retrieves the {@link gui.layout.Layout Layout} object that the Container is currently
 		 * configured to use.  If no {@link #layout} is currently configured for the Container, this method
 		 * creates a {@link gui.layout.Auto} to use for this Container, and returns that.
-		 *
-		 * @method getLayout
 		 */
 		getLayout : function() {
 			if( !this.layout ) {
-				var AutoLayout = require( 'gui/layout/Auto' );
 				this.setLayout( new AutoLayout() );
 			}
 			return this.layout;
@@ -5685,12 +5759,9 @@ define('gui/Container', [
 		 * Sets a new layout strategy object for the Container. Any previous layout will be detached from
 		 * the Container (its container reference set to null).
 		 *
-		 * @method setLayout
 		 * @param {String/Object/gui.layout.Layout} layout See the {@link #layout} config.
 		 */
 		setLayout : function( layout ) {
-			var Layout = require( 'gui/layout/Layout' );  // for dealing with circular dependency
-			
 			// Destroy the current layout if we have a new one, and detach all Components in the Container, as 
 			// a new layout is going to have to render them anyway.
 			if( this.layout instanceof Layout && this.layout !== layout ) {
@@ -5704,34 +5775,8 @@ define('gui/Container', [
 				this.layout.destroy();
 			}
 
-	
-			if( layout instanceof Layout ) {
-				// The new layout is already a Layout instance
-				this.layout = layout;
-				layout.setContainer( this );
-	
-			} else {
-				// The new layout is a string or config object
-				var layoutTypeName,
-				    layoutConfig = { container: this };
-	
-				if( typeof layout === 'string' ) {
-					layoutTypeName = layout;
-	
-				} else if( typeof layout === 'object' ) { // config object
-					layoutTypeName = layout.type || 'auto';   // default to 'auto' layout
-					layoutConfig = _.defaults( _.clone( layoutConfig ), layout );
-					delete layoutConfig.type;  // remove the 'type' property from the config object now, as to not shadow the Layout object's prototype 'type' property when applied
-	
-				} else {
-					// Not a gui.layout.Layout, String, or Object...
-					throw new Error( "Invalid layout argument provided to setLayout. See method description in docs." );
-				}
-
-				// Create the layout strategy object from its type name if all is well
-				var LayoutClass = Container.getLayoutType( layoutTypeName );
-				this.layout = new LayoutClass( layoutConfig );
-			}
+			this.layout = layout = LayoutManager.create( layout );
+			layout.setContainer( this );
 		},
 	
 	
@@ -5850,7 +5895,6 @@ define('gui/Container', [
 			this.removeAll();
 	
 			// Destroy the Container's layout, if it has one
-			var Layout = require( 'gui/layout/Layout' );
 			if( this.layout instanceof Layout ) {  // just in case it's still the string config
 				this.layout.destroy();
 			}
@@ -11457,9 +11501,10 @@ define('gui/layout/Card.SwitchTransition', [
 define('gui/layout/Card', [
 	'gui/Component',
 	'gui/Container',
+	'gui/layout/Manager',
 	'gui/layout/Layout',
 	'gui/layout/Card.SwitchTransition'
-], function( Component, Container, Layout, SwitchTransition ) {
+], function( Component, Container, LayoutManager, Layout, SwitchTransition ) {
 	
 	/**
 	 * @class gui.layout.Card
@@ -11741,19 +11786,16 @@ define('gui/layout/Card', [
 	} );
 	
 	
-	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'card', CardLayout );
+	LayoutManager.registerType( 'card', CardLayout );
 	
 	return CardLayout;
 
 } );
 /*global define */
 define('gui/layout/Column', [
-	'Class',
-	'gui/Component',
-	'gui/Container',
+	'gui/layout/Manager',
 	'gui/layout/Layout'
-], function( Class, Component, Container, Layout ) {
+], function( LayoutManager, Layout ) {
 
 	/**
 	 * @class gui.layout.Column
@@ -11879,19 +11921,16 @@ define('gui/layout/Column', [
 	} );
 	
 	
-	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'column', ColumnLayout );
+	LayoutManager.registerType( 'column', ColumnLayout );
 	
 	return ColumnLayout;
 	
 } );
 /*global define */
 define('gui/layout/Fit', [
-	'Class',
-	'gui/Component',
-	'gui/Container',
+	'gui/layout/Manager',
 	'gui/layout/Layout'
-], function( Class, Component, Container, Layout ) {
+], function( LayoutManager, Layout ) {
 
 	/**
 	 * @class gui.layout.Fit
@@ -11987,8 +12026,7 @@ define('gui/layout/Fit', [
 	} );
 	
 	
-	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'fit', FitLayout );
+	LayoutManager.registerType( 'fit', FitLayout );
 
 	return FitLayout;
 	
@@ -11996,10 +12034,10 @@ define('gui/layout/Fit', [
 /*global define */
 define('gui/layout/HBox', [
 	'jquery',
-	'gui/Component',
-	'gui/Container',
+	
+	'gui/layout/Manager',
 	'gui/layout/Layout'
-], function( jQuery, Component, Container, Layout ) {
+], function( jQuery, LayoutManager, Layout ) {
 
 	/**
 	 * @class gui.layout.HBox
@@ -12157,8 +12195,7 @@ define('gui/layout/HBox', [
 	} );
 	
 	
-	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'hbox', HBoxLayout );
+	LayoutManager.registerType( 'hbox', HBoxLayout );
 	
 	return HBoxLayout;
 	
@@ -12166,9 +12203,9 @@ define('gui/layout/HBox', [
 
 /*global define */
 define('gui/layout/VBox', [
-	'gui/Container',
+	'gui/layout/Manager',
 	'gui/layout/Layout'
-], function( Container, Layout ) {
+], function( LayoutManager, Layout ) {
 
 	/**
 	 * @class gui.layout.VBox
@@ -12293,8 +12330,7 @@ define('gui/layout/VBox', [
 	} );
 	
 	
-	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'vbox', VBoxLayout );
+	LayoutManager.registerType( 'vbox', VBoxLayout );
 	
 	return VBoxLayout;
 	
@@ -15693,4 +15729,4 @@ define('gui/window/Window', [
 	
 } );
 
-require(["gui/Anchor", "gui/Component", "gui/ComponentManager", "gui/ComponentQuery", "gui/Container", "gui/Gui", "gui/Image", "gui/Label", "gui/Mask", "gui/Overlay", "gui/Viewport", "gui/anim/Animation", "gui/app/Application", "gui/app/Controller", "gui/app/EventBus", "gui/button/Button", "gui/form/field/Checkbox", "gui/form/field/Dropdown", "gui/form/field/Field", "gui/form/field/Hidden", "gui/form/field/Radio", "gui/form/field/Text", "gui/form/field/TextArea", "gui/layout/Auto", "gui/layout/Card.SwitchTransition", "gui/layout/Card.Transition", "gui/layout/Card", "gui/layout/Column", "gui/layout/Fit", "gui/layout/HBox", "gui/layout/Layout", "gui/layout/VBox", "gui/loader/Loader", "gui/loader/RequireJs", "gui/panel/Header", "gui/panel/Panel", "gui/panel/ToolButton", "gui/plugin/Plugin", "gui/tab/Bar", "gui/tab/Panel", "gui/tab/Tab", "gui/template/LoDash", "gui/template/Template", "gui/util/CallbackList", "gui/util/CollectionBindable", "gui/util/Css", "gui/util/Html", "gui/util/ModelBindable", "gui/util/OptionsStore", "gui/view/Collection", "gui/view/DataBound", "gui/view/Model", "gui/window/Header", "gui/window/Window"]);
+require(["gui/Anchor", "gui/Component", "gui/ComponentManager", "gui/ComponentQuery", "gui/Container", "gui/Gui", "gui/Image", "gui/Label", "gui/Mask", "gui/Overlay", "gui/Viewport", "gui/anim/Animation", "gui/app/Application", "gui/app/Controller", "gui/app/EventBus", "gui/button/Button", "gui/form/field/Checkbox", "gui/form/field/Dropdown", "gui/form/field/Field", "gui/form/field/Hidden", "gui/form/field/Radio", "gui/form/field/Text", "gui/form/field/TextArea", "gui/layout/Auto", "gui/layout/Card.SwitchTransition", "gui/layout/Card.Transition", "gui/layout/Card", "gui/layout/Column", "gui/layout/Fit", "gui/layout/HBox", "gui/layout/Layout", "gui/layout/Manager", "gui/layout/VBox", "gui/loader/Loader", "gui/loader/RequireJs", "gui/panel/Header", "gui/panel/Panel", "gui/panel/ToolButton", "gui/plugin/Plugin", "gui/tab/Bar", "gui/tab/Panel", "gui/tab/Tab", "gui/template/LoDash", "gui/template/Template", "gui/util/CallbackList", "gui/util/CollectionBindable", "gui/util/Css", "gui/util/Html", "gui/util/ModelBindable", "gui/util/OptionsStore", "gui/view/Collection", "gui/view/DataBound", "gui/view/Model", "gui/window/Header", "gui/window/Window"]);
