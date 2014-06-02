@@ -1,15 +1,17 @@
 /*global define */
 define( [
 	'lodash',
-	'ui/util/Css',
-	'ui/Component',
-	'ui/Container',
-	'ui/layout/Layout'
-], function( _, Css, Component, Container, Layout ) {
+	
+	'gui/util/Css',
+	'gui/Component',
+	'gui/Container',
+	'gui/layout/Manager',
+	'gui/layout/Layout'
+], function( _, Css, Component, Container, LayoutManager, Layout ) {
 
 	/**
-	 * @class ui.layout.Tab
-	 * @extends ui.layout.Layout
+	 * @class gui.layout.Tab
+	 * @extends gui.layout.Layout
 	 * 
 	 * A layout that renders a {@link ui.Container Container's} child components in tabs.  Methods are available in 
 	 * this class to control which tab is shown.
@@ -393,7 +395,7 @@ define( [
 	
 	
 	// Register the layout type with the ui.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'tabs', TabLayout );
+	LayoutManager.registerType( 'tabs', TabLayout );
 	
 	return TabLayout;
 	

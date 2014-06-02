@@ -1,9 +1,8 @@
 /*global define */
 define( [
-	'require',
-	'gui/layout/Layout',
-	'gui/Container'
-], function( require, Layout ) {
+	'gui/layout/Manager',
+	'gui/layout/Layout'
+], function( LayoutManager, Layout ) {
 	
 	/**
 	 * @class gui.layout.Auto
@@ -38,11 +37,9 @@ define( [
 		
 	} );
 	
-	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
-	// NOTE: Due to circular dependency issues with RequireJS, gui.Container automatically considers this class as "registered" with
-	// the type string 'auto'. Leaving below line commented as a reminder. Even if we add an async require() call here,
-	// it is possible that the AutoLayout class is still not registered in time for use.
-	//Container.registerLayout( 'auto', AutoLayout );   -- leave as reminder
+	
+	LayoutManager.registerType( 'auto', AutoLayout );
 
 	return AutoLayout;
+	
 } );

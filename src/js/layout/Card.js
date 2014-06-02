@@ -2,9 +2,10 @@
 define( [
 	'gui/Component',
 	'gui/Container',
+	'gui/layout/Manager',
 	'gui/layout/Layout',
 	'gui/layout/Card.SwitchTransition'
-], function( Component, Container, Layout, SwitchTransition ) {
+], function( Component, Container, LayoutManager, Layout, SwitchTransition ) {
 	
 	/**
 	 * @class gui.layout.Card
@@ -286,8 +287,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'card', CardLayout );
+	LayoutManager.registerType( 'card', CardLayout );
 	
 	return CardLayout;
 

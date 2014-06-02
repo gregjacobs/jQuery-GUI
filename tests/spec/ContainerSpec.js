@@ -4,9 +4,10 @@ define( [
 	'Class',
 	'gui/Component',
 	'gui/Container',
+	'gui/layout/Manager',
 	'gui/layout/Layout',
 	'gui/layout/Auto'
-], function( jQuery, Class, Component, Container, Layout, AutoLayout ) {
+], function( jQuery, Class, Component, Container, LayoutManager, Layout, AutoLayout ) {
 	
 	describe( 'gui.Container', function() {
 		
@@ -968,7 +969,7 @@ define( [
 		 */
 		describe( 'getLayout()', function() {
 			var TestLayout = Class.extend( Layout, {} );
-			Container.registerLayout( '__getLayoutTest_testLayout', TestLayout );
+			LayoutManager.registerType( '__getLayoutTest_testLayout', TestLayout );
 			
 			
 			it( "should return a gui.layout.Auto layout instance when no layout has been configured", function() {
@@ -1004,7 +1005,7 @@ define( [
 		 */
 		describe( "Test the setLayout() method", function() {
 			var TestLayout = Class.extend( Layout, {} );
-			Container.registerLayout( '__setLayoutTest_testLayout', TestLayout );
+			LayoutManager.registerType( '__setLayoutTest_testLayout', TestLayout );
 			
 			it( "setLayout() should throw an error if not provided an argument", function() {
 				var container = new Container();
@@ -1016,9 +1017,11 @@ define( [
 			
 			it( "setLayout() should throw an error if given a string that doesn't have an associated Layout class", function() {
 				var container = new Container();
+				
 				expect( function() {
 					container.setLayout( 'non-existent-layout' );
-				} ).toThrow( "Layout type 'non-existent-layout' is not a registered layout type." );
+				} ).toThrow( "The layout class with type name 'non-existent-layout' has not been registered. Make sure that the layout " +
+                             "exists, and has been 'required' by a RequireJS require() or define() call" );
 			} );
 			
 			

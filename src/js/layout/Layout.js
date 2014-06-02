@@ -1,9 +1,8 @@
 /*global define */
 define( [
 	'lodash',
-	'Observable',
-	'gui/Gui'
-], function( _, Observable, Gui ) {
+	'Observable'
+], function( _, Observable ) {
 	
 	/**
 	 * @abstract 
@@ -59,6 +58,18 @@ define( [
 		 * after instantiation with {@link #setContainer}. 
 		 */
 		container : null,
+		
+		
+		/**
+		 * @property {Boolean} isGuiLayout (readonly)
+		 * 
+		 * A property simply to identify Layout instances as such. This is so that we don't need circular dependencies in some of the
+		 * other jQuery-GUI files, which only bring in the Layout class for an `instanceof` check.
+		 * 
+		 * Although RequireJS supports circular dependencies, compiling in advanced mode with the Google Closure Compiler requires that
+		 * no circular dependencies exist.
+		 */
+		isGuiLayout : true,
 		
 		/**
 		 * @private
@@ -122,7 +133,7 @@ define( [
 		 * @template
 		 * @method initLayout
 		 */
-		initLayout : Gui.emptyFn,
+		initLayout : _.noop,
 		
 		
 		/**
@@ -159,7 +170,7 @@ define( [
 		 * @method onContainerSet
 		 * @param {gui.Container} container The Container that was set.
 		 */
-		onContainerSet : Gui.emptyFn,
+		onContainerSet : _.noop,
 		
 		
 		/**
@@ -221,7 +232,7 @@ define( [
 		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
-		onLayout : Gui.emptyFn,
+		onLayout : _.noop,
 		
 		
 		/**
@@ -235,7 +246,7 @@ define( [
 		 * @param {gui.Component[]} childComponents The child components that should be rendered and laid out.
 		 * @param {jQuery} $targetEl The target element, where child components should be rendered into.
 		 */
-		afterLayout : Gui.emptyFn,
+		afterLayout : _.noop,
 		
 		
 		/**
@@ -366,7 +377,7 @@ define( [
 		 * @template
 		 * @method onDestroy
 		 */
-		onDestroy : Gui.emptyFn
+		onDestroy : _.noop
 		
 	} );
 

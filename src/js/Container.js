@@ -1,14 +1,14 @@
 /*global define */
 define( [
-	'require',
 	'lodash',
 	'Class',
 	'gui/Gui',
 	'gui/ComponentManager',
 	'gui/Component',
-	'gui/layout/Layout',   // circular dependency, used with require() call
-	'gui/layout/Auto'      // circular dependency, used with require() call
-], function( require, _, Class, Gui, ComponentManager, Component ) {
+	'gui/layout/Manager',
+	'gui/layout/Layout',
+	'gui/layout/Auto'
+], function( _, Class, Gui, ComponentManager, Component, LayoutManager, Layout, AutoLayout ) {
 
 	/**
 	 * @class gui.Container
@@ -18,60 +18,7 @@ define( [
 	 * Base class for a component that holds other child components. Provides a default
 	 * container layout that just adds child components directly into it with no layout.
 	 */
-	var Container = Class.extend( Component, {
-	
-		statics : {
-			
-			/**
-			 * @private
-			 * @static
-			 * @property {Object} layouts
-			 * 
-			 * Map that stores "registered" layout types. The layouts are in the `gui.layout` package, and each
-			 * specifies a type name that is used to instantiate them.
-			 */
-			layouts : {},
-			
-			/**
-			 * Registers a {@link gui.layout.Layout Layout} with the Container class, allowing {@link #layout layouts}
-			 * to be specified by their string `typeName`.
-			 *
-			 * @static
-			 * @param {String} typeName The type name for the Layout.
-			 * @param {Function} layoutClass A {@link gui.layout.Layout} subclass.
-			 */
-			registerLayout : function( typeName, layoutClass ) {
-				Container.layouts[ typeName.toLowerCase() ] = layoutClass;
-			},
-			
-			/**
-			 * Retrieves a registered {@link gui.layout.Layout Layout} class by "type" name.
-			 * 
-			 * @static
-			 * @protected
-			 * @param {String} typeName The type name that the layout was registered with. This is case-insensitive.
-			 * @return {Function} The {@link gui.layout.Layout Layout} that was registered with the
-			 *   given `typeName`.
-			 * @throws {Error} If the `typeName` did not resolve to a registered {@link gui.layout.Layout Layout}.
-			 */
-			getLayoutType : function( typeName ) {
-				typeName = typeName.toLowerCase();
-				
-				// <debug>
-				// Check that the layout type given is a registered layout type (or 'auto', as the AutoLayout
-				// is assumed to be loaded as a workaround for the circular dependency of this class requiring it)
-				if( typeName !== 'auto' && !Container.layouts[ typeName ] ) {
-					throw new Error( "Layout type '" + typeName + "' is not a registered layout type." );
-				}
-				// </debug>
-				
-				// Return the AutoLayout explicitly if asked for, since that class is not registered due to issues 
-				// with RequireJS and the circular dependency of this class requiring it. Other Layout classes are 
-				// registered normally. 
-				return ( typeName === 'auto' ) ? require( 'gui/layout/Auto' ) : Container.layouts[ typeName ];
-			}
-			
-		},
+	var Container = Component.extend( {
 	
 		/**
 		 * @cfg {String} defaultType
@@ -834,12 +781,9 @@ define( [
 		 * Retrieves the {@link gui.layout.Layout Layout} object that the Container is currently
 		 * configured to use.  If no {@link #layout} is currently configured for the Container, this method
 		 * creates a {@link gui.layout.Auto} to use for this Container, and returns that.
-		 *
-		 * @method getLayout
 		 */
 		getLayout : function() {
 			if( !this.layout ) {
-				var AutoLayout = require( 'gui/layout/Auto' );
 				this.setLayout( new AutoLayout() );
 			}
 			return this.layout;
@@ -850,12 +794,9 @@ define( [
 		 * Sets a new layout strategy object for the Container. Any previous layout will be detached from
 		 * the Container (its container reference set to null).
 		 *
-		 * @method setLayout
 		 * @param {String/Object/gui.layout.Layout} layout See the {@link #layout} config.
 		 */
 		setLayout : function( layout ) {
-			var Layout = require( 'gui/layout/Layout' );  // for dealing with circular dependency
-			
 			// Destroy the current layout if we have a new one, and detach all Components in the Container, as 
 			// a new layout is going to have to render them anyway.
 			if( this.layout instanceof Layout && this.layout !== layout ) {
@@ -869,34 +810,8 @@ define( [
 				this.layout.destroy();
 			}
 
-	
-			if( layout instanceof Layout ) {
-				// The new layout is already a Layout instance
-				this.layout = layout;
-				layout.setContainer( this );
-	
-			} else {
-				// The new layout is a string or config object
-				var layoutTypeName,
-				    layoutConfig = { container: this };
-	
-				if( typeof layout === 'string' ) {
-					layoutTypeName = layout;
-	
-				} else if( typeof layout === 'object' ) { // config object
-					layoutTypeName = layout.type || 'auto';   // default to 'auto' layout
-					layoutConfig = _.defaults( _.clone( layoutConfig ), layout );
-					delete layoutConfig.type;  // remove the 'type' property from the config object now, as to not shadow the Layout object's prototype 'type' property when applied
-	
-				} else {
-					// Not a gui.layout.Layout, String, or Object...
-					throw new Error( "Invalid layout argument provided to setLayout. See method description in docs." );
-				}
-
-				// Create the layout strategy object from its type name if all is well
-				var LayoutClass = Container.getLayoutType( layoutTypeName );
-				this.layout = new LayoutClass( layoutConfig );
-			}
+			this.layout = layout = LayoutManager.create( layout );
+			layout.setContainer( this );
 		},
 	
 	
@@ -1015,7 +930,6 @@ define( [
 			this.removeAll();
 	
 			// Destroy the Container's layout, if it has one
-			var Layout = require( 'gui/layout/Layout' );
 			if( this.layout instanceof Layout ) {  // just in case it's still the string config
 				this.layout.destroy();
 			}

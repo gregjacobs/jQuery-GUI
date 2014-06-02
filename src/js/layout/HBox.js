@@ -1,10 +1,10 @@
 /*global define */
 define( [
 	'jquery',
-	'gui/Component',
-	'gui/Container',
+	
+	'gui/layout/Manager',
 	'gui/layout/Layout'
-], function( jQuery, Component, Container, Layout ) {
+], function( jQuery, LayoutManager, Layout ) {
 
 	/**
 	 * @class gui.layout.HBox
@@ -162,8 +162,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'hbox', HBoxLayout );
+	LayoutManager.registerType( 'hbox', HBoxLayout );
 	
 	return HBoxLayout;
 	

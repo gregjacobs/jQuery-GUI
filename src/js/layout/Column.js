@@ -1,10 +1,8 @@
 /*global define */
 define( [
-	'Class',
-	'gui/Component',
-	'gui/Container',
+	'gui/layout/Manager',
 	'gui/layout/Layout'
-], function( Class, Component, Container, Layout ) {
+], function( LayoutManager, Layout ) {
 
 	/**
 	 * @class gui.layout.Column
@@ -130,8 +128,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'column', ColumnLayout );
+	LayoutManager.registerType( 'column', ColumnLayout );
 	
 	return ColumnLayout;
 	

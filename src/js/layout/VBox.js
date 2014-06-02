@@ -1,8 +1,8 @@
 /*global define */
 define( [
-	'gui/Container',
+	'gui/layout/Manager',
 	'gui/layout/Layout'
-], function( Container, Layout ) {
+], function( LayoutManager, Layout ) {
 
 	/**
 	 * @class gui.layout.VBox
@@ -127,8 +127,7 @@ define( [
 	} );
 	
 	
-	// Register the layout type with the gui.Container class, which is used to be able to instantiate the layout via its type name.
-	Container.registerLayout( 'vbox', VBoxLayout );
+	LayoutManager.registerType( 'vbox', VBoxLayout );
 	
 	return VBoxLayout;
 	
