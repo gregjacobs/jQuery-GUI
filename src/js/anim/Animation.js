@@ -1,12 +1,9 @@
 /*global define */
 define( [
-	'require',
 	'jquery',
 	'lodash',
-	'Class',
-	'Observable',
-	'gui/Component'
-], function( require, jQuery, _, Class, Observable, Component ) {
+	'Observable'
+], function( jQuery, _, Observable ) {
 	
 	/**
 	 * @class gui.anim.Animation
@@ -14,7 +11,7 @@ define( [
 	 * 
 	 * A class that encapsulates a single animation of a given HTMLElement, jQuery wrapped set, or {@link gui.Component}.
 	 */
-	var Animation = Class.extend( Observable, {
+	var Animation = Observable.extend( {
 		
 		/**
 		 * @cfg {HTMLElement/jQuery/gui.Component} target (required)
@@ -183,7 +180,7 @@ define( [
 			// Make sure there is a 'target' config, and normalize it if need be
 			var target = this.target;
 			if( target ) {
-				if( target instanceof require( 'gui/Component' ) ) {   // need to require() gui.Component here, because it is a circular dependency
+				if( target.isGuiComponent ) {
 					$target = jQuery( target.getEl() );
 				} else {
 					$target = jQuery( target );
