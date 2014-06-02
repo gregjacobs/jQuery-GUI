@@ -104,11 +104,11 @@ define( [
 			
 		describe( 'create()', function() {
 			
-			it( "should simply return an already-instantiated component", function() { 
-				// Test that already-instantiated components are returned directly
+			it( "should simply return an already-instantiated component", function() {
 				var myComponent = new Component();
 				var cmp = ComponentManager.create( myComponent );
-				expect( cmp ).toBe( myComponent );  // create() did not return already-instantiated Component directly.
+				
+				expect( cmp ).toBe( myComponent );
 			} );
 			
 			it( "should simply return an already-instantiated component, if the component is a subclass of gui.Component", function() {
@@ -120,7 +120,7 @@ define( [
 				
 				var myComponentSubclass = new MyComponentSubclass();
 				var cmp = ComponentManager.create( myComponentSubclass );
-				expect( cmp ).toBe( myComponentSubclass );  // create() did not return already-instantiated subclass of Component directly.
+				expect( cmp ).toBe( myComponentSubclass );
 			} );
 			
 			
@@ -133,7 +133,7 @@ define( [
 				var cmp = ComponentManager.create( {
 					type : 'someClass'
 				} );
-				expect( cmp instanceof Component ).toBe( true );  // create() did not instantiate 'someClass' via config object.
+				expect( cmp instanceof Component ).toBe( true );
 			} );
 			
 			
@@ -141,7 +141,7 @@ define( [
 				ComponentManager.registerType( 'container', Container );  // need to re-register the Container class for this test.
 				
 				var cmp = ComponentManager.create( {} );
-				expect( cmp instanceof Container ).toBe( true );  // create() did not instantiate a Container via config object with no type property.
+				expect( cmp instanceof Container ).toBe( true );
 			} );
 			
 		
