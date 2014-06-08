@@ -61,6 +61,41 @@ define( [
 			}
 		} );
 		
+		
+		describe( 'getText()', function() {
+			
+			it( "should retrieve the 'text' of the selected option (unrendered)", function() {
+				var field = new RadioField( {
+					options : [ 
+						{ text: "Option 1", value: "value1" }, 
+						{ text: "Option 2", value: "value2" }	
+					],
+					value: "value1"
+				} );
+				
+				expect( field.getText() ).toBe( "Option 1" );
+				
+				field.destroy();
+			} );
+			
+			
+			it( "should retrieve the 'text' of the selected option (rendered)", function() {
+				var field = new RadioField( {
+					renderTo : 'body',
+					options : [ 
+						{ text: "Option 1", value: "value1" }, 
+						{ text: "Option 2", value: "value2" }	
+					],
+					value: "value1"
+				} );
+				
+				expect( field.getText() ).toBe( "Option 1" );
+				
+				field.destroy();
+			} );
+			
+		} );
+		
 	} );
 	
 } );

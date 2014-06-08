@@ -124,11 +124,11 @@ define( [
 			
 			var options = this.optionsStore.getOptions(),
 			    radioTpl = this.radioTpl,
-				inputName = this.inputName,
-				$inputContainerEl = this.$inputContainerEl,
-				stacked = this.stacked,
-				fieldValue = this.value,
-				markup = [];
+			    inputName = this.inputName,
+			    $inputContainerEl = this.$inputContainerEl,
+			    stacked = this.stacked,
+			    fieldValue = this.value,
+			    markup = [];
 			
 			for( var i = 0, len = options.length; i < len; i++ ) {
 				var option = options[ i ];
@@ -192,6 +192,19 @@ define( [
 			} else {
 				return this.$inputContainerEl.find( ':radio:checked' ).val();
 			}
+		},
+		
+		
+		/**
+		 * Retrieves the text of the selected radio option (as opposed to retrieving the selected option's 
+		 * {@link getValue value}).
+		 * 
+		 * @return {String}
+		 */
+		getText : function() {
+			var option = this.optionsStore.getByValue( this.getValue() );
+			
+			return ( option ) ? option.text : "";
 		}
 		
 	} );
