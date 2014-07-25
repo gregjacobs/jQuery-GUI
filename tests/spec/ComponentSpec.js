@@ -153,15 +153,12 @@ function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container )
 		
 		// -----------------------------------------------
 		
-		
-		/*
-		 * Test render()
-		 */
-		describe( "Test render()", function() {
+		describe( 'render()', function() {
 			
-			it( "Attributes given to the `attr` config should be applied to the element", function() {
+			it( "should apply attributes given to the `attr` config to the element", function() {
 				var component = new Component( {
 					renderTo : document.body,   // to cause it to render
+					
 					attr : {
 						attr1 : "value1",
 						attr2 : "value2"
@@ -176,9 +173,10 @@ function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container )
 			} );
 			
 			
-			it( "CSS class names given to the `baseCls` config should be applied to the element", function() {
+			it( "should apply any CSS class names given to the `baseCls` config to the element", function() {
 				var component = new Component( {
 					renderTo : document.body,   // to cause it to render
+					
 					baseCls: 'gui-testComponent'
 				} );
 				
@@ -189,9 +187,10 @@ function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container )
 			} );
 			
 			
-			it( "CSS class names given to the `componentCls` config should be applied to the element", function() {
+			it( "should apply any CSS class names given to the `componentCls` config to the element", function() {
 				var component = new Component( {
 					renderTo : document.body,   // to cause it to render
+					
 					componentCls: 'gui-testComponent'
 				} );
 				
@@ -203,9 +202,10 @@ function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container )
 			} );
 			
 			
-			it( "CSS class names given to the `cls` config should be applied to the element", function() {
+			it( "should apply any CSS class names given to the `cls` config to the element", function() {
 				var component = new Component( {
 					renderTo : document.body,   // to cause it to render
+					
 					cls: 'myClass1 myClass2'
 				} );
 				
@@ -217,9 +217,10 @@ function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container )
 			} );
 			
 			
-			it( "style properties given to the `style` config should be applied to the element", function() {
+			it( "should apply style properties given to the `style` config to the element", function() {
 				var component = new Component( {
 					renderTo : document.body,   // to cause it to render
+					
 					style: {
 						'fontFamily' : 'Arial', // specified as JS property name
 						'font-size'  : '12px'   // specified as CSS property name
