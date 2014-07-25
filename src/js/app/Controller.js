@@ -188,6 +188,7 @@ define( [
 		 * component(s) throughout the Controller's code using {@link #getRef}.
 		 * 
 		 * This Object should be keyed by the ref names, and whose values are Objects with the following properties:
+		 * 
 		 * - **selector** (String) : The selector string for the ref.
 		 * - **multiple** (Boolean) : (Optional) `true` if this is a multi-component selector (in which case an array is returned
 		 *   when retrieving the ref), or `false` if the selector returns a single component. Defaults to `false`.
