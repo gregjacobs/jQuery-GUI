@@ -10,6 +10,19 @@ define( [
 ], function( jQuery, _, ComponentDomDelegateHandler, Component, Container ) {
 	
 	describe( 'gui.ComponentDomDelegateHandler', function() {
+		var component,
+		    container;
+		
+		beforeEach( function() {
+			component = null;
+			container = null;
+		} );
+		
+		afterEach( function() {
+			if( component ) component.destroy();
+			if( container ) container.destroy();
+		} );
+		
 		
 		it( "should automatically facilitate the hookup of a component's child elements having special `gui-[eventName]` attributes", function() {
 			var div1ClickCount = 0,
@@ -17,7 +30,7 @@ define( [
 			    div1,
 			    div2;
 			
-			var component = new Component( {
+			component = new Component( {
 				html : '<div gui-click="onDiv1Click">Div 1</div>' + 
 				       '<div gui-click="onDiv2Click">Div 2</div>',
 				
@@ -25,7 +38,7 @@ define( [
 				onDiv2Click : function( evt ) { div2ClickCount++; expect( evt.target ).toBe( div2 ); }
 			} );
 			
-			component.render( 'body' );
+			component.render( 'body', 0 );
 			div1 = component.getEl().find( 'div' )[ 0 ];
 			div2 = component.getEl().find( 'div' )[ 1 ];
 			
@@ -37,13 +50,11 @@ define( [
 			jQuery( div2 ).trigger( 'click' );
 			expect( div1ClickCount ).toBe( 1 );
 			expect( div2ClickCount ).toBe( 1 );
-			
-			component.destroy();  // clean up
 		} );
 		
 		
 		it( "should automatically facilitate the hookup of all events defined in the ComponentDomDelegateHandler for a component's child elements having the special `gui-[eventName]` attributes", function() {
-			var eventNames = _.without( ComponentDomDelegateHandler.eventNames, 'focus', 'blur' ),  // unfortunately, can't focus or blur a <div>, so we'll skip these
+			var eventNames = ComponentDomDelegateHandler.getDelegateEventNames(),  // doesn't include 'focus' or 'blur', since a <div> cannot have those events fired on it
 			    eventCounts = {},  // map of event names -> counts
 			    allEventAttrs,
 			    element;
@@ -57,7 +68,7 @@ define( [
 				return 'gui-' + eventName + '="onEvent"';  // ex: gui-click="onEvent"
 			} );
 			
-			var component = new Component( {
+			component = new Component( {
 				html : '<div ' + allEventAttrs.join( " " ) + '>Div</div>',  
 				
 				onEvent : function( evt ) { 
@@ -66,7 +77,7 @@ define( [
 				}
 			} );
 			
-			component.render( 'body' );
+			component.render( 'body', 0 );
 			element = component.getEl().find( 'div' )[ 0 ];
 			
 			// Simulate Events
@@ -81,8 +92,6 @@ define( [
 				if( count !== 1 ) 
 					throw new Error( "Count for event '" + eventName + "' was " + count + " instead of 1" ); 
 			} );
-			
-			component.destroy();  // clean up
 		} );
 		
 		
@@ -92,7 +101,7 @@ define( [
 			    nested2Div,
 			    nested3Div;
 			
-			var component = new Component( {
+			component = new Component( {
 				tpl : [
 					'<div data-elem="outer">',
 						'<div data-elem="nested1" gui-click="onDivClick">',
@@ -119,10 +128,10 @@ define( [
 				}
 			} );
 			
-			component.render( 'body' );
-			nested1Div = component.getEl().find( 'div' )[ 1 ];  // not index 0, because that is the data-elem="outer" div
-			nested2Div = component.getEl().find( 'div' )[ 2 ];
-			nested3Div = component.getEl().find( 'div' )[ 3 ];
+			component.render( 'body', 0 );
+			nested1Div = component.getEl().find( 'div[data-elem="nested1"]' )[ 0 ];
+			nested2Div = component.getEl().find( 'div[data-elem="nested2"]' )[ 0 ];
+			nested3Div = component.getEl().find( 'div[data-elem="nested3"]' )[ 0 ];
 			
 			// Simulate Events
 			jQuery( nested1Div ).trigger( 'click' );
@@ -133,8 +142,6 @@ define( [
 			
 			jQuery( nested3Div ).trigger( 'click' );
 			expect( divClickCount ).toBe( 3 );
-			
-			component.destroy();  // clean up
 		} );
 		
 		
@@ -144,7 +151,7 @@ define( [
 			    divMouseLeaveCount = 0,
 			    div;
 			
-			var component = new Component( {
+			component = new Component( {
 				html : '<div gui-click="onDivClick" gui-mouseenter="onDivMouseEnter" gui-mouseleave="onDivMouseLeave">Div</div>',
 				
 				onDivClick      : function( evt ) { divClickCount++;      expect( evt.target ).toBe( div ); },
@@ -152,7 +159,7 @@ define( [
 				onDivMouseLeave : function( evt ) { divMouseLeaveCount++; expect( evt.target ).toBe( div ); }
 			} );
 			
-			component.render( 'body' );
+			component.render( 'body', 0 );
 			div = component.getEl().find( 'div' )[ 0 ];
 			
 			
@@ -171,8 +178,6 @@ define( [
 			expect( divClickCount ).toBe( 1 );
 			expect( divMouseEnterCount ).toBe( 1 );
 			expect( divMouseLeaveCount ).toBe( 1 );
-			
-			component.destroy();  // clean up
 		} );
 		
 		
@@ -184,7 +189,7 @@ define( [
 			    child1Div,
 			    child2Div;
 			
-			var container = new Container( {
+			container = new Container( {
 				renderTpl : [
 					'<div gui-click="onDivClick">Container Div</div>',
 					
@@ -212,7 +217,7 @@ define( [
 				onDivClick : function( evt ) { containerDivClickCount++; expect( evt.target ).toBe( containerDiv ); }
 			} );
 			
-			container.render( 'body' );
+			container.render( 'body', 0 );
 			containerDiv = container.getEl().find( 'div' )[ 0 ];
 			child1Div = container.getItemAt( 0 ).getEl().find( 'div' )[ 0 ];
 			child2Div = container.getItemAt( 1 ).getEl().find( 'div' )[ 0 ];
@@ -232,8 +237,6 @@ define( [
 			expect( containerDivClickCount ).toBe( 1 );
 			expect( child1DivClickCount ).toBe( 1 );
 			expect( child2DivClickCount ).toBe( 1 );
-			
-			container.destroy();  // clean up
 		} );
 		
 		
@@ -243,7 +246,7 @@ define( [
 			    containerDiv,
 			    childDiv;
 			
-			var container = new Container( {
+			container = new Container( {
 				renderTpl : [
 					'<div gui-click="onDivClick" id="<%= elId %>-contentTarget"></div>'
 				],
@@ -263,7 +266,7 @@ define( [
 				onDivClick : function( evt ) { containerDivClickCount++; expect( evt.currentTarget ).toBe( containerDiv ); }
 			} );
 			
-			container.render( 'body' );
+			container.render( 'body', 0 );
 			containerDiv = container.getEl().find( 'div' )[ 0 ];
 			childDiv = container.getItemAt( 0 ).getEl().find( 'div' )[ 0 ];
 			
@@ -275,8 +278,39 @@ define( [
 			jQuery( childDiv ).trigger( 'click' );
 			expect( containerDivClickCount ).toBe( 2 );  // this should be triggered again (bringing it to 2), as a parent to another element that has a gui-click handler
 			expect( childDivClickCount ).toBe( 1 );
+		} );
+		
+		
+		it( "should *not* allow the 'focus' or 'blur' events to be bubbled - only specific elements with 'focus' and 'blur' should have an event handler called. 'focusin' and 'focusout' should be bubbled, however", function() {
+			var counts = { outerFocus: 0, outerBlur: 0, outerFocusIn: 0, outerFocusOut: 0, innerFocus: 0, innerBlur: 0 },
+			    outerEl,
+			    innerEl;
 			
-			container.destroy();  // clean up
+			component = new Component( {
+				renderTpl : [
+					'<div gui-focus="onOuterFocus" gui-blur="onInnerFocus" gui-focusin="onOuterFocusIn" gui-focusout="onOuterFocusOut">',
+						'<input type="text" gui-focus="onInnerFocus" gui-blur="onInnerBlur" />',
+					'</div>'
+				],
+				
+				onOuterFocus    : function( evt ) { counts.outerFocus++;    expect( evt.currentTarget ).toBe( outerEl ); },
+				onOuterBlur     : function( evt ) { counts.outerBlur++;     expect( evt.currentTarget ).toBe( outerEl ); },
+				onOuterFocusIn  : function( evt ) { counts.outerFocusIn++;  expect( evt.currentTarget ).toBe( outerEl ); },
+				onOuterFocusOut : function( evt ) { counts.outerFocusOut++; expect( evt.currentTarget ).toBe( outerEl ); },
+				onInnerFocus    : function( evt ) { counts.innerFocus++;    expect( evt.currentTarget ).toBe( innerEl ); },
+				onInnerBlur     : function( evt ) { counts.innerBlur++;     expect( evt.currentTarget ).toBe( innerEl ); }
+			} );
+			component.render( 'body', 0 );
+			
+			outerEl = component.getEl().find( 'div' )[ 0 ];
+			innerEl = component.getEl().find( 'input' )[ 0 ];
+			
+			// Simulate Events
+			jQuery( innerEl ).trigger( 'focus' );
+			expect( counts ).toEqual( { outerFocus: 0, outerBlur: 0, outerFocusIn: 1, outerFocusOut: 0, innerFocus: 1, innerBlur: 0 } );
+			
+			jQuery( innerEl ).trigger( 'blur' );
+			expect( counts ).toEqual( { outerFocus: 0, outerBlur: 0, outerFocusIn: 1, outerFocusOut: 1, innerFocus: 1, innerBlur: 1 } );
 		} );
 		
 		
@@ -286,7 +320,7 @@ define( [
 			    containerDiv,
 			    childDiv;
 			
-			var container = new Container( {
+			container = new Container( {
 				renderTpl : [
 					'<div gui-click="onDivClick" id="<%= elId %>-contentTarget"></div>'
 				],
@@ -311,7 +345,7 @@ define( [
 				onDivClick : function( evt ) { containerDivClickCount++; expect( evt.currentTarget ).toBe( containerDiv ); }
 			} );
 			
-			container.render( 'body' );
+			container.render( 'body', 0 );
 			containerDiv = container.getEl().find( 'div' )[ 0 ];
 			childDiv = container.getItemAt( 0 ).getEl().find( 'div' )[ 0 ];
 			
@@ -323,8 +357,6 @@ define( [
 			jQuery( childDiv ).trigger( 'click' );
 			expect( containerDivClickCount ).toBe( 1 );  // this should *not* be triggered again in this case, since the nested handler stopped event propagation
 			expect( childDivClickCount ).toBe( 1 );
-			
-			container.destroy();  // clean up
 		} );
 		
 		
@@ -332,7 +364,7 @@ define( [
 			var checkboxClickCount = 0,
 			    checkbox;
 			
-			var component = new Component( {
+			component = new Component( {
 				html : '<input type="checkbox" gui-click="onCheckboxClick" />',
 				
 				onCheckboxClick : function( evt ) { 
@@ -343,15 +375,13 @@ define( [
 				}
 			} );
 			
-			component.render( 'body' );
+			component.render( 'body', 0 );
 			checkbox = component.getEl().find( 'input' )[ 0 ];
 			
 			// Simulate Events
 			jQuery( checkbox ).trigger( 'click' );
 			expect( checkboxClickCount ).toBe( 1 );
 			expect( checkbox.checked ).toBe( false );  // default behavior should have been prevented (i.e. checkbox should not have been checked)
-			
-			component.destroy();  // clean up
 		} );
 		
 	} );

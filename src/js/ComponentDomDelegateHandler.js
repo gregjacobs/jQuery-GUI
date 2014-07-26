@@ -24,8 +24,10 @@ define( [
 	 * - gui-keydown
 	 * - gui-keypress
 	 * - gui-keyup
-	 * - gui-focus
-	 * - gui-blur
+	 * - gui-focus    (non-bubbling - only affects the element that it is attached to)
+	 * - gui-blur     (non-bubbling - only affects the element that it is attached to)
+	 * - gui-focusin  (bubbling 'focus' event)
+	 * - gui-focusout (bubbling 'blur' event)
 	 * - gui-change
 	 * - gui-select
 	 * - gui-submit
@@ -114,6 +116,8 @@ define( [
 			'keyup',
 			'focus',
 			'blur',
+			'focusin',
+			'focusout',
 			'change',
 			'select'
 		],
@@ -145,7 +149,19 @@ define( [
 		 * @private
 		 */
 		init : function() {
-			jQuery( document.body ).on( this.eventNames.join( " " ), this.onEventScopedFn );
+			var eventNames = this.getDelegateEventNames();
+			
+			jQuery( document.body ).on( eventNames.join( " " ), this.onEventScopedFn );
+		},
+		
+		
+		/**
+		 * Retrieves the list of event names to subscribe to using the document-level delegate handler. 
+		 * 
+		 * @private
+		 */
+		getDelegateEventNames : function() {
+			return _.without( this.eventNames, 'focus', 'blur' );  // 'focus' and 'blur' are handled with the 'focusin' and 'focusout' events, since these events do not bubble
 		},
 		
 		
@@ -159,24 +175,72 @@ define( [
 		 */
 		onEvent : function( evt ) {
 			var el = evt.target,
-			    attrName = 'gui-' + evt.type,
-			    attrValue,
+			    eventType = evt.type,
 			    doc = document;
 			
+			// Special case for 'focusin' and 'focusout' events, which handle 'gui-focus' and 'gui-blur' attributes.
+			// This is because 'focus' and 'blur' events do not bubble, and are therefore not handled by our delegate listener.
+			if( el !== doc && ( eventType === 'focusin' || eventType === 'focusout' ) ) {
+				this.handleFocusOrBlur( el, eventType, evt );
+			}
+			
+			// Walk up the DOM tree, finding elements with the appropriate `gui-[eventName]` attributes, and calling
+			// handler methods on those elements' corresponding Components.
+			var evtAttrName = 'gui-' + eventType;
 			do {
-				if( el !== doc && ( attrValue = el.getAttribute( attrName ) ) ) {
-					var component = this.resolveComponent( el );
-					
-					if( component ) {
-						evt.currentTarget = el;  // update the current target as the element with the gui-[eventName] attribute, as would be done in normal event bubbling
-						
-						// call the method on the component
-						var returnVal = component[ attrValue ]( evt );
-						if( returnVal === false ) 
-							evt.preventDefault();  // Prevent default event behavior if a handler returns `false`
-					}
+				var handlerMethodName;
+				
+				if( el !== doc && ( handlerMethodName = el.getAttribute( evtAttrName ) ) ) {
+					this.callHandler( el, handlerMethodName, evt );
 				}
 			} while( !evt.isPropagationStopped() && ( el = el.parentNode ) );
+		},
+		
+		
+		/**
+		 * Special case to handle the 'gui-focus' or 'gui-blur' event attributes using the 'focusin' or 'focusout'
+		 * events. 
+		 * 
+		 * 'gui-focus' and 'gui-blur' apply to *only* the evt.target element (assuming one of these attributes exist there).
+		 * Normally, 'focus' and 'blur' events are not bubbled by the browser, so we're using 'focusin' and 'focusout' to 
+		 * handle these.
+		 * 
+		 * @private
+		 * @param {HTMLElement} el The element that is being processed, which has the special gui-[eventName] event 
+		 *   attribute. This is used to resolve the {@link gui.Component} that is associated with the element.
+		 * @param {String} eventType The name of the event that occurred. Will be either 'focusin' or 'focusout'.
+		 * @param {jQuery.Event} evt The event object.
+		 */
+		handleFocusOrBlur : function( el, eventType, evt ) {
+			var handlerMethodName;
+			
+			if( eventType === 'focusin' && ( handlerMethodName = el.getAttribute( 'gui-focus' ) ) ) {
+				this.callHandler( el, handlerMethodName, evt );
+				
+			} else if( eventType === 'focusout' && ( handlerMethodName = el.getAttribute( 'gui-blur' ) ) ) {
+				this.callHandler( el, handlerMethodName, evt );
+			}
+		},
+		
+		
+		/**
+		 * Calls the handler `method` on the `element`'s associated {@link gui.Component}, passing in the `evt`.
+		 * 
+		 * @private
+		 * @param {HTMLElement} element The element that is being processed, which has the special gui-[eventName] event 
+		 *   attribute. This is used to resolve the {@link gui.Component} that is associated with the element.
+		 * @param {String} method The name of the handler method to call.
+		 * @param {jQuery.Event} evt The event object.
+		 */
+		callHandler : function( element, method, evt ) {
+			evt.currentTarget = element;  // update the current target as the element with the gui-[eventName] attribute, as would be done in normal event bubbling
+			
+			// call the method on the component
+			var component = this.resolveComponent( element ),
+			    returnVal = component[ method ]( evt );
+			
+			if( returnVal === false ) 
+				evt.preventDefault();  // prevent default event behavior if a handler returns `false`
 		},
 		
 		
@@ -201,6 +265,7 @@ define( [
 		},
 		
 		
+		
 		/**
 		 * Destroys the ComponentDomDelegateHandler on window unload by unregistering the event handlers it has
 		 * placed on the &lt;body&gt; tag.
@@ -208,7 +273,7 @@ define( [
 		 * @private
 		 */
 		destroy : function() {
-			jQuery( document.body ).off( this.eventNames.join( " " ), this.onEventScopedFn );
+			jQuery( document.body ).off( this.getDelegateEventNames().join( " " ), this.onEventScopedFn );
 		}
 		
 	} );
