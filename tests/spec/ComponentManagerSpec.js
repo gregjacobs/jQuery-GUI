@@ -155,5 +155,87 @@ define( [
 			} );
 			
 		} );
+		
+		
+		// -----------------------------------
+		
+		
+		describe( 'registerComponentEl()', function() {
+			var component;
+			
+			beforeEach( function() {
+				component = new Component();
+			} );
+			
+			afterEach( function() {
+				component.destroy();
+			} );
+			
+			
+			it( "should register a Component's element ID to be associated with the Component itself", function() {
+				var elId = component.elId;
+				
+				ComponentManager.registerComponentEl( elId, component );
+				
+				expect( ComponentManager.getComponentByElId( elId ) ).toBe( component );
+			} );
+			
+		} );
+		
+		
+		describe( 'unregisterComponentEl()', function() {
+			var component;
+			
+			beforeEach( function() {
+				component = new Component();
+			} );
+			
+			afterEach( function() {
+				component.destroy();
+			} );
+			
+			
+			it( "should unregister a Component's element ID from being associated with the Component itself", function() {
+				var elId = component.elId;
+				
+				ComponentManager.registerComponentEl( elId, component );
+				ComponentManager.unregisterComponentEl( elId );
+				
+				expect( ComponentManager.getComponentByElId( elId ) ).toBe( null );
+			} );
+			
+		} );
+		
+		
+		describe( 'getComponentByElId()', function() {
+			var component1,
+			    component2;
+			
+			beforeEach( function() {
+				component1 = new Component();
+				component2 = new Component();
+			} );
+			
+			afterEach( function() {
+				component1.destroy();
+				component2.destroy();
+			} );
+			
+			
+			it( "should retrieve component references that have been registered by their element ID (`elId`)", function() {
+				ComponentManager.registerComponentEl( component1.elId, component1 );
+				ComponentManager.registerComponentEl( component2.elId, component2 );
+				
+				expect( ComponentManager.getComponentByElId( component1.elId ) ).toBe( component1 );
+				expect( ComponentManager.getComponentByElId( component2.elId ) ).toBe( component2 );
+			} );
+			
+			
+			it( "should return `null` for an `elId` that hasn't been registered", function() {
+				expect( ComponentManager.getComponentByElId( 'non-existent-elId' ) ).toBe( null );
+			} );
+			
+		} );
+		
 	} );
 } );

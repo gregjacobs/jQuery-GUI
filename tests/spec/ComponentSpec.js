@@ -155,6 +155,30 @@ function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container )
 		
 		describe( 'render()', function() {
 			
+			it( "should register the Component's elementId (`elId`) with the ComponentManager once the Component is rendered", function() {
+				var component = new Component(),
+				    elId = component.elId;
+				
+				expect( ComponentManager.getComponentByElId( elId ) ).toBe( null );  // initial condition
+				
+				component.render( 'body' );
+				
+				expect( ComponentManager.getComponentByElId( elId ) ).toBe( component );
+			} );
+			
+			
+			it( "should apply the special attribute `gui-isComponentEl` to the component, which is used by the ComponentDomDelegateHandler to find Component root elements", function() {
+				var component = new Component( {
+					renderTo : document.body   // to cause it to render
+				} );
+				
+				var el = component.getEl()[ 0 ];
+				expect( el.hasAttribute( 'gui-isComponentEl' ) ).toBe( true );
+				
+				component.destroy();
+			} );
+			
+			
 			it( "should apply attributes given to the `attr` config to the element", function() {
 				var component = new Component( {
 					renderTo : document.body,   // to cause it to render
@@ -2451,6 +2475,30 @@ function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container )
 		
 		
 		describe( 'destroy()', function() {
+			
+			it( "should unregister the Component's elementId (`elId`) from the ComponentManager once the Component is destroyed", function() {
+				var component = new Component(),
+				    elId = component.elId;
+				
+				component.render( 'body' );
+				expect( ComponentManager.getComponentByElId( elId ) ).toBe( component );   // initial condition
+				
+				component.destroy();
+				expect( ComponentManager.getComponentByElId( elId ) ).toBe( null );
+			} );
+			
+			
+			it( "should not error when unregistering the Component's elementId (`elId`) from the ComponentManager, if the Component was never rendered", function() {
+				var component = new Component(),
+				    elId = component.elId;
+				
+				// component.render( 'body' );  -- never rendered
+				expect( ComponentManager.getComponentByElId( elId ) ).toBe( null );   // initial condition
+				
+				component.destroy();
+				expect( ComponentManager.getComponentByElId( elId ) ).toBe( null );
+			} );
+			
 			
 			it( "should remove all event handlers from the component", function() {
 				var component = new Component( {

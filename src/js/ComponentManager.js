@@ -5,8 +5,12 @@ define( function() {
 	 * @class gui.ComponentManager
 	 * @singleton
 	 *
-	 * Object used to manage {@link gui.Component} "types", and handles instantiating them based on the string that is specified
-	 * for them in the manifest.
+	 * Object used to manage {@link gui.Component} `type`s and instances. Performs the following tasks:
+	 * 
+	 * 1) Instantiates anonymous configuration objects with a `type` property into the appropriate {@link gui.Component}
+	 *    subclass ({@link #create} method).
+	 * 2) Maintains a map of Component's {@link gui.Component#elId element IDs} -> {@link gui.Component Component} instances,
+	 *    which are registered when components are rendered.
 	 */
 	var ComponentManager = {
 		
@@ -18,6 +22,16 @@ define( function() {
 		 * keyed by their type name. 
 		 */
 		componentClasses : {},
+		
+		
+		/**
+		 * @private
+		 * @property {Object} elementIdMap
+		 * 
+		 * An Object (map) of {@link gui.Component#elId Component element IDs} -> {@link gui.Component Component} instances,
+		 * which are registered when each Component is {@link gui.Component#render rendered}.
+		 */
+		elementIdMap : {},
 	   
 	   
 		/**
@@ -103,6 +117,53 @@ define( function() {
 				// No registered type with the given type, throw an error
 				throw new Error( "ComponentManager.create(): Unknown type: '" + type + "'" );
 			}
+		},
+		
+		
+		// -----------------------------------
+		
+		
+		/**
+		 * Registers a {@link gui.Component Component's} element to be associated with the Component instance.
+		 * Sets up a mapping by the Component's {@link gui.Component#elId element ID}, and is done when the
+		 * Component is {@link gui.Component#render rendered}.
+		 * 
+		 * Note: This is used internally by the library, and shouldn't be called directly.
+		 * 
+		 * @param {String} elId The Component's {@link gui.Component#elId element ID}.
+		 * @param {gui.Component} component The Component itself.
+		 */
+		registerComponentEl : function( elId, component ) {
+			this.elementIdMap[ elId ] = component;
+		},
+		
+		
+		/**
+		 * Unregisters a {@link gui.Component Component's} element from its association with its {@link gui.Component}
+		 * instance. This is performed when a Component is destroyed.
+		 * 
+		 * Note: This is used internally by the library, and shouldn't be called directly.
+		 * 
+		 * @param {String} elId The Component's {@link gui.Component#elId element ID}.
+		 */
+		unregisterComponentEl : function( elId ) {
+			delete this.elementIdMap[ elId ];
+		},
+		
+		
+		/**
+		 * Retrieves a {@link gui.Component Component} instance by its {@link gui.Component#elId element ID}.
+		 * 
+		 * Note: This is used internally by the library (namely the {@link gui.ComponentDomDelegateHandler} class), 
+		 * and shouldn't be called directly from code except for debugging purposes. Code that reverse-references a
+		 * Component instance from an HTML element instead of simply being passed the Component reference will most
+		 * likely be very difficult to understand, and maintain.
+		 * 
+		 * @param {String} elId The Component's {@link gui.Component#elId element ID}.
+		 * @return {gui.Component} The Component instance that is mapped to the `elId`, or `null` if one was not found.
+		 */
+		getComponentByElId : function( elId ) {
+			return this.elementIdMap[ elId ] || null;
 		}
 		
 	};

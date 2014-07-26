@@ -7,6 +7,7 @@ define( [
 	
 	'gui/Gui',
 	'gui/ComponentManager',
+	'gui/ComponentDomDelegateHandler',  // must be included in order to initialize it
 	'gui/util/Css',
 	'gui/util/Html',
 	'gui/Mask',
@@ -22,6 +23,7 @@ define( [
 	
 	Gui,
 	ComponentManager,
+	ComponentDomDelegateHandler,
 	Css,
 	Html,
 	Mask,
@@ -131,6 +133,48 @@ define( [
 	 * These instantiated but unrendered components may still be updated by a {@link gui.app.Controller Controller} however. The client code 
 	 * in the Controller should not have to first test if the component is rendered before calling methods on it, so the automatic handling 
 	 * of rendered/unrendered state within the components makes this distinction transparent.
+	 * 
+	 * 
+	 * ## Events from child HTML elements
+	 * 
+	 * DOM Events may be set up from child elements to call methods on the Component using the special `gui-[eventName]`
+	 * attributes. This alleviates the need to manually listen to events on the Component's {@link #$el element} once
+	 * the Component has been rendered.
+	 * 
+	 * These special 'gui-' attributes may be placed in markup / DOM nodes anywhere under the Component,
+	 * such as in:
+	 * 
+	 * 1) The {@link #html} config,
+	 * 2) The {@link #tpl} config,
+	 * 3) The {@link #renderTpl} config,
+	 * 4) Injected HTML at any point via direct DOM manipulation by a method of the Component.
+	 * 
+	 * For a full list of the event names that can be subscribed to in this fashion, see the
+	 * {@link gui.ComponentDomDelegateHandler} class.
+	 * 
+	 * Example:
+	 * 
+	 *     require( [
+	 *         'gui/Component'
+	 *     ], function( Component ) {
+	 *     
+	 *         var component = new Component( {
+	 *             html : '<div gui-click="onDiv1Click">Div 1</div>' + 
+	 *                    '<div gui-click="onDiv2Click">Div 2</div>',
+	 *             
+	 *             onDiv1Click : function( evt ) {
+	 *                 alert( "Div 1 Clicked" );
+	 *             },
+	 *             
+	 *             onDiv2Click : function( evt ) {
+	 *                 alert( "Div 2 Clicked" );
+	 *             }
+	 *             
+	 *         } );
+	 *         
+	 *         component.render( 'body' );
+	 *     
+	 *     } );
 	 * 
 	 * 
 	 * ## Other notes
@@ -277,6 +321,26 @@ define( [
 		 * 
 		 * For the set of common variables that are automatically provided to this template, see {@link #renderTplData}.
 		 * 
+		 * ## Events from child HTML elements
+		 * 
+		 * Any child element may have the special `gui-[eventName]` attributes, which are auto-bound to call methods
+		 * on the Component instance. See the "Events from child HTML elements" section of the docs of this class.
+		 * 
+		 * Quick example:
+		 * 
+		 *     renderTpl : [
+		 *         '<a href="javascript:;" gui-click="onHelloAnchorClick">Hello</a>, ',
+		 *         '<a href="javascript:;" gui-click="onWorldAnchorClick">World</a>'
+		 *     ],
+		 *     
+		 *     onHelloAnchorClick : function( evt ) {
+		 *         alert( "'Hello' clicked" );
+		 *     },
+		 *     
+		 *     onWorldAnchorClick : function( evt ) {
+		 *         alert( "'World' clicked" );
+		 *     }
+		 * 
 		 * ## More Information About Templating
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
@@ -318,7 +382,29 @@ define( [
 		
 		/**
 		 * @cfg {String} html
-		 * Any explicit HTML to attach to the Component at render time.
+		 * 
+		 * Any explicit child HTML to attach to the Component at render time.
+		 * 
+		 * 
+		 * ## Events from child HTML elements
+		 * 
+		 * Any child element may have the special `gui-[eventName]` attributes, which are auto-bound to call methods
+		 * on the Component instance. See the "Events from child HTML elements" section of the docs of this class.
+		 * 
+		 * Quick example:
+		 * 
+		 *     html : [
+		 *         '<a href="javascript:;" gui-click="onHelloAnchorClick">Hello</a>, ',
+		 *         '<a href="javascript:;" gui-click="onWorldAnchorClick">World</a>'
+		 *     ].join( "" ),
+		 *     
+		 *     onHelloAnchorClick : function( evt ) {
+		 *         alert( "'Hello' clicked" );
+		 *     },
+		 *     
+		 *     onWorldAnchorClick : function( evt ) {
+		 *         alert( "'World' clicked" );
+		 *     }
 		 * 
 		 * Note that this config, in the end, has the same effect as the {@link #contentEl} config, but is more clear 
 		 * from the client code's side for adding explict HTML to the Component.
@@ -326,6 +412,7 @@ define( [
 		
 		/**
 		 * @cfg {HTMLElement/jQuery} contentEl
+		 * 
 		 * An existing element or jQuery wrapped set to place into the Component when it is rendered, which will become
 		 * the "content" of the Component.  The element will be moved from its current location in the DOM to inside this
 		 * Component's element.
@@ -369,6 +456,26 @@ define( [
 		 *   element to become 'gui-panel-body', but when a {@link gui.window.Window Window} is created, the value is
 		 *   'gui-window', and the body becomes 'gui-window-body' instead. 
 		 * - **componentCls**: The {@link #componentCls} config.
+		 * 
+		 * ## Events from child HTML elements
+		 * 
+		 * Any child element may have the special `gui-[eventName]` attributes, which are auto-bound to call methods
+		 * on the Component instance. See the "Events from child HTML elements" section of the docs of this class.
+		 * 
+		 * Quick example:
+		 * 
+		 *     tpl : [
+		 *         '<a href="javascript:;" gui-click="onHelloAnchorClick">Hello</a>, ',
+		 *         '<a href="javascript:;" gui-click="onWorldAnchorClick">World</a>'
+		 *     ],
+		 *     
+		 *     onHelloAnchorClick : function( evt ) {
+		 *         alert( "'Hello' clicked" );
+		 *     },
+		 *     
+		 *     onWorldAnchorClick : function( evt ) {
+		 *         alert( "'World' clicked" );
+		 *     }
 		 * 
 		 * ## More Information About Templating
 		 * 
@@ -876,9 +983,17 @@ define( [
 				}
 				
 			} else {
-				// Handle any additional attributes (the `attr` config) that were specified to add (or any attributes
-				// added by subclass implementations of getRenderAttributes())
-				var attr = Html.attrMapToString( this.getRenderAttributes() );
+				var elId = this.elId;
+				
+				// First, register the Component with the ComponentManager by its `elId`. This is to allow support code
+				// (such as the gui.ComponentDomDelegateHandler) to back-reference a Component instance by its element ID.
+				ComponentManager.registerComponentEl( elId, this );
+				
+				// Handle any additional attributes (the `attr` config) that were specified to add (or any attributes 
+				// added by subclass implementations of getRenderAttributes()). Also, add the 'gui-isComponentEl' marker
+				// for the gui.ComponentDomDelegateHandler class, which uses it as a marker to tell which elements are 
+				// Component elements.
+				var attr = Html.attrMapToString( _.assign( { 'gui-isComponentEl': "true" }, this.getRenderAttributes() ) );
 				delete this.attr;  // config no longer needed
 				
 				// Create a CSS string of any specified styles (the `style` config + sizing configs such as width/height)
@@ -901,7 +1016,7 @@ define( [
 				// <div id="someId"><div id="bodyEl" /></div>
 				var cls = _.compact( [ this.baseCls, this.componentCls, this.cls ] ).join( " " );  // _.compact() removes falsy values. In this case, undefined values.
 				var elMarkup = [
-					'<', this.elType, ' id="', this.elId, '" class="', cls, '" style="', style, '" ', attr, '>',
+					'<', this.elType, ' id="', elId, '" class="', cls, '" style="', style, '" ', attr, '>',
 						renderTplMarkup,
 					'</', this.elType, '>'
 				].join( "" );
@@ -2188,6 +2303,9 @@ define( [
 						}
 					}
 				}
+				
+				// Unregister the component's element from the ComponentManager (assuming the component was ever rendered) 
+				ComponentManager.unregisterComponentEl( this.elId );
 				
 				this.rendered = false;  // the Component is no longer rendered; it's $el has been removed (above)
 				this.destroying = false;
