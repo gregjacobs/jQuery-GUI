@@ -15,8 +15,12 @@ define('gui/ComponentManager',[], function() {
 	 * @class gui.ComponentManager
 	 * @singleton
 	 *
-	 * Object used to manage {@link gui.Component} "types", and handles instantiating them based on the string that is specified
-	 * for them in the manifest.
+	 * Object used to manage {@link gui.Component} `type`s and instances. Performs the following tasks:
+	 * 
+	 * 1) Instantiates anonymous configuration objects with a `type` property into the appropriate {@link gui.Component}
+	 *    subclass ({@link #create} method).
+	 * 2) Maintains a map of Component's {@link gui.Component#elId element IDs} -> {@link gui.Component Component} instances,
+	 *    which are registered when components are rendered.
 	 */
 	var ComponentManager = {
 		
@@ -28,6 +32,16 @@ define('gui/ComponentManager',[], function() {
 		 * keyed by their type name. 
 		 */
 		componentClasses : {},
+		
+		
+		/**
+		 * @private
+		 * @property {Object} elementIdMap
+		 * 
+		 * An Object (map) of {@link gui.Component#elId Component element IDs} -> {@link gui.Component Component} instances,
+		 * which are registered when each Component is {@link gui.Component#render rendered}.
+		 */
+		elementIdMap : {},
 	   
 	   
 		/**
@@ -113,6 +127,53 @@ define('gui/ComponentManager',[], function() {
 				// No registered type with the given type, throw an error
 				throw new Error( "ComponentManager.create(): Unknown type: '" + type + "'" );
 			}
+		},
+		
+		
+		// -----------------------------------
+		
+		
+		/**
+		 * Registers a {@link gui.Component Component's} element to be associated with the Component instance.
+		 * Sets up a mapping by the Component's {@link gui.Component#elId element ID}, and is done when the
+		 * Component is {@link gui.Component#render rendered}.
+		 * 
+		 * Note: This is used internally by the library, and shouldn't be called directly.
+		 * 
+		 * @param {String} elId The Component's {@link gui.Component#elId element ID}.
+		 * @param {gui.Component} component The Component itself.
+		 */
+		registerComponentEl : function( elId, component ) {
+			this.elementIdMap[ elId ] = component;
+		},
+		
+		
+		/**
+		 * Unregisters a {@link gui.Component Component's} element from its association with its {@link gui.Component}
+		 * instance. This is performed when a Component is destroyed.
+		 * 
+		 * Note: This is used internally by the library, and shouldn't be called directly.
+		 * 
+		 * @param {String} elId The Component's {@link gui.Component#elId element ID}.
+		 */
+		unregisterComponentEl : function( elId ) {
+			delete this.elementIdMap[ elId ];
+		},
+		
+		
+		/**
+		 * Retrieves a {@link gui.Component Component} instance by its {@link gui.Component#elId element ID}.
+		 * 
+		 * Note: This is used internally by the library (namely the {@link gui.ComponentDomDelegateHandler} class), 
+		 * and shouldn't be called directly from code except for debugging purposes. Code that reverse-references a
+		 * Component instance from an HTML element instead of simply being passed the Component reference will most
+		 * likely be very difficult to understand, and maintain.
+		 * 
+		 * @param {String} elId The Component's {@link gui.Component#elId element ID}.
+		 * @return {gui.Component} The Component instance that is mapped to the `elId`, or `null` if one was not found.
+		 */
+		getComponentByElId : function( elId ) {
+			return this.elementIdMap[ elId ] || null;
 		}
 		
 	};
@@ -319,6 +380,226 @@ define('gui/Gui', [
 	// Return singleton instance
 	return new Gui();
 	
+} );
+/*global define */
+/*jshint boss:true */
+define('gui/ComponentDomDelegateHandler', [
+	'jquery',
+	'lodash',
+	'Class',
+	
+	'gui/ComponentManager'
+], function( jQuery, _, Class, ComponentManager ) {
+
+	/**
+	 * @class gui.ComponentDomDelegateHandler
+	 * @singleton
+	 * 
+	 * The ComponentDomDelegateHandler class supports the special jQuery-GUI DOM event attributes that may be placed within 
+	 * the HTML elements of a {@link gui.Component}. These special attributes include:
+	 * 
+	 * - gui-click
+	 * - gui-dblclick
+	 * - gui-mouseenter (jQuery emulated event)
+	 * - gui-mouseleave (jQuery emulated event)
+	 * - gui-mousedown
+	 * - gui-mouseup
+	 * - gui-keydown
+	 * - gui-keypress
+	 * - gui-keyup
+	 * - gui-focus
+	 * - gui-blur
+	 * - gui-change
+	 * - gui-select
+	 * - gui-submit
+	 * 
+	 * When one of these attributes is placed in an HTML element under a component (say, in a component's 
+	 * {@link gui.Component#tpl template}), the event is auto-bound to the Component, and the specified method name (in the
+	 * attribute's value) is called on the Component.
+	 * 
+	 * For example: the attribute `gui-click="onMyElementClick"` will call the `onMyElementClick` method of the 
+	 * component when this element is clicked, passing in the `jQuery.Event` object as its first argument.
+	 * 
+	 * The special 'gui-' attributes may be placed in markup / DOM nodes anywhere under the {@link gui.Component Component},
+	 * such as in:
+	 * 
+	 * 1) The {@link gui.Component#html html} config,
+	 * 2) The {@link gui.Component#tpl tpl} config,
+	 * 3) The {@link gui.Component#renderTpl renderTpl} config,
+	 * 4) Injected HTML at any point via direct DOM manipulation by a method of the {@link gui.Component Component}.
+	 * 
+	 * HTML with these attributes may be added at any time, as this implementation uses event bubbling to determine
+	 * the Component an event should be attached to.
+	 * 
+	 * 
+	 * ## Full Example
+	 * 
+	 *     require( [
+	 *         'gui/Component'
+	 *     ], function( Component ) {
+	 *     
+	 *         var component = new Component( {
+	 *             html : '<div gui-click="onDiv1Click">Div 1</div>' + 
+	 *                    '<div gui-click="onDiv2Click">Div 2</div>',
+	 *             
+	 *             onDiv1Click : function( evt ) {
+	 *                 alert( "Div 1 Clicked" );
+	 *             },
+	 *             
+	 *             onDiv2Click : function( evt ) {
+	 *                 alert( "Div 2 Clicked" );
+	 *             }
+	 *             
+	 *         } );
+	 *         
+	 *         component.render( 'body' );
+	 *     
+	 *     } );
+	 * 
+	 * 
+	 * ## Detailed Operation
+	 * 
+	 * This class sets up global (i.e. document-level) delegate event handlers to support the functionality of the special 
+	 * attributes via event bubbling. This has the advantages that:
+	 * 
+	 * 1) only one set of handlers needs to be set up,
+	 * 2) any additional DOM manipulations made by a component are automatically handled, and
+	 * 3) only a small set of event handlers are ever set up, and only a small set need to be unbound when the document 
+	 *    is unloaded.
+	 * 
+	 * 
+	 * What happens internally when, for example, a 'click' event is captured from an HTML element, this class:
+	 * 
+	 * A) checks the element and/or its ancestors for a `gui-[eventName]="[methodName]"` attribute. If one is found, 
+	 *    it then
+	 * B) continues up the DOM tree until it finds the {@link gui.Component Component's} element
+	 * 
+	 * When these two items are found, the method is called on the component, passing in the `jQuery.Event` object as
+	 * its first argument.
+	 */
+	var ComponentDomDelegateHandler = Class.create( {
+		
+		/**
+		 * @private
+		 * @property {String[]} eventNames
+		 * 
+		 * The event names that can be used by the special 'gui-[eventName]' attributes.
+		 */
+		eventNames : [
+			'click',
+			'dblclick',
+			'mouseenter',
+			'mouseleave', 
+			'mousedown',
+			'mouseup',
+			'keydown',
+			'keypress',
+			'keyup',
+			'focus',
+			'blur',
+			'change',
+			'select'
+		],
+		
+		/**
+		 * @private
+		 * @property {Function} onEventScopedFn
+		 * 
+		 * A reference to the {@link #onEvent} function, scoped to the singleton instance. This is used to register
+		 * the event handling method, and unregister it later in {@link #destroy}.
+		 */
+		
+		
+		/**
+		 * @constructor
+		 */
+		constructor : function() {
+			this.onEventScopedFn = _.bind( this.onEvent, this );  // bound function for use in init() and destroy()
+			
+			jQuery( document ).ready( _.bind( this.init, this ) );
+			jQuery( window ).on( 'beforeunload', _.bind( this.destroy, this ) );
+		},
+		
+		
+		/**
+		 * Initializes the ComponentDomDelegateHandler by attaching its event handlers on the document body.
+		 * These event handlers will hook up to the components to call methods on them.
+		 * 
+		 * @private
+		 */
+		init : function() {
+			jQuery( document.body ).on( this.eventNames.join( " " ), this.onEventScopedFn );
+		},
+		
+		
+		/**
+		 * Handles a listened-to event, looking for any `gui-[eventName]` attributes, and calling the specified
+		 * method on the Component which owns the element.
+		 * 
+		 * @private
+		 * @param {jQuery.Event} evt The jQuery event object, which will be passed to the method specified by
+		 *   a `gui-[eventName]` attribute.
+		 */
+		onEvent : function( evt ) {
+			var el = evt.target,
+			    attrName = 'gui-' + evt.type,
+			    attrValue,
+			    doc = document;
+			
+			do {
+				if( el !== doc && ( attrValue = el.getAttribute( attrName ) ) ) {
+					var component = this.resolveComponent( el );
+					
+					if( component ) {
+						evt.currentTarget = el;  // update the current target as the element with the gui-[eventName] attribute, as would be done in normal event bubbling
+						
+						// call the method on the component
+						var returnVal = component[ attrValue ]( evt );
+						if( returnVal === false ) 
+							evt.preventDefault();  // Prevent default event behavior if a handler returns `false`
+					}
+				}
+			} while( !evt.isPropagationStopped() && ( el = el.parentNode ) );
+		},
+		
+		
+		/**
+		 * Resolves the {@link gui.Component} instance from a given input element (`el`). This is either found from the input
+		 * `element` itself (using its `id`), or the DOM tree is walked up until a Component element is found.
+		 * 
+		 * If no Component is able to be resolved, the method returns `null`.
+		 * 
+		 * @private
+		 * @param {HTMLElement} el
+		 * @return {gui.Component}
+		 */
+		resolveComponent : function( el ) {
+			do {
+				if( el.hasAttribute( 'gui-isComponentEl' ) ) {
+					return ComponentManager.getComponentByElId( el.id );
+				}
+			} while( el = el.parentNode );
+			
+			return null;
+		},
+		
+		
+		/**
+		 * Destroys the ComponentDomDelegateHandler on window unload by unregistering the event handlers it has
+		 * placed on the &lt;body&gt; tag.
+		 * 
+		 * @private
+		 */
+		destroy : function() {
+			jQuery( document.body ).off( this.eventNames.join( " " ), this.onEventScopedFn );
+		}
+		
+	} );
+	
+	
+	// Return singleton instance
+	return new ComponentDomDelegateHandler();
+
 } );
 /*global define */
 define('gui/util/Css', [
@@ -2002,6 +2283,7 @@ define('gui/Component', [
 	
 	'gui/Gui',
 	'gui/ComponentManager',
+	'gui/ComponentDomDelegateHandler',  // must be included in order to initialize it
 	'gui/util/Css',
 	'gui/util/Html',
 	'gui/Mask',
@@ -2017,6 +2299,7 @@ define('gui/Component', [
 	
 	Gui,
 	ComponentManager,
+	ComponentDomDelegateHandler,
 	Css,
 	Html,
 	Mask,
@@ -2126,6 +2409,48 @@ define('gui/Component', [
 	 * These instantiated but unrendered components may still be updated by a {@link gui.app.Controller Controller} however. The client code 
 	 * in the Controller should not have to first test if the component is rendered before calling methods on it, so the automatic handling 
 	 * of rendered/unrendered state within the components makes this distinction transparent.
+	 * 
+	 * 
+	 * ## Events from child HTML elements
+	 * 
+	 * DOM Events may be set up from child elements to call methods on the Component using the special `gui-[eventName]`
+	 * attributes. This alleviates the need to manually listen to events on the Component's {@link #$el element} once
+	 * the Component has been rendered.
+	 * 
+	 * These special 'gui-' attributes may be placed in markup / DOM nodes anywhere under the Component,
+	 * such as in:
+	 * 
+	 * 1) The {@link #html} config,
+	 * 2) The {@link #tpl} config,
+	 * 3) The {@link #renderTpl} config,
+	 * 4) Injected HTML at any point via direct DOM manipulation by a method of the Component.
+	 * 
+	 * For a full list of the event names that can be subscribed to in this fashion, see the
+	 * {@link gui.ComponentDomDelegateHandler} class.
+	 * 
+	 * Example:
+	 * 
+	 *     require( [
+	 *         'gui/Component'
+	 *     ], function( Component ) {
+	 *     
+	 *         var component = new Component( {
+	 *             html : '<div gui-click="onDiv1Click">Div 1</div>' + 
+	 *                    '<div gui-click="onDiv2Click">Div 2</div>',
+	 *             
+	 *             onDiv1Click : function( evt ) {
+	 *                 alert( "Div 1 Clicked" );
+	 *             },
+	 *             
+	 *             onDiv2Click : function( evt ) {
+	 *                 alert( "Div 2 Clicked" );
+	 *             }
+	 *             
+	 *         } );
+	 *         
+	 *         component.render( 'body' );
+	 *     
+	 *     } );
 	 * 
 	 * 
 	 * ## Other notes
@@ -2272,6 +2597,26 @@ define('gui/Component', [
 		 * 
 		 * For the set of common variables that are automatically provided to this template, see {@link #renderTplData}.
 		 * 
+		 * ## Events from child HTML elements
+		 * 
+		 * Any child element may have the special `gui-[eventName]` attributes, which are auto-bound to call methods
+		 * on the Component instance. See the "Events from child HTML elements" section of the docs of this class.
+		 * 
+		 * Quick example:
+		 * 
+		 *     renderTpl : [
+		 *         '<a href="javascript:;" gui-click="onHelloAnchorClick">Hello</a>, ',
+		 *         '<a href="javascript:;" gui-click="onWorldAnchorClick">World</a>'
+		 *     ],
+		 *     
+		 *     onHelloAnchorClick : function( evt ) {
+		 *         alert( "'Hello' clicked" );
+		 *     },
+		 *     
+		 *     onWorldAnchorClick : function( evt ) {
+		 *         alert( "'World' clicked" );
+		 *     }
+		 * 
 		 * ## More Information About Templating
 		 * 
 		 * For more information on Lo-Dash templates (the default type), see: [http://lodash.com/docs#template](http://lodash.com/docs#template)
@@ -2313,7 +2658,29 @@ define('gui/Component', [
 		
 		/**
 		 * @cfg {String} html
-		 * Any explicit HTML to attach to the Component at render time.
+		 * 
+		 * Any explicit child HTML to attach to the Component at render time.
+		 * 
+		 * 
+		 * ## Events from child HTML elements
+		 * 
+		 * Any child element may have the special `gui-[eventName]` attributes, which are auto-bound to call methods
+		 * on the Component instance. See the "Events from child HTML elements" section of the docs of this class.
+		 * 
+		 * Quick example:
+		 * 
+		 *     html : [
+		 *         '<a href="javascript:;" gui-click="onHelloAnchorClick">Hello</a>, ',
+		 *         '<a href="javascript:;" gui-click="onWorldAnchorClick">World</a>'
+		 *     ].join( "" ),
+		 *     
+		 *     onHelloAnchorClick : function( evt ) {
+		 *         alert( "'Hello' clicked" );
+		 *     },
+		 *     
+		 *     onWorldAnchorClick : function( evt ) {
+		 *         alert( "'World' clicked" );
+		 *     }
 		 * 
 		 * Note that this config, in the end, has the same effect as the {@link #contentEl} config, but is more clear 
 		 * from the client code's side for adding explict HTML to the Component.
@@ -2321,6 +2688,7 @@ define('gui/Component', [
 		
 		/**
 		 * @cfg {HTMLElement/jQuery} contentEl
+		 * 
 		 * An existing element or jQuery wrapped set to place into the Component when it is rendered, which will become
 		 * the "content" of the Component.  The element will be moved from its current location in the DOM to inside this
 		 * Component's element.
@@ -2364,6 +2732,26 @@ define('gui/Component', [
 		 *   element to become 'gui-panel-body', but when a {@link gui.window.Window Window} is created, the value is
 		 *   'gui-window', and the body becomes 'gui-window-body' instead. 
 		 * - **componentCls**: The {@link #componentCls} config.
+		 * 
+		 * ## Events from child HTML elements
+		 * 
+		 * Any child element may have the special `gui-[eventName]` attributes, which are auto-bound to call methods
+		 * on the Component instance. See the "Events from child HTML elements" section of the docs of this class.
+		 * 
+		 * Quick example:
+		 * 
+		 *     tpl : [
+		 *         '<a href="javascript:;" gui-click="onHelloAnchorClick">Hello</a>, ',
+		 *         '<a href="javascript:;" gui-click="onWorldAnchorClick">World</a>'
+		 *     ],
+		 *     
+		 *     onHelloAnchorClick : function( evt ) {
+		 *         alert( "'Hello' clicked" );
+		 *     },
+		 *     
+		 *     onWorldAnchorClick : function( evt ) {
+		 *         alert( "'World' clicked" );
+		 *     }
 		 * 
 		 * ## More Information About Templating
 		 * 
@@ -2871,9 +3259,17 @@ define('gui/Component', [
 				}
 				
 			} else {
-				// Handle any additional attributes (the `attr` config) that were specified to add (or any attributes
-				// added by subclass implementations of getRenderAttributes())
-				var attr = Html.attrMapToString( this.getRenderAttributes() );
+				var elId = this.elId;
+				
+				// First, register the Component with the ComponentManager by its `elId`. This is to allow support code
+				// (such as the gui.ComponentDomDelegateHandler) to back-reference a Component instance by its element ID.
+				ComponentManager.registerComponentEl( elId, this );
+				
+				// Handle any additional attributes (the `attr` config) that were specified to add (or any attributes 
+				// added by subclass implementations of getRenderAttributes()). Also, add the 'gui-isComponentEl' marker
+				// for the gui.ComponentDomDelegateHandler class, which uses it as a marker to tell which elements are 
+				// Component elements.
+				var attr = Html.attrMapToString( _.assign( { 'gui-isComponentEl': "true" }, this.getRenderAttributes() ) );
 				delete this.attr;  // config no longer needed
 				
 				// Create a CSS string of any specified styles (the `style` config + sizing configs such as width/height)
@@ -2896,7 +3292,7 @@ define('gui/Component', [
 				// <div id="someId"><div id="bodyEl" /></div>
 				var cls = _.compact( [ this.baseCls, this.componentCls, this.cls ] ).join( " " );  // _.compact() removes falsy values. In this case, undefined values.
 				var elMarkup = [
-					'<', this.elType, ' id="', this.elId, '" class="', cls, '" style="', style, '" ', attr, '>',
+					'<', this.elType, ' id="', elId, '" class="', cls, '" style="', style, '" ', attr, '>',
 						renderTplMarkup,
 					'</', this.elType, '>'
 				].join( "" );
@@ -4183,6 +4579,9 @@ define('gui/Component', [
 						}
 					}
 				}
+				
+				// Unregister the component's element from the ComponentManager (assuming the component was ever rendered) 
+				ComponentManager.unregisterComponentEl( this.elId );
 				
 				this.rendered = false;  // the Component is no longer rendered; it's $el has been removed (above)
 				this.destroying = false;
@@ -8215,6 +8614,7 @@ define('gui/app/Controller', [
 		 * component(s) throughout the Controller's code using {@link #getRef}.
 		 * 
 		 * This Object should be keyed by the ref names, and whose values are Objects with the following properties:
+		 * 
 		 * - **selector** (String) : The selector string for the ref.
 		 * - **multiple** (Boolean) : (Optional) `true` if this is a multi-component selector (in which case an array is returned
 		 *   when retrieving the ref), or `false` if the selector returns a single component. Defaults to `false`.
@@ -15765,4 +16165,4 @@ define('gui/window/Window', [
 	
 } );
 
-require(["gui/Anchor", "gui/Component", "gui/ComponentManager", "gui/ComponentQuery", "gui/Container", "gui/Gui", "gui/Image", "gui/Label", "gui/Mask", "gui/Overlay", "gui/Viewport", "gui/anim/Animation", "gui/app/Application", "gui/app/Controller", "gui/app/EventBus", "gui/button/Button", "gui/form/field/Checkbox", "gui/form/field/Dropdown", "gui/form/field/Field", "gui/form/field/Hidden", "gui/form/field/Radio", "gui/form/field/Text", "gui/form/field/TextArea", "gui/layout/Auto", "gui/layout/Card.SwitchTransition", "gui/layout/Card.Transition", "gui/layout/Card", "gui/layout/Column", "gui/layout/Fit", "gui/layout/HBox", "gui/layout/Layout", "gui/layout/Manager", "gui/layout/VBox", "gui/loader/Loader", "gui/loader/RequireJs", "gui/panel/Header", "gui/panel/Panel", "gui/panel/ToolButton", "gui/plugin/Plugin", "gui/tab/Bar", "gui/tab/Panel", "gui/tab/Tab", "gui/template/LoDash", "gui/template/Template", "gui/util/CallbackList", "gui/util/CollectionBindable", "gui/util/Css", "gui/util/Html", "gui/util/ModelBindable", "gui/util/OptionsStore", "gui/view/Collection", "gui/view/DataBound", "gui/view/Model", "gui/window/Header", "gui/window/Window"]);
+require(["gui/Anchor", "gui/Component", "gui/ComponentDomDelegateHandler", "gui/ComponentManager", "gui/ComponentQuery", "gui/Container", "gui/Gui", "gui/Image", "gui/Label", "gui/Mask", "gui/Overlay", "gui/Viewport", "gui/anim/Animation", "gui/app/Application", "gui/app/Controller", "gui/app/EventBus", "gui/button/Button", "gui/form/field/Checkbox", "gui/form/field/Dropdown", "gui/form/field/Field", "gui/form/field/Hidden", "gui/form/field/Radio", "gui/form/field/Text", "gui/form/field/TextArea", "gui/layout/Auto", "gui/layout/Card.SwitchTransition", "gui/layout/Card.Transition", "gui/layout/Card", "gui/layout/Column", "gui/layout/Fit", "gui/layout/HBox", "gui/layout/Layout", "gui/layout/Manager", "gui/layout/VBox", "gui/loader/Loader", "gui/loader/RequireJs", "gui/panel/Header", "gui/panel/Panel", "gui/panel/ToolButton", "gui/plugin/Plugin", "gui/tab/Bar", "gui/tab/Panel", "gui/tab/Tab", "gui/template/LoDash", "gui/template/Template", "gui/util/CallbackList", "gui/util/CollectionBindable", "gui/util/Css", "gui/util/Html", "gui/util/ModelBindable", "gui/util/OptionsStore", "gui/view/Collection", "gui/view/DataBound", "gui/view/Model", "gui/window/Header", "gui/window/Window"]);
