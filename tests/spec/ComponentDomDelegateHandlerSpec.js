@@ -1,16 +1,17 @@
 /*global define, describe, beforeEach, afterEach, it, expect, spyOn */
 define( [
 	'jquery',
+	'lodash',
 	
 	'gui/ComponentDomDelegateHandler',
 	
 	'gui/Component',
 	'gui/Container'
-], function( jQuery, ComponentDomDelegateHandler, Component, Container ) {
+], function( jQuery, _, ComponentDomDelegateHandler, Component, Container ) {
 	
 	describe( 'gui.ComponentDomDelegateHandler', function() {
 		
-		it( "should automatically facilitate the hookup of a component's child elements having special `gui-[eventName]` elements", function() {
+		it( "should automatically facilitate the hookup of a component's child elements having special `gui-[eventName]` attributes", function() {
 			var div1ClickCount = 0,
 			    div2ClickCount = 0,
 			    div1,
@@ -41,7 +42,51 @@ define( [
 		} );
 		
 		
-		it( "should automatically facilitate the hookup of a component's descendent elements having special `gui-[eventName]` elements, even when events are triggered on even further descendent elements", function() {
+		it( "should automatically facilitate the hookup of all events defined in the ComponentDomDelegateHandler for a component's child elements having the special `gui-[eventName]` attributes", function() {
+			var eventNames = _.without( ComponentDomDelegateHandler.eventNames, 'focus', 'blur' ),  // unfortunately, can't focus or blur a <div>, so we'll skip these
+			    eventCounts = {},  // map of event names -> counts
+			    allEventAttrs,
+			    element;
+			
+			// Initialize all eventCounts to 0
+			_.forEach( eventNames, function( eventName ) { eventCounts[ eventName ] = 0; } );
+			
+			// Create an array of all of the special gui-[eventName] attributes
+			// ex: [ 'gui-click="onEvent"', 'gui-dblclick="onEvent"', ... ]
+			allEventAttrs = _.map( eventNames, function( eventName ) {
+				return 'gui-' + eventName + '="onEvent"';  // ex: gui-click="onEvent"
+			} );
+			
+			var component = new Component( {
+				html : '<div ' + allEventAttrs.join( " " ) + '>Div</div>',  
+				
+				onEvent : function( evt ) { 
+					eventCounts[ evt.type ]++;
+					expect( evt.target ).toBe( element );
+				}
+			} );
+			
+			component.render( 'body' );
+			element = component.getEl().find( 'div' )[ 0 ];
+			
+			// Simulate Events
+			_.forEach( eventNames, function( eventName ) {
+				jQuery( element ).trigger( eventName );
+			} );
+			
+			// Check counts
+			_.forEach( eventCounts, function( count, eventName ) {
+				expect( count ).toBe( 1 );
+				
+				if( count !== 1 ) 
+					throw new Error( "Count for event '" + eventName + "' was " + count + " instead of 1" ); 
+			} );
+			
+			component.destroy();  // clean up
+		} );
+		
+		
+		it( "should automatically facilitate the hookup of a component's descendent elements having special `gui-[eventName]` attributes, even when events are triggered on even further descendent elements", function() {
 			var divClickCount = 0,
 			    nested1Div,
 			    nested2Div,
@@ -192,7 +237,7 @@ define( [
 		} );
 		
 		
-		it( "should allow nested special event handlers to all call the proper method on their corresponding components, updating the `currentTarget` property on the event object to the element with the `gui-[eventName]` attribute", function() {
+		it( "should allow nested special event handlers to all call the proper method on their corresponding components, updating the `currentTarget` property on the event object to the element with the `gui-[eventName]` attribute for the handler call", function() {
 			var containerDivClickCount = 0,
 			    childDivClickCount = 0,
 			    containerDiv,
@@ -235,7 +280,7 @@ define( [
 		} );
 		
 		
-		it( "should allow the propagation of the emulated event bubbling to be stopped by handlers", function() {
+		it( "should allow the propagation of the emulated event bubbling to be stopped by handlers when evt.stopPropagation() is called", function() {
 			var containerDivClickCount = 0,
 			    childDivClickCount = 0,
 			    containerDiv,
