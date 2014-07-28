@@ -1,4 +1,5 @@
 /*global define */
+/*jshint boss:true */
 define( [
 	'jquery',
 	'lodash',

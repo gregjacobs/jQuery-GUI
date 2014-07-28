@@ -581,7 +581,7 @@ define( [
 					items : [ { id : "c1" }, { id: "c2" }, { id: "c3" }, { id: "c3" } ]
 				} );
 				childCmps = container.getItems();
-				c1 = childCmps[ 0 ], c2 = childCmps[ 1 ], c3 = childCmps[ 2 ], c4 = childCmps[ 3 ];
+				c1 = childCmps[ 0 ]; c2 = childCmps[ 1 ]; c3 = childCmps[ 2 ]; c4 = childCmps[ 3 ];
 				
 				container.remove( [ c1, c3 ] );
 				expect( [ c2, c4 ] ).toEqual( container.getItems() );  // multiple components not removed correctly
