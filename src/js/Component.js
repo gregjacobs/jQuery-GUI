@@ -1012,12 +1012,6 @@ define( [
 				// Attach any configured content to the Component's contentTarget
 				this.attachContent( this.getContentTarget() );
 				
-				// If the Component was configured with hidden = true, hide it now. This must be done after onRender,
-				// because some onRender methods change the 'display' style of the outer element.
-				if( this.hidden ) {
-					this.$el.hide();
-				}
-				
 				// Call the onAfterRender hook method, and fire the 'render' event
 				this.onAfterRender( $containerEl, options );
 				this.fireEvent( 'render', this );
@@ -1046,7 +1040,9 @@ define( [
 			delete this.attr;  // no longer needed
 			
 			// Create the CSS classes for the element
-			var cls = _.compact( [ this.baseCls, this.componentCls, this.cls ] ).join( " " );  // _.compact() removes falsy values. In this case, undefined values.
+			var cssClasses = _.compact( [ this.baseCls, this.componentCls, this.cls ] );  // _.compact() removes falsy values. In this case, undefined values.
+			if( this.hidden ) 
+				cssClasses.push( 'gui-component-hidden' );  // Component is hidden at render time, add the appropriate CSS class
 
 			// Create a CSS string of any specified styles (the `style` config + sizing configs such as width/height)
 			var style = Css.mapToString( this.getRenderStyle() );  // convert the Object (map) returned by getRenderStyle() into a CSS string
@@ -1068,7 +1064,7 @@ define( [
 			// <div id="someId"><div id="bodyEl" /></div>
 			var elType = this.elType;
 			return [
-				'<', elType, ' id="', this.elId, '" class="', cls, '" style="', style, '" ', attr, '>',
+				'<', elType, ' id="', this.elId, '" class="', cssClasses.join( " " ), '" style="', style, '" ', attr, '>',
 					renderTplMarkup,
 				'</', elType, '>'
 			].join( "" );
@@ -1785,7 +1781,7 @@ define( [
 				
 				// make sure the element is displayed. This is done even for animations, which will always need
 				// to display the element in some way first before animating size, opacity, etc
-				this.$el.show();
+				this.$el.removeClass( 'gui-component-hidden' );
 				
 				// Call template method, and fire the events. These are done before the animation is complete. See the 'show' and 
 				// 'aftershow' event descriptions for details on why this is done now, instead of when the animation (if any) 
@@ -1928,7 +1924,7 @@ define( [
 			this.hiding = false;
 			this.currentAnimation = null;  // remove the reference to the "hiding" animation
 			
-			this.$el.hide();   // make sure the element is hidden at this point
+			this.$el.addClass( 'gui-component-hidden' );   // make sure the element is hidden at this point
 			
 			// Run hook methods, and fire the 'hide' events
 			this.onHide( options );

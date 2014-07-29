@@ -1,3 +1,8 @@
+/* line 2, ../../../src/css/base/_Component.scss */
+.gui-component-hidden {
+  display: none !important;
+}
+
 /* line 1, ../../../src/css/base/_Overlay.scss */
 .gui-overlay, .gui-window {
   position: absolute;
@@ -254,7 +259,7 @@ iframe.gui-form-field-dropdown-shim {
 }
 
 /* General Styles */
-/* line 23, ../../../src/css/base/base.scss */
+/* line 24, ../../../src/css/base/base.scss */
 .gui-clear {
   clear: both;
 }
