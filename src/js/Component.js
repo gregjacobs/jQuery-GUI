@@ -983,55 +983,24 @@ define( [
 				}
 				
 			} else {
+				// Component not yet rendered, render it now
 				var elId = this.elId;
 				
 				// First, register the Component with the ComponentManager by its `elId`. This is to allow support code
 				// (such as the gui.ComponentDomDelegateHandler) to back-reference a Component instance by its element ID.
 				ComponentManager.registerComponentEl( elId, this );
 				
-				// Handle any additional attributes (the `attr` config) that were specified to add (or any attributes 
-				// added by subclass implementations of getRenderAttributes()). Also, add the 'gui-isComponentEl' marker
-				// for the gui.ComponentDomDelegateHandler class, which uses it as a marker to tell which elements are 
-				// Component elements.
-				var attr = Html.attrMapToString( _.assign( { 'gui-isComponentEl': "true" }, this.getRenderAttributes() ) );
-				delete this.attr;  // config no longer needed
-				
-				// Create a CSS string of any specified styles (the `style` config + sizing configs such as width/height)
-				var style = Css.mapToString( this.getRenderStyle() );  // convert the Object (map) returned by getRenderStyle() into a CSS string
-				delete this.style;  // config no longer needed
-				
-				// If there is a `renderTpl`, execute it now
-				var renderTpl = this.renderTpl,
-				    renderTplMarkup = "";
-				if( renderTpl ) {
-					renderTpl = ( renderTpl instanceof Template ) ? renderTpl : new LoDashTpl( renderTpl );  // normalize renderTpl to a Template instance if it is not one already
-					renderTplMarkup = renderTpl.apply( this.getRenderTplData() );
-					
-					delete this.renderTpl;      // no longer needed
-					delete this.renderTplData;  // no longer needed
-				}
-				
-				// Create the main (outermost) element for the Component. By default, creates a div element, such as: <div id="someId"></div>
-				// With a `renderTpl`, it will create the div with its `renderTpl` result as its inner HTML. Ex:
-				// <div id="someId"><div id="bodyEl" /></div>
-				var cls = _.compact( [ this.baseCls, this.componentCls, this.cls ] ).join( " " );  // _.compact() removes falsy values. In this case, undefined values.
-				var elMarkup = [
-					'<', this.elType, ' id="', elId, '" class="', cls, '" style="', style, '" ', attr, '>',
-						renderTplMarkup,
-					'</', this.elType, '>'
-				].join( "" );
-				this.$el = jQuery( elMarkup );
-				
+				// Create the Component's element
+				var $el = this.$el = jQuery( this.generateComponentMarkup() );
 				
 				// Appending the element to the container before the call to onRender. It is necessary to do things in this order (and not rendering children and then appending)
 				// for things like the jQuery UI tabs, which requires that their wrapping elements be attached to the DOM when they are instantiated.
 				// Otherwise, those items require their instantiation to be placed into a setTimeout(), which causes a flicker on the screen (especially for the jQuery UI tabs). 
 				if( position ) {
-					this.$el.insertBefore( position );
+					$el.insertBefore( position );
 				} else {
-					this.$el.appendTo( $containerEl );
+					$el.appendTo( $containerEl );
 				}
-				
 				
 				// Setting the render flag before the call to onRender so that onRender implementations can call methods that check this flag (such as setters
 				// that handle the case of the Component not yet being rendered).
@@ -1040,34 +1009,8 @@ define( [
 				// Call onRender hook method for subclasses to add their own elements, and whatever else they need 
 				this.onRender( $containerEl, options );
 				
-				// Make sure the `tpl` has been created into a LoDashTpl instance, not only for the initial rendering,
-				// but also for when calling `update()` with a data object.
-				if( this.tpl && !( this.tpl instanceof Template ) ) {
-					this.tpl = new LoDashTpl( this.tpl );
-				}
-				
-				
-				// Attach the output of the `tpl` config (if provided) or any specified HTML or content element to the Component's content 
-				// target. The content target is by default, the Component's element, but may be overridden by subclasses that generate a 
-				// more complex HTML structure.
-				var $contentTarget = this.getContentTarget();
-				if( this.tpl && !this.updateCalledWithContent ) {  // tpl config takes precedence over html/contentEl configs, *unless* update() has been called with HTML content
-					var tplData = _.assign( {}, this.getDefaultTplData(), this.tplData );
-					$contentTarget.append( this.tpl.apply( tplData ) );
-					
-				} else {
-					if( this.html ) {
-						$contentTarget.append( this.html );
-					}
-					if( this.contentEl ) {
-						$contentTarget.append( this.contentEl );
-					}
-				}
-				delete this.tplData;                  // no longer needed
-				delete this.updateCalledWithContent;  // no longer needed
-				delete this.html;                     // no longer needed
-				delete this.contentEl;                // no longer needed
-				
+				// Attach any configured content to the Component's contentTarget
+				this.attachContent( this.getContentTarget() );
 				
 				// If the Component was configured with hidden = true, hide it now. This must be done after onRender,
 				// because some onRender methods change the 'display' style of the outer element.
@@ -1085,6 +1028,50 @@ define( [
 					this.doLayout();
 				}
 			}
+		},
+		
+		
+		/** 
+		 * Generates the HTML markup for the Component when it is rendered. This method is only called once, when the Component 
+		 * is first {@link #render rendered}.
+		 * 
+		 * @protected
+		 * @return {String} The HTML markup for the Component.
+		 */
+		generateComponentMarkup : function() {
+			// Handle any attributes (the `attr` config) that were specified to add (or any attributes added by subclass 
+			// implementations of getRenderAttributes()). Also, add the 'gui-isComponentEl' marker for a few classes, which
+			// use it as a marker to tell which elements belong to Components.
+			var attr = Html.attrMapToString( _.assign( { 'gui-isComponentEl': "true" }, this.getRenderAttributes() ) );
+			delete this.attr;  // no longer needed
+			
+			// Create the CSS classes for the element
+			var cls = _.compact( [ this.baseCls, this.componentCls, this.cls ] ).join( " " );  // _.compact() removes falsy values. In this case, undefined values.
+
+			// Create a CSS string of any specified styles (the `style` config + sizing configs such as width/height)
+			var style = Css.mapToString( this.getRenderStyle() );  // convert the Object (map) returned by getRenderStyle() into a CSS string
+			delete this.style;  // no longer needed
+			
+			// If there is a `renderTpl`, execute it now. This will be used to populate the inner HTML of the element
+			var renderTpl = this.renderTpl,
+			    renderTplMarkup = "";
+			if( renderTpl ) {
+				renderTpl = ( renderTpl instanceof Template ) ? renderTpl : new LoDashTpl( renderTpl );  // normalize renderTpl to a Template instance if it is not one already
+				renderTplMarkup = renderTpl.apply( this.getRenderTplData() );
+				
+				delete this.renderTpl;      // no longer needed
+				delete this.renderTplData;  // no longer needed
+			}
+			
+			// Create the main (outermost) element for the Component. By default, creates a div element, such as: <div id="someId"></div>
+			// With a `renderTpl`, it will create the div with its `renderTpl` result as its inner HTML. Ex:
+			// <div id="someId"><div id="bodyEl" /></div>
+			var elType = this.elType;
+			return [
+				'<', elType, ' id="', this.elId, '" class="', cls, '" style="', style, '" ', attr, '>',
+					renderTplMarkup,
+				'</', elType, '>'
+			].join( "" );
 		},
 		
 		
@@ -1130,6 +1117,43 @@ define( [
 			if( maxHeight !== undef ) style.maxHeight = normalizeSizeValue( maxHeight );
 			
 			return style;
+		},
+		
+		
+		/**
+		 * Attaches the configured "content" of the Component to its {@link #getContentTarget content target} element.
+		 * 
+		 * This content includes either the {@link #tpl}, or the {@link #html}/{@link #contentEl} configs.
+		 * 
+		 * @protected
+		 * @param {jQuery} $contentTarget The content target element, of which to attach the content's HTML elements to.
+		 */
+		attachContent : function( $contentTarget ) {
+			// Make sure the `tpl` has been created into a LoDashTpl instance, not only for the initial rendering,
+			// but also for when calling `update()` with a data object.
+			if( this.tpl && !( this.tpl instanceof Template ) ) {
+				this.tpl = new LoDashTpl( this.tpl );
+			}
+			
+			// Attach the output of the `tpl` config (if provided) or any specified HTML or content element to the Component's content 
+			// target. The content target is by default, the Component's element, but may be overridden by subclasses that generate a 
+			// more complex HTML structure.
+			if( this.tpl && !this.updateCalledWithContent ) {  // tpl config takes precedence over html/contentEl configs, *unless* update() has been called with HTML content
+				var tplData = _.assign( {}, this.getDefaultTplData(), this.tplData );
+				$contentTarget.append( this.tpl.apply( tplData ) );
+				
+			} else {
+				if( this.html ) {
+					$contentTarget.append( this.html );
+				}
+				if( this.contentEl ) {
+					$contentTarget.append( this.contentEl );
+				}
+			}
+			delete this.tplData;                  // no longer needed
+			delete this.updateCalledWithContent;  // no longer needed
+			delete this.html;                     // no longer needed
+			delete this.contentEl;                // no longer needed
 		},
 		
 		
