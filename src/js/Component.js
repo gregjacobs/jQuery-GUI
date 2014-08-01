@@ -7,7 +7,7 @@ define( [
 	
 	'gui/Gui',
 	'gui/ComponentManager',
-	'gui/ComponentDomDelegateHandler',  // must be included in order to initialize it
+	'gui/component/DomDelegateHandler',  // must be included in order to initialize it
 	'gui/util/Css',
 	'gui/util/Html',
 	'gui/Mask',
@@ -150,7 +150,7 @@ define( [
 	 * 4) Injected HTML at any point via direct DOM manipulation by a method of the Component.
 	 * 
 	 * For a full list of the event names that can be subscribed to in this fashion, see the
-	 * {@link gui.ComponentDomDelegateHandler} class.
+	 * {@link gui.component.DomDelegateHandler} class.
 	 * 
 	 * Example:
 	 * 
@@ -987,7 +987,7 @@ define( [
 				var elId = this.elId;
 				
 				// First, register the Component with the ComponentManager by its `elId`. This is to allow support code
-				// (such as the gui.ComponentDomDelegateHandler) to back-reference a Component instance by its element ID.
+				// (such as the gui.component.DomDelegateHandler) to back-reference a Component instance by its element ID.
 				ComponentManager.registerComponentEl( elId, this );
 				
 				// Create the Component's element

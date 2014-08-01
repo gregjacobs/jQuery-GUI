@@ -154,7 +154,7 @@ define( function() {
 		/**
 		 * Retrieves a {@link gui.Component Component} instance by its {@link gui.Component#elId element ID}.
 		 * 
-		 * Note: This is used internally by the library (namely the {@link gui.ComponentDomDelegateHandler} class), 
+		 * Note: This is used internally by the library (namely the {@link gui.component.DomDelegateHandler} class), 
 		 * and shouldn't be called directly from code except for debugging purposes. Code that reverse-references a
 		 * Component instance from an HTML element instead of simply being passed the Component reference will most
 		 * likely be very difficult to understand, and maintain.

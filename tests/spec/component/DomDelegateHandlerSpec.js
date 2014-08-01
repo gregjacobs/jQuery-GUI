@@ -3,13 +3,13 @@ define( [
 	'jquery',
 	'lodash',
 	
-	'gui/ComponentDomDelegateHandler',
+	'gui/component/DomDelegateHandler',
 	
 	'gui/Component',
 	'gui/Container'
 ], function( jQuery, _, ComponentDomDelegateHandler, Component, Container ) {
 	
-	describe( 'gui.ComponentDomDelegateHandler', function() {
+	describe( 'gui.component.DomDelegateHandler', function() {
 		var component,
 		    container;
 		

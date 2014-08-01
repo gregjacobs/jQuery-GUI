@@ -9,7 +9,7 @@ define( [
 ], function( jQuery, _, Class, ComponentManager ) {
 
 	/**
-	 * @class gui.ComponentDomDelegateHandler
+	 * @class gui.component.DomDelegateHandler
 	 * @singleton
 	 * 
 	 * The ComponentDomDelegateHandler class supports the special jQuery-GUI DOM event attributes that may be placed within 
