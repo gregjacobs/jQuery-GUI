@@ -156,6 +156,34 @@ function( Css ) {
 			
 		} );
 		
+	
+		describe( 'stringToMap()', function() {
+			
+			it( "should return an empty map (Object) when providing an empty string", function() {
+				expect( Css.stringToMap( "" ) ).toEqual( {} );
+			} );
+			
+		
+			it( "should convert a single property/value to a single-element map (Object)", function() {
+				var propsStr = "color:red;";
+				
+				expect( Css.stringToMap( propsStr ) ).toEqual( {
+					'color' : 'red'
+				} );
+			} );
+			
+		
+			it( "should convert a string of property/value pairs to a multiple-element map (Object)", function() {
+				var propsStr = "color:red;font-size:12px;";
+				
+				expect( Css.stringToMap( propsStr ) ).toEqual( {
+					'color'     : 'red',
+					'font-size' : '12px'
+				} );
+			} );
+			
+		} );
+		
 		
 		describe( 'normalizeSizeValue()', function() {
 			

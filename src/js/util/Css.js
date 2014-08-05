@@ -137,6 +137,31 @@ function( jQuery, _, Gui ) {
 		
 		
 		/**
+		 * Given a string of CSS property/value pairs, will return a map (Object) of the properties/values.
+		 * 
+		 * Ex:
+		 *     
+		 *     Css.stringToMap( "color:red;font-size:12px;" );  
+		 *     // returns: { "color": "red", "font-size": "12px" }
+		 *     
+		 * @param {String} propsStr A string of the CSS property/value pairs. Ex: "color:red;font-size:12px;"
+		 * @return {Object} The CSS properties in a key/value map (Object).
+		 */
+		stringToMap : function( propsStr ) {
+			var map = {},
+			    re = /(.*?):(.*)/;
+			
+			_.forEach( propsStr.split( ';' ), function( propStr ) {
+				if( !propStr ) return;  // to ignore a trailing ';' from having created another element in the split propsStr array
+				
+				var keyValPair = propStr.match( re );
+				map[ keyValPair[ 1 ] ] = keyValPair[ 2 ];
+			} );
+			return map;
+		},
+		
+		
+		/**
 		 * Updates the given &lt;style&gt; element(s) with new CSS text. Handles the special case for IE.
 		 * 
 		 * @param {String/HTMLElement/jQuery} styleEl A selector, reference to an HTMLElement, or jQuery wrapped
