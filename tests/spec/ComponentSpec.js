@@ -1077,10 +1077,7 @@ function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container )
 		} );
 		
 		
-		/*
-		 * Test setStyle()
-		 */
-		describe( "Test setStyle()", function() {
+		describe( 'setStyle()', function() {
 			
 			it( "setStyle() should add a style property when unrendered", function() {
 				var cmp = new Component();
@@ -1183,23 +1180,49 @@ function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container )
 		
 		// -------------------------------------
 		
+
+		describe( 'getElId()', function() {
+			var cmp;
+			
+			beforeEach( function() {
+				cmp = new Component();
+			} );
+			
+			afterEach( function() {
+				cmp.destroy();  // clean up
+			} );
+			
+			
+			it( "should return the same element ID before and after the Component has been rendered", function() {
+				var preRenderElId = cmp.getElId();
+				expect( preRenderElId ).toMatch( /^gui-cmp-\d+$/ );
+				
+				cmp.render( 'body' );
+				expect( cmp.getElId() ).toBe( preRenderElId );
+			} ); 
+			
+		} );
+		
+		
+		// -------------------------------------
+		
 		
 		/*
 		 * Test setSize()
 		 */
-		describe( "Test setSize()", function() {
+		describe( 'setSize()', function() {
+			var cmp;
 			
 			beforeEach( function() {
-				this.cmp = new Component();
+				cmp = new Component();
 			} );
 			
 			afterEach( function() {
-				this.cmp.destroy();  // clean up
+				cmp.destroy();  // clean up
 			} );
 			
 			
 			it( "setSize() should set the width and height of the Component in an unrendered state", function() {
-				var cmp = this.cmp;
 				cmp.setSize( 10, 20 );
 				
 				expect( cmp.getConfiguredWidth() ).toBe( 10 );  // The width should have been set
@@ -1207,8 +1230,6 @@ function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container )
 			} );
 			
 			it( "setSize() should set the width and height of the Component in a rendered state", function() {
-				var cmp = this.cmp;
-				
 				cmp.render( 'body' );
 				cmp.setStyle( 'position', 'absolute' );
 				cmp.setSize( 10, 20 );
@@ -1219,7 +1240,6 @@ function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container )
 			
 			
 			it( "setSize() should set the width only if that is the only argument provided to the method", function() {
-				var cmp = this.cmp;
 				cmp.setSize( 10, 20 );  // initial
 				
 				expect( cmp.getConfiguredWidth() ).toBe( 10 );  // Initial condition: The width should have been set
@@ -1232,7 +1252,6 @@ function( jQuery, _, ComponentManager, Animation, Plugin, Component, Container )
 			} );
 			
 			it( "setSize() should set the height only if that is the only argument provided to the method", function() {
-				var cmp = this.cmp;
 				cmp.setSize( 10, 20 );  // initial
 				
 				expect( cmp.getConfiguredWidth() ).toBe( 10 );  // Initial condition: The width should have been set

@@ -8,6 +8,7 @@ define( [
 	'gui/Gui',
 	'gui/ComponentManager',
 	'gui/component/DomDelegateHandler',  // must be included in order to initialize it
+	'gui/component/Renderer',
 	'gui/util/Css',
 	'gui/util/Html',
 	'gui/Mask',
@@ -24,6 +25,7 @@ define( [
 	Gui,
 	ComponentManager,
 	ComponentDomDelegateHandler,
+	ComponentRenderer,
 	Css,
 	Html,
 	Mask,
@@ -943,6 +945,8 @@ define( [
 				return;
 			}
 			
+			var $containerEl = jQuery( containerEl );
+			
 			// Maintain backward compatibility where the `options` argument was the `position` option
 			var position;
 			if( _.isNumber( options ) || _.isString( options ) || _.isElement( options ) || options instanceof jQuery ) {
@@ -952,9 +956,6 @@ define( [
 				options = options || {};
 				position = options.position;
 			}
-			
-			
-			var $containerEl = jQuery( containerEl );
 			
 			// Normalize position to the element where the Component is to be placed before (if provided)
 			if( typeof position !== 'undefined' ) {
@@ -984,43 +985,8 @@ define( [
 				
 			} else {
 				// Component not yet rendered, render it now
-				var elId = this.elId;
-				
-				// First, register the Component with the ComponentManager by its `elId`. This is to allow support code
-				// (such as the gui.component.DomDelegateHandler) to back-reference a Component instance by its element ID.
-				ComponentManager.registerComponentEl( elId, this );
-				
-				// Create the Component's element
-				var $el = this.$el = jQuery( this.generateComponentMarkup() );
-				
-				// Appending the element to the container before the call to onRender. It is necessary to do things in this order (and not rendering children and then appending)
-				// for things like the jQuery UI tabs, which requires that their wrapping elements be attached to the DOM when they are instantiated.
-				// Otherwise, those items require their instantiation to be placed into a setTimeout(), which causes a flicker on the screen (especially for the jQuery UI tabs). 
-				if( position ) {
-					$el.insertBefore( position );
-				} else {
-					$el.appendTo( $containerEl );
-				}
-				
-				// Setting the render flag before the call to onRender so that onRender implementations can call methods that check this flag (such as setters
-				// that handle the case of the Component not yet being rendered).
-				this.rendered = true;
-				
-				// Call onRender hook method for subclasses to add their own elements, and whatever else they need 
-				this.onRender( $containerEl, options );
-				
-				// Attach any configured content to the Component's contentTarget
-				this.attachContent( this.getContentTarget() );
-				
-				// Call the onAfterRender hook method, and fire the 'render' event
-				this.onAfterRender( $containerEl, options );
-				this.fireEvent( 'render', this );
-				
-				// Finally, if the deferLayout option was not provided as true, run the layout on the Component (or Container, 
-				// if it's a gui.Container subclass!)
-				if( !options.deferLayout ) {
-					this.doLayout();
-				}
+				var renderer = new ComponentRenderer( { component: this, $containerEl: $containerEl, position: position, options: options } );
+				renderer.execute();
 			}
 		},
 		
@@ -1219,6 +1185,20 @@ define( [
 		 * @param {Object} options The options provided to {@link #method-render}.
 		 */
 		onAfterRender : Gui.emptyFn,
+		
+		
+		/**
+		 * Called by a {@link gui.component.Renderer ComponentRenderer}, this method marks the Component as having been 
+		 * completely rendered.
+		 * 
+		 * @protected
+		 */
+		setRenderComplete : function() {
+			this.fireEvent( 'render', this );			
+		},
+		
+		
+		// -----------------------------------
 		
 		
 		/**
@@ -1487,6 +1467,16 @@ define( [
 		 */
 		getId : function() {
 			return this.id;
+		},
+		
+		
+		/**
+		 * Returns the {@link #elId} of the Component.
+		 * 
+		 * @return {String}
+		 */
+		getElId : function() {
+			return this.elId;
 		},
 		
 		
