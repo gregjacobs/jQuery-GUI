@@ -521,7 +521,7 @@ define('gui/ComponentDomDelegateHandler', [
 			this.onEventScopedFn = _.bind( this.onEvent, this );  // bound function for use in init() and destroy()
 			
 			jQuery( document ).ready( _.bind( this.init, this ) );
-			jQuery( window ).on( 'beforeunload', _.bind( this.destroy, this ) );
+			jQuery( window ).on( 'unload', _.bind( this.destroy, this ) );  // note: not using beforeunload, because IE8 fires this event before a new window is opened using window.open()
 		},
 		
 		
